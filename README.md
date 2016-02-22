@@ -1,26 +1,12 @@
 # Dotfiles
+ ---- hacker1db Modified dot files!  
+    
+    These dot files are from @nicknisi 
 
-Welcome to my world. This is a collection of vim, tmux, and zsh configurations. Interested in a video walkthrough of the dotfiles? Check out my talk, [vim + tmux](https://www.youtube.com/watch?v=5r6yzFEXajQ).
 
-## Contents
 
-+ [Initial Setup and Installation](#initial-setup-and-installation)
-+ [ZSH Setup](#zsh-setup)
-+ [Vim and Neovim Setup](#vim-and-neovim-setup)
-+ [Fonts](#fonts)
-+ [Tmux](#tmux-configuration)
 
-## Initial Setup and Installation
 
-If on OSX, you will need to install the XCode CLI tools before continuing. To do so, open a terminal and type
-
-```bash
-xcode-select --install
-```
-
-Then, clone the dotfiles repository to your computer. This can be placed anywhere, and symbolic links will be created to reference it from your home directory.
-
-```bash
 git clone https://github.com/nicknisi/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./install.sh
@@ -40,33 +26,15 @@ ZSH is configured in the `zshrc.symlink` file, which will be symlinked to the ho
 * Recursively search the `$DOTFILES/zsh` directory for files ending in .zsh and source them
 * source a `~/.localrc` if it exists so that additional configurations can be made that won't be kept track of in this dotfiles repo. This is good for things like API keys, etc.
 * Add the `~/bin` and `$DOTFILES/bin` directories to the path
-* Setup NVM, RVM, and hub if they exist
-* Set the base16 colorscheme to use for both the terminal (iTerm2) and vim/neovim by exporting the `$THEME` and `$BACKGROUND` environment variables
-* And more...
 
-### Prompt
 
-The prompt is meant to be simple while still providing a lot of information to the user, particularly about the status of the git project, if the PWD is a git project. This prompt sets `precmd`, `PROMPT` and `RPROMPT`.
 
-![](http://nicknisi.com/share/prompt.png)
 
-The `precmd` shows the current working directory in it and the `RPROMPT` shows the git and suspended jobs info.
 
-#### Prompt Git Info
 
-The git info shown on the `RPROMPT` displays the current branch name, and whether it is clean or dirty.
 
-![](http://nicknisi.com/share/git-branch-state.png)
 
-Additionally, there are ⇣ and ⇡ arrows that indicate whether a commit has happened and needs to be pushed (⇡), and whether commits have happened on the remote branch that need to be pulled (⇣).
 
-![](http://nicknisi.com/share/git-arrows.png)
-
-#### Suspended Jobs
-
-The prompt will also display a ✱ character in the `RPROMPT` indicating that there is a suspended job that exists in the background. This is helpful in keeping track of putting vim in the background by pressing CTRL-Z.
-
-![](http://nicknisi.com/share/suspended-jobs.png)
 
 ## Vim and Neovim Setup
 
@@ -91,12 +59,4 @@ vim and neovim should just work once the correct plugins are installed. To insta
 nvim +PlugInstall
 ```
 
-## Fonts
 
-I am currently using [Hack](http://sourcefoundry.org/hack/) as my default font, which does include Powerline support, so you don't need an additional patched font. In addition to this, I do have [nerd-fonts](https://github.com/ryanoasis/nerd-fonts) installed and configured to be used for non-ascii characters. If you would prefer not to do this, then simply remove the `Plug 'ryanoasis/vim-devicons'` plugin from vim/nvim. Then, I configure the fonts in this way in iTerm2:
-
-![](http://nicknisi.com/share/iterm-fonts-config.png)
-
-## Tmux Configuration
-
-*TODO: Documentation coming soon.*
