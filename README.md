@@ -2,8 +2,13 @@
  ---- hacker1db Modified dot files!  
     
     These dot files are from @nicknisi 
+Copy and paste the following to Install my modified dotfiles I use solarzied Theme personally its easier on the eyes if you dont like it you can switch it 
+or type light in terminal to change it to a light version of solarized but it will switch it back in when you run 
+tmux I am working on trying to fix it but it will take time! 
 
 
+And most of all enjoy 
+and share your thoughts and what works for me wont always work for you but smile and enjoy anyway! 
 
 
 
@@ -57,7 +62,7 @@ Inside of [`.zshrc`](zsh/zshrc.symlink), the `EDITOR` shell variable is set to `
 vim and neovim should just work once the correct plugins are installed. To install the plugins, you will need to open Neovim in the following way:
 
 ```bash
-
+         Run the following in a terminal to install neovim and vim plugins 
     nvim +PlugInstall
 
 
