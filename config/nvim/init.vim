@@ -37,7 +37,8 @@ Plug 'junegunn/limelight.vim', { 'on': 'Limelight' } " focus tool. Good for pres
 Plug 'xolox/vim-notes' "Note taking for vim 
 Plug 'xolox/vim-misc' "part of the note taking for vim
 Plug 'tmhedberg/SimpylFold' "Aid for Folding in code
-Plug 'nvie/vim-flake8' "Python Code Checker  
+Plug 'nvie/vim-flake8' "Python Code Checker 
+Plug 'airblade/vim-gitgutter'
 
 
 " language-specific plugins
@@ -473,6 +474,9 @@ nnoremap <silent> <leader>u :call HtmlUnEscape()<cr>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"vim gutter plugin 
+let g:gitgutter_max_signs = 500  " default value
+
 "Notes in Vim 
 let g:notes_directories = ['~/Documents/Notes', ]
 
