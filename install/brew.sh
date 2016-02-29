@@ -26,9 +26,9 @@ brew install zsh
 brew install highlight
 brew install nvm
 brew install z
-brew install markdown
-
+brew install earkdown
+brew install node
 # install neovim
-brew install neovim/neovim/neovim
+brew install --HEAD  neovim/neovim/neovim
 
 exit 0

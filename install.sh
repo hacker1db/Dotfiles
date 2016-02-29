@@ -29,6 +29,9 @@ fi
 
 echo "creating vim directories"
 mkdir -p ~/.vim-tmp
+mkdir -p ~/Documents/Sites
+mkdir -p ~/Documents/Notes
+
 
 
 echo "Configuring zsh as default shell"
