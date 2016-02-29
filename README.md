@@ -1,6 +1,7 @@
 # Dotfiles
  ---- hacker1db Modified dot files!  
-    
+
+#DISCLAIMER THIS Edits Branch is for upcoming changes or changes that may have bugs! ' you have been warned'
     These dot files are from @nicknisi 
 Copy and paste the following to Install my modified dotfiles I use solarzied Theme personally its easier on the eyes if you dont like it you can switch it 
 or type light in terminal to change it to a light version of solarized but it will switch it back in when you run 
