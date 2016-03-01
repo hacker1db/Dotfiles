@@ -536,10 +536,16 @@ let g:ctrlp_working_path_mode = 2
 
 
 " airline options
+"This line add's staus bar on top of nvim 
+let g:airline#extensions#tabline#enabled = 1 
+
+let g:arline_detect_crypt=1 
+let g:airline_left_sep='>'
 let g:airline_powerline_fonts=1
 let g:airline_left_sep=''
 let g:airline_right_sep=''
-let g:airline_theme='base16'
+" Change The Airline theme by = 'name of theme' I am using the bright theme its easier to see for me. 
+let g:airline_theme='base16_bright'
 
 " don't hide quotes in json files
 let g:vim_json_syntax_conceal = 0
