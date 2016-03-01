@@ -17,7 +17,7 @@ Plug 'tpope/vim-surround' " mappings to easily delete, change and add such surro
 Plug 'benmills/vimux' " tmux integration for vim
 Plug 'vim-airline/vim-airline' " fancy statusline
 Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
-" Plug 'scrooloose/syntastic' " syntax checking for vim
+Plug 'scrooloose/syntastic' " syntax checking for vim
 Plug 'benekastah/neomake' " neovim replacement for syntastic using neovim's job control functonality
 Plug 'tpope/vim-fugitive' " amazing git wrapper for vim
 Plug 'tpope/vim-repeat' " enables repeating other supported plugins with the . command
@@ -28,15 +28,18 @@ Plug 'tomtom/tlib_vim' " utility functions for vim
 Plug 'sotte/presenting.vim', { 'for': 'markdown' } " a simple tool for presenting slides in vim based on text files
 Plug 'ervandew/supertab' " Perform all your vim insert mode completions with Tab
 Plug 'tpope/vim-dispatch' " asynchronous build and test dispatcher
-" Plug 'mtth/scratch.vim'
-" Plug 'tpope/vim-vinegar'
-" Plug 'tpope/vim-abolish'
 Plug 'AndrewRadev/splitjoin.vim' " single/multi line code handler: gS - split one line into multiple, gJ - combine multiple lines into one
 Plug 'vim-scripts/matchit.zip' " extended % matching
 Plug 'tpope/vim-sleuth' " detect indent style (tabs vs. spaces)
 Plug 'sickill/vim-pasta' " context-aware pasting
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' } " distraction-free writing
 Plug 'junegunn/limelight.vim', { 'on': 'Limelight' } " focus tool. Good for presentating with vim
+Plug 'xolox/vim-notes' "Note taking for vim 
+Plug 'xolox/vim-misc' "part of the note taking for vim
+Plug 'tmhedberg/SimpylFold' "Aid for Folding in code
+Plug 'nvie/vim-flake8' "Python Code Checker 
+Plug 'airblade/vim-gitgutter'
+
 
 " language-specific plugins
 Plug 'mattn/emmet-vim', { 'for': 'html' } " emmet support for vim - easily create markdup wth CSS-like syntax
@@ -47,11 +50,7 @@ Plug 'moll/vim-node', { 'for': 'javascript' } " node support
 Plug 'jelera/vim-javascript-syntax', { 'for': 'javascript' } " JavaScript syntax plugin
 Plug 'mxw/vim-jsx', { 'for': 'jsx' } " JSX support
 Plug 'elzr/vim-json', { 'for': 'json' } " JSON support
-" Plug 'Quramy/tsuquyomi', { 'for': 'typescript', 'do': 'npm install' } " extended typescript support - works as a client for TSServer
 Plug 'Shougo/vimproc.vim', { 'do': 'make' } " interactive command execution in vim
-Plug 'leafgarland/typescript-vim', { 'for': 'typescript' } " typescript support
-" Plug 'juvenn/mustache.vim', { 'for': 'mustache' } " mustache support
-Plug 'mustache/vim-mustache-handlebars' " mustach support
 Plug 'digitaltoad/vim-jade', { 'for': 'jade' } " jade support
 Plug 'cakebaker/scss-syntax.vim', { 'for': 'scss' } " sass scss syntax support
 Plug 'wavded/vim-stylus', { 'for': ['stylus', 'markdown'] } " markdown support
@@ -60,8 +59,6 @@ Plug 'ap/vim-css-color', { 'for': ['css','stylus','scss'] } " set the background
 Plug 'hail2u/vim-css3-syntax', { 'for': 'css' } " CSS3 syntax support
 Plug 'itspriddle/vim-marked', { 'for': 'markdown', 'on': 'MarkedOpen' } " Open markdown files in Marked.app - mapped to <leader>m
 Plug 'tpope/vim-markdown', { 'for': 'markdown' } " markdown support
-Plug 'fatih/vim-go', { 'for': 'go' } " go support
-Plug 'timcharper/textile.vim', { 'for': 'textile' } " textile support
 Plug 'tclem/vim-arduino' " arduino support - compile wihtout needing to open the arduino IDE
 
 call plug#end()
@@ -157,10 +154,10 @@ if has('autocmd') && !exists('autocommands_loaded')
 endif
 
 " code folding settings
-set foldmethod=syntax " fold based on indent
 set foldnestmax=10 " deepest fold is 10 levels
-set nofoldenable " don't fold by default
 set foldlevel=1
+set foldmethod=indent
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => User Interface
@@ -333,6 +330,23 @@ nmap \s :set ts=4 sts=4 sw=4 et<cr>
 
 nmap <leader>w :setf textile<cr> :Goyo<cr>
 
+
+
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Django and Python set up 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Set if file type .py then excute below  
+autocmd FileType python set sw=4
+autocmd FileType python set ts=4
+autocmd FileType python set sts=4
+
+
+
+
+
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Functions
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -460,6 +474,18 @@ nnoremap <silent> <leader>u :call HtmlUnEscape()<cr>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"vim gutter plugin 
+let g:gitgutter_max_signs = 500  " default value
+
+"Notes in Vim 
+let g:notes_directories = ['~/Documents/Notes', ]
+
+"don't highlight single quoted strings.
+highlight link notesSingleQuoted Normal
+ 
+" Show double quoted strings in italic font.
+highlight notesDoubleQuoted gui=italic
+
 
 " close NERDTree after a file is opened
 let g:NERDTreeQuitOnOpen=0
@@ -510,10 +536,16 @@ let g:ctrlp_working_path_mode = 2
 
 
 " airline options
+"This line add's staus bar on top of nvim 
+let g:airline#extensions#tabline#enabled = 1 
+
+let g:arline_detect_crypt=1 
+let g:airline_left_sep='>'
 let g:airline_powerline_fonts=1
 let g:airline_left_sep=''
 let g:airline_right_sep=''
-let g:airline_theme='base16'
+" Change The Airline theme by = 'name of theme' I am using the bright theme its easier to see for me. 
+let g:airline_theme='base16_bright'
 
 " don't hide quotes in json files
 let g:vim_json_syntax_conceal = 0

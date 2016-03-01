@@ -50,10 +50,10 @@ if hash rbenv 2>/dev/null; then
     eval "$(rbenv init -)"
 fi
 
-if [[ -d ~/.rvm ]]; then
-    PATH=$HOME/.rvm/bin:$PATH # Add RVM to PATH for scripting
-    source ~/.rvm/scripts/rvm
-fi
+# if [[ -d ~/.rvm ]]; then
+#     PATH=$HOME/.rvm/bin:$PATH # Add RVM to PATH for scripting
+#     # source ~/.rvm/scripts/rvm
+# fi
 
 # alias git to hub
 if hash hub 2>/dev/null; then
@@ -74,7 +74,7 @@ fi
     export THEME="base16-solarized"
 # fi
 if [ -z "$BACKGROUND" ]; then
-    export BACKGROUND="dark"
+    export BACKGROUND="light"
 fi
 
 BASE16_SHELL="$DOTFILES/.config/base16-shell/$THEME.$BACKGROUND.sh"
