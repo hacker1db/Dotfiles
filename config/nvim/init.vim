@@ -38,11 +38,11 @@ Plug 'xolox/vim-notes' "Note taking for vim
 Plug 'xolox/vim-misc' "part of the note taking for vim
 Plug 'tmhedberg/SimpylFold' "Aid for Folding in code
 Plug 'nvie/vim-flake8' "Python Code Checker 
-Plug 'airblade/vim-gitgutter'
-
+Plug 'airblade/vim-gitgutter'" adds marks on the side bar telling you have changes in your repo wiht a marks. 
+plug 'gabrielelana/vim-markdown' "to help with Writing Markdown just helpful for documenation for Blogs :D 
 
 " language-specific plugins
-Plug 'mattn/emmet-vim', { 'for': 'html' } " emmet support for vim - easily create markdup wth CSS-like syntax
+Plug 'mattn/emmet-vim', { 'fr': 'html' } " emmet support for vim - easily create markdup wth CSS-like syntax
 Plug 'gregsexton/MatchTag', { 'for': 'html' } " match tags in html, similar to paren support
 Plug 'othree/html5.vim', { 'for': 'html' } " html5 support
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' } " JavaScript support
@@ -157,6 +157,7 @@ endif
 set foldnestmax=10 " deepest fold is 10 levels
 set foldlevel=1
 set foldmethod=indent
+set nofoldenable " don't fold by default
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -474,6 +475,9 @@ nnoremap <silent> <leader>u :call HtmlUnEscape()<cr>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Plugins
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+
 "vim gutter plugin 
 let g:gitgutter_max_signs = 500  " default value
 
@@ -537,7 +541,6 @@ let g:ctrlp_working_path_mode = 2
 
 " airline options
 "This line add's staus bar on top of nvim 
-let g:airline#extensions#tabline#enabled = 1 
 
 let g:arline_detect_crypt=1 
 let g:airline_left_sep='>'
