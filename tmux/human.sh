@@ -33,6 +33,7 @@ set -g window-status-format "#I #W"
 # active window title colors
 set-window-option -g  window-status-current-format "#[fg=$tm_color_background,bg=$tm_color_active]$tm_left_separator_black #[fg=colour0,bg=$tm_color_active,bold]#I #W #[bg=$tm_color_background,fg=$tm_color_active]$tm_left_separator_black "
 
+
 # pane border
 set-option -g pane-border-fg $tm_color_inactive
 set-option -g pane-active-border-fg $tm_color_active

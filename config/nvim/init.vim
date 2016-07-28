@@ -39,7 +39,6 @@ Plug 'xolox/vim-misc' "part of the note taking for vim
 Plug 'tmhedberg/SimpylFold' "Aid for Folding in code
 Plug 'nvie/vim-flake8' "Python Code Checker 
 Plug 'airblade/vim-gitgutter'" adds marks on the side bar telling you have changes in your repo wiht a marks. 
-plug 'gabrielelana/vim-markdown' "to help with Writing Markdown just helpful for documenation for Blogs :D 
 
 " language-specific plugins
 Plug 'mattn/emmet-vim', { 'fr': 'html' } " emmet support for vim - easily create markdup wth CSS-like syntax
