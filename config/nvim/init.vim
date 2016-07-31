@@ -199,8 +199,8 @@ syntax on
 set encoding=utf8
 let base16colorspace=256  " Access colors present in 256 colorspace"
 set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
-execute "set background=".$BACKGROUND
-execute "colorscheme ".$THEME
+"execute "set background=".$BACKGROUND
+"execute "colorscheme ".$THEME
 
 " set number " show line numbers
 " set relativenumber " show relative line numbers
@@ -558,7 +558,7 @@ let g:SuperTabCrMapping = 0
 if (has("gui_running"))
     set guioptions=egmrt
     set background=light
-    colorscheme solarized
+    colorscheme base16-solarized-light
     let g:airline_left_sep=''
     let g:airline_right_sep=''
     let g:airline_powerline_fonts=0
