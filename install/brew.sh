@@ -11,6 +11,10 @@ echo "Installing homebrew packages..."
 brew install ack
 brew install tree
 brew install wget
+#tools for chef dev
+brew install packer
+brew cask install virtualbox
+brew cask install vagrant
 
 # development server setup
 brew install nginx
