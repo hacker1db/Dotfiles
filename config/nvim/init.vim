@@ -1,8 +1,10 @@
+
+" @hacker1db Vimrc File and Neovim 
+" I have known issue with the Base16 colorscheme I am still working on fixing it :D
+
 call plug#begin('~/.config/nvim/plugged')
-
-" colorschemes
-Plug 'chriskempson/base16-vim'
-
+" colorscheme
+Plug 'dracula/vim'
 
 " utilities
 Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
@@ -34,11 +36,11 @@ Plug 'tpope/vim-sleuth' " detect indent style (tabs vs. spaces)
 Plug 'sickill/vim-pasta' " context-aware pasting
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' } " distraction-free writing
 Plug 'junegunn/limelight.vim', { 'on': 'Limelight' } " focus tool. Good for presentating with vim
-Plug 'xolox/vim-notes' "Note taking for vim 
+Plug 'xolox/vim-notes' "Note taking for vim
 Plug 'xolox/vim-misc' "part of the note taking for vim
 Plug 'tmhedberg/SimpylFold' "Aid for Folding in code
-Plug 'nvie/vim-flake8' "Python Code Checker 
-Plug 'airblade/vim-gitgutter'" adds marks on the side bar telling you have changes in your repo wiht a marks. 
+Plug 'nvie/vim-flake8' "Python Code Checker
+Plug 'airblade/vim-gitgutter'" adds marks on the side bar telling you have changes in your repo wiht a marks.
 
 " language-specific plugins
 Plug 'mattn/emmet-vim', { 'fr': 'html' } " emmet support for vim - easily create markdup wth CSS-like syntax
@@ -199,8 +201,14 @@ syntax on
 set encoding=utf8
 let base16colorspace=256  " Access colors present in 256 colorspace"
 set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
-"execute "set background=".$BACKGROUND
+
+
+"Colors changes 
+execute "set background=".$BACKGROUND
+colorscheme dracula
 "execute "colorscheme ".$THEME
+highlight Comment cterm=italic
+highlight htmlArg cterm=italic
 
 " set number " show line numbers
 " set relativenumber " show relative line numbers
@@ -335,9 +343,9 @@ nmap <leader>w :setf textile<cr> :Goyo<cr>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" => Django and Python set up 
+" => Django and Python set up
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Set if file type .py then excute below  
+" Set if file type .py then excute below
 autocmd FileType python set sw=4
 autocmd FileType python set ts=4
 autocmd FileType python set sts=4
@@ -477,15 +485,15 @@ nnoremap <silent> <leader>u :call HtmlUnEscape()<cr>
 
 
 
-"vim gutter plugin 
+"vim gutter plugin
 let g:gitgutter_max_signs = 500  " default value
 
-"Notes in Vim 
+"Notes in Vim
 let g:notes_directories = ['~/Documents/Notes', ]
 
 "don't highlight single quoted strings.
 highlight link notesSingleQuoted Normal
- 
+
 " Show double quoted strings in italic font.
 highlight notesDoubleQuoted gui=italic
 
@@ -539,14 +547,14 @@ let g:ctrlp_working_path_mode = 2
 
 
 " airline options
-"This line add's staus bar on top of nvim 
+"This line add's staus bar on top of nvim
 
-let g:arline_detect_crypt=1 
+let g:arline_detect_crypt=1
 let g:airline_left_sep='>'
 let g:airline_powerline_fonts=1
 let g:airline_left_sep=''
 let g:airline_right_sep=''
-" Change The Airline theme by = 'name of theme' I am using the bright theme its easier to see for me. 
+" Change The Airline theme by = 'name of theme' I am using the bright theme its easier to see for me.
 let g:airline_theme='base16_bright'
 
 " don't hide quotes in json files
@@ -555,14 +563,16 @@ let g:vim_json_syntax_conceal = 0
 
 let g:SuperTabCrMapping = 0
 
+
+
 if (has("gui_running"))
     set guioptions=egmrt
     set background=light
-    colorscheme base16-solarized-light
+    colorscheme base16-solarized 
     let g:airline_left_sep=''
     let g:airline_right_sep=''
     let g:airline_powerline_fonts=0
-    let g:airline_theme='solarized'
+    let g:airline_theme='solarized-dark'
 endif
 
 call ApplyLocalSettings(expand('.'))
