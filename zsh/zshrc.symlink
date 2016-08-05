@@ -69,30 +69,14 @@ if hash brew 2>/dev/null; then
 fi
 
 
-
-
-
-
-
-
 # Base16 Shell
-if [ "$BACKGROUND" = "light" ]; then
-     export THEME="base16-solarized-light"
-     BACKGROUND=""
-else
-     export THEME="base16-solarized-dark"
-
-
+# if [ -z "$THEME" ]; then
+    export THEME="base16-solarized"
+# fi
+if [ -z "$BACKGROUND" ]; then
+    export BACKGROUND="dark"
 fi
 
-
-# Base16 Shell
-BASE16_SHELL="$DOTFILES/.config/base16-shell/scripts/$THEME.sh"
+BASE16_SHELL="$DOTFILES/.config/base16-shell/$THEME.$BACKGROUND.sh"
 # [[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 source $BASE16_SHELL
-
-
-
-
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

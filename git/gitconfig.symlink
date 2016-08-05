@@ -1,7 +1,9 @@
+
 # gitconfig
 [user]
-    name = Nick Nisi
-    email = nick@nisi.org
+    name = hacker1db
+    email = hacker1db@outlook.com
+  # @hacker1db on twitter :D
 [github]
     user = nicknisi
 [init]

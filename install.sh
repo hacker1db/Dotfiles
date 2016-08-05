@@ -29,8 +29,10 @@ fi
 
 echo "creating vim directories"
 mkdir -p ~/.vim-tmp
-echo "Creating Sites and Notes directories" 
-mkdir -p ~/Documents/Sites
+echo "Creating Sites, Code, Chef, Notes directories! :D Its the little things!" 
+mkdir -p ~/Documents/Code
+mkdir -p ~/Documents/Code/Sites
+mkdir -p ~/Documents/Code/Chef_Projects
 mkdir -p ~/Documents/Notes
 
 

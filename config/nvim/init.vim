@@ -1,11 +1,11 @@
 
-" @hacker1db Vimrc File and Neovim 
-" I have known issue with the Base16 colorscheme I am still working on fixing it :D
+" @hacker1db Vimrc File and Neovim
+
 
 call plug#begin('~/.config/nvim/plugged')
 " colorscheme
 Plug 'dracula/vim'
-
+Plug 'chriskempson/base16-vim' 
 " utilities
 Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin' | Plug 'ryanoasis/vim-devicons' " file drawer
@@ -203,12 +203,10 @@ let base16colorspace=256  " Access colors present in 256 colorspace"
 set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
 
 
-"Colors changes 
+"Colors changes
 execute "set background=".$BACKGROUND
 colorscheme dracula
 "execute "colorscheme ".$THEME
-highlight Comment cterm=italic
-highlight htmlArg cterm=italic
 
 " set number " show line numbers
 " set relativenumber " show relative line numbers
@@ -568,7 +566,7 @@ let g:SuperTabCrMapping = 0
 if (has("gui_running"))
     set guioptions=egmrt
     set background=light
-    colorscheme base16-solarized 
+    colorscheme base16-solarized
     let g:airline_left_sep=''
     let g:airline_right_sep=''
     let g:airline_powerline_fonts=0
