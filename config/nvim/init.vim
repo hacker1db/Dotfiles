@@ -5,7 +5,7 @@
 call plug#begin('~/.config/nvim/plugged')
 " colorscheme
 Plug 'dracula/vim'
-Plug 'chriskempson/base16-vim' 
+Plug 'chriskempson/base16-vim'
 " utilities
 Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin' | Plug 'ryanoasis/vim-devicons' " file drawer
@@ -205,7 +205,6 @@ set t_Co=256 " Explicitly tell vim that the terminal supports 256 colors"
 
 "Colors changes
 execute "set background=".$BACKGROUND
-colorscheme dracula
 "execute "colorscheme ".$THEME
 
 " set number " show line numbers
@@ -553,7 +552,6 @@ let g:airline_powerline_fonts=1
 let g:airline_left_sep=''
 let g:airline_right_sep=''
 " Change The Airline theme by = 'name of theme' I am using the bright theme its easier to see for me.
-let g:airline_theme='base16_bright'
 
 " don't hide quotes in json files
 let g:vim_json_syntax_conceal = 0
