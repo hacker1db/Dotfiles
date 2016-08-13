@@ -8,6 +8,7 @@ fi
 echo "Installing homebrew packages..."
 
 # cli tools
+brew tap caskroom/cask
 brew install ack
 brew install tree
 brew install wget
@@ -16,6 +17,7 @@ brew install packer
 brew cask install virtualbox
 brew cask install vagrant
 brew cask install vagrant-manager
+vagrant plugin install vagrant-cachier
 brew cask install chefdk
 
 
@@ -44,8 +46,8 @@ brew install zsh-autosuggestions
 # Desktop apps
 brew cask install skype
 # Browser :D
-# I need those tunes
-brew cask install google-chrome
+# I need those eunes
+brew cask install firefox
 brew cask install spotify
 brew cask install slack
 

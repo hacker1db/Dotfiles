@@ -67,12 +67,12 @@ fi
 
 # Base16 Shell
  if [ -z "$THEME" ]; then
-    export THEME="base16-solarized"
- fi
-if [ -z "$BACKGROUND" ]; then
-    export BACKGROUND="dark"
-fi
+    export THEME="DRACULA_THEME"
+  fi
+# if [ -z "$BACKGROUND" ]; then
+ #    export BACKGROUND="dark"
+# fi
 
-BASE16_SHELL="$DOTFILES/.config/base16-shell/$THEME.$BACKGROUND.sh"
- [[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
-source $BASE16_SHELL
+# BASE16_SHELL="$DOTFILES/.config/base16-shell/$THEME.$BACKGROUND.sh"
+ # [[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
+# source $BASE16_SHELL
