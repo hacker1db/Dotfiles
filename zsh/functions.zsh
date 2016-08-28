@@ -108,8 +108,6 @@ function extract() {
     fi
 }
 
-
-
 # syntax highlight the contents of a file or the clipboard and place the result on the clipboard
 function hl() {
     if [ -z "$3" ]; then
@@ -125,13 +123,4 @@ function hl() {
     fi
 
     echo $src | highlight -O rtf --syntax $1 --font Inconsoloata --style $style --line-number --font-size 24 | pbcopy
-}
-
-# set the background color to light
-function light() {
-    BACKGROUND="light" && reload! && unset $BACKGROUND
-}
-
-function dark() {
-    reload!
 }
