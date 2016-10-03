@@ -80,13 +80,9 @@ bind -r J resize-pane -D 10
 bind -r K resize-pane -U 10
 bind -r L resize-pane -R 10
 
-# enable mouse support for switching panes/windows
-# Makes it easy to resieze panes with mouse and or move between splits #
-#  horay!!!
-set -g mode-mouse on
-set -g mouse-resize-pane on
-set -g mouse-select-pane on
-set -g mouse-select-window on
+# enable mouse support for switching panes/windows miuse support
+setw -g mouse on
+
 
 
 
