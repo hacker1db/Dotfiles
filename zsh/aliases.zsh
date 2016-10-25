@@ -21,6 +21,12 @@ alias la="ls -AF ${colorflag}"
 alias ll="ls -lFh ${colorflag}"
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
+# moving dir 
+
+alias chefc='cd ~/Documents/Code/Chef_Projects/; code .'
+# lets me cd to my chef projects directory and not run code app. 
+alias chefd='cd ~/Documents/Code/Chef_Projects/'
+
 
 # Helpers
 alias grep='grep --color=auto'
