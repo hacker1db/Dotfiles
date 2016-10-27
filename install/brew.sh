@@ -47,10 +47,8 @@ brew install zsh-autosuggestions
 
 # Browser :D
 # I need those tunes
-brew cask install firefox
 brew cask install spotify
 brew cask install slack
-brew cask install skype
 
 # install neovim
 brew install --HEAD  neovim/neovim/neovim
