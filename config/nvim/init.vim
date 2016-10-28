@@ -21,9 +21,24 @@ set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 
 " Section User Interface {{{
 
-syntax on                   " switch syntax highlighting on
+" switch cursor to line when in insert mode, and block when not
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 
-set t_Co=256                " Explicitly tell vim that the terminal supports 256 colors"
+if &term =~ '256color'
+    " disable background color erase
+    set t_ut=
+endif
+
+" enable 24 bit color support if supported
+if (empty($TMUX) && has("termguicolors"))
+    set termguicolors
+endif
+
+let g:dracula_termcolors=16
+let g:dracula_terminal_italics=1
+
+syntax on
+" set t_Co=256                " Explicitly tell vim that the terminal supports 256 colors"
 colorscheme dracula         " Set the colorscheme
 
 " make the highlighting of tabs and other non-text less annoying
@@ -118,7 +133,7 @@ endif
 let mapleader = ','
 
 " remap esc
-inoremap df <esc>
+inoremap jk <esc>
 
 " wipout buffer
 nmap <silent> <leader>b :bw<cr>
@@ -158,10 +173,18 @@ vmap <leader>] >gv
 nmap <leader>[ <<
 nmap <leader>] >>
 
-"move window funtion and key remaps
-"
+" switch between current and last buffer
+nmap <leader>. <c-^>
 
+" enable . command in visual mode
+vnoremap . :normal .<cr>
 
+map <silent> <C-h> :call functions#WinMove('h')<cr>
+map <silent> <C-j> :call functions#WinMove('j')<cr>
+map <silent> <C-k> :call functions#WinMove('k')<cr>
+map <silent> <C-l> :call functions#WinMove('l')<cr>
+
+map <leader>wc :wincmd q<cr>
 
 " toggle cursor line
 nnoremap <leader>i :set cursorline!<cr>
@@ -200,26 +223,14 @@ nnoremap <silent> <leader>u :call functions#HtmlUnEscape()<cr>
 augroup configgroup
     autocmd!
 
+    " automatically resize panes on resize
+    autocmd VimResized * exe 'normal! \<c-w>='
+    autocmd BufWritePost .vimrc,.vimrc.local,init.vim source %
+    autocmd BufWritePost .vimrc.local source %
+    " save all files on focus lost, ignoring warnings about untitled buffers
+    autocmd FocusLost * silent! wa
 
-
-" make quickfix on! WinMove(key) 
-let t:curwin = winnr()
-exec "wincmd ".a:key
-if (t:curwin == winnr()) "we havent moved
-if (match(a:key,'[jk]')) "were we going up/down
-    wincmd v
-else 
-    wincmd s
-endif
-    
-exec "wincmd ".a:key
-    endif
- endfunction
-
-map <leader>h              :call WinMove('h')<cr>
-map <leader>k              :call WinMove('k')<cr>
-map <leader>l              :call WinMove('l')<cr>
-map <leader>j              :call WinMove('j')<cr>indows take all the lower section of the screen
+    " make quickfix windows take all the lower section of the screen
     " when there are multiple windows open
     autocmd FileType qf wincmd J
 
@@ -240,6 +251,15 @@ augroup END
 " FZF
 """""""""""""""""""""""""""""""""""""
 
+" Toggle NERDTree
+nmap <silent> <leader>k :NERDTreeToggle<cr>
+" expand to the path of the file in the current buffer
+nmap <silent> <leader>y :NERDTreeFind<cr>
+
+let NERDTreeShowHidden=1
+let NERDTreeDirArrowExpandable = '▷'
+let NERDTreeDirArrowCollapsible = '▼'
+
 let g:fzf_layout = { 'down': '~25%' }
 
 if isdirectory(".git")
@@ -251,7 +271,7 @@ else
 endif
 
 nmap <silent> <leader>r :Buffers<cr>
-nmap <silent> <leader>e :GFiles?<cr>
+nmap <silent> <leader>e :FZF<cr>
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
 omap <leader><tab> <plug>(fzf-maps-o)
@@ -277,15 +297,6 @@ command! FZFMru call fzf#run({
 \  'options': '-m -x +s',
 \  'down':    '40%'})
 
-
-" show hidden files in NERDTree
-let NERDTreeShowHidden=1
-" remove some files by extension
-let NERDTreeIgnore = ['\.js.map$']
-" Toggle NERDTree
-nmap <silent> <leader>k :NERDTreeToggle<cr>
-" expand to the path of the file in the current buffer
-nmap <silent> <leader>y :NERDTreeFind<cr>
 
 " Fugitive Shortcuts
 """""""""""""""""""""""""""""""""""""
@@ -322,25 +333,13 @@ let g:airline#extensions#tabline#enabled = 1 " enable airline tabline
 let g:airline#extensions#tabline#tab_min_count = 2 " only show tabline if tabs are being used (more than 1 tab open)
 let g:airline#extensions#tabline#show_buffers = 0 " do not show open buffers in tabline
 let g:airline#extensions#tabline#show_splits = 0
+
+
 " don't hide quotes in json files
 let g:vim_json_syntax_conceal = 0
 
-
 let g:SuperTabCrMapping = 0
+
 " }}}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+" vim:foldmethod=marker:foldlevel=0
