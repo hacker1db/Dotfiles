@@ -12,7 +12,6 @@ alias gmv='git mv'
 alias grm='git rm'
 alias grn='git-rename'
 alias glog="git l"
-
 # alias git-amend='git commit --amend -C HEAD'
 alias git-undo='git reset --soft HEAD~1'
 alias git-count='git shortlog -sn'

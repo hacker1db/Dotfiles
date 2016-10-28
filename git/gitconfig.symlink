@@ -5,7 +5,7 @@
     email = hacker1db@outlook.com
   # @hacker1db on twitter :D
 [github]
-    user = nicknisi
+    user = hacker1db 
 [init]
     templatedir = ~/.dotfiles/git/templates
 [alias]
