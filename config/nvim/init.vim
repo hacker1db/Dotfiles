@@ -118,7 +118,7 @@ endif
 let mapleader = ','
 
 " remap esc
-inoremap jk <esc>
+inoremap df <esc>
 
 " wipout buffer
 nmap <silent> <leader>b :bw<cr>
@@ -158,18 +158,10 @@ vmap <leader>] >gv
 nmap <leader>[ <<
 nmap <leader>] >>
 
-" switch between current and last buffer
-nmap <leader>. <c-^>
+"move window funtion and key remaps
+"
 
-" enable . command in visual mode
-vnoremap . :normal .<cr>
 
-map <silent> <C-h> :call functions#WinMove('h')<cr>
-map <silent> <C-j> :call functions#WinMove('j')<cr>
-map <silent> <C-k> :call functions#WinMove('k')<cr>
-map <silent> <C-l> :call functions#WinMove('l')<cr>
-
-map <leader>wc :wincmd q<cr>
 
 " toggle cursor line
 nnoremap <leader>i :set cursorline!<cr>
@@ -208,14 +200,26 @@ nnoremap <silent> <leader>u :call functions#HtmlUnEscape()<cr>
 augroup configgroup
     autocmd!
 
-    " automatically resize panes on resize
-    autocmd VimResized * exe 'normal! \<c-w>='
-    autocmd BufWritePost .vimrc,.vimrc.local,init.vim source %
-    autocmd BufWritePost .vimrc.local source %
-    " save all files on focus lost, ignoring warnings about untitled buffers
-    autocmd FocusLost * silent! wa
 
-    " make quickfix windows take all the lower section of the screen
+
+" make quickfix on! WinMove(key) 
+let t:curwin = winnr()
+exec "wincmd ".a:key
+if (t:curwin == winnr()) "we havent moved
+if (match(a:key,'[jk]')) "were we going up/down
+    wincmd v
+else 
+    wincmd s
+endif
+    
+exec "wincmd ".a:key
+    endif
+ endfunction
+
+map <leader>h              :call WinMove('h')<cr>
+map <leader>k              :call WinMove('k')<cr>
+map <leader>l              :call WinMove('l')<cr>
+map <leader>j              :call WinMove('j')<cr>indows take all the lower section of the screen
     " when there are multiple windows open
     autocmd FileType qf wincmd J
 
