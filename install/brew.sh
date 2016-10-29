@@ -14,12 +14,9 @@ brew install tree
 brew install wget
 #tools for chef dev
 brew install packer
-brew cask install virtualbox
 brew cask install vagrant
-brew cask install vagrant-manager
 vagrant plugin install vagrant-cachier
 brew cask install chefdk
-
 
 # development server setup
 brew install nginx
