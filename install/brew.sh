@@ -54,6 +54,7 @@ brew cask install visual-studio-code
 brew cask install virtualbox
 brew cask install iterm2
 brew cask install microsoft-office
+brew cask install 1password
 
 echo "Installing neovim..."
 # install neovim
