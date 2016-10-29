@@ -43,13 +43,17 @@ brew install markdown
 brew install node
 brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
+brew install nmap 
+echo "Installing desktop application..."
 
-
-# Browser :D
-# I need those tunes
+brew cask install google-chrome
 brew cask install spotify
 brew cask install slack
+brew cask install vmware-fusion
+brew cask install visual-studio-code
+brew cask install virtualbox
 
+echo "Installing neovim..."
 # install neovim
 brew install --HEAD  neovim/neovim/neovim
 
