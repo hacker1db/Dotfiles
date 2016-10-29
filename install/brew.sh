@@ -52,6 +52,8 @@ brew cask install slack
 brew cask install vmware-fusion
 brew cask install visual-studio-code
 brew cask install virtualbox
+brew cask install iterm2
+brew cask install microsoft-office
 
 echo "Installing neovim..."
 # install neovim
