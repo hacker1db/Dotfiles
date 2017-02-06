@@ -7,8 +7,8 @@ setopt LOCAL_TRAPS
 setopt PROMPT_SUBST
 
 HISTFILE=~/.zsh_history
-HISTSIZE=10000
-SAVEHIST=10000
+HISTSIZE=10
+SAVEHIST=10
 
 # history
 setopt HIST_VERIFY
@@ -27,7 +27,6 @@ bindkey '^[^[[C' forward-word
 bindkey '^[[5D' beginning-of-line
 bindkey '^[[5C' end-of-line
 bindkey '^[[3~' delete-char
-bindkey '^[^N' newtab
 bindkey '^?' backward-delete-char
 
 fpath=($ZSH/functions $fpath)

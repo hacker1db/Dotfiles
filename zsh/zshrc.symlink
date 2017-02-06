@@ -60,23 +60,6 @@ if hash hub 2>/dev/null; then
     eval "$(hub alias -s)"
 fi
 
-# source nvm
-export NVM_DIR=~/.nvm
-
-load-nvmrc() {
-    if [[ -f .nvmrc && -r .nvmrc ]]; then
-        nvm use
-    fi
-}
-add-zsh-hook chpwd load-nvmrc
-
-if hash brew 2>/dev/null; then
-    source $(brew --prefix nvm)/nvm.sh
-    source `brew --prefix`/etc/profile.d/z.sh
-    # when sourcing, check and ensure that the correct Node version is set
-    load-nvmrc
-
-fi
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 

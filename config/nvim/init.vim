@@ -17,6 +17,8 @@ set textwidth=120
 set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 
+
+
 " }}}
 
 " Section User Interface {{{
@@ -43,8 +45,7 @@ colorscheme dracula         " Set the colorscheme
 
 " make the highlighting of tabs and other non-text less annoying
 highlight SpecialKey ctermbg=none ctermfg=8
-highlight NonText ctermbg=none ctermfg=8
-
+highlight NonText ctermbg=none ctermfg=8 
 " make comments and HTML attributes italic
 highlight Comment cterm=italic
 highlight htmlArg cterm=italic
@@ -323,6 +324,11 @@ let g:neomake_typescript_tsc_maker = {
         \ '%Eerror %m,' .
         \ '%C%\s%\+%m'
 \ }
+
+
+"Used for Chef code 'aka ruby'
+autocmd FileType ruby,eruby set filetype=ruby.eruby.chef
+
 
 " airline options
 let g:airline_powerline_fonts=1
