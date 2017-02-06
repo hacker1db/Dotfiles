@@ -16,7 +16,9 @@ set textwidth=120
 
 set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-
+"automation commands
+nmap wp :w !python<CR>
+nmap cu :! delivery local unit<CR>
 
 
 " }}}
