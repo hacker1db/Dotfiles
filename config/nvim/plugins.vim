@@ -4,11 +4,13 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'dracula/vim'
 
 " utilities
-Plug 'mileszs/ack.vimileszs/ack.vimm'
+
+
+ Plug 'vadv/vim-chef' "for chef yo! 
 Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
 Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utility, but use :Ack
- Plug 'Raimondi/delimitMate' " automatic closing of quotes, parenthesis, brackets, etc.
+Plug 'Raimondi/delimitMate' " automatic closing of quotes, parenthesis, brackets, etc.
 Plug 'tpope/vim-commentary' " comment stuff out
 Plug 'tpope/vim-unimpaired' " mappings which are simply short normal mode aliases for commonly used ex commands
 Plug 'tpope/vim-endwise' " automatically add end in ruby
@@ -74,6 +76,9 @@ Plug 'tclem/vim-arduino' " arduino support - compile wihtout needing to open the
 Plug 'elzr/vim-json', { 'for': 'json' } " JSON support
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' } " ruby support
 " Python
-Plug 'nvie/vim-flake8' "Python Code Checker
+Plug 'davidhalter/jedi-vim', {'for': 'Python'}
+"Powershell
+Plug 'PProvost/vim-ps1'
 
+Plug 'nvie/vim-flake8', {'for': 'python'} "Python Code Checker
 call plug#end()

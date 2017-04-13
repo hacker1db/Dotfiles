@@ -1,15 +1,6 @@
-# Dotfiles
- ---- hacker1db Modified dot files!  
-# I have an edits branch for things I am working on and considering adding to my workflow! 
+# ~/.Dotfiles hacker1db Modified dot files!  
      
-    These dot files are from @nicknisi 
-Copy and paste the following to Install my modified dotfiles I use solarzied Theme personally its easier on the eyes if you dont like it you can switch it 
-or type light in terminal to change it to a light version of solarized but it will switch it back in when you run 
-tmux I am working on trying to fix it but it will take time! 
 
-
-And most of all enjoy 
-and share your thoughts!  what works for me wont always work for you but smile and enjoy anyway! 
 
 
 

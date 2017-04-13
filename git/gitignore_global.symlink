@@ -6,7 +6,8 @@ Thumbs.db
 .LSOverride
 Icon
 .ssh 
-
+*.ini
+*.csv
 # Thumbnails
 ._*
 

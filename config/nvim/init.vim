@@ -1,5 +1,4 @@
 source ~/.config/nvim/plugins.vim
-
 " Section General {{{
 
 " Abbreviations
@@ -18,7 +17,7 @@ set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 "automation commands
 nmap wp :w !python<CR>
-nmap cu :! delivery local unit<CR>
+nmap cu :! delivery local unit
 
 
 " }}}
@@ -218,6 +217,10 @@ nmap \s :set ts=4 sts=4 sw=4 et<cr>
 nmap <leader>w :setf textile<cr> :Goyo<cr>
 
 nnoremap <silent> <leader>u :call functions#HtmlUnEscape()<cr>
+"chef plugin for autocomplete
+autocmd FileType ruby,eruby set filetype=ruby.eruby.chef
+
+
 
 " }}}
 
@@ -328,10 +331,6 @@ let g:neomake_typescript_tsc_maker = {
 \ }
 
 
-"Used for Chef code 'aka ruby'
-autocmd FileType ruby,eruby set filetype=ruby.eruby.chef
-
-
 " airline options
 let g:airline_powerline_fonts=1
 let g:airline_left_sep=''
@@ -347,6 +346,14 @@ let g:airline#extensions#tabline#show_splits = 0
 let g:vim_json_syntax_conceal = 0
 
 let g:SuperTabCrMapping = 0
+
+"python 
+let g:jedi#use_tabs_not_buffers = 1
+let g:jedi#completions_enabled = 1
+let g:jedi#auto_initialization = 1
+let g:jedi#auto_vim_configuration = 1
+
+
 
 " }}}
 

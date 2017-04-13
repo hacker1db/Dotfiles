@@ -9,7 +9,7 @@ source install/link.sh
 
 if [ "$(uname)" == "Darwin" ]; then
     echo "Running on OSX"
-
+elif ["$(uname)" == "linux-gnu"] then 
     echo "Brewing all the things"
     source install/brew.sh
 
@@ -25,8 +25,8 @@ if [ "$(uname)" == "Darwin" ]; then
     ln -s ~/.dotfiles/nginx/nginx.conf /usr/local/etc/nginx/nginx.conf
     # symlink the code.dev from dotfiles
     ln -s ~/.dotfiles/nginx/code.dev /usr/local/etc/nginx/sites-enabled/code.dev
-fi
-
+    fi
+    
 echo "creating vim directories"
 mkdir -p ~/.vim-tmp
 echo "Creating Sites, Code, Chef, Notes directories! :D Its the little things!" 

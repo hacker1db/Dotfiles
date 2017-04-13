@@ -9,7 +9,8 @@ else # OS X `ls`
 fi
 
 alias vim="nvim"
-
+alias vi="nvim"
+alias gitpulla='find . -mindepth 1 -maxdepth 1 -type d -print -exec git -C {} pull \;'
 # Filesystem aliases
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -26,7 +27,7 @@ alias rmf="rm -rf"
 alias chefc='cd ~/Documents/Code/Chef_Projects/; code .'
 # lets me cd to my chef projects directory and not run code app. 
 alias chefd='cd ~/Documents/Code/Chef_Projects/'
-
+alias cdpy='cd ~/Documents/Code/Scripts/python_scripts/'
 
 # Helpers
 alias grep='grep --color=auto'
