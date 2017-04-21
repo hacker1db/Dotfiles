@@ -8,6 +8,7 @@ Icon
 .ssh 
 *.ini
 *.csv
+.zsh_histroy
 # Thumbnails
 ._*
 
