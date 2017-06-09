@@ -9,7 +9,6 @@ source install/link.sh
 
 if [ "$(uname)" == "Darwin" ]; then
     echo "Running on OSX"
-elif ["$(uname)" == "linux-gnu"] then 
     echo "Brewing all the things"
     source install/brew.sh
 
