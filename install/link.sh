@@ -21,7 +21,7 @@ if [ ! -d $HOME/.config ]; then
     echo "Creating ~/.config"
     mkdir -p $HOME/.config
 fi
-# configs=$( find -path "$DOTFILES/config.symlink" -maxdepth 1 )
+
 for config in $DOTFILES/config/*; do
     target=$HOME/.config/$( basename $config )
     if [ -e $target ]; then
@@ -32,20 +32,18 @@ for config in $DOTFILES/config/*; do
     fi
 done
 
-# create vim symlinks
-
 echo -e "\n\nCreating vim symlinks"
 echo "=============================="
+VIMFILES=( "$HOME/.vim:$DOTFILES/vim/.vim"
+        "$HOME/.vimrc:$DOTFILES/vim/.vimrc" )
 
-typeset -A vimfiles
-vimfiles[~/.vim]=$DOTFILES/config/nvim
-vimfiles[~/.vimrc]=$DOTFILES/config/nvim/init.vim
-
-for file in "${!vimfiles[@]}"; do
-    if [ -e ${file} ]; then
-        echo "${file} already exists... skipping"
+for file in "${VIMFILES[@]}"; do
+    KEY=${file%%:*}
+    VALUE=${file#*:}
+    if [ -e ${KEY} ]; then
+        echo "${KEY} already exists... skipping."
     else
-        echo "Creating symlink for $file"
-        ln -s ${vimfiles[$file]} $file
+        echo "Creating symlink for $KEY"
+        ln -s ${VALUE} ${KEY}
     fi
-done
+done 
