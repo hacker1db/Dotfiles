@@ -1,14 +1,14 @@
+
 call plug#begin('~/.config/nvim/plugged')
 
 " colorschemes
 Plug 'dracula/vim'
-Plug 'chriskempson/base16-vim'
 " utilities
 
 
 Plug 'vadv/vim-chef' "for chef yo! 
-Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
+Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
 Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utility, but use :Ack
 Plug 'Raimondi/delimitMate' " automatic closing of quotes, parenthesis, brackets, etc.
 Plug 'tpope/vim-commentary' " comment stuff out

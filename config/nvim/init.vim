@@ -164,6 +164,7 @@ nmap ;s :set invspell spelllang=en<cr>
 nmap <leader>md :%!markdown --html4tags <cr>
 
 " remove extra whitespace
+"
 nmap <leader><space> :%s/\s\+$<cr>
 
 

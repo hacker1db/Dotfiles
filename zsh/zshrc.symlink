@@ -1,10 +1,15 @@
 export DOTFILES=$HOME/.dotfiles
 export ZSH=$DOTFILES/zsh
 
+command_exists() {
+    type "$1" > /dev/null 2>&1
+}
+
+
 # display how long all tasks over 10 seconds take
 export REPORTTIME=10
 
-[[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
+[[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo 
 # define the code directory
 # This is where my code exists and where I want the `c` autocomplete to work from exclusively
 if [[ -d ~/code ]]; then
@@ -22,12 +27,13 @@ fi
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
 compinit
-for config ($ZSH/**/*completion.sh) source $config 
+
+for config ($ZSH/**/*completion.sh) source $config
+
 export EDITOR='nvim'
+export GIT_EDITOR='nvim'
 
 export PATH=/usr/local/bin:$PATH
-
-
 
 # add /usr/local/sbin
 if [[ -d /usr/local/sbin ]]; then
@@ -42,10 +48,9 @@ if [[ -d ~/bin ]]; then
     export PATH=~/bin:$PATH
 fi
 
-[ -z "$TMUX" ] && export TERM=xterm-256color
 
 # install rbenv
-if hash rbenv 2>/dev/null; then
+if command_exists rbenv; then
     eval "$(rbenv init -)"
 fi
 
@@ -55,12 +60,9 @@ if [[ -d ~/.rvm ]]; then
 fi
 
 # alias git to hub
-if hash hub 2>/dev/null; then
+if command_exists hub; then
     eval "$(hub alias -s)"
 fi
-
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 if [ -z ${DOTFILES_LOADED+x} ]; then
     # install zsh-syntax-highlighting
@@ -69,8 +71,7 @@ if [ -z ${DOTFILES_LOADED+x} ]; then
     source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 
-
 DOTFILES_LOADED=1
 
-
-
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_COMMAND='ag -g ""'
