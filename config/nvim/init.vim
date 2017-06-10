@@ -349,6 +349,7 @@ let g:vim_json_syntax_conceal = 0
 let g:SuperTabCrMapping = 0
 
 "python 
+
 let g:jedi#use_tabs_not_buffers = 1
 let g:jedi#completions_enabled = 1
 let g:jedi#auto_initialization = 1
