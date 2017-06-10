@@ -5,7 +5,6 @@ call plug#begin('~/.config/nvim/plugged')
 Plug 'dracula/vim'
 " utilities
 
-
 Plug 'vadv/vim-chef' "for chef yo! 
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
 Plug 'ctrlpvim/ctrlp.vim' " fuzzy file finder, mapped to <leader>t
