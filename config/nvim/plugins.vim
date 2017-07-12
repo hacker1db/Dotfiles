@@ -75,7 +75,6 @@ Plug 'tclem/vim-arduino' " arduino support - compile wihtout needing to open the
 Plug 'elzr/vim-json', { 'for': 'json' } " JSON support
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' } " ruby support
 " Python
-Plug 'davidhalter/jedi-vim', {'for': 'python'}
 Plug 'nvie/vim-flake8', {'for': 'python' } "Python Code Checker
 "Powershell
 Plug 'PProvost/vim-ps1'

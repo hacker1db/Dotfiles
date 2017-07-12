@@ -1,6 +1,6 @@
 source ~/.config/nvim/plugins.vim
 " Section General {{{
-
+                        
 " Abbreviations
 abbr funciton function
 abbr teh the
@@ -63,7 +63,7 @@ set autoindent              " automatically set indent of new line
 set smartindent
 
 " toggle invisible characters
-set list
+set list!
 set listchars=tab:→\ ,eol:¬,trail:⋅,extends:❯,precedes:❮
 set showbreak=↪
 
@@ -146,8 +146,6 @@ nmap <leader>, :w<cr>
 " set paste toggle
 set pastetoggle=<leader>v
 
-" toggle paste mode
-" map <leader>v :set paste!<cr>
 
 " edit ~/.config/nvim/init.vim
 map <leader>ev :e! ~/.config/nvim/init.vim<cr>
@@ -348,12 +346,8 @@ let g:vim_json_syntax_conceal = 0
 
 let g:SuperTabCrMapping = 0
 
-"python 
 
-let g:jedi#use_tabs_not_buffers = 1
-let g:jedi#completions_enabled = 1
-let g:jedi#auto_initialization = 1
-let g:jedi#auto_vim_configuration = 1
+
 
 
 
