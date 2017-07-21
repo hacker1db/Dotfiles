@@ -124,7 +124,6 @@ set tm=500
 
 if has('mouse')
 	set mouse=a
-	" set ttymouse=xterm2
 endif
 
 " }}}
@@ -269,12 +268,12 @@ let g:fzf_layout = { 'down': '~25%' }
 
 if isdirectory(".git")
     " if in a git project, use :GFiles
-    nmap <silent> <leader>t :GFiles<cr>
+    nmap <silent> <leader>f :GFiles<cr>
 else
     " otherwise, use :FZF
-    nmap <silent> <leader>t :FZF<cr>
+    nmap <silent> <leader>f :FZF<cr>
 endif
-
+nmap <silent><leader>vc :Commits<cr>
 nmap <silent> <leader>r :Buffers<cr>
 nmap <silent> <leader>e :FZF<cr>
 nmap <leader><tab> <plug>(fzf-maps-n)
@@ -345,9 +344,6 @@ let g:airline#extensions#tabline#show_splits = 0
 let g:vim_json_syntax_conceal = 0
 
 let g:SuperTabCrMapping = 0
-
-
-
 
 
 
