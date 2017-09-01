@@ -124,3 +124,23 @@ function hl() {
 
     echo $src | highlight -O rtf --syntax $1 --font Inconsoloata --style $style --line-number --font-size 24 | pbcopy
 }
+
+function bump () {
+file=metadata.rb
+grep -w "version" $file
+x=$(grep -w "version" $file | grep -o "'.*'")
+x="${x%\'}"
+x="${x#\'}"
+y=$(echo "$x" | grep -o "[0-9]*$")
+old="${x%.*}"
+dot=.
+new=$(($y+1))
+a=$x
+b=$old$dot$new
+sed -i '' "s/'$a'/'$b'/g" $file
+grep -w "version" $file
+}
+
+
+
+

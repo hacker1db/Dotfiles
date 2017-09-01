@@ -1,6 +1,6 @@
 source ~/.config/nvim/plugins.vim
 " Section General {{{
-                        
+
 " Abbreviations
 abbr funciton function
 abbr teh the
@@ -16,11 +16,13 @@ set textwidth=120
 set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 "automation commands
-nmap wp :w !python<CR>
+nmap wp :w !python3<CR>
 nmap cu :! delivery local unit
 
 
 " }}}
+let g:ycm_autoclose_preview_window_after_completion=1
+map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
 
 " Section User Interface {{{
 
@@ -41,12 +43,12 @@ let g:dracula_termcolors=16
 let g:dracula_terminal_italics=1
 
 syntax on
-" set t_Co=256                " Explicitly tell vim that the terminal supports 256 colors"
-colorscheme dracula         " Set the colorscheme
+set background=dark
+colorscheme dracula "colorscheme
 
 " make the highlighting of tabs and other non-text less annoying
 highlight SpecialKey ctermbg=none ctermfg=8
-highlight NonText ctermbg=none ctermfg=8 
+highlight NonText ctermbg=none ctermfg=8
 " make comments and HTML attributes italic
 highlight Comment cterm=italic
 highlight htmlArg cterm=italic
@@ -270,8 +272,8 @@ if isdirectory(".git")
     " if in a git project, use :GFiles
     nmap <silent> <leader>f :GFiles<cr>
 else
-    " otherwise, use :FZF
-    nmap <silent> <leader>f :FZF<cr>
+    " otherwise, use :FZFMru
+    nmap <silent> <leader>f :FZFMru<cr>
 endif
 nmap <silent><leader>vc :Commits<cr>
 nmap <silent> <leader>r :Buffers<cr>
@@ -283,7 +285,7 @@ omap <leader><tab> <plug>(fzf-maps-o)
 " Insert mode completion
 imap <c-x><c-k> <plug>(fzf-complete-word)
 imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+
 imap <c-x><c-l> <plug>(fzf-complete-line)
 
 nnoremap <silent> <Leader>C :call fzf#run({

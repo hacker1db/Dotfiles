@@ -50,10 +50,7 @@ Plug 'moll/vim-node', { 'for': 'javascript' } " node support
 Plug 'othree/yajs.vim', { 'for': 'javascript' } " JavaScript syntax plugin
 Plug 'mxw/vim-jsx', { 'for': 'jsx' } " JSX support
 Plug 'othree/es.next.syntax.vim', { 'for': 'javascript' } " ES6 and beyond syntax
-
-" TypeScript
-Plug 'leafgarland/typescript-vim', { 'for': 'typescript' } " typescript support
-
+Plug 'kchmck/vim-coffee-script', {'for': 'coffee'} " Coffee Script Support
 " styles
 Plug 'wavded/vim-stylus', { 'for': ['stylus', 'markdown'] } " markdown support
 Plug 'groenewege/vim-less', { 'for': 'less' } " less support
@@ -75,6 +72,7 @@ Plug 'elzr/vim-json', { 'for': 'json' } " JSON support
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' } " ruby support
 " Python
 Plug 'nvie/vim-flake8', {'for': 'python' } "Python Code Checker
+
 "Powershell
 Plug 'PProvost/vim-ps1'
 

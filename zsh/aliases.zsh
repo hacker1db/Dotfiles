@@ -28,7 +28,8 @@ alias chefc='cd ~/Documents/Code/Chef_Projects/; code .'
 # lets me cd to my chef projects directory and not run code app. 
 alias chefd='cd ~/Documents/Code/Chef_Projects/'
 alias cdpy='cd ~/Documents/Code/Scripts/python_scripts/'
-
+# Chef commands I hate running with the full command
+alias kdc='kitchen destroy && kitchen converge'
 # Helpers
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes

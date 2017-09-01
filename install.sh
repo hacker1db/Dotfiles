@@ -33,6 +33,7 @@ mkdir -p ~/Documents/Code
 mkdir -p ~/Documents/Code/Sites
 mkdir -p ~/Documents/Code/Chef_Projects
 mkdir -p ~/Documents/Notes
+touch ~/.dotfiles/zsh/hidden_exports.zsh
 
 
 

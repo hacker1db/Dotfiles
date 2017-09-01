@@ -15,9 +15,12 @@ Icon
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
-
+.DS_store
 # project-specific vim configurations
 .vimrc.local
 
 # typescript command garbage
 tscommand*.txt
+# Local config files exports and such
+hidden_exports.zsh
+
