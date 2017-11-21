@@ -12,6 +12,7 @@ brew tap caskroom/cask
 brew install ack
 brew install tree
 brew install wget
+brew install fzf
 #tools for chef dev
 brew install packer
 brew cask install vagrant
@@ -24,8 +25,6 @@ brew install dnsmasq
 
 # development tools
 brew install git
-brew cask install visual-studio-code
-brew cask install moom
 # terminals cause why not!
 brew cask install iterm2
 brew install hub
@@ -41,8 +40,14 @@ brew install node
 brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
 brew install nmap 
+echo "Installing neovim..."
+# install neovim
+brew install neovim
+
 echo "Installing desktop application..."
 
+brew cask install visual-studio-code
+brew cask install moom
 brew cask install google-chrome
 brew cask install spotify
 brew cask install slack
@@ -52,10 +57,5 @@ brew cask install virtualbox
 brew cask install iterm2
 brew cask install microsoft-office
 brew cask install 1password
-brew cask install nozbe
-
-echo "Installing neovim..."
-# install neovim
-brew install --HEAD  neovim/neovim/neovim
-
+brew cask install torbrowser
 exit 0
