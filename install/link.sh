@@ -35,7 +35,7 @@ done
 echo -e "\n\nCreating vim symlinks"
 echo "=============================="
 VIMFILES=( "$HOME/.vim:$DOTFILES/vim/.vim"
-        "$HOME/.vimrc:$DOTFILES/vim/.vimrc" "$HONE/.gvimrc:$DOTFILES/Config/gvim/gvimrc )
+        "$HOME/.vimrc:$DOTFILES/vim/.vimrc" )
 
 for file in "${VIMFILES[@]}"; do
     KEY=${file%%:*}
@@ -46,4 +46,19 @@ for file in "${VIMFILES[@]}"; do
         echo "Creating symlink for $KEY"
         ln -s ${VALUE} ${KEY}
     fi
-done 
+done
+
+echo -e "\n\nCreating vim symlinks"
+echo "=============================="
+ZSHRC=( "$HOME/.zhrc:$DOTFILES/zsh/zshrc.symlink")
+
+for file in "${ZSHRC[@]}"; do
+    KEY=${file%%:*}
+    VALUE=${file#*:}
+    if [ -e ${KEY} ]; then
+        echo "${KEY} already exists... skipping."
+    else
+        echo "Creating symlink for $KEY"
+        ln -s ${VALUE} ${KEY}
+    fi
+done
