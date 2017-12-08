@@ -19,7 +19,6 @@ set -g status-interval 5
 
 
 # default statusbar colors
-# set-option -g status-bg colour0
 set-option -g status-fg $tm_color_active
 set-option -g status-bg default
 set-option -g status-attr default
@@ -50,12 +49,11 @@ set-option -g display-panes-colour $tm_color_inactive
 set-window-option -g clock-mode-colour $tm_color_active
 
 tm_tunes="#[fg=$tm_color_music]#(osascript ~/.dotfiles/applescripts/tunes.scpt)"
-tm_battery="#(~/.dotfiles/bin/battery_indicator.sh)"
-
+tm_battery="#{battery_status_bg} Batt: #{battery_icon} #{battery_percentage} #{battery_remain}"
 tm_date="#[fg=$tm_color_inactive] %R %d %b"
 tm_host="#[fg=$tm_color_feature,bold]#h"
 tm_session_name="#[fg=$tm_color_feature,bold]$tm_icon #S"
-
+tm_cpu="#{cpu_bg_color} CPU: #{cpu_icon} #{cpu_percentage}"
 set -g status-left $tm_session_name' '
-set -g status-right $tm_tunes' '$tm_date' '$tm_host
+set -g status-right $tm_tunes' '$tm_date' '$tm_cpu' '$tm_battery
 
