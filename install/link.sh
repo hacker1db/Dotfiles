@@ -50,7 +50,7 @@ done
 
 echo -e "\n\nCreating vim symlinks"
 echo "=============================="
-ZSHRC=( "$HOME/.zhrc:$DOTFILES/zsh/zshrc.symlink")
+ZSHRC=( "$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")
 
 for file in "${ZSHRC[@]}"; do
     KEY=${file%%:*}

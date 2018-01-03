@@ -346,9 +346,10 @@ let g:airline#extensions#tabline#show_splits = 0
 let g:vim_json_syntax_conceal = 0
 
 let g:SuperTabCrMapping = 0
-
-
-
+" Testing markdown preview
+let vim_markdown_preview_hotkey='<C-m>'
+let vim_markdown_preview_temp_file=1
+let vim_markdown_preview_browser='Google Chrome'
 " }}}
 
 " vim:foldmethod=marker:foldlevel=0

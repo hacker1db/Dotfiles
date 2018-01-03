@@ -24,8 +24,8 @@ alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
 # moving dir 
 alias chefc='cd ~/Documents/Code/Chef_Projects/; code .'
+alias sites='cd ~/Documents/Code/Sites/'
 # lets me cd to my chef projects directory and not run code app. 
-alias chefd='cd ~/Documents/Code/Chef_Projects/'
 alias cdpy='cd ~/Documents/Code/Scripts/python_scripts/'
 # Chef commands I hate running with the full command
 alias kdc='kitchen destroy && kitchen converge'
@@ -83,4 +83,4 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 
 alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chrome"
 alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\ Chrome\\ Canary"
-
+alias code="code-insiders"

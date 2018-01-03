@@ -17,7 +17,7 @@ if [ "$(uname)" == "Darwin" ]; then
 
     echo "Installing node (from nvm)"
     source install/nvm.sh
-
+    
     echo "Configuring nginx"
     # create a backup of the original nginx.conf
     mv /usr/local/etc/nginx/nginx.conf /usr/local/etc/nginx/nginx.original
@@ -33,6 +33,7 @@ mkdir -p ~/Documents/Code
 mkdir -p ~/Documents/Code/Sites
 mkdir -p ~/Documents/Code/Chef_Projects
 mkdir -p ~/Documents/Notes
+echo "Creating personalizable exports i.e for work duh.."
 touch ~/.dotfiles/zsh/hidden_exports.zsh
 
 

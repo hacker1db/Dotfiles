@@ -47,6 +47,16 @@ if [[ -d ~/bin ]]; then
     export PATH=~/bin:$PATH
 fi
 
+# install rbenv
+if command_exists rbenv; then
+    eval "$(rbenv init -)"
+fi
+
+if [[ -d ~/.rvm ]]; then
+    PATH=$HOME/.rvm/bin:$PATH # Add RVM to PATH for scripting
+    source ~/.rvm/scripts/rvm
+fi
+
 # alias git to hub
 if command_exists hub; then
     eval "$(hub alias -s)"
@@ -57,7 +67,10 @@ if [ -z ${DOTFILES_LOADED+x} ]; then
     source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     # install zsh autosuggestions
     source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+    plugins=(git vi-mode coffee)
 fi
+export NVM_DIR="$HOME/.nvm" 
+. "/usr/local/opt/nvm/nvm.sh"
 
 DOTFILES_LOADED=1
 
@@ -65,5 +78,3 @@ DOTFILES_LOADED=1
 export FZF_DEFAULT_COMMAND='ag -g ""'
 
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
