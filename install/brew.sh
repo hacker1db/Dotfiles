@@ -11,8 +11,9 @@ echo "Installing homebrew packages..."
 brew tap caskroom/cask
 brew install ack
 brew install tree
-brew install wget
-brew install fzf
+brew install wget 
+brew install fzf # Fuzzy file finder
+brew install lnav # for viewing log files in terminal 
 #tools for chef dev
 brew install packer
 brew cask install vagrant
