@@ -67,8 +67,8 @@ if [ -z ${DOTFILES_LOADED+x} ]; then
     source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     # install zsh autosuggestions
     source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-    plugins=(git vi-mode coffee)
 fi
+
 export NVM_DIR="$HOME/.nvm" 
 . "/usr/local/opt/nvm/nvm.sh"
 
