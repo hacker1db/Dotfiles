@@ -37,7 +37,9 @@ Plug 'sickill/vim-pasta' " context-aware pasting
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' } " distraction-free writing
 Plug 'junegunn/limelight.vim', { 'on': 'Limelight' } " focus tool. Good for presentating with vim
 Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin' | Plug 'ryanoasis/vim-devicons' " file drawer
-Plug 'mklabs/split-term.vim' "better splits in vim. "
+Plug 'mklabs/split-term.vim' "better splits in vim.
+" Testing in VIM 
+Plug 'janko-m/vim-test'
 " html / templates
 Plug 'mattn/emmet-vim', { 'for': 'html' } " emmet support for vim - easily create markdup wth CSS-like syntax
 Plug 'gregsexton/MatchTag', { 'for': 'html' } " match tags in html, similar to paren support
@@ -76,5 +78,6 @@ Plug 'nvie/vim-flake8', {'for': 'python' } "Python Code Checker
 
 "Powershell
 Plug 'PProvost/vim-ps1'
-
+" Docs
+Plug 'rizzatti/dash.vim'
 call plug#end()

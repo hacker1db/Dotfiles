@@ -350,6 +350,16 @@ let g:SuperTabCrMapping = 0
 let vim_markdown_preview_hotkey='<C-m>'
 let vim_markdown_preview_temp_file=1
 let vim_markdown_preview_browser='Google Chrome'
+
+"vim tests plugin config
+
+augroup test
+  autocmd!
+  autocmd BufWrite * if test#exists() |
+    \   TestFile
+    \ endif
+augroup END
+
 " }}}
 
 " vim:foldmethod=marker:foldlevel=0

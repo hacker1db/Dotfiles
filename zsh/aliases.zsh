@@ -36,7 +36,7 @@ alias du='du -h -c' # calculate disk usage for a folder
 
 # Applications
 alias ios='open -a /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
-
+alias ,d='open -a /Applications/Dash.app'
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias localip="ipconfig getifaddr en1"
