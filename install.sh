@@ -34,7 +34,7 @@ mkdir -p ~/Documents/Code/Sites
 mkdir -p ~/Documents/Code/Chef_Projects
 mkdir -p ~/Documents/Notes
 echo "Creating personalizable exports i.e for work duh.."
-touch ~/.dotfiles/zsh/hidden_exports.zsh
+touch ~/.localrc
 
 
 
