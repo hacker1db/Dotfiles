@@ -32,7 +32,6 @@ brew install dnsmasq
 
 
 # terminals cause why not!
-brew cask install iterm2
 brew install hub
 brew install macvim --override-system-vim
 brew install reattach-to-user-namespace
@@ -52,6 +51,7 @@ brew install neovim
 
 echo "Installing desktop application..."
 
+brew cask install iterm2
 brew cask install visual-studio-code
 brew cask install moom
 brew cask install google-chrome
