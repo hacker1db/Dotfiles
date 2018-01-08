@@ -21,6 +21,4 @@ Icon
 
 # typescript command garbage
 tscommand*.txt
-# Local config files exports and such
-hidden_exports.zsh
 

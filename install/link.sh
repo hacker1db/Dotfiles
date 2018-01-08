@@ -48,7 +48,7 @@ for file in "${VIMFILES[@]}"; do
     fi
 done
 
-echo -e "\n\nCreating vim symlinks"
+echo -e "\n\nCreating zshrc symlinks"
 echo "=============================="
 ZSHRC=( "$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")
 
