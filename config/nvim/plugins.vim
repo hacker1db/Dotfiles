@@ -75,7 +75,7 @@ Plug 'elzr/vim-json', { 'for': 'json' } " JSON support
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' } " ruby support
 " Python
 Plug 'nvie/vim-flake8', {'for': 'python' } "Python Code Checker
-
+Plug 'jmcomets/vim-pony'
 "Powershell
 Plug 'PProvost/vim-ps1'
 " Docs

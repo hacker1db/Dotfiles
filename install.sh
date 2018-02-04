@@ -2,15 +2,12 @@
 
 echo "Installing dotfiles"
 
-echo "Initializing submodule(s)"
-git submodule update --init --recursive
-
 source install/link.sh
 
 if [ "$(uname)" == "Darwin" ]; then
     echo "Running on OSX"
     echo "Brewing all the things"
-    source install/brew.sh
+    source install/install_tools.sh
 
     echo "Updating OSX settings"
     source install/osx.sh
@@ -33,7 +30,7 @@ mkdir -p ~/Documents/Code
 mkdir -p ~/Documents/Code/Sites
 mkdir -p ~/Documents/Code/Chef_Projects
 mkdir -p ~/Documents/Notes
-echo "Creating personalizable exports i.e for work duh.."
+echo "Creating personalizable exports i.e for work duh..api keys?"
 touch ~/.localrc
 
 

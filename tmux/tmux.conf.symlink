@@ -12,6 +12,7 @@ set -g renumber-windows on
 
 # unbind default prefix and set it to Ctrl+a
 unbind C-b
+
 set -g prefix C-a
 bind C-a send-prefix
 
@@ -35,9 +36,9 @@ unbind =
 bind = select-layout tiled
 
 # cycle through panes
-# unbind C-a
+unbind C-a
 # unbind o # this is the default key for cycling panes
-# bind ^A select-pane -t:.+
+bind ^A select-pane -t:.+
 
 # make window/pane index start with 1
 set -g base-index 1
@@ -108,13 +109,9 @@ bind C-v run "tmux set-buffer $(reattach-to-user-namespace pbpaste); tmux paste-
 
 source ~/.dotfiles/tmux/theme.sh
 
-
-
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-sensible'
-set -g @plugin 'tmux-plugins/tmux-resurrect'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
-set -g @plugin 'tmux-plugins/tmux-sessionist'
 run '~/.tmux/plugins/tpm/tpm'
+

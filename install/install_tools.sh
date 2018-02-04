@@ -14,7 +14,6 @@ brew install tree
 brew install wget 
 brew install fzf # Fuzzy file finder
 brew install lnav # for viewing log files in terminal 
-brew install todolist # todo list tool cmdline based
 echo "Install jekyll for blogging"
 gem install jekyll bundler
 echo "Installing tools for Chef dev"
@@ -23,19 +22,14 @@ brew install packer
 brew cask install vagrant
 vagrant plugin install vagrant-cachier
 brew cask install chefdk
-
-echo "Installing dev server tools"
-# development server setup
-brew install nginx
-brew install dnsmasq
-
-
+brew install docker
 
 # terminals cause why not!
 brew install hub
-brew install macvim --override-system-vim
 brew install reattach-to-user-namespace
 brew install tmux
+echo "installing tpm plugin manager"
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 brew install zsh
 brew install highlight
 brew install nvm
@@ -52,7 +46,6 @@ brew install neovim
 echo "Installing desktop application..."
 
 brew cask install iterm2
-brew cask install visual-studio-code
 brew cask install moom
 brew cask install google-chrome
 brew cask install spotify
@@ -66,10 +59,11 @@ brew cask install 1password
 brew cask install torbrowser
 brew cask install unetbootin
 brew cask install owasp-zap
-brew cask install eoapui
+brew cask install soapui
 brew cask install vlc
 brew cask install polymail
 brew cask install alfred
 brew cask install foxitreader
+brew cask install dash
 
 exit 0

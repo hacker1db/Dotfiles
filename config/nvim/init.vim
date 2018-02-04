@@ -361,5 +361,8 @@ augroup test
 augroup END
 
 " }}}
+"
+" Sytastic plugin
+let g:syntastic_python_checkers = ['pylint']
 
 " vim:foldmethod=marker:foldlevel=0

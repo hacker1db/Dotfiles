@@ -4,7 +4,7 @@
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
 # echo "show hidden files by default"
-defaults write com.apple.Finder AppleShowAllFiles -bool false
+defaults write com.apple.Finder AppleShowAllFiles -bool true
 
 # echo "only use UTF-8 in Terminal.app"
 defaults write com.apple.terminal StringEncodings -array 4
@@ -25,32 +25,29 @@ echo "Enable subpixel font rendering on non-Apple LCDs"
 defaults write NSGlobalDomain AppleFontSmoothing -int 2
 
 # echo "Enable the 2D Dock"
-# defaults write com.apple.dock no-glass -bool true
+defaults write com.apple.dock no-glass -bool false
 
 # Automatically hide and show the Dock
-# defaults write com.apple.dock autohide -bool true
+defaults write com.apple.dock autohide -bool True
 
 # echo "Make Dock icons of hidden applications translucent"
-# defaults write com.apple.dock showhidden -bool true
+defaults write com.apple.dock showhidden -bool true
 
 #echo "Enable iTunes track notifications in the Dock"
-#defaults write com.apple.dock itunes-notifications -bool true
+defaults write com.apple.dock itunes-notifications -bool true
 
 # Disable menu bar transparency
 #defaults write NSGlobalDomain AppleEnableMenuBarTransparency -bool false
 
 # Show remaining battery time; hide percentage
-# defaults write com.apple.menuextra.battery ShowPercent -string "NO"
-# defaults write com.apple.menuextra.battery ShowTime -string "YES"
+defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 
 # echo "Always show scrollbars"
-# defaults write NSGlobalDomain AppleShowScrollBars -string "Auto"
+defaults write NSGlobalDomain AppleShowScrollBars -string "Auto"
 
-#echo "Allow quitting Finder via ⌘ + Q; doing so will also hide desktop icons"
-#defaults write com.apple.finder QuitMenuItem -bool true
 
 # Disable window animations and Get Info animations in Finder
-# defaults write com.apple.finder DisableAllAnimations -bool true
+defaults write com.apple.finder DisableAllAnimations -bool true
 
 echo "Use current directory as default search scope in Finder"
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
@@ -62,25 +59,14 @@ echo "Show Status bar in Finder"
 defaults write com.apple.finder ShowStatusBar -bool true
 
 # echo "Expand print panel by default"
-# defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
-
-#echo "Disable the “Are you sure you want to open this application?” dialog"
-#defaults write com.apple.LaunchServices LSQuarantine -bool false
+defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
 
 #echo "Disable shadow in screenshots"
-#defaults write com.apple.screencapture disable-shadow -bool true
+defaults write com.apple.screencapture disable-shadow -bool true
 
-# echo "Enable highlight hover effect for the grid view of a stack (Dock)"
-# defaults write com.apple.dock mouse-over-hilte-stack -bool true
-
-# echo "Enable spring loading for all Dock items"
-# defaults write enable-spring-load-actions-on-all-items -bool true
-
-# echo "Show indicator lights for open applications in the Dock"
-# defaults write com.apple.dock show-process-indicators -bool true
 
 # Don’t animate opening applications from the Dock
-# defaults write com.apple.dock launchanim -bool false
+defaults write com.apple.dock launchanim -bool True
 
 #echo "Display ASCII control characters using caret notation in standard text views"
 # Try e.g. `cd /tmp; unidecode "\x{0000}" > cc.txt; open -e cc.txt`
