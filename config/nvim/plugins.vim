@@ -1,10 +1,15 @@
-
 call plug#begin('~/.config/nvim/plugged')
-
+if has('nvim')
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+    Plug 'Shougo/deoplete.nvim'
+    Plug 'roxma/nvim-yarp'
+    Plug 'roxma/vim-hug-neovim-rpc'
+endif
 " colorschemes
-Plug 'dracula/vim'
+Plug 'dracula/vim', { 'as': 'dracula' }
 " utilities
-
+" regular plugins
 Plug 'vadv/vim-chef' "for chef yo! 
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
 Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utility, but use :Ack
@@ -76,8 +81,13 @@ Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' } " ruby support
 " Python
 Plug 'nvie/vim-flake8', {'for': 'python' } "Python Code Checker
 Plug 'jmcomets/vim-pony'
+Plug 'zchee/deoplete-jedi'
 "Powershell
 Plug 'PProvost/vim-ps1'
 " Docs
 Plug 'rizzatti/dash.vim'
+" go code 
+Plug 'zchee/deoplete-go', { 'do': 'make'}
 call plug#end()
+let g:deoplete#enable_at_startup = 1
+
