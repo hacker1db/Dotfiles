@@ -1,4 +1,5 @@
 source ~/.config/nvim/plugins.vim
+
 " Section General {{{
 
 " Abbreviations
@@ -14,37 +15,70 @@ set history=1000            " change history to 1000
 set textwidth=120
 
 set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 "automation commands
 nmap wp :w !python3<CR>
 nmap cu :! delivery local unit
 
 
 " }}}
-let g:ycm_autoclose_preview_window_after_completion=1
-map <leader>g  :YcmCompleter GoToDefinitionElseDeclaration<CR>
+set encoding=utf-8
+set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,utf-16,big5,euc-jp,latin1
+
+if !exists("g:syntax_on")
+  syntax enable
+endif
+
+syntax on
+colorscheme dracula
+let g:dracula_colorterm = 0
+
+
+
+
+
 
 " Section User Interface {{{
 
 " switch cursor to line when in insert mode, and block when not
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+if !has('gui_running')
+  set t_Co=256
+  let g:dracula_italic=0
+  if has('termguicolors') && !exists('$TMUX')
+    set termguicolors
+  end
+  colorscheme Dracula
+  let lightlineColor = 'Dracula'
+  
+  if exists('$TMUX')
+    let &t_SI = "\<Esc>Ptmux;\<Esc>\e[5 q\<Esc>\\"
+    let &t_SR = "\<Esc>Ptmux;\<Esc>\e[4 q\<Esc>\\"
+    let &t_EI = "\<Esc>Ptmux;\<Esc>\e[2 q\<Esc>\\"
+  else
+    let &t_SI = "\<Esc>]50;CursorShape=1\x7"
+    let &t_SR = "\<Esc>]50;CursorShape=2\x7"
+    let &t_EI = "\<Esc>]50;CursorShape=0\x7"
+  endif
 
-if &term =~ '256color'
-    " disable background color erase
-    set t_ut=
+  set timeoutlen=1000 ttimeoutlen=0
+  highlight Normal ctermbg=NONE
+else
+  if strftime('%H') >= 21 || strftime('%H') <= 9
+    set background=dark
+  else
+    set background=light
+  endif
+  colorscheme solarized
+  let lightlineColor = 'solarized'
 endif
 
-" enable 24 bit color support if supported
-" if (empty($TMUX) && has("termguicolors"))
-"     set termguicolors
-" endif
 
-let g:dracula_termcolors=16
-let g:dracula_terminal_italics=0
+if has('title')
+  set notitle
+endif
 
-syntax on
-set background=dark
-colorscheme dracula "colorscheme
+" lightline
+
 
 " make the highlighting of tabs and other non-text less annoying
 highlight SpecialKey ctermbg=none ctermfg=8
@@ -54,7 +88,6 @@ highlight Comment cterm=italic
 highlight htmlArg cterm=italic
 
 set number                  " show line numbers
-" set relativenumber          " show relative line numbers
 
 set wrap                    " turn on line wrapping
 set wrapmargin=8            " wrap lines when coming within n characters from side
@@ -64,8 +97,8 @@ set showbreak=…             " show ellipsis at breaking
 set autoindent              " automatically set indent of new line
 set smartindent
 
-" toggle invisible characters
-set list!
+set list
+set list lcs=tab:\|\ 
 set listchars=tab:→\ ,eol:¬,trail:⋅,extends:❯,precedes:❮
 set showbreak=↪
 
@@ -76,7 +109,7 @@ match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 set backspace=indent,eol,start
 
 " Tab control
-set noexpandtab             " insert tabs rather than spaces for <Tab>
+set expandtab				" insert space rather than tab for <Tab>
 set smarttab                " tab respects 'tabstop', 'shiftwidth', and 'softtabstop'
 set tabstop=4               " the visible width of tabs
 set softtabstop=4           " edit as if the tabs are 4 characters wide
@@ -358,7 +391,10 @@ augroup END
 
 " }}}
 "
+let g:deoplete#enable_at_startup = 1
 " Sytastic plugin
+"
 let g:syntastic_python_checkers = ['pylint']
 
 " vim:foldmethod=marker:foldlevel=0
+

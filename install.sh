@@ -34,7 +34,6 @@ echo "Creating personalizable exports i.e for work duh..api keys?"
 touch ~/.localrc
 
 
-
 echo "Configuring zsh as default shell"
 chsh -s $(which zsh)
 

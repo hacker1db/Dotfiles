@@ -8,11 +8,16 @@ else
 endif
 " colorschemes
 Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'altercation/vim-colors-solarized'
+
 " utilities
+
+Plug 'Yggdroot/indentLine'
+Plug 'itchyny/lightline.vim'
 " regular plugins
 Plug 'vadv/vim-chef' "for chef yo! 
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
-Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utility, but use :Ack
+Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utiliey, but use :Ack
 Plug 'Raimondi/delimitMate' " automatic closing of quotes, parenthesis, brackets, etc.
 Plug 'tpope/vim-commentary' " comment stuff out
 Plug 'tpope/vim-unimpaired' " mappings which are simply short normal mode aliases for commonly used ex commands
@@ -86,8 +91,6 @@ Plug 'zchee/deoplete-jedi'
 Plug 'PProvost/vim-ps1'
 " Docs
 Plug 'rizzatti/dash.vim'
-" go code 
-Plug 'zchee/deoplete-go', { 'do': 'make'}
 call plug#end()
 let g:deoplete#enable_at_startup = 1
 
