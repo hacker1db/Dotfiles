@@ -24,10 +24,6 @@ nmap cu :! delivery local unit
 set encoding=utf-8
 set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,utf-16,big5,euc-jp,latin1
 
-if !exists("g:syntax_on")
-  syntax enable
-endif
-
 syntax on
 if exists($TMUX)
   let g:dracula_colorterm = 0
@@ -70,16 +66,6 @@ else
   colorscheme solarized
   let lightlineColor = 'solarized'
 endif
-
-
-if has('title')
-  set notitle
-endif
-
-" lightline
-let g:lightline = {
-      \ 'colorscheme': 'Dracula',
-      \ }
 
 
 
@@ -370,13 +356,13 @@ let g:neomake_typescript_tsc_maker = {
 
 " airline options
 
-" let g:airline_left_sep=''
-" let g:airline_right_sep=''
-" let g:airline_theme='dracula'
-" let g:airline#extensions#tabline#enabled = 1 " enable airline tabline
-" let g:airline#extensions#tabline#tab_min_count = 2 " only show tabline if tabs are being used (more than 1 tab open)
-" let g:airline#extensions#tabline#show_buffers = 0 " do not show open buffers in tabline
-" let g:airline#extensions#tabline#show_splits = 0
+let g:airline_left_sep=''
+let g:airline_right_sep=''
+let g:airline_theme='dracula'
+let g:airline#extensions#tabline#enabled = 1 " enable airline tabline
+let g:airline#extensions#tabline#tab_min_count = 2 " only show tabline if tabs are being used (more than 1 tab open)
+let g:airline#extensions#tabline#show_buffers = 0 " do not show open buffers in tabline
+let g:airline#extensions#tabline#show_splits = 0
 
 
 " don't hide quotes in json files
