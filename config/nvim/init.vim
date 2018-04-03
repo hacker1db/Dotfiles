@@ -29,11 +29,9 @@ if !exists("g:syntax_on")
 endif
 
 syntax on
-colorscheme dracula
-let g:dracula_colorterm = 0
-
-
-
+if exists($TMUX)
+  let g:dracula_colorterm = 0
+endif
 
 
 
@@ -41,9 +39,10 @@ let g:dracula_colorterm = 0
 
 " switch cursor to line when in insert mode, and block when not
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+
 if !has('gui_running')
   set t_Co=256
-  let g:dracula_italic=0
+  let g:dracula_italic=1
   if has('termguicolors') && !exists('$TMUX')
     set termguicolors
   end
@@ -78,6 +77,11 @@ if has('title')
 endif
 
 " lightline
+let g:lightline = {
+      \ 'colorscheme': 'Dracula',
+      \ }
+
+
 
 
 " make the highlighting of tabs and other non-text less annoying
@@ -366,13 +370,13 @@ let g:neomake_typescript_tsc_maker = {
 
 " airline options
 
-let g:airline_left_sep=''
-let g:airline_right_sep=''
-let g:airline_theme='dracula'
-let g:airline#extensions#tabline#enabled = 1 " enable airline tabline
-let g:airline#extensions#tabline#tab_min_count = 2 " only show tabline if tabs are being used (more than 1 tab open)
-let g:airline#extensions#tabline#show_buffers = 0 " do not show open buffers in tabline
-let g:airline#extensions#tabline#show_splits = 0
+" let g:airline_left_sep=''
+" let g:airline_right_sep=''
+" let g:airline_theme='dracula'
+" let g:airline#extensions#tabline#enabled = 1 " enable airline tabline
+" let g:airline#extensions#tabline#tab_min_count = 2 " only show tabline if tabs are being used (more than 1 tab open)
+" let g:airline#extensions#tabline#show_buffers = 0 " do not show open buffers in tabline
+" let g:airline#extensions#tabline#show_splits = 0
 
 
 " don't hide quotes in json files
