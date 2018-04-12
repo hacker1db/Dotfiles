@@ -21,13 +21,11 @@ nmap cu :! delivery local unit
 
 
 " }}}
+
+syntax on
 set encoding=utf-8
 set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,utf-16,big5,euc-jp,latin1
 
-syntax on
-if exists($TMUX)
-  let g:dracula_colorterm = 0
-endif
 
 
 
@@ -41,31 +39,13 @@ if !has('gui_running')
   let g:dracula_italic=1
   if has('termguicolors') && !exists('$TMUX')
     set termguicolors
-  end
-  colorscheme Dracula
-  let lightlineColor = 'Dracula'
-  
-  if exists('$TMUX')
-    let &t_SI = "\<Esc>Ptmux;\<Esc>\e[5 q\<Esc>\\"
-    let &t_SR = "\<Esc>Ptmux;\<Esc>\e[4 q\<Esc>\\"
-    let &t_EI = "\<Esc>Ptmux;\<Esc>\e[2 q\<Esc>\\"
-  else
-    let &t_SI = "\<Esc>]50;CursorShape=1\x7"
-    let &t_SR = "\<Esc>]50;CursorShape=2\x7"
-    let &t_EI = "\<Esc>]50;CursorShape=0\x7"
-  endif
+end
+endif 
+colorscheme Dracula
+highlight Normal ctermbg=None
+let lightlineColor = 'Dracula'
+let g:dracula_colorterm = 0
 
-  set timeoutlen=1000 ttimeoutlen=0
-  highlight Normal ctermbg=NONE
-else
-  if strftime('%H') >= 21 || strftime('%H') <= 9
-    set background=dark
-  else
-    set background=light
-  endif
-  colorscheme solarized
-  let lightlineColor = 'solarized'
-endif
 
 
 
@@ -91,7 +71,9 @@ set list
 set list lcs=tab:\|\ 
 set listchars=tab:→\ ,eol:¬,trail:⋅,extends:❯,precedes:❮
 set showbreak=↪
-
+" set indetn line config
+let g:indentLine_concealcursor = 'inc'
+let g:indentLine_conceallevel = 2
 " highlight conflicts
 match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
