@@ -68,6 +68,9 @@ brew cask install polymail
 brew cask install alfred
 brew cask install foxitreader
 brew cask install dash
-"echo import the iterm dracula theme"
+echo "import the iterm dracula theme"
  git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
+ echo "install deoplete requirements for neovim"
+ pip3 install neovim
+
 exit 0
