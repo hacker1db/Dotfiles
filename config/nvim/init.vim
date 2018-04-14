@@ -367,7 +367,21 @@ let g:deoplete#enable_at_startup = 1
 
 " Sytastic plugin"
 let g:syntastic_python_checkers = ['pylint']
+" Go
+" use goimports for formatting
+let g:go_fmt_command = "goimports"
 
+" turn highlighting on
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+
+let g:syntastic_go_checkers = ['golint', 'errcheck', 'go']
+let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
+let g:deoplete#sources#go#package_dot = 1
+let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 " }}}
 "
 

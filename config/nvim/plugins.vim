@@ -86,6 +86,10 @@ Plug 'jmcomets/vim-pony'
 Plug 'zchee/deoplete-jedi'
 "Powershell
 Plug 'PProvost/vim-ps1'
+" GO
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
+Plug 'zchee/deoplete-go', { 'do': 'make'}
 " Docs
 Plug 'rizzatti/dash.vim'
 call plug#end()

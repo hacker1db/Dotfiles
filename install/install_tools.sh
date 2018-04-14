@@ -26,6 +26,7 @@ brew cask install chefdk
 brew install docker
 
 # terminals cause why not!
+brew install go
 brew install hub
 brew install reattach-to-user-namespace
 brew install tmux
