@@ -14,6 +14,7 @@ brew install tree
 brew install wget 
 brew install fzf # Fuzzy file finder
 brew install lnav # for viewing log files in terminal 
+brew install azure-cli
 echo "Install jekyll for blogging"
 gem install jekyll bundler
 echo "Installing tools for Chef dev"
@@ -48,6 +49,7 @@ echo "Installing desktop application..."
 brew cask install iterm2
 brew cask install moom
 brew cask install google-chrome
+brew cask Install firefox
 brew cask install spotify
 brew cask install slack
 brew cask install vmware-fusion
@@ -60,10 +62,12 @@ brew cask install torbrowser
 brew cask install unetbootin
 brew cask install owasp-zap
 brew cask install soapui
+brew cask install insomnia
 brew cask install vlc
 brew cask install polymail
 brew cask install alfred
 brew cask install foxitreader
 brew cask install dash
-
+"echo import the iterm dracula theme"
+ git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
 exit 0

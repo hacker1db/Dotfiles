@@ -1,4 +1,5 @@
 call plug#begin('~/.config/nvim/plugged')
+
 if has('nvim')
     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
@@ -8,8 +9,6 @@ else
 endif
 " colorschemes
 Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'altercation/vim-colors-solarized'
-Plug 'itchyny/lightline.vim'
 " utilities
 Plug 'Yggdroot/indentLine'
 " regular plugins

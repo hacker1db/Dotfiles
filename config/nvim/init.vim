@@ -15,9 +15,11 @@ set history=1000            " change history to 1000
 set textwidth=120
 
 set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-"automation commands
-nmap wp :w !python3<CR>
-nmap cu :! delivery local unit
+
+
+" switch cursor to line when in insert mode, and block when not
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+
 
 
 " }}}
@@ -26,36 +28,18 @@ syntax on
 set encoding=utf-8
 set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,utf-16,big5,euc-jp,latin1
 
-
-
-
 " Section User Interface {{{
 
-" switch cursor to line when in insert mode, and block when not
-let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 
 if !has('gui_running')
   set t_Co=256
-  let g:dracula_italic=1
   if has('termguicolors') && !exists('$TMUX')
     set termguicolors
 end
 endif 
-colorscheme Dracula
-highlight Normal ctermbg=None
-let lightlineColor = 'Dracula'
+
 let g:dracula_colorterm = 0
-
-
-
-
-
-" make the highlighting of tabs and other non-text less annoying
-highlight SpecialKey ctermbg=none ctermfg=8
-highlight NonText ctermbg=none ctermfg=8
-" make comments and HTML attributes italic
-highlight Comment cterm=italic
-highlight htmlArg cterm=italic
+colorscheme Dracula
 
 set number                  " show line numbers
 
@@ -67,13 +51,16 @@ set showbreak=…             " show ellipsis at breaking
 set autoindent              " automatically set indent of new line
 set smartindent
 
-set list
+
 set list lcs=tab:\|\ 
-set listchars=tab:→\ ,eol:¬,trail:⋅,extends:❯,precedes:❮
-set showbreak=↪
-" set indetn line config
+let g:indentLine_char = '|'
 let g:indentLine_concealcursor = 'inc'
 let g:indentLine_conceallevel = 2
+let g:indentLine_setColors = 239
+
+set list
+set listchars=tab:→\ ,eol:¬,trail:⋅,extends:❯,precedes:❮
+set showbreak=↪
 " highlight conflicts
 match ErrorMsg '^\(<\|=\|>\)\{7\}\([^=].\+\)\?$'
 
@@ -225,6 +212,9 @@ nnoremap <silent> <leader>u :call functions#HtmlUnEscape()<cr>
 "chef plugin for autocomplete
 autocmd FileType ruby,eruby set filetype=ruby.eruby.chef
 
+"automation commands
+nmap wp :w !python3<CR>
+nmap cu :! delivery local unit
 
 
 " }}}
@@ -336,37 +326,50 @@ let g:neomake_typescript_tsc_maker = {
 \ }
 
 
-" airline options
+" Airline {{{"
+" customize airline if installed
+" check if dictionary exists
+let g:airline_theme='dracula' "Airline Theme same as neovim $dracula 
+if !exists('g:airline_symbols')
+  let g:airline_symbols = {}
+endif
 
-let g:airline_left_sep=''
-let g:airline_right_sep=''
-let g:airline_theme='dracula'
+" unicode symbols
+let g:airline_left_sep = '»'
+let g:airline_left_sep = '▶'
+let g:airline_right_sep = '«'
+let g:airline_right_sep = '◀'
+let g:airline_symbols.crypt = '🔒'
+let g:airline_symbols.linenr = '␊'
+let g:airline_symbols.linenr = '␤'
+let g:airline_symbols.linenr = '¶'
+let g:airline_symbols.maxlinenr = '☰'
+let g:airline_symbols.maxlinenr = ''
+let g:airline_symbols.branch = '⎇'
+let g:airline_symbols.spell = 'Ꞩ'
+let g:airline_symbols.notexists = '∄'
+let g:airline_symbols.whitespace = 'Ξ'
+
+" Enable windowswap
+" let g:airline#extensions#windowswap#enabled = 1
 let g:airline#extensions#tabline#enabled = 1 " enable airline tabline
 let g:airline#extensions#tabline#tab_min_count = 2 " only show tabline if tabs are being used (more than 1 tab open)
 let g:airline#extensions#tabline#show_buffers = 0 " do not show open buffers in tabline
 let g:airline#extensions#tabline#show_splits = 0
-
+" End Airline }}}
 
 " don't hide quotes in json files
 let g:vim_json_syntax_conceal = 0
 
 let g:SuperTabCrMapping = 0
 
-"vim tests plugin config
+let g:deoplete#enable_at_startup = 1
 
-augroup test
-  autocmd!
-  autocmd BufWrite * if test#exists() |
-    \   TestFile
-    \ endif
-augroup END
+" Sytastic plugin"
+let g:syntastic_python_checkers = ['pylint']
 
 " }}}
 "
-let g:deoplete#enable_at_startup = 1
-" Sytastic plugin
-"
-let g:syntastic_python_checkers = ['pylint']
 
-" vim:foldmethod=marker:foldlevel=0
+" vim:foldmethod=marker:foldlevel=1
 
