@@ -39,8 +39,7 @@ end
 endif 
 
 let g:dracula_colorterm = 0
-colorscheme Dracula
-
+colorscheme dracula
 set number                  " show line numbers
 
 set wrap                    " turn on line wrapping
@@ -362,9 +361,10 @@ let g:airline#extensions#tabline#show_splits = 0
 let g:vim_json_syntax_conceal = 0
 
 let g:SuperTabCrMapping = 0
-
+" deoplete
 let g:deoplete#enable_at_startup = 1
-
+autocmd CompleteDone * silent! pclose!
+set completeopt-=preview
 " Sytastic plugin"
 let g:syntastic_python_checkers = ['pylint']
 " Go

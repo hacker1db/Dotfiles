@@ -9,6 +9,7 @@ else
 endif
 " colorschemes
 Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'altercation/vim-colors-solarized'
 " utilities
 Plug 'Yggdroot/indentLine'
 " regular plugins
