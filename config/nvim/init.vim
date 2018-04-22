@@ -365,6 +365,9 @@ let g:SuperTabCrMapping = 0
 let g:deoplete#enable_at_startup = 1
 autocmd CompleteDone * silent! pclose!
 set completeopt-=preview
+" deoplete javascript
+let g:neosnippet#enable_completed_snippet = 1
+
 " Sytastic plugin"
 let g:syntastic_python_checkers = ['pylint']
 " Go
