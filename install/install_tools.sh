@@ -14,9 +14,7 @@ brew install tree
 brew install wget 
 brew install fzf # Fuzzy file finder
 brew install lnav # for viewing log files in terminal 
-brew install azure-cli
-echo "Install jekyll for blogging"
-gem install jekyll bundler
+brew install az
 echo "Installing tools for Chef dev"
 # tools for chef dev
 brew install packer
@@ -30,6 +28,9 @@ brew install go
 brew install hub
 brew install reattach-to-user-namespace
 brew install tmux
+# installing pandoc and latex
+brew install pandoc
+brew cask install mactex
 echo "installing tpm plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 brew install zsh
@@ -40,6 +41,7 @@ brew install markdown
 brew install node
 brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
+brew cask install powershell
 brew install nmap 
 echo "Installing neovim..."
 # install neovim
@@ -54,7 +56,6 @@ brew cask Install firefox
 brew cask install spotify
 brew cask install slack
 brew cask install vmware-fusion
-brew cask install visual-studio-code
 brew cask install virtualbox
 brew cask install iterm2
 brew cask install microsoft-office
@@ -70,8 +71,10 @@ brew cask install alfred
 brew cask install foxitreader
 brew cask install dash
 echo "import the iterm dracula theme"
- git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
- echo "install deoplete requirements for neovim"
+git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
+echo "install deoplete requirements for neovim"
  pip3 install neovim
+echo "Install jekyll for blogging"
+sudo gem install jekyll bundler
 
 exit 0
