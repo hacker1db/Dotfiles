@@ -51,8 +51,10 @@ echo "Installing desktop application..."
 
 brew cask install iterm2
 brew cask install moom
-brew cask install google-chrome
-brew cask Install firefox
+brew cask install omnigraffle
+brew cause install firefox
+brew cask install maltego
+brew cask install caskroom/versions/firefox-developer-edition
 brew cask install spotify
 brew cask install slack
 brew cask install vmware-fusion
@@ -60,15 +62,14 @@ brew cask install virtualbox
 brew cask install iterm2
 brew cask install microsoft-office
 brew cask install 1password
+brew cask install private-internet-access
 brew cask install torbrowser
 brew cask install unetbootin
 brew cask install owasp-zap
 brew cask install soapui
 brew cask install insomnia
 brew cask install vlc
-brew cask install polymail
 brew cask install alfred
-brew cask install foxitreader
 brew cask install dash
 echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
