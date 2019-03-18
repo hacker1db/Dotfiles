@@ -25,8 +25,6 @@ alias rmf="rm -rf"
 # moving dir 
 alias sites='cd ~/Documents/Code/Sites/'
 alias notes='cd ~/Documents/Notes'
-# lets me cd to my chef projects directory and not run code app. 
-alias cdpy='cd ~/Documents/Code/Scripts/python_scripts/'
 # Chef commands I hate running with the full command
 alias kdc='kitchen destroy && kitchen converge'
 # Helpers

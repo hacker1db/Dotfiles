@@ -32,6 +32,9 @@ for config ($ZSH/**/*completion.sh) source $config
 export EDITOR='nvim'
 export GIT_EDITOR='nvim'
 
+# pyenv
+eval "$(pyenv init -)"
+
 export PATH=/usr/local/bin:$PATH
 
 # add /usr/local/sbin
@@ -75,6 +78,7 @@ export NVM_DIR="$HOME/.nvm"
 export GOPATH="${HOME}/.go"
 export GOROOT="$(brew --prefix golang)/libexec"
 export PATH="$PATH:${GOPATH}/bin:${GOROOT}/bin"
+export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
 
 test -d "${GOPATH}" || mkdir "${GOPATH}"
 test -d "${GOPATH}/src/github.com" || mkdir -p "${GOPATH}/src/github.com"
@@ -86,3 +90,11 @@ export FZF_DEFAULT_COMMAND='ag -g ""'
 
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/local/bin/vault vault
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi

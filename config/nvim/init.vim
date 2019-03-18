@@ -1,5 +1,4 @@
 source ~/.config/nvim/plugins.vim
-
 " Section General {{{
 
 " Abbreviations
@@ -21,7 +20,6 @@ set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 
 
-
 " }}}
 
 syntax on
@@ -30,13 +28,12 @@ set fileencodings=utf-8,ucs-bom,shift-jis,gb18030,gbk,gb2312,cp936,utf-16,big5,e
 
 " Section User Interface {{{
 
-
-if !has('gui_running')
-  set t_Co=256
-  if has('termguicolors') && !exists('$TMUX')
-    set termguicolors
-end
-endif 
+" if !has('gui_running')
+"   set t_Co=256
+"   if has('termguicolors') && !exists('$TMUX')
+"     set termguicolors
+" end
+" endif 
 
 let g:dracula_colorterm = 0
 colorscheme dracula
@@ -255,7 +252,6 @@ augroup END
 nmap <silent> <leader>k :NERDTreeToggle<cr>
 " expand to the path of the file in the current buffer
 nmap <silent> <leader>y :NERDTreeFind<cr>
-
 let NERDTreeShowHidden=1
 let NERDTreeDirArrowExpandable = '▷'
 let NERDTreeDirArrowCollapsible = '▼'
@@ -333,28 +329,28 @@ if !exists('g:airline_symbols')
   let g:airline_symbols = {}
 endif
 
-" unicode symbols
-let g:airline_left_sep = '»'
-let g:airline_left_sep = '▶'
-let g:airline_right_sep = '«'
-let g:airline_right_sep = '◀'
-let g:airline_symbols.crypt = '🔒'
-let g:airline_symbols.linenr = '␊'
-let g:airline_symbols.linenr = '␤'
-let g:airline_symbols.linenr = '¶'
-let g:airline_symbols.maxlinenr = '☰'
-let g:airline_symbols.maxlinenr = ''
-let g:airline_symbols.branch = '⎇'
-let g:airline_symbols.spell = 'Ꞩ'
-let g:airline_symbols.notexists = '∄'
-let g:airline_symbols.whitespace = 'Ξ'
-
-" Enable windowswap
-" let g:airline#extensions#windowswap#enabled = 1
+"" " unicode symbols
+"let g:airline_left_sep = '»'
+"let g:airline_left_sep = '▶'
+"let g:airline_right_sep = '«'
+"let g:airline_right_sep = '◀'
+"let g:airline_symbols.crypt = '🔒'
+"let g:airline_symbols.linenr = '␊'
+"let g:airline_symbols.linenr = '␤'
+"let g:airline_symbols.linenr = '¶'
+"let g:airline_symbols.maxlinenr = '☰'
+"let g:airline_symbols.maxlinenr = ''
+"let g:airline_symbols.branch = '⎇'
+"let g:airline_symbols.spell = 'Ꞩ'
+"let g:airline_symbols.notexists = '∄'
+"let g:airline_symbols.whitespace = 'Ξ'
+""Enable windowswap
+let g:airline#extensions#windowswap#enabled = 1
 let g:airline#extensions#tabline#enabled = 1 " enable airline tabline
 let g:airline#extensions#tabline#tab_min_count = 2 " only show tabline if tabs are being used (more than 1 tab open)
 let g:airline#extensions#tabline#show_buffers = 0 " do not show open buffers in tabline
 let g:airline#extensions#tabline#show_splits = 0
+let g:airline_powerline_fonts = 1
 " End Airline }}}
 
 " don't hide quotes in json files

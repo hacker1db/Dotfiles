@@ -13,7 +13,6 @@ Plug 'altercation/vim-colors-solarized'
 " utilities
 Plug 'Yggdroot/indentLine'
 " regular plugins
-Plug 'vadv/vim-chef' "for chef yo! 
 Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
 Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utiliey, but use :Ack
 Plug 'Raimondi/delimitMate' " automatic closing of quotes, parenthesis, brackets, etc.
@@ -44,7 +43,9 @@ Plug 'tpope/vim-sleuth' " detect indent style (tabs vs. spaces)
 Plug 'sickill/vim-pasta' " context-aware pasting
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' } " distraction-free writing
 Plug 'junegunn/limelight.vim', { 'on': 'Limelight' } " focus tool. Good for presentating with vim
-Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } | Plug 'Xuyuanp/nerdtree-git-plugin' | Plug 'ryanoasis/vim-devicons' " file drawer
+Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } " file drawer
+Plug 'Xuyuanp/nerdtree-git-plugin' 
+Plug 'ryanoasis/vim-devicons' 
 Plug 'mklabs/split-term.vim' "better splits in vim.
 " Testing in VIM 
 Plug 'janko-m/vim-test'
@@ -61,7 +62,8 @@ Plug 'moll/vim-node', { 'for': 'javascript' } " node support
 Plug 'othree/yajs.vim', { 'for': 'javascript' } " JavaScript syntax plugin
 Plug 'mxw/vim-jsx', { 'for': 'jsx' } " JSX support
 Plug 'othree/es.next.syntax.vim', { 'for': 'javascript' } " ES6 and beyond syntax
-Plug 'kchmck/vim-coffee-script', {'for': 'coffee'} " Coffee Script Support
+Plug 'HerringtonDarkholme/yats.vim' " yats for JavaScript
+Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
 " deoplete javascript
 Plug 'wokalski/autocomplete-flow'
 " For func argument completion
@@ -96,6 +98,8 @@ Plug 'PProvost/vim-ps1'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 Plug 'zchee/deoplete-go', { 'do': 'make'}
+" latex
+Plug 'lervag/vimtex'
 " Docs
 Plug 'rizzatti/dash.vim'
 call plug#end()

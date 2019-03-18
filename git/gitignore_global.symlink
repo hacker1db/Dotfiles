@@ -9,6 +9,7 @@ Icon
 .ssh 
 *.ini
 *.csv
+*.pyc
 .zsh_histroy
 # Thumbnails
 ._*
