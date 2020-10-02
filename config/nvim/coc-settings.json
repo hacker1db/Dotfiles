@@ -1,0 +1,9 @@
+{
+  "python.jediEnabled": false,
+  "html.autoClosingTags": true,
+  "coc.preferences.formatOnSaveFiletypes": ["css", "Markdown"],
+  "go.goplsOptions": {
+    "completeUnimported": true
+  }
+}
+
