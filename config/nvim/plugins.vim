@@ -1,9 +1,7 @@
 call plug#begin('~/.config/nvim/plugged')
 
 if has('nvim')
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 else
-    Plug 'Shougo/deoplete.nvim'
     Plug 'roxma/nvim-yarp'
     Plug 'roxma/vim-hug-neovim-rpc'
 endif
@@ -13,7 +11,8 @@ Plug 'altercation/vim-colors-solarized'
 " utilities
 Plug 'Yggdroot/indentLine'
 " regular plugins
-Plug '/usr/local/opt/fzf' | Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
 Plug 'mileszs/ack.vim' " search inside files using ack. Same as command line ack utiliey, but use :Ack
 Plug 'Raimondi/delimitMate' " automatic closing of quotes, parenthesis, brackets, etc.
 Plug 'tpope/vim-commentary' " comment stuff out
@@ -64,8 +63,6 @@ Plug 'mxw/vim-jsx', { 'for': 'jsx' } " JSX support
 Plug 'othree/es.next.syntax.vim', { 'for': 'javascript' } " ES6 and beyond syntax
 Plug 'HerringtonDarkholme/yats.vim' " yats for JavaScript
 Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
-" deoplete javascript
-Plug 'wokalski/autocomplete-flow'
 " For func argument completion
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
@@ -91,17 +88,20 @@ Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' } " ruby support
 " Python
 Plug 'nvie/vim-flake8', {'for': 'python' } "Python Code Checker
 Plug 'jmcomets/vim-pony'
-Plug 'zchee/deoplete-jedi'
 "Powershell
 Plug 'PProvost/vim-ps1'
 " GO
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
-Plug 'zchee/deoplete-go', { 'do': 'make'}
-" latex
-Plug 'lervag/vimtex'
+" svelte
+Plug 'evanleck/vim-svelte', {'branch': 'main'}
 " Docs
 Plug 'rizzatti/dash.vim'
+" coc complete this!
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc-highlight', {'do': 'yarn install --frozen-lockfile'} " color highlighting
+" emmet
+Plug 'mattn/emmet-vim'
+
 call plug#end()
-let g:deoplete#enable_at_startup = 1
 

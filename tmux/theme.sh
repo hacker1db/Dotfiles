@@ -53,7 +53,7 @@ set-option -g display-panes-colour $tm_color_inactive
 # clock
 set-window-option -g clock-mode-colour $tm_clock_color
 
-tm_tunes="#[fg=$tm_color_music,bold]#(osascript ~/.dotfiles/applescripts/tunes.scpt)"
+tm_tunes="#[bg=default,fg=$tm_color_music] #(osascript ~/.dotfiles/applescripts/tunes.scpt)"
 tm_battery="#[fg=$dark_purple]#[bg=default] Batt: #{battery_percentage} #{battery_remain}"
 tm_date="#[fg=$tm_clock_color] %a %h-%d %H:%M "
 # tm_host="#[fg=$tm_color_music]#[bg=$default]#h"

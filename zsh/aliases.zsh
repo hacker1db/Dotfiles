@@ -81,6 +81,9 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 
 alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chrome"
 alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\ Chrome\\ Canary"
-alias code="code-insiders"
 alias rundj="python manage.py runserver 7000"
 alias school="cd ~/Documents/school"
+alias cod="cd ~/Documents/code"
+alias k="kubectl"
+
+

@@ -8,7 +8,7 @@ fi
 echo "Installing cli tools.."
 brew tap caskroom/cask
 brew tap homebrew/cask-fonts  
-brew cask install font-dejavusansmono-nerd-font-mono
+brew cask install font-dejavusansmono-nerd-font
 brew install git
 brew install ack
 brew install tree

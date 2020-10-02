@@ -320,6 +320,7 @@ let g:neomake_typescript_tsc_maker = {
         \ '%C%\s%\+%m'
 \ }
 
+let g:coc_global_extensions=['coc-omnisharp', 'coc-emmet', 'coc-css', 'coc-html', 'coc-json', 'coc-prettier', 'coc-tsserver']
 
 " Airline {{{"
 " customize airline if installed
@@ -330,20 +331,20 @@ if !exists('g:airline_symbols')
 endif
 
 "" " unicode symbols
-"let g:airline_left_sep = '»'
-"let g:airline_left_sep = '▶'
-"let g:airline_right_sep = '«'
-"let g:airline_right_sep = '◀'
-"let g:airline_symbols.crypt = '🔒'
-"let g:airline_symbols.linenr = '␊'
-"let g:airline_symbols.linenr = '␤'
-"let g:airline_symbols.linenr = '¶'
-"let g:airline_symbols.maxlinenr = '☰'
-"let g:airline_symbols.maxlinenr = ''
-"let g:airline_symbols.branch = '⎇'
-"let g:airline_symbols.spell = 'Ꞩ'
-"let g:airline_symbols.notexists = '∄'
-"let g:airline_symbols.whitespace = 'Ξ'
+let g:airline_left_sep = '»'
+let g:airline_left_sep = '▶'
+let g:airline_right_sep = '«'
+let g:airline_right_sep = '◀'
+let g:airline_symbols.crypt = '🔒'
+let g:airline_symbols.linenr = '␊'
+let g:airline_symbols.linenr = '␤'
+let g:airline_symbols.linenr = '¶'
+let g:airline_symbols.maxlinenr = '☰'
+let g:airline_symbols.maxlinenr = ''
+let g:airline_symbols.branch = '⎇'
+let g:airline_symbols.spell = 'Ꞩ'
+let g:airline_symbols.notexists = '∄'
+let g:airline_symbols.whitespace = 'Ξ'
 ""Enable windowswap
 let g:airline#extensions#windowswap#enabled = 1
 let g:airline#extensions#tabline#enabled = 1 " enable airline tabline
@@ -352,35 +353,25 @@ let g:airline#extensions#tabline#show_buffers = 0 " do not show open buffers in 
 let g:airline#extensions#tabline#show_splits = 0
 let g:airline_powerline_fonts = 1
 " End Airline }}}
+"Svelte edits
+augroup svelte
+au! BufNewFile,BufRead *.svelte set ft=html
+augroup END
 
-" don't hide quotes in json files
-let g:vim_json_syntax_conceal = 0
+command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+" Go lang
+autocmd BufWritePre *.go :call CocAction('organizeImport')
 
-let g:SuperTabCrMapping = 0
-" deoplete
-let g:deoplete#enable_at_startup = 1
-autocmd CompleteDone * silent! pclose!
-set completeopt-=preview
-" deoplete javascript
-let g:neosnippet#enable_completed_snippet = 1
+autocmd FileType go nmap gtj :CocCommand go.tags.add json<cr>
+autocmd FileType go nmap gty :CocCommand go.tags.add yaml<cr>
+autocmd FileType go nmap gtx :CocCommand go.tags.clear<cr>
+" Emet
+let g:user_emmet_install_global = 0
+autocmd FileType html,css EmmetInstall
+let g:user_emmet_mode='n'    "only enable normal mode functions.
+let g:user_emmet_mode='inv'  "enable all functions, which is equal to
+let g:user_emmet_mode='a'    "enable all function in all mode.
 
-" Sytastic plugin"
-let g:syntastic_python_checkers = ['pylint']
-" Go
-" use goimports for formatting
-let g:go_fmt_command = "goimports"
-
-" turn highlighting on
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-
-let g:syntastic_go_checkers = ['golint', 'errcheck', 'go']
-let g:deoplete#sources#go#gocode_binary = $GOPATH.'/bin/gocode'
-let g:deoplete#sources#go#package_dot = 1
-let g:deoplete#sources#go#sort_class = ['package', 'func', 'type', 'var', 'const']
 " }}}
 "
 " vim:foldmethod=marker:foldlevel=1
