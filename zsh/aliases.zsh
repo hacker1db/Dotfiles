@@ -39,7 +39,7 @@ alias ,d='open -a /Applications/Dash.app'
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias localip="ipconfig getifaddr en1"
 alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
-
+alias k="kubectl"
 # Flush Directory Service cache
 alias flush="dscacheutil -flushcache"
 
@@ -84,6 +84,5 @@ alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\
 alias rundj="python manage.py runserver 7000"
 alias school="cd ~/Documents/school"
 alias cod="cd ~/Documents/code"
-alias k="kubectl"
 
 

@@ -40,8 +40,7 @@ VIMFILES=( "$HOME/.vim:$DOTFILES/vim/.vim"
 for file in "${VIMFILES[@]}"; do
     KEY=${file%%:*}
     VALUE=${file#*:}
-    if [ -e ${KEY} ]; then
-        echo "${KEY} already exists... skipping."
+    if [ -e ${KEY} ]; then echo "${KEY} already exists... skipping."
     else
         echo "Creating symlink for $KEY"
         ln -s ${VALUE} ${KEY}

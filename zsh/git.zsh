@@ -13,6 +13,7 @@ alias grm='git rm'
 alias grn='git-rename'
 alias glog="git l"
 alias gcm="git commit -am"
+alias gcs="git commit -S -am"
 
 # alias git-amend='git commit --amend -C HEAD'
 alias git-undo='git reset --soft HEAD~1'

@@ -77,7 +77,8 @@ echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
 echo "install deoplete requirements for neovim"
  pip3 install neovim
-echo "Install jekyll for blogging"
-sudo gem install jekyll bundler
+echo "Install tools for blogging"
+brew install hugo
+
 
 exit 0

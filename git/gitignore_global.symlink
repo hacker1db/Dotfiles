@@ -13,7 +13,9 @@ Icon
 .zsh_histroy
 # Thumbnails
 ._*
-
+.netrwhist
+# Rider
+.idea
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
@@ -23,4 +25,5 @@ Icon
 
 # typescript command garbage
 tscommand*.txt
-
+# localconfig
+config.json

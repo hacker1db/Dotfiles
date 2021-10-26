@@ -1,9 +1,16 @@
 {
+  "eslint.autoFixOnSave": true,
+  "eslint.filetypes": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "prettier.disableSuccessMessage": true,
+  "tsserver.formatOnType": true,
   "python.jediEnabled": false,
   "html.autoClosingTags": true,
   "coc.preferences.formatOnSaveFiletypes": ["css", "Markdown"],
+  "coc.preferences.formatOnType": true,
+  "powershell.integratedConsole.showOnStartup": true,
   "go.goplsOptions": {
-    "completeUnimported": true
+    "completeUnimported": true,
+    "gofumpt":true
   }
 }
 

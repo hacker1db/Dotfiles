@@ -7,7 +7,6 @@ else
 endif
 " colorschemes
 Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'altercation/vim-colors-solarized'
 " utilities
 Plug 'Yggdroot/indentLine'
 " regular plugins
@@ -26,14 +25,13 @@ Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
 Plug 'neomake/neomake' " neovim replacement for syntastic using neovim's job control functonality
 Plug 'vim-syntastic/syntastic' "syntastic returns! 
 Plug 'tpope/vim-fugitive' " amazing git wrapper for vim
+Plug 'airblade/vim-gitgutter' " git integration
 Plug 'tpope/vim-repeat' " enables repeating other supported plugins with the . command
-Plug 'garbas/vim-snipmate' " snippet manager
 Plug 'editorconfig/editorconfig-vim' " .editorconfig support
 Plug 'MarcWeber/vim-addon-mw-utils' " interpret a file by function and cache file automatically
 Plug 'tomtom/tlib_vim' " utility functions for vim
 Plug 'sotte/presenting.vim', { 'for': 'markdown' } " a simple tool for presenting slides in vim based on text files
 Plug 'JamshedVesuna/vim-markdown-preview' "markdown testing
-Plug 'ervandew/supertab' " Perform all your vim insert mode completions with Tab
 Plug 'tpope/vim-dispatch' " asynchronous build and test dispatcher
 Plug 'tpope/vim-vinegar'
 Plug 'AndrewRadev/splitjoin.vim' " single/multi line code handler: gS - split one line into multiple, gJ - combine multiple lines into one
@@ -63,6 +61,12 @@ Plug 'mxw/vim-jsx', { 'for': 'jsx' } " JSX support
 Plug 'othree/es.next.syntax.vim', { 'for': 'javascript' } " ES6 and beyond syntax
 Plug 'HerringtonDarkholme/yats.vim' " yats for JavaScript
 Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
+" Reactjs
+Plug 'pangloss/vim-javascript'
+Plug 'leafgarland/typescript-vim'
+Plug 'peitalin/vim-jsx-typescript'
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
+
 " For func argument completion
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
@@ -85,23 +89,29 @@ Plug 'timcharper/textile.vim', { 'for': 'textile' } " textile support
 Plug 'tclem/vim-arduino' " arduino support - compile wihtout needing to open the arduino IDE
 Plug 'elzr/vim-json', { 'for': 'json' } " JSON support
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' } " ruby support
+
 " Python
-Plug 'nvie/vim-flake8', {'for': 'python' } "Python Code Checker
 Plug 'jmcomets/vim-pony'
+Plug 'Vimjas/vim-python-pep8-indent'
+Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
+
 "Powershell
 Plug 'PProvost/vim-ps1'
 " GO
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
-" svelte
-Plug 'evanleck/vim-svelte', {'branch': 'main'}
-" Docs
-Plug 'rizzatti/dash.vim'
 " coc complete this!
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'neoclide/coc-highlight', {'do': 'yarn install --frozen-lockfile'} " color highlighting
 " emmet
 Plug 'mattn/emmet-vim'
-
+" Rainbow braces
+Plug 'frazrepo/vim-rainbow'
+" C#
+Plug 'OmniSharp/omnisharp-vim'
+" Terrafrom
+Plug 'hashivim/vim-terraform'
+"Md Preview
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 call plug#end()
 

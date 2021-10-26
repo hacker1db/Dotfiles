@@ -126,6 +126,9 @@ sed -i '' "s/'$a'/'$b'/g" $file
 grep -w "version" $file
 }
 
+function set-ns() {
+kubectl config set-context --current --namespace="$@"
+}
 
 
 

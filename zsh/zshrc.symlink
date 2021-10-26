@@ -57,7 +57,9 @@ if [[ -d ~/.rvm ]]; then
     PATH=$HOME/.rvm/bin:$PATH # Add RVM to PATH for scripting
     source ~/.rvm/scripts/rvm
 fi
-
+# eport node version manager.
+export NVM_DIR=~/.nvm
+source $(brew --prefix nvm)/nvm.sh 
 # alias git to hub
 if command_exists hub; then
     eval "$(hub alias -s)"
@@ -69,9 +71,6 @@ if [ -z ${DOTFILES_LOADED+x} ]; then
     # install zsh autosuggestions
     source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
-
-export NVM_DIR="$HOME/.nvm" 
-. "/usr/local/opt/nvm/nvm.sh"
 # Go Lang dev info 
 export GOPATH="${HOME}/.go"
 export GOROOT="$(brew --prefix golang)/libexec"
@@ -80,15 +79,21 @@ export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
 
 test -d "${GOPATH}" || mkdir "${GOPATH}"
 test -d "${GOPATH}/src/github.com" || mkdir -p "${GOPATH}/src/github.com"
-DOTFILES_LOADED=1
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_DEFAULT_COMMAND='ag -g ""'
 
 # End oG Config
-
-
-
-
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/local/bin/vault vault
+
+# Add .NET Core SDK tools
+export PATH="$PATH:/Users/david.waltersalaskaair.com/.dotnet/tools"
+autoload -U +X bashcompinit && bashcompinit
+source /usr/local/etc/bash_completion.d/az
+export GPG_TTY=$(tty)
+
+
+DOTFILES_LOADED=1
+
+
