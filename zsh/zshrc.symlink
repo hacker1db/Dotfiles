@@ -43,15 +43,7 @@ if [[ -d ~/bin ]]; then
     export PATH=~/bin:$PATH
 fi
 
-# install rbenv
-if command_exists rbenv; then
-    eval "$(rbenv init -)"
-fi
 
-if [[ -d ~/.rvm ]]; then
-    PATH=$HOME/.rvm/bin:$PATH # Add RVM to PATH for scripting
-    source ~/.rvm/scripts/rvm
-fi
 # eport node version manager.
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
