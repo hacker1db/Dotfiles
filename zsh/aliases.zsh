@@ -23,8 +23,8 @@ alias ll="ls -lFh ${colorflag}"
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
 # moving dir 
-alias sites='cd ~/Documents/Code/Sites/'
-alias notes='cd ~/Documents/Notes'
+alias sites='cd ~/Code/Sites/'
+alias notes='cd ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes'
 # Chef commands I hate running with the full command
 alias kdc='kitchen destroy && kitchen converge'
 # Helpers

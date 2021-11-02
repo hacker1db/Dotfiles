@@ -1,10 +1,6 @@
 export DOTFILES=$HOME/.dotfiles
 export ZSH=$DOTFILES/zsh
 
-command_exists() {
-    type "$1" > /dev/null 2>&1
-}
-
 # display how long all tasks over 10 seconds take
 export REPORTTIME=10
 
@@ -21,7 +17,6 @@ for config ($ZSH/**/*.zsh) source $config
 if [[ -a ~/.localrc ]]; then
     source ~/.localrc
 fi
-
 
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
@@ -58,12 +53,9 @@ if [[ -d ~/.rvm ]]; then
     source ~/.rvm/scripts/rvm
 fi
 # eport node version manager.
-export NVM_DIR=~/.nvm
-source $(brew --prefix nvm)/nvm.sh 
-# alias git to hub
-if command_exists hub; then
-    eval "$(hub alias -s)"
-fi
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
 
 if [ -z ${DOTFILES_LOADED+x} ]; then
     # install zsh-syntax-highlighting
@@ -83,16 +75,10 @@ test -d "${GOPATH}/src/github.com" || mkdir -p "${GOPATH}/src/github.com"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_DEFAULT_COMMAND='ag -g ""'
 
-# End oG Config
-autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /usr/local/bin/vault vault
 
-# Add .NET Core SDK tools
-export PATH="$PATH:/Users/david.waltersalaskaair.com/.dotnet/tools"
 autoload -U +X bashcompinit && bashcompinit
 source /usr/local/etc/bash_completion.d/az
 export GPG_TTY=$(tty)
-
 
 DOTFILES_LOADED=1
 
