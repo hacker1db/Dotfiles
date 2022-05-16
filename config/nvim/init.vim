@@ -247,13 +247,12 @@ nnoremap <leader>t :call OpenTerminal()<CR>
 " FZF
 """""""""""""""""""""""""""""""""""""
 
-" Toggle NERDTree
-nmap <silent> <leader>k :NERDTreeToggle<cr>
+" Toggle NvimTree
+nmap <silent> <leader>k :NvimTreeFindFileToggle<cr>
 " expand to the path of the file in the current buffer
-nmap <silent> <leader>y :NERDTreeFind<cr>
-let NERDTreeShowHidden=1
-let NERDTreeDirArrowExpandable = '▷'
-let NERDTreeDirArrowCollapsible = '▼'
+" let NERDTreeShowHidden=1
+" let NERDTreeDirArrowExpandable = '▷'
+" let NERDTreeDirArrowCollapsible = '▼'
 
 let g:fzf_layout = { 'down': '~25%' }
 
