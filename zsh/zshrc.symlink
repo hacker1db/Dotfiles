@@ -11,6 +11,21 @@ if [[ -d ~/code ]]; then
     export CODE_DIR=~/code
 fi
 
+
+if [[ -d ~/go/bin/air ]]; then
+ alias air=~/go/bin/air
+fi
+
+autoload -Uz compinit
+compinit
+eval "$(op completion zsh)"; compdef _op op
+
+# source z.sh if it exists
+zpath="$(brew --prefix)/etc/profile.d/z.sh"
+if [ -f "$zpath" ]; then
+    source "$zpath"
+fi
+
 # source all .zsh files inside of the zsh/ directory
 for config ($ZSH/**/*.zsh) source $config
 
@@ -51,27 +66,30 @@ export NVM_DIR="$HOME/.nvm"
 
 if [ -z ${DOTFILES_LOADED+x} ]; then
     # install zsh-syntax-highlighting
-    source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    source /opt/homebrew/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     # install zsh autosuggestions
-    source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+    source /opt/homebrew/opt/zsh-autosuggestions/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
-# Go Lang dev info 
-export GOPATH="${HOME}/.go"
-export GOROOT="$(brew --prefix golang)/libexec"
-export PATH="$PATH:${GOPATH}/bin:${GOROOT}/bin"
 export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
 
-test -d "${GOPATH}" || mkdir "${GOPATH}"
-test -d "${GOPATH}/src/github.com" || mkdir -p "${GOPATH}/src/github.com"
+# add a config file for ripgrep
+export RIPGREP_CONFIG_PATH="$HOME/.rgrc"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+[ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
 export FZF_DEFAULT_COMMAND='ag -g ""'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
+
+
+source <(kubectl completion zsh)
+alias k=kubectl
+complete -F __start_kubectl k
 
 autoload -U +X bashcompinit && bashcompinit
-source /usr/local/etc/bash_completion.d/az
+# source /opt/homebrew/opt/etc/bash_completion.d/az
 export GPG_TTY=$(tty)
 
 DOTFILES_LOADED=1
 
-
+export PATH="$PATH:/Users/hacker1db/.kit/bin"

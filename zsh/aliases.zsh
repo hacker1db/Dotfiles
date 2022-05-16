@@ -17,6 +17,8 @@ alias ...='cd ../..'
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 
+alias cat='bat'
+alias tf="terraform"
 alias l="ls -lah ${colorflag}"
 alias la="ls -AF ${colorflag}"
 alias ll="ls -lFh ${colorflag}"
@@ -84,5 +86,3 @@ alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\
 alias rundj="python manage.py runserver 7000"
 alias school="cd ~/Documents/school"
 alias cod="cd ~/Documents/code"
-
-

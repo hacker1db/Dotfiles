@@ -1,10 +1,12 @@
+if has("nvim")
+  let g:plug_home = stdpath('data') . '/plugged'
+endif
+
+
+
 call plug#begin('~/.config/nvim/plugged')
 
-if has('nvim')
-else
-    Plug 'roxma/nvim-yarp'
-    Plug 'roxma/vim-hug-neovim-rpc'
-endif
+
 " colorschemes
 Plug 'dracula/vim', { 'as': 'dracula' }
 " utilities
@@ -20,8 +22,8 @@ Plug 'tpope/vim-endwise' " automatically add end in ruby
 Plug 'tpope/vim-ragtag' " endings for html, xml, etc. - ehances surround
 Plug 'tpope/vim-surround' " mappings to easily delete, change and add such surroundings in pairs, such as quotes, parens, etc.
 Plug 'benmills/vimux' " tmux integration for vim
-Plug 'vim-airline/vim-airline' " fancy statusline
-Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
+" Plug 'vim-airline/vim-airline' " fancy statusline
+" Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
 Plug 'neomake/neomake' " neovim replacement for syntastic using neovim's job control functonality
 Plug 'vim-syntastic/syntastic' "syntastic returns! 
 Plug 'tpope/vim-fugitive' " amazing git wrapper for vim
@@ -31,7 +33,7 @@ Plug 'editorconfig/editorconfig-vim' " .editorconfig support
 Plug 'MarcWeber/vim-addon-mw-utils' " interpret a file by function and cache file automatically
 Plug 'tomtom/tlib_vim' " utility functions for vim
 Plug 'sotte/presenting.vim', { 'for': 'markdown' } " a simple tool for presenting slides in vim based on text files
-Plug 'JamshedVesuna/vim-markdown-preview' "markdown testing
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']} "markdown testing
 Plug 'tpope/vim-dispatch' " asynchronous build and test dispatcher
 Plug 'tpope/vim-vinegar'
 Plug 'AndrewRadev/splitjoin.vim' " single/multi line code handler: gS - split one line into multiple, gJ - combine multiple lines into one
@@ -60,11 +62,9 @@ Plug 'othree/yajs.vim', { 'for': 'javascript' } " JavaScript syntax plugin
 Plug 'mxw/vim-jsx', { 'for': 'jsx' } " JSX support
 Plug 'othree/es.next.syntax.vim', { 'for': 'javascript' } " ES6 and beyond syntax
 Plug 'HerringtonDarkholme/yats.vim' " yats for JavaScript
-Plug 'mhartington/nvim-typescript', {'do': './install.sh'}
+
 " Reactjs
 Plug 'pangloss/vim-javascript'
-Plug 'leafgarland/typescript-vim'
-Plug 'peitalin/vim-jsx-typescript'
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' }
 
 " For func argument completion
@@ -101,8 +101,8 @@ Plug 'PProvost/vim-ps1'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 " coc complete this!
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-Plug 'neoclide/coc-highlight', {'do': 'yarn install --frozen-lockfile'} " color highlighting
+" Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'neoclide/coc-highlight', {'do': 'yarn install --frozen-lockfile'} " color highlighting
 " emmet
 Plug 'mattn/emmet-vim'
 " Rainbow braces
@@ -113,5 +113,39 @@ Plug 'OmniSharp/omnisharp-vim'
 Plug 'hashivim/vim-terraform'
 "Md Preview
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+Plug 'robertbasic/vim-hugo-helper'
+" Vue
+Plug 'leafOfTree/vim-vue-plugin'
+Plug 'groenewege/vim-less', { 'for': 'less' }
+
+if has('nvim')
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'glepnir/lspsaga.nvim'
+    Plug 'hoob3rt/lualine.nvim'
+    Plug 'kristijanhusak/defx-git'
+    Plug 'kristijanhusak/defx-icons'
+    Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
+    Plug 'neovim/nvim-lspconfig'
+    Plug 'williamboman/nvim-lsp-installer'
+    Plug 'tami5/lspsaga.nvim'
+    Plug 'folke/lsp-colors.nvim'
+    Plug 'L3MON4D3/LuaSnip'
+    Plug 'hrsh7th/cmp-nvim-lsp'
+    Plug 'hrsh7th/cmp-buffer'
+    Plug 'hrsh7th/nvim-cmp'
+    Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+    Plug 'kyazdani42/nvim-web-devicons'
+    Plug 'onsails/lspkind-nvim'
+    Plug 'nvim-lua/popup.nvim'
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
+    Plug 'windwp/nvim-autopairs'
+    Plug 'windwp/nvim-ts-autotag'
+    Plug 'kyazdani42/nvim-web-devicons'
+    Plug 'nvim-lualine/lualine.nvim'
+    Plug 'kyazdani42/nvim-tree.lua'
+endif
+
+
 call plug#end()
 

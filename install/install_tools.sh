@@ -16,6 +16,7 @@ brew install wget
 brew install fzf # Fuzzy file finder
 brew install lnav # for viewing log files in terminal 
 brew install az
+brew instal bat
 echo "Installing tools for Chef dev"
 # tools for chef dev
 brew install packer
@@ -45,6 +46,9 @@ brew install zsh-autosuggestions
 brew cask install powershell
 brew cask install font-hack-nerd-font
 brew install nmap 
+brew install tree-sitter
+brew install --cask dotnet
+brew install --cask dotnet-sdk
 echo "Installing neovim..."
 # install neovim
 brew install neovim
@@ -53,15 +57,16 @@ echo "Installing desktop application..."
 
 brew cask install iterm2
 brew cask install moom
-brew cask install omnigraffle
-brew cask install maltego
+brew cask install darwio
 brew cask install spotify
 brew cask install slack
+brew install --cask discord
 brew cask install vmware-fusion
 brew cask install virtualbox
 brew cask install iterm2
-brew cask install microsoft-office
-brew cask install 1password
+brew install --cask 1password-cli
+brew install --cask keycastr
+brew install --cask jetbrains-toolbox
 brew cask install private-internet-access
 brew cask install torbrowser
 brew cask install unetbootin
@@ -69,10 +74,14 @@ brew cask install soapui
 brew cask install insomnia
 brew cask install vlc
 brew cask install alfred
-brew cask install dash
 brew cask install obs
+brew install --cask obsidian
 brew cask install wireshark
-brew cask install royal-tsx
+brew install rustscan
+brew install --cask min
+brew install --cask dotnet
+brew install --cask krisp
+
 echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
 echo "install deoplete requirements for neovim"

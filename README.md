@@ -58,4 +58,11 @@ vim and neovim should just work once the correct plugins are installed. To insta
     nvim +PlugInstall
 
 
+```
 
+
+--- 
+
+[golang air](https://github.com/cosmtrek/air)
+
+`npm install -g typescript typescript-language-server eslint prettier`

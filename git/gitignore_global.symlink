@@ -27,3 +27,4 @@ Icon
 tscommand*.txt
 # localconfig
 config.json
+.hugo_build.lock
