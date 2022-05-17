@@ -17,12 +17,7 @@ brew install fzf # Fuzzy file finder
 brew install lnav # for viewing log files in terminal 
 brew install az
 brew instal bat
-echo "Installing tools for Chef dev"
-# tools for chef dev
-brew install packer
-brew cask install vagrant
-vagrant plugin install vagrant-cachier
-brew cask install chefdk
+brew install httpie
 brew install docker
 
 # terminals cause why not!
@@ -44,11 +39,14 @@ brew install node
 brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
 brew cask install powershell
-brew cask install font-hack-nerd-font
+brew tap homebrew/cask-fonts
+brew install --cask font-hack-nerd-font
 brew install nmap 
 brew install tree-sitter
 brew install --cask dotnet
 brew install --cask dotnet-sdk
+brew install --cask flutter
+
 echo "Installing neovim..."
 # install neovim
 brew install neovim

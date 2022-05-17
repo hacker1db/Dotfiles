@@ -21,9 +21,10 @@ alias cat='bat'
 alias tf="terraform"
 alias l="ls -lah ${colorflag}"
 alias la="ls -AF ${colorflag}"
-alias ll="exa -g -l --icons"
+alias ll="exa -g -l --icons -a"
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
+alias tree='exa -l --icons --tree -a -g'
 # moving dir 
 alias sites='cd ~/Code/Sites/'
 alias notes='cd ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes'
