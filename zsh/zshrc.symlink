@@ -1,6 +1,9 @@
 export DOTFILES=$HOME/.dotfiles
 export ZSH=$DOTFILES/zsh
 
+autoload -Uz compinit
+compinit
+
 # display how long all tasks over 10 seconds take
 export REPORTTIME=10
 
@@ -17,10 +20,7 @@ if [[ -d ~/go/bin/air ]]; then
 fi
 
 
-eval "$(pandoc --bash-completion)"
-
-autoload -Uz compinit
-compinit
+# eval "$(pandoc --bash-completion)"
 eval "$(op completion zsh)"; compdef _op op
 
 # source z.sh if it exists
@@ -69,14 +69,11 @@ export NVM_DIR="$HOME/.nvm"
 
 if [ -z ${DOTFILES_LOADED+x} ]; then
     # install zsh-syntax-highlighting
-    source /opt/homebrew/opt/zsh-syntax-highlighting/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
     # install zsh autosuggestions
-    source /opt/homebrew/opt/zsh-autosuggestions/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+    source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
 export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
-
-# add a config file for ripgrep
-export RIPGREP_CONFIG_PATH="$HOME/.rgrc"
 
 
 [ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
@@ -84,13 +81,12 @@ export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 
-
 source <(kubectl completion zsh)
 alias k=kubectl
-complete -F __start_kubectl k
+compdef __start_kubectl k
 
-autoload -U +X bashcompinit && bashcompinit
-# source /opt/homebrew/opt/etc/bash_completion.d/az
+autoload bashcompinit && bashcompinit
+source /usr/local/etc/bash_completion.d/az
 export GPG_TTY=$(tty)
 
 DOTFILES_LOADED=1

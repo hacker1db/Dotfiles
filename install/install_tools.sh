@@ -15,7 +15,7 @@ brew install tree
 brew install wget 
 brew install fzf # Fuzzy file finder
 brew install lnav # for viewing log files in terminal 
-brew install az
+brew install azure-cli
 brew instal bat
 brew install httpie
 brew install docker
