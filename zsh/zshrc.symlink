@@ -16,6 +16,9 @@ if [[ -d ~/go/bin/air ]]; then
  alias air=~/go/bin/air
 fi
 
+
+eval "$(pandoc --bash-completion)"
+
 autoload -Uz compinit
 compinit
 eval "$(op completion zsh)"; compdef _op op

@@ -21,7 +21,7 @@ alias cat='bat'
 alias tf="terraform"
 alias l="ls -lah ${colorflag}"
 alias la="ls -AF ${colorflag}"
-alias ll="ls -lFh ${colorflag}"
+alias ll="exa -g -l --icons"
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
 # moving dir 
