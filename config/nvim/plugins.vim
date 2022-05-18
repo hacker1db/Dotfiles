@@ -6,7 +6,6 @@ endif
 
 call plug#begin('~/.config/nvim/plugged')
 
-
 " colorschemes
 Plug 'dracula/vim', { 'as': 'dracula' }
 " utilities
@@ -22,8 +21,6 @@ Plug 'tpope/vim-endwise' " automatically add end in ruby
 Plug 'tpope/vim-ragtag' " endings for html, xml, etc. - ehances surround
 Plug 'tpope/vim-surround' " mappings to easily delete, change and add such surroundings in pairs, such as quotes, parens, etc.
 Plug 'benmills/vimux' " tmux integration for vim
-" Plug 'vim-airline/vim-airline' " fancy statusline
-" Plug 'vim-airline/vim-airline-themes' " themes for vim-airline
 Plug 'neomake/neomake' " neovim replacement for syntastic using neovim's job control functonality
 Plug 'vim-syntastic/syntastic' "syntastic returns! 
 Plug 'tpope/vim-fugitive' " amazing git wrapper for vim
@@ -100,9 +97,6 @@ Plug 'PProvost/vim-ps1'
 " GO
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
-" coc complete this!
-" Plug 'neoclide/coc.nvim', {'branch': 'release'}
-" Plug 'neoclide/coc-highlight', {'do': 'yarn install --frozen-lockfile'} " color highlighting
 " emmet
 Plug 'mattn/emmet-vim'
 " Rainbow braces
@@ -146,6 +140,9 @@ if has('nvim')
     Plug 'kyazdani42/nvim-tree.lua'
 endif
 
+"Dart/Flutter
+Plug 'dart-lang/dart-vim-plugin'
+Plug 'akinsho/flutter-tools.nvim'
 
 call plug#end()
 

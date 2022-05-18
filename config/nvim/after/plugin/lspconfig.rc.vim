@@ -98,5 +98,6 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
     }
   }
 )
-
+-- alternatively you can override the default configs
+require("flutter-tools").setup {}
 EOF

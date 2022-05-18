@@ -10,6 +10,7 @@ fi
 
 alias vim="nvim"
 alias vi="nvim"
+alias f="flutter"
 alias gitpulla='find . -mindepth 1 -maxdepth 1 -type d -print -exec git -C {} pull \;'
 # Filesystem aliases
 alias ..='cd ..'
@@ -28,8 +29,6 @@ alias tree='exa -l --icons --tree -a -g'
 # moving dir 
 alias sites='cd ~/Code/Sites/'
 alias notes='cd ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes'
-# Chef commands I hate running with the full command
-alias kdc='kitchen destroy && kitchen converge'
 # Helpers
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
@@ -37,7 +36,6 @@ alias du='du -h -c' # calculate disk usage for a folder
 
 # Applications
 alias ios='open -a /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
-alias ,d='open -a /Applications/Dash.app'
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias localip="ipconfig getifaddr en1"
