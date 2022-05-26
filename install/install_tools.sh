@@ -46,6 +46,7 @@ brew install tree-sitter
 brew install --cask dotnet
 brew install --cask dotnet-sdk
 brew install --cask flutter
+brew install --cask hiddenbar
 
 echo "Installing neovim..."
 # install neovim
