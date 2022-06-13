@@ -47,6 +47,8 @@ brew install --cask dotnet
 brew install --cask dotnet-sdk
 brew install --cask flutter
 brew install --cask hiddenbar
+brew tap anchore/syft
+brew install syft
 
 echo "Installing neovim..."
 # install neovim
@@ -70,7 +72,6 @@ brew cask install private-internet-access
 brew cask install torbrowser
 brew cask install unetbootin
 brew cask install soapui
-brew cask install insomnia
 brew cask install vlc
 brew cask install alfred
 brew cask install obs
@@ -80,6 +81,7 @@ brew install rustscan
 brew install --cask min
 brew install --cask dotnet
 brew install --cask krisp
+brew install --cask postman
 
 echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
