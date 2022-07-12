@@ -17,6 +17,7 @@ do
 		"New Session")
             echo "add ssh keys"
             ssh-add ~/.ssh/id_ed25519
+            ssh-add ~/.ssh/id_rsa
 			read -p "Enter new session name: " SESSION_NAME
 			tmux new -s "$SESSION_NAME"
             			break

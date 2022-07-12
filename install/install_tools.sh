@@ -6,7 +6,7 @@ fi
 
 # cli tools
 echo "Installing cli tools.."
-brew tap caskroom/cask
+brew install gh
 brew tap homebrew/cask-fonts  
 brew cask install font-dejavusansmono-nerd-font
 brew install git
@@ -19,6 +19,8 @@ brew install azure-cli
 brew instal bat
 brew install httpie
 brew install docker
+brew install kubectx
+berw install helem
 
 # terminals cause why not!
 brew install go
@@ -38,9 +40,12 @@ brew install markdown
 brew install node
 brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
-brew cask install powershell
+brew install --cask powershell
+echo "Install Azure powershell"
+pwsh -c "Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force"
 brew tap homebrew/cask-fonts
 brew install --cask font-hack-nerd-font
+brew install --cask  font-Caskaydia-Cove-Nerd-Font
 brew install nmap 
 brew install tree-sitter
 brew install --cask dotnet
@@ -49,6 +54,10 @@ brew install --cask flutter
 brew install --cask hiddenbar
 brew tap anchore/syft
 brew install syft
+brew tap azure/functions
+brew install azure-functions-core-tools@4
+# if upgrading on a machine that has 2.x or 3.x installed:
+brew link --overwrite azure-functions-core-tools@4
 
 echo "Installing neovim..."
 # install neovim
@@ -56,27 +65,23 @@ brew install neovim
 
 echo "Installing desktop application..."
 
-brew cask install iterm2
-brew cask install moom
-brew cask install darwio
-brew cask install spotify
-brew cask install slack
+brew install --cask iterm2
+brew install --cask burp-suite-professional
+brew install --cask moom
+brew install --cask darwio
+brew install --cask spotify
+brew install --cask slack
 brew install --cask discord
-brew cask install vmware-fusion
-brew cask install virtualbox
-brew cask install iterm2
 brew install --cask 1password-cli
 brew install --cask keycastr
 brew install --cask jetbrains-toolbox
-brew cask install private-internet-access
-brew cask install torbrowser
-brew cask install unetbootin
-brew cask install soapui
-brew cask install vlc
-brew cask install alfred
-brew cask install obs
+brew install --cask private-internet-access
+brew install --cask unetbootin
+brew install --cask soapui
+brew install --cask alfred
+brew install --cask obs
 brew install --cask obsidian
-brew cask install wireshark
+brew install --cask wireshark
 brew install rustscan
 brew install --cask min
 brew install --cask dotnet
@@ -91,12 +96,24 @@ npm install --global yarn
 yarn global add prisma
 yarn global add expo-cli
 
+brew install --cask menumeters
+brew install --cask azure-data-studio
+brew install --cask google-cloud-sdk
+brew install kubectx
+brew install watch
+brew install tfsec
+echo "set node version"
+nvm use --lts
+nvm install --lts 
+
+echo "install wordlists"
+git clone https://github.com/danielmiessler/SecLists.git ~/wordlists
 echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
 echo "install deoplete requirements for neovim"
  pip3 install neovim
 echo "Install tools for blogging"
 brew install hugo
-
+echo "go get your cli tools from github"
 
 exit 0

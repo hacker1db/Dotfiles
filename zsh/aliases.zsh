@@ -29,7 +29,7 @@ alias tree='exa -l --icons --tree -a -g'
 alias wv='gh repo view --web'
 # moving dir 
 alias sites='cd ~/Code/Sites/'
-alias notes='cd ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes'
+alias notes='cd ~/notes'
 # Helpers
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
@@ -84,5 +84,4 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chrome"
 alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\ Chrome\\ Canary"
 alias rundj="python manage.py runserver 7000"
-alias school="cd ~/Documents/school"
-alias cod="cd ~/Documents/code"
+alias azlocations='az account list-locations -o table'
