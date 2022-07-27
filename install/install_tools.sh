@@ -81,7 +81,11 @@ brew install rustscan
 brew install --cask min
 brew install --cask dotnet
 brew install --cask krisp
+<<<<<<< Updated upstream
 brew install --cask postman
+=======
+brew install --cask android-platform-tools
+>>>>>>> Stashed changes
 
 echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/

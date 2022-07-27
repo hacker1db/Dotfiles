@@ -39,8 +39,9 @@ Plug 'tpope/vim-sleuth' " detect indent style (tabs vs. spaces)
 Plug 'sickill/vim-pasta' " context-aware pasting
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' } " distraction-free writing
 Plug 'junegunn/limelight.vim', { 'on': 'Limelight' } " focus tool. Good for presentating with vim
-Plug 'scrooloose/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] } " file drawer
 Plug 'Xuyuanp/nerdtree-git-plugin' 
+Plug 'kyazdani42/nvim-web-devicons' " optional, for file icons
+Plug 'kyazdani42/nvim-tree.lua'
 Plug 'ryanoasis/vim-devicons' 
 Plug 'mklabs/split-term.vim' "better splits in vim.
 " Testing in VIM 
@@ -143,6 +144,6 @@ endif
 "Dart/Flutter
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'akinsho/flutter-tools.nvim'
-
+Plug 'JoosepAlviste/nvim-ts-context-commentstring'
 call plug#end()
 

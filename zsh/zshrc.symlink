@@ -79,16 +79,16 @@ export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
 [ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
 export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
+export ANDROID_NDK_HOME="$(brew --prefix)/share/android-ndk"
 
 source <(kubectl completion zsh)
 alias k=kubectl
 compdef __start_kubectl k
 
 autoload bashcompinit && bashcompinit
-source /usr/local/etc/bash_completion.d/az
+source /opt/homebrew/etc/bash_completion.d/az
 export GPG_TTY=$(tty)
+export PATH="$PATH":"$HOME/.pub-cache/bin"
+export PATH="$PATH:/Users/hacker1db/.kit/bin"
 
 DOTFILES_LOADED=1
-
-export PATH="$PATH:/Users/hacker1db/.kit/bin"

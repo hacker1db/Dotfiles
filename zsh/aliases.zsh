@@ -26,6 +26,7 @@ alias ll="exa -g -l --icons -a"
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
 alias tree='exa -l --icons --tree -a -g'
+alias wv='gh repo view --web'
 # moving dir 
 alias sites='cd ~/Code/Sites/'
 alias notes='cd ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes'
