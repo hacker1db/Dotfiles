@@ -86,6 +86,10 @@ brew install --cask android-platform-tools
 brew install planetscale/tap/pscale
 brew install mysql-client
 
+echo "install yarn and tools"
+npm install --global yarn
+yarn global add prisma
+yarn global add expo-cli
 
 echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
