@@ -112,6 +112,7 @@ Plug 'robertbasic/vim-hugo-helper'
 " Vue
 Plug 'leafOfTree/vim-vue-plugin'
 Plug 'groenewege/vim-less', { 'for': 'less' }
+Plug 'editorconfig/editorconfig-vim'
 
 if has('nvim')
     Plug 'neovim/nvim-lspconfig'
