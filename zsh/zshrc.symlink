@@ -92,3 +92,4 @@ export PATH="$PATH":"$HOME/.pub-cache/bin"
 export PATH="$PATH:/Users/hacker1db/.kit/bin"
 
 DOTFILES_LOADED=1
+export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
