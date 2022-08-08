@@ -7,4 +7,8 @@ config/nvim/shada
 config/nvim/plugged
 vim/vim.symlink/spell/
 vim/vim.symlink/plugged/
-.dotfiles/bin/jetbrains
+goland
+idea
+rider
+studio
+webstorm
