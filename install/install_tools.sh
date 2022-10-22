@@ -102,6 +102,10 @@ brew install --cask google-cloud-sdk
 brew install kubectx
 brew install watch
 brew install tfsec
+brew install tfenv
+tfenv install latest
+tfenv use latest
+
 echo "set node version"
 nvm use --lts
 nvm install --lts 
