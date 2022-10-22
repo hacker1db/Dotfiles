@@ -19,6 +19,16 @@ function md() {
     mkdir -p "$@" && cd "$@"
 }
 
+alias bathelp='bat --plain --language=help'
+help() {
+    "$@" --help 2>&1 | bathelp
+}
+
+function batdiff() {
+    git diff --name-only --relative --diff-filter=d | xargs bat --diff
+}
+
+
 function hist() {
     history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head
 }
