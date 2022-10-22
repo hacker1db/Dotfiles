@@ -146,5 +146,6 @@ endif
 Plug 'dart-lang/dart-vim-plugin'
 Plug 'akinsho/flutter-tools.nvim'
 Plug 'JoosepAlviste/nvim-ts-context-commentstring'
+
 call plug#end()
 

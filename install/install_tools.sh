@@ -52,6 +52,7 @@ brew install --cask dotnet
 brew install --cask dotnet-sdk
 brew install --cask flutter
 brew install --cask hiddenbar
+brew install --cask raycast
 brew tap anchore/syft
 brew install syft
 brew tap azure/functions
@@ -95,6 +96,7 @@ echo "install yarn and tools"
 npm install --global yarn
 yarn global add prisma
 yarn global add expo-cli
+npm i -g vercel
 
 brew install --cask menumeters
 brew install --cask azure-data-studio
