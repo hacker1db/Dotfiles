@@ -68,7 +68,6 @@ echo "Installing desktop application..."
 
 brew install --cask iterm2
 brew install --cask burp-suite-professional
-brew install --cask moom
 brew install --cask darwio
 brew install --cask spotify
 brew install --cask slack
@@ -79,7 +78,6 @@ brew install --cask jetbrains-toolbox
 brew install --cask private-internet-access
 brew install --cask unetbootin
 brew install --cask soapui
-brew install --cask alfred
 brew install --cask obs
 brew install --cask obsidian
 brew install --cask wireshark

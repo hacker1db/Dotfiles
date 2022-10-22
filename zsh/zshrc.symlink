@@ -1,9 +1,9 @@
-export DOTFILES=$HOME/.dotfiles
-export ZSH=$DOTFILES/zsh
-
-eval $(/opt/homebrew/bin/brew shellenv)
 autoload -Uz compinit
 compinit
+
+export DOTFILES=$HOME/.dotfiles
+export ZSH=$DOTFILES/zsh
+eval $(/opt/homebrew/bin/brew shellenv)
 
 # display how long all tasks over 10 seconds take
 export REPORTTIME=10
