@@ -14,6 +14,7 @@ require("plugins.lspconfig")
 require("plugins.lspsaga")
 require("plugins.mason")
 require("plugins.formatter")
+require("plugins.gitsigns")
 
 
 -- source ~/.config/nvim/plugins.vim

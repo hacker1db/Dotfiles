@@ -1,17 +1,39 @@
-require("nvim-treesitter.configs").setup {
-  ensure_installed = {"bash", "c", "cpp", "css", "html", "javascript", "lua", "python", "rust", "typescript", "vim", "tsx", "yaml", "json", "python", "go", "c_sharp"},
+local status, treesitter = pcall(require, "nvim-treesitter.configs")
+if not status then
+	return
+end
+
+
+treesitter.setup {
+  ensure_installed = {
+        "bash", 
+        "css", 
+        "html", 
+        "javascript", 
+        "lua",
+        "python", 
+        "rust",
+        "typescript", 
+        "vim", 
+        "tsx", 
+        "yaml", 
+        "json", 
+        "python", 
+        "go", 
+        "c_sharp"
+    },
+  auto_install = true,  -- auto install above language parsers
   highlight = {
     enable = true,
     use_languagetree = true
   },
   context_commentstring = {
     enable = true
-  },
-  indent = {enable = true},
+  }, indent = {enable = true},
   rainbow = {
     enable = true,
     extended_mode = true,
-    max_file_lines = 1000
+    max_file_lines = nil
   },
   textobjects = {
     select = {
