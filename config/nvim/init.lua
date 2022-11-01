@@ -8,13 +8,15 @@ require("plugins.nvimtree")
 require("plugins.lualine")
 require("plugins.telescope")
 require("plugins.nvim-cmp")
-
 require("plugins.treesitter")
-
+require("plugins.autopair")
+require("plugins.lspconfig")
+require("plugins.lspsaga")
+require("plugins.mason")
+require("plugins.formatter")
 
 
 -- source ~/.config/nvim/plugins.vim
-
 -- " Section General {{{
 
 -- " Abbreviations
@@ -431,72 +433,3 @@ require("plugins.treesitter")
 -- " these filetypes will have MarkdownPreview... commands
 -- let g:mkdp_filetypes = ['markdown']
 
--- " set default theme (dark or light)
--- " By default the theme is define according to the preferences of the system
--- let g:mkdp_theme = 'dark'
-
--- "" " unicode symbols
--- " let g:airline_left_sep = '»'
--- " let g:airline_left_sep = '▶'
--- " let g:airline_right_sep = '«'
--- " let g:airline_right_sep = '◀'
--- " let g:airline_symbols.crypt = '🔒'
--- " let g:airline_symbols.linenr = '␊'
--- " let g:airline_symbols.linenr = '␤'
--- " let g:airline_symbols.linenr = '¶'
--- " let g:airline_symbols.maxlinenr = '☰'
--- " let g:airline_symbols.maxlinenr = ''
--- " let g:airline_symbols.branch = '⎇'
--- " let g:airline_symbols.spell = 'Ꞩ'
--- " let g:airline_symbols.notexists = '∄'
--- " let g:airline_symbols.whitespace = 'Ξ'
-
--- " End Airline }}}
-
-
--- " Emet
--- let g:user_emmet_install_global = 0
--- autocmd FileType html,css EmmetInstall
--- let g:user_emmet_mode='n'    "only enable normal mode functions.
--- let g:user_emmet_mode='inv'  "enable all functions, which is equal to
--- let g:user_emmet_mode='a'    "enable all function in all mode.
--- " for rainbow braces.
--- let g:rainbow_active = 1
-
--- let g:rainbow_load_separately = [
---     \ [ '*' , [['(', ')'], ['\[', '\]'], ['{', '}']] ],
---     \ [ '*.tex' , [['(', ')'], ['\[', '\]']] ],
---     \ [ '*.cpp' , [['(', ')'], ['\[', '\]'], ['{', '}']] ],
---     \ [ '*.{html,htm}' , [['(', ')'], ['\[', '\]'], ['{', '}'], ['<\a[^>]*>', '</[^>]*>']] ],
---     \ ]
-
--- let g:rainbow_guifgs = ['RoyalBlue3', 'DarkOrange3', 'DarkOrchid3', 'FireBrick']
--- let g:rainbow_ctermfgs = ['lightblue', 'lightgreen', 'yellow', 'red', 'magenta']
-
--- " }}}
--- "
--- " vim:foldmethod=marker:foldlevel=1
--- " remove trailing whitespace
--- autocmd BufWritePre *.py :%s/\s\+$//e 
--- au BufNewFile,BufRead *.py
---     \ set expandtab       |" replace tabs with spaces
---     \ set autoindent      |" copy indent when starting a new line
---     \ set tabstop=4
---     \ set softtabstop=4
---     \ set shiftwidth=4
-
-
--- " ReacJS
--- xmap <leader>a  <Plug>(coc-codeaction-selected)
--- nmap <leader>a  <Plug>(coc-codeaction-selected)
--- " Disable quote concealing in JSON files
--- autocmd Filetype json
---   \ let g:indentLine_setConceal = 0 |
---   \ let g:vim_json_syntax_conceal = 0
-
-
--- " Vue 
--- let g:vim_vue_plugin_load_full_syntax = 1
-
--- let g:go_fmt_command = "goimports"    " Run goimports along gofmt on each save     
--- let g:go_auto_type_info = 1           " Automatically get signature/type info for object under cursor     
