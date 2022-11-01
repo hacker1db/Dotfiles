@@ -6,6 +6,7 @@ require("plugins.packer-setup")
 require("plugins.comment")
 require("plugins.nvimtree")
 require("plugins.lualine")
+require("plugins.telescope")
 
 
 -- source ~/.config/nvim/plugins.vim
