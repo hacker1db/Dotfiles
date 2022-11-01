@@ -68,8 +68,6 @@ vim and neovim should just work once the correct plugins are installed. To insta
 - [golang air](https://github.com/cosmtrek/air)
 
 - `npm install -g typescript typescript-language-server eslint prettier` add this to insall script. 
-- Fix Key Maps
 - migrate to full lua 
-- update docs
 - Update brew install with new tools
 

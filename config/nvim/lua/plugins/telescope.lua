@@ -16,7 +16,8 @@ telescope.setup({
 	defaults = {
 		mappings = {
             n = {
-            ["q"] = actions.close },
+            ["q"] = actions.close,
+        },
 
 			i = {
 				["<C-k>"] = actions.move_selection_previous, -- move to prev result

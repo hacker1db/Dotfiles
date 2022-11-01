@@ -7,6 +7,10 @@ require("plugins.comment")
 require("plugins.nvimtree")
 require("plugins.lualine")
 require("plugins.telescope")
+require("plugins.nvim-cmp")
+
+require("plugins.treesitter")
+
 
 
 -- source ~/.config/nvim/plugins.vim
