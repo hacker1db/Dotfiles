@@ -31,7 +31,13 @@ return packer.startup(function(use)
 	-- packer can manage itself
 	use("wbthomason/packer.nvim")
 
-    use("hashivim/vim-terraform") -- terraform
+	use("frazrepo/vim-rainbow") -- rainbow brackets
+
+	use("tpope/vim-sleuth")
+
+	use("PProvost/vim-ps1") -- powershell
+
+	use("hashivim/vim-terraform") -- terraform
 
 	use("nvim-lua/plenary.nvim") -- lua functions that many plugins use
 
@@ -49,7 +55,7 @@ return packer.startup(function(use)
 	use("numToStr/Comment.nvim")
 
 	-- file explorer
-	use{"nvim-tree/nvim-tree.lua", requires = 'kyazdani42/nvim-web-devicons'}
+	use({ "nvim-tree/nvim-tree.lua", requires = "kyazdani42/nvim-web-devicons" })
 
 	-- vs-code like icons
 	use("kyazdani42/nvim-web-devicons")
