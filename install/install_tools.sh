@@ -27,6 +27,8 @@ brew install go
 brew install hub
 brew install reattach-to-user-namespace
 brew install tmux
+brew install terraform-lsp
+brew install yaml-language-server
 # installing pandoc and latex
 brew install pandoc
 brew cask install mactex

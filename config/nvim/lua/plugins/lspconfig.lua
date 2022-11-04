@@ -107,3 +107,9 @@ nvim_lsp.sumneko_lua.setup({
 })
 
 nvim_lsp.gopls.setup({})
+nvim_lsp.csharp_ls.setup({})
+nvim_lsp.golangci_lint_ls.setup({})
+nvim_lsp.jedi_language_server.setup({})
+nvim_lsp.terraform_lsp.setup({})
+nvim_lsp.powershell_es.setup({})
+nvim_lsp.omnisharp.setup({})
