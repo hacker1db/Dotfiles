@@ -15,8 +15,7 @@ require("plugins.lspsaga")
 require("plugins.mason")
 require("plugins.formatter")
 require("plugins.gitsigns")
-
-
+require("plugins.indent")
 -- source ~/.config/nvim/plugins.vim
 -- " Section General {{{
 
@@ -34,10 +33,8 @@ require("plugins.gitsigns")
 
 -- set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 
-
 -- " switch cursor to line when in insert mode, and block when not
 -- let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
-
 
 -- " }}}
 
@@ -57,8 +54,7 @@ require("plugins.gitsigns")
 -- set autoindent              " automatically set indent of new line
 -- set smartindent
 
-
--- set list lcs=tab:\|\ 
+-- set list lcs=tab:\|\
 -- let g:indentLine_char = '|'
 -- let g:indentLine_concealcursor = 'inc'
 -- let g:indentLine_conceallevel = 2
@@ -165,7 +161,6 @@ require("plugins.gitsigns")
 -- "
 -- nmap <leader><space> :%s/\s\+$<cr>
 
-
 -- nmap <leader>l :set list!<cr>
 
 -- " Textmate style indentation
@@ -216,9 +211,6 @@ require("plugins.gitsigns")
 -- nmap <leader>w :setf textile<cr> :Goyo<cr>
 
 -- nnoremap <silent> <leader>u :call functions#HtmlUnEscape()<cr>
-
-
-
 
 -- " }}}
 
@@ -308,7 +300,6 @@ require("plugins.gitsigns")
 -- \  'sink':    'e',
 -- \  'options': '-m -x +s',
 -- \  'down':    '40%'})
-
 
 -- " Fugitive Shortcuts
 -- """""""""""""""""""""""""""""""""""""
@@ -433,4 +424,3 @@ require("plugins.gitsigns")
 -- " recognized filetypes
 -- " these filetypes will have MarkdownPreview... commands
 -- let g:mkdp_filetypes = ['markdown']
-

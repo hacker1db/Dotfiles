@@ -16,7 +16,9 @@ if not typescript_setup then
 	return
 end
 
-local nvim_lsp = require('lspconfig')
+local util = require("lspconfig/util")
+
+local nvim_lsp = require("lspconfig")
 
 local keymap = vim.keymap -- for conciseness
 
@@ -50,32 +52,26 @@ end
 -- Set up completion using nvim_cmp with LSP source
 local capabilities = cmp_nvim_lsp.default_capabilities()
 
-nvim_lsp.flow.setup {
-  on_attach = on_attach,
-  capabilities = capabilities
-}
+nvim_lsp.flow.setup({
+	on_attach = on_attach,
+	capabilities = capabilities,
+})
 
-nvim_lsp.tsserver.setup {
-  on_attach = on_attach,
-  filetypes = { "typescript", "typescriptreact", "typescript.tsx", "javascript", "javascriptreact", "javascript.jsx" },
-  capabilities = capabilities
-}
-
+nvim_lsp.tsserver.setup({
+	on_attach = on_attach,
+	filetypes = { "typescript", "typescriptreact", "typescript.tsx", "javascript", "javascriptreact", "javascript.jsx" },
+	capabilities = capabilities,
+})
 
 -- icon
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
-  vim.lsp.diagnostic.on_publish_diagnostics, {
-    underline = true,
-    -- This sets the spacing and the prefix, obviously.
-    virtual_text = {
-      spacing = 4,
-      prefix = ''
-    }
-  }
-)
-
-
-
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+	underline = true,
+	-- This sets the spacing and the prefix, obviously.
+	virtual_text = {
+		spacing = 4,
+		prefix = "",
+	},
+})
 
 -- configure css server
 nvim_lsp.cssls.setup({
@@ -110,3 +106,4 @@ nvim_lsp.sumneko_lua.setup({
 	},
 })
 
+nvim_lsp.gopls.setup({})

@@ -1,11 +1,18 @@
 -- set leader key to space
 vim.g.mapleader = ";"
-
 local keymap = vim.keymap -- for conciseness
 
 ---------------------
 -- General Keymaps
 ---------------------
+
+-- Textmate style indentation
+-- vmap <leader>[ <gv
+-- vmap <leader>] >gv
+-- nmap <leader>[ <<
+-- nmap <leader>] >>
+
+
 
 -- use jk to exit insert mode
 keymap.set("i", "jk", "<ESC>")
@@ -19,7 +26,7 @@ keymap.set("n", "x", '"_x')
 -- window management
 keymap.set("n", "<leader>\\", "<C-w>v") -- split window vertically
 keymap.set("n", "<leader>-", "<C-w>s") -- split window horizontally
-keymap.set("n", "<leader>=", "<C-w>=") -- make split windows equal width & height 
+keymap.set("n", "<leader>=", "<C-w>=") -- make split windows equal width & height
 keymap.set("n", "<leader>w", ":close<CR>") -- close current split window, also close current tab
 
 keymap.set("n", "<leader>t", ":tabnew<CR>") -- open new tab
@@ -27,14 +34,12 @@ keymap.set("n", "<leader>tn", ":tabn<CR>") --  go to next tab
 keymap.set("n", "<leader>tp", ":tabp<CR>") --  go to previous tab
 keymap.set("n", ",,", ":w<CR>")
 
-
 ----------------------
 -- Plugin Keybinds
 ----------------------
 
 -- vim-maximizer
 keymap.set("n", "<leader>sm", ":MaximizerToggle<CR>") -- toggle split window maximization
-
 
 -- nvim-tree
 keymap.set("n", "<leader>k", ":NvimTreeToggle<CR>") -- toggle file explorer

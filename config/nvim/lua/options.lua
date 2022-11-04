@@ -8,10 +8,8 @@ opt.shiftwidth = 4
 opt.expandtab = true
 opt.autoindent = true
 
-
 -- line wrap
 opt.wrap = false
-
 
 -- serach settings
 opt.ignorecase = true
@@ -27,7 +25,6 @@ opt.signcolumn = "yes"
 
 opt.backspace = "indent,eol,start"
 
-
 -- clipboard
 opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 -- use mouse in all modes
@@ -39,7 +36,6 @@ opt.splitbelow = true -- split horizontal window to the bottom
 
 opt.iskeyword:append("-") -- consider string-string as whole word
 
-
 opt.hlsearch = true -- highlight search results
 opt.title = true -- set terminal title
 -- mappings
@@ -47,19 +43,18 @@ opt.pastetoggle = "<leader>v"
 
 -- toggle invisible characters
 opt.list = true
+opt.listchars:append("space:⋅")
 opt.listchars = {
-  tab = "→ ",
-  eol = "¬",
-  trail = "⋅",
-  extends = "❯",
-  precedes = "❮"
+	tab = "→ ",
+	eol = "¬",
+	trail = "⋅",
+	extends = "❯",
+	precedes = "❮",
 }
 
-
 -- Extra vim stuff
-cmd [[syntax on]]
-cmd [[filetype plugin indent on]]
+cmd([[syntax on]])
+cmd([[filetype plugin indent on]])
 -- make the highlighting of tabs and other non-text less annoying
-cmd [[highlight SpecialKey ctermfg=19 guifg=#333333]]
-cmd [[highlight NonText ctermfg=19 guifg=#333333]]
-
+cmd([[highlight SpecialKey ctermfg=19 guifg=#333333]])
+cmd([[highlight NonText ctermfg=19 guifg=#333333]])

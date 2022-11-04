@@ -5,7 +5,7 @@ if not lspsaga_status then
 end
 
 lspsaga.init_lsp_saga({
-    border_style = "round",
+	border_style = "round",
 	-- keybinds for navigation in lspsaga window
 	move_in_saga = { prev = "<C-k>", next = "<C-j>" },
 	-- use enter to open file with finder
