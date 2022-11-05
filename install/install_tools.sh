@@ -52,6 +52,7 @@ brew install nmap
 brew install tree-sitter
 brew install --cask dotnet
 brew install --cask dotnet-sdk
+dotnet tool install --global csharp-ls
 brew install --cask flutter
 brew install --cask hiddenbar
 brew install --cask raycast
@@ -85,7 +86,6 @@ brew install --cask obsidian
 brew install --cask wireshark
 brew install rustscan
 brew install --cask min
-brew install --cask dotnet
 brew install --cask krisp
 brew install --cask postman
 brew install --cask android-platform-tools

@@ -94,6 +94,8 @@ source /opt/homebrew/etc/bash_completion.d/az
 export GPG_TTY=$(tty)
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 export PATH="$PATH:/Users/hacker1db/.kit/bin"
+export PATH="$PATH:/Users/hacker1db/.dotnet/tools"
+
+export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
 
 DOTFILES_LOADED=1
-export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"

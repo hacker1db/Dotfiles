@@ -236,15 +236,28 @@ _G.packer_plugins = {
     path = "/Users/hacker1db/.local/share/nvim/site/pack/packer/start/typescript.nvim",
     url = "https://github.com/jose-elias-alvarez/typescript.nvim"
   },
+  ["vim-go"] = {
+    commands = { ":GoUpdateBinaries" },
+    loaded = false,
+    needs_bufread = true,
+    only_cond = false,
+    path = "/Users/hacker1db/.local/share/nvim/site/pack/packer/opt/vim-go",
+    url = "https://github.com/fatih/vim-go"
+  },
   ["vim-maximizer"] = {
     loaded = true,
     path = "/Users/hacker1db/.local/share/nvim/site/pack/packer/start/vim-maximizer",
     url = "https://github.com/szw/vim-maximizer"
   },
-  ["vim-ps1"] = {
+  ["vim-pony"] = {
     loaded = true,
-    path = "/Users/hacker1db/.local/share/nvim/site/pack/packer/start/vim-ps1",
-    url = "https://github.com/PProvost/vim-ps1"
+    path = "/Users/hacker1db/.local/share/nvim/site/pack/packer/start/vim-pony",
+    url = "https://github.com/jmcomets/vim-pony"
+  },
+  ["vim-python-pep8-indent"] = {
+    loaded = true,
+    path = "/Users/hacker1db/.local/share/nvim/site/pack/packer/start/vim-python-pep8-indent",
+    url = "https://github.com/Vimjas/vim-python-pep8-indent"
   },
   ["vim-rainbow"] = {
     loaded = true,
@@ -279,6 +292,12 @@ time([[Sequenced loading]], true)
 vim.cmd [[ packadd nvim-treesitter ]]
 vim.cmd [[ packadd nvim-ts-autotag ]]
 time([[Sequenced loading]], false)
+
+-- Command lazy-loads
+time([[Defining lazy-load commands]], true)
+pcall(vim.cmd, [[au CmdUndefined :GoUpdateBinaries ++once lua require"packer.load"({'vim-go'}, {}, _G.packer_plugins)]])
+time([[Defining lazy-load commands]], false)
+
 
 _G._packer.inside_compile = false
 if _G._packer.needs_bufread == true then

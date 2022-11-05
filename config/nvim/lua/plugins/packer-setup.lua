@@ -35,8 +35,6 @@ return packer.startup(function(use)
 
 	use("tpope/vim-sleuth")
 
-	use("PProvost/vim-ps1") -- powershell
-
 	use("hashivim/vim-terraform") -- terraform
 
 	use("nvim-lua/plenary.nvim") -- lua functions that many plugins use
@@ -58,6 +56,11 @@ return packer.startup(function(use)
 
 	-- file explorer
 	use({ "nvim-tree/nvim-tree.lua", requires = "kyazdani42/nvim-web-devicons" })
+	-- language plugins
+	use({ "fatih/vim-go", cmd = ":GoUpdateBinaries" })
+	-- pyhton
+	use("jmcomets/vim-pony")
+	use("Vimjas/vim-python-pep8-indent")
 
 	-- vs-code like icons
 	use("kyazdani42/nvim-web-devicons")
@@ -65,7 +68,6 @@ return packer.startup(function(use)
 	use("simrat39/rust-tools.nvim")
 
 	-- Debugging
-	use("nvim-lua/plenary.nvim")
 	use("mfussenegger/nvim-dap")
 
 	-- statusline

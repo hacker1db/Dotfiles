@@ -1,15 +1,3 @@
-if has("nvim")
-  let g:plug_home = stdpath('data') . '/plugged'
-endif
-
-
-
-call plug#begin('~/.config/nvim/plugged')
-
-" colorschemes
-Plug 'dracula/vim', { 'as': 'dracula' }
-" utilities
-Plug 'Yggdroot/indentLine'
 " regular plugins
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim' " fuzzy file finder and so much more
@@ -88,16 +76,7 @@ Plug 'tclem/vim-arduino' " arduino support - compile wihtout needing to open the
 Plug 'elzr/vim-json', { 'for': 'json' } " JSON support
 Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' } " ruby support
 
-" Python
-Plug 'jmcomets/vim-pony'
-Plug 'Vimjas/vim-python-pep8-indent'
-Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 
-"Powershell
-Plug 'PProvost/vim-ps1'
-" GO
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'nsf/gocode', { 'rtp': 'vim', 'do': '~/.vim/plugged/gocode/vim/symlink.sh' }
 " emmet
 Plug 'mattn/emmet-vim'
 " Rainbow braces

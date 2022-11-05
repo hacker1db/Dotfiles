@@ -30,6 +30,8 @@ keymap.set("n", "<leader>t", ":tabnew<CR>") -- open new tab
 keymap.set("n", "<leader>tn", ":tabn<CR>") --  go to next tab
 keymap.set("n", "<leader>tp", ":tabp<CR>") --  go to previous tab
 keymap.set("n", ",,", ":w<CR>")
+keymap.set("n", "<leader>ff", ":lua vim.lsp.buf.format()<CR>")
+keymap.set("n", "<leader>s", ":so<CR>")
 
 ----------------------
 -- Plugin Keybinds
