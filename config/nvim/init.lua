@@ -1,6 +1,6 @@
+require("colorscheme")
 require("options")
 require("keymaps")
-require("colorscheme")
 -- import plugin's
 require("plugins.packer-setup")
 require("plugins.comment")

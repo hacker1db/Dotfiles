@@ -7,8 +7,10 @@ config/nvim/shada
 config/nvim/plugged
 vim/vim.symlink/spell/
 vim/vim.symlink/plugged/
-goland
-idea
-rider
-studio
-webstorm
+bin/goland
+bin/idea
+bin/rider
+bin/studio
+bin/webstorm
+bin/pycharm
+bin/fleet

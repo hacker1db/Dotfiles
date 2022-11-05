@@ -79,6 +79,7 @@ bind -r J resize-pane -D 10
 bind -r K resize-pane -U 10
 bind -r L resize-pane -R 10
 
+bind -r M resize-pane -Z
 # enable mouse support for switching panes/windows miuse support
 setw -g mouse on
 
@@ -113,12 +114,12 @@ source ~/.dotfiles/tmux/theme.sh
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
+set -g @plugin 'christoomey/vim-tmux-navigator'
 set -g @plugin 'tmux-plugins/tmux-resurrect' # persist tmux sessions after computer restart
 set -g @plugin 'tmux-plugins/tmux-continuum' # automatically saves sessions for you every 15 minutes
 
 set -g @resurrect-capture-pane-contents 'on'
 set -g @continuum-restore 'on'
-
 run '~/.tmux/plugins/tpm/tpm'
 
 

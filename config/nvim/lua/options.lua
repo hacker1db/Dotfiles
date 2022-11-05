@@ -18,8 +18,8 @@ opt.cursorline = true
 
 -- apperaence
 opt.termguicolors = true
-opt.background = "dark"
 opt.signcolumn = "yes"
+vim.opt.colorcolumn = "80"
 
 -- backsapce key
 

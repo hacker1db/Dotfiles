@@ -1,18 +1,15 @@
 -- set leader key to space
 vim.g.mapleader = ";"
 local keymap = vim.keymap -- for conciseness
+local opts = { noremap = true, silent = true }
 
 ---------------------
 -- General Keymaps
 ---------------------
 
--- Textmate style indentation
--- vmap <leader>[ <gv
--- vmap <leader>] >gv
--- nmap <leader>[ <<
--- nmap <leader>] >>
-
-
+-- indentation carry
+keymap.set("v", "<leader>[", "<gv", opts)
+keymap.set("v", "<leader>]", ">gv", opts)
 
 -- use jk to exit insert mode
 keymap.set("i", "jk", "<ESC>")
