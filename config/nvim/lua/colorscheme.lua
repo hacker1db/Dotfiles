@@ -29,7 +29,7 @@ dracula.setup({
 		gutter_fg = "#4B5263",
 		nontext = "#3B4048",
 	},
-	-- show_end_of_buffer = true, -- default false
+	show_end_of_buffer = true, -- default false
 	-- use transparent background
 	transparent_bg = true, -- default false
 	-- set custom lualine background color
