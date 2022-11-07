@@ -1,5 +1,6 @@
 local opt = vim.opt -- save me time later and stop repeating myself
 local cmd = vim.cmd
+opt.syntax = "enable"
 opt.number = true
 opt.relativenumber = true
 
@@ -54,7 +55,6 @@ opt.listchars = {
 }
 
 -- Extra vim stuff
-cmd([[syntax on]])
 cmd([[filetype plugin indent on]])
 -- make the highlighting of tabs and other non-text less annoying
 cmd([[highlight SpecialKey ctermfg=19 guifg=#333333]])
