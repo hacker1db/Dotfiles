@@ -14,3 +14,4 @@ bin/studio
 bin/webstorm
 bin/pycharm
 bin/fleet
+config/nvim/plugin/
