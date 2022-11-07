@@ -97,6 +97,7 @@ npm install --global yarn
 yarn global add prisma
 yarn global add expo-cli
 npm i -g vercel
+npm install -g typescript typescript-language-server eslint prettier
 
 brew install --cask menumeters
 brew install --cask azure-data-studio
