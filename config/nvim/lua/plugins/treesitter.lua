@@ -18,8 +18,12 @@ treesitter.setup({
 		"yaml",
 		"json",
 		"python",
-		"go",
+		"Go",
 		"c_sharp",
+		"markdown",
+	},
+	autotag = {
+		enable = true,
 	},
 	auto_install = true, -- auto install above language parsers
 	highlight = {

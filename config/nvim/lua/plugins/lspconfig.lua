@@ -119,3 +119,4 @@ nvim_lsp.powershell_es.setup({
 nvim_lsp.csharp_ls.setup({})
 nvim_lsp.pylsp.setup({})
 nvim_lsp.dockerls.setup({})
+nvim_lsp.html.setup({})
