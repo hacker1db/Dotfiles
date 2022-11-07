@@ -1,5 +1,5 @@
-local status, dracula = pcall(require, "dracula")
-if not status then
+local dracula_status, dracula = pcall(require, "dracula")
+if not dracula_status then
 	print("colorscheme is not installed")
 	return
 end
@@ -45,8 +45,8 @@ dracula.setup({
 	},
 })
 
-local status, _ = pcall(vim.cmd, "colorscheme dracula")
-if not status then
+local color_status, _ = pcall(vim.cmd, "colorscheme dracula")
+if not color_status then
 	print("colorscheme is not installed")
 	return
 end
