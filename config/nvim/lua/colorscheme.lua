@@ -3,6 +3,7 @@ if not dracula_status then
 	print("colorscheme is not installed")
 	return
 end
+
 dracula.setup({
 	-- customize dracula color palette
 	colors = {
