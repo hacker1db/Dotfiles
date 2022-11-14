@@ -16,6 +16,7 @@ require("plugins.mason")
 require("plugins.formatter")
 require("plugins.gitsigns")
 require("plugins.indent")
+require("plugins.devicons")
 -- source ~/.config/nvim/plugins.vim
 -- " Section General {{{
 
