@@ -2,7 +2,7 @@ local opt = vim.opt -- save me time later and stop repeating myself
 local cmd = vim.cmd
 opt.syntax = "enable"
 opt.number = true
-opt.relativenumber = true
+-- opt.relativenumber = true
 
 -- tabs
 opt.tabstop = 4
