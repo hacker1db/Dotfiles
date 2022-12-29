@@ -49,6 +49,8 @@ brew tap homebrew/cask-fonts
 brew install --cask font-hack-nerd-font
 brew install --cask  font-Caskaydia-Cove-Nerd-Font
 brew install nmap 
+brew tap caffix/amass
+brew install amass
 brew install tree-sitter
 brew install --cask dotnet
 brew install --cask dotnet-sdk
