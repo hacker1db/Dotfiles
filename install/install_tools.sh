@@ -18,7 +18,7 @@ brew install lnav # for viewing log files in terminal
 brew install azure-cli
 brew instal bat
 brew install httpie
-brew install docker
+brew install --cask rancher
 brew install kubectx
 berw install helem
 
@@ -89,7 +89,6 @@ brew install --cask wireshark
 brew install rustscan
 brew install --cask min
 brew install --cask krisp
-brew install --cask postman
 brew install --cask android-platform-tools
 brew install planetscale/tap/pscale
 brew install mysql-client

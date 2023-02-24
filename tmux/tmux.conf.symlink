@@ -1,5 +1,4 @@
 # Tmux Configuration
-
 set -g default-command "login-shell"
 # tmux display things in 256 colors
 set -g default-terminal "screen-256color"
