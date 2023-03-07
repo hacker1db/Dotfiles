@@ -86,7 +86,7 @@ nvim_lsp.tailwindcss.setup({
 })
 
 -- configure lua server (with special settings)
-nvim_lsp.sumneko_lua.setup({
+nvim_lsp.lua_ls.setup({
 	capabilities = capabilities,
 	on_attach = on_attach,
 	settings = { -- custom settings for lua

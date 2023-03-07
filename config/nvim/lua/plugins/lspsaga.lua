@@ -4,7 +4,7 @@ if not lspsaga_status then
 	return
 end
 
-lspsaga.init_lsp_saga({
+lspsaga.setup({
 	border_style = "round",
 	-- keybinds for navigation in lspsaga window
 	move_in_saga = { prev = "<C-k>", next = "<C-j>" },
