@@ -47,13 +47,16 @@ opt.pastetoggle = "<leader>v"
 opt.list = true
 opt.listchars:append("space:⋅")
 opt.listchars = {
-	tab = "→ ",
-	eol = "¬",
-	trail = "⋅",
-	extends = "❯",
-	precedes = "❮",
+    tab = "→ ",
+    eol = "¬",
+    trail = "⋅",
+    extends = "❯",
+    precedes = "❮",
 }
-
+-- auto set spell
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, { command = "setlocal spell spelllang=en_us" })
+--
+--
 -- Extra vim stuff
 cmd([[filetype plugin indent on]])
 -- make the highlighting of tabs and other non-text less annoying
