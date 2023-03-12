@@ -16,8 +16,6 @@ if not typescript_setup then
     return
 end
 
-local util = require("lspconfig/util")
-
 local nvim_lsp = require("lspconfig")
 
 local keymap = vim.keymap -- for conciseness
@@ -26,9 +24,6 @@ local keymap = vim.keymap -- for conciseness
 local on_attach = function(client, bufnr)
     -- keybind options
     local opts = { noremap = true, silent = true, buffer = bufnr }
-
-    -- set keybinds
-    --
 
     -- set keybinds
     keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
@@ -84,12 +79,16 @@ nvim_lsp.cssls.setup({
     on_attach = on_attach,
 })
 
+local on_attach = function(client, bufnr)
+    -- other stuff --
+    require("tailwindcss-colors").buf_attach(bufnr)
+end
+
 -- configure tailwindcss server
 nvim_lsp.tailwindcss.setup({
     capabilities = capabilities,
     on_attach = on_attach,
 })
-
 -- configure lua server (with special settings)
 nvim_lsp.lua_ls.setup({
     capabilities = capabilities,

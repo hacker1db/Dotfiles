@@ -13,7 +13,7 @@ local packer_bootstrap = ensure_packer() -- true if packer was just installed
 
 -- autocommand that reloads neovim and installs/updates/removes plugins
 -- when file is saved
-vim.cmd([[ 
+vim.cmd([[
   augroup packer_user_config
     autocmd!
     autocmd BufWritePost plugins-setup.lua source <afile> | PackerSync
@@ -31,10 +31,7 @@ return packer.startup(function(use)
     -- packer can manage itself
     use("wbthomason/packer.nvim")
 
-    use("frazrepo/vim-rainbow") -- rainbow brackets
-
     use("tpope/vim-sleuth")
-    use("jose-elias-alvarez/typescript.nvim") -- additional functionality for typescript server (e.g. rename file & update imports)
 
     use("hashivim/vim-terraform") -- terraform
 
@@ -87,7 +84,6 @@ return packer.startup(function(use)
     use({ "nvim-telescope/telescope-fzf-native.nvim", run = "make" }) -- dependency for better sorting performance
     use({ "nvim-telescope/telescope.nvim", branch = "0.1.x" }) -- fuzzy finder
     use({ "nvim-telescope/telescope-ui-select.nvim" }) -- for showing lsp code actions
-    use("onsails/lspkind.nvim") -- vs-code like icons for autocompletion
     use({
         "smjonas/inc-rename.nvim",
         config = function()
@@ -132,6 +128,17 @@ return packer.startup(function(use)
     -- auto closing
     use("windwp/nvim-autopairs") -- autoclose parens, brackets, quotes, etc...
     use({ "windwp/nvim-ts-autotag", after = "nvim-treesitter" }) -- autoclose tags
+
+    use({
+        "themaxmarchuk/tailwindcss-colors.nvim",
+        -- load only on require("tailwindcss-colors")
+        module = "tailwindcss-colors",
+        -- run the setup function after plugin is loaded
+        config = function()
+            -- pass config options here (or nothing to use defaults)
+            require("tailwindcss-colors").setup()
+        end,
+    })
 
     -- git integration
     use("lewis6991/gitsigns.nvim") -- show line modifications on left hand side
