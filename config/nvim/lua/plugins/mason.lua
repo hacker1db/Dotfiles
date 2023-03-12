@@ -27,6 +27,16 @@ mason_lspconfig.setup({
 		"cssls",
 		"tailwindcss",
 		"lua_ls",
+		"omnisharp",
+		"dockerls",
+		"gopls",
+		"marksman",
+		"spectral",
+		"powershell_es",
+		"jedi_language_server",
+		"sqlls",
+		"yamlls",
+		"terraformls",
 	},
 	-- auto-install configured servers (with lspconfig)
 	automatic_installation = true, -- not the same as ensure_installed
