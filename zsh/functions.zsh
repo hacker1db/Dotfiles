@@ -19,6 +19,16 @@ function md() {
     mkdir -p "$@" && cd "$@"
 }
 
+alias bathelp='bat --plain --language=help'
+help() {
+    "$@" --help 2>&1 | bathelp
+}
+
+function bd() {
+    git diff --name-only --relative --diff-filter=d | xargs bat --diff
+}
+
+
 function hist() {
     history | awk '{a[$2]++}END{for(i in a){print a[i] " " i}}' | sort -rn | head
 }
@@ -28,22 +38,6 @@ function f() {
     find . -name "$1"
 }
 
-function ng-stop() {
-    sudo launchctl stop homebrew.mxcl.nginx
-}
-
-function ng-start() {
-    sudo launchctl start homebrew.mxcl.nginx
-}
-function ng-restart() {
-     sudo launchctl start homebrew.mxcl.nginx
-}
-
-function dns-restart() {
-    sudo launchctl stop homebrew.mxcl.dnsmasq
-    sudo launchctl start homebrew.mxcl.dnsmasq
-}
-
 
 # Start an HTTP server from a directory, optionally specifying the port
 function server() {
@@ -51,8 +45,9 @@ function server() {
     open "http://localhost:${port}/"
     # Set the default Content-Type to `text/plain` instead of `application/octet-stream`
     # And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
-    python -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
+    python3 -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
 }
+
 
 # take this repo and copy it to somewhere else minus the .git stuff.
 function gitexport(){
@@ -125,22 +120,10 @@ function hl() {
     echo $src | highlight -O rtf --syntax $1 --font Inconsoloata --style $style --line-number --font-size 24 | pbcopy
 }
 
-function bump () {
-file=metadata.rb
-grep -w "version" $file
-x=$(grep -w "version" $file | grep -o "'.*'")
-x="${x%\'}"
-x="${x#\'}"
-y=$(echo "$x" | grep -o "[0-9]*$")
-old="${x%.*}"
-dot=.
-new=$(($y+1))
-a=$x
-b=$old$dot$new
-sed -i '' "s/'$a'/'$b'/g" $file
-grep -w "version" $file
-}
 
+function set-ns() {
+kubectl config set-context --current --namespace="$@"
+}
 
 
 

@@ -10,6 +10,7 @@ fi
 
 alias vim="nvim"
 alias vi="nvim"
+alias f="flutter"
 alias gitpulla='find . -mindepth 1 -maxdepth 1 -type d -print -exec git -C {} pull \;'
 # Filesystem aliases
 alias ..='cd ..'
@@ -17,30 +18,36 @@ alias ...='cd ../..'
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 
+alias cat='bat'
+alias tf="terraform"
 alias l="ls -lah ${colorflag}"
 alias la="ls -AF ${colorflag}"
-alias ll="ls -lFh ${colorflag}"
+alias ll="exa -g -l --icons -a"
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
+alias tree='exa -l --icons --tree -a -g'
+alias wv='gh repo view --web'
 # moving dir 
-alias sites='cd ~/Documents/Code/Sites/'
-# lets me cd to my chef projects directory and not run code app. 
-alias cdpy='cd ~/Documents/Code/Scripts/python_scripts/'
-# Chef commands I hate running with the full command
-alias kdc='kitchen destroy && kitchen converge'
+alias sites='cd ~/Code/Sites/'
+alias notes='cd ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes'
 # Helpers
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
 alias du='du -h -c' # calculate disk usage for a folder
+alias dotfiles="cd ~/.dotfiles"
 
 # Applications
-alias ios='open -a /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Applications/iPhone\ Simulator.app'
-alias ,d='open -a /Applications/Dash.app'
+alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
+
+
+
+
+
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias localip="ipconfig getifaddr en1"
 alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
-
+alias k="kubectl"
 # Flush Directory Service cache
 alias flush="dscacheutil -flushcache"
 
@@ -82,6 +89,6 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 
 alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chrome"
 alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\ Chrome\\ Canary"
-alias code="code-insiders"
 alias rundj="python manage.py runserver 7000"
-alias school="cd ~/Documents/school"
+alias azlocations='az account list-locations -o table'
+alias bookp="op item get 'sans book password' --fields label=password | pbcopy"

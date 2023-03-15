@@ -1,4 +1,5 @@
-.DS_Store
+*.DS_Store
+.DS_store
 Thumbs.db
 *~
 *.swp
@@ -8,10 +9,13 @@ Icon
 .ssh 
 *.ini
 *.csv
+*.pyc
 .zsh_histroy
 # Thumbnails
 ._*
-
+.netrwhist
+# Rider
+.idea
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
@@ -21,4 +25,7 @@ Icon
 
 # typescript command garbage
 tscommand*.txt
-
+# localconfig
+config.json
+.hugo_build.lock
+tmp

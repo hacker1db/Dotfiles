@@ -58,3 +58,6 @@ function! functions#HtmlUnEscape()
   silent s/&gt;/>/eg
   silent s/&amp;/\&/eg
 endfunction
+
+
+

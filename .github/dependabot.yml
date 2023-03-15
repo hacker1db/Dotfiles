@@ -1,0 +1,39 @@
+# Please see the documentation for all configuration options:
+# https://docs.github.com/en/code-security/supply-chain-security/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    labels:
+      - "dependencies"
+      - "nuget"
+    open-pull-requests-limit: 10
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/"
+    open-pull-requests-limit: 10
+    schedule:
+      interval: "daily"
+    labels:
+      - "docker"
+      - "Iac"
+
+  # Maintain dependencies for npm
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    labels:
+      - "npm"
+      - "dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    labels:
+      - "dependencies"
+      - "Github Actions"
+    open-pull-requests-limit: 10
+    schedule:
+      interval: "daily"

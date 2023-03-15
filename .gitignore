@@ -7,3 +7,12 @@ config/nvim/shada
 config/nvim/plugged
 vim/vim.symlink/spell/
 vim/vim.symlink/plugged/
+bin/goland
+bin/idea
+bin/rider
+bin/studio
+bin/webstorm
+bin/pycharm
+bin/fleet
+config/nvim/plugin/
+config/nvim/plugin/packer_compiled.lua
