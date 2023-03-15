@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Installing dotfiles"
+echo "Installing dotfiles!"
 
 source install/link.sh
 
