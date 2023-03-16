@@ -16,7 +16,7 @@ local packer_bootstrap = ensure_packer() -- true if packer was just installed
 vim.cmd([[
   augroup packer_user_config
     autocmd!
-    autocmd BufWritePost plugins-setup.lua source <afile> | PackerSync
+    autocmd BufWritePost packer-setup.lua source <afile> | PackerSync
   augroup end
 ]])
 
@@ -51,6 +51,7 @@ return packer.startup(function(use)
 
     -- commenting with gc
     use("numToStr/Comment.nvim")
+    use("JoosepAlviste/nvim-ts-context-commentstring")
 
     -- file explorer
     use({ "nvim-tree/nvim-tree.lua", requires = "kyazdani42/nvim-web-devicons" })
