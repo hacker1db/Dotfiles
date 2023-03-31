@@ -92,3 +92,4 @@ alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\
 alias rundj="python manage.py runserver 7000"
 alias azlocations='az account list-locations -o table'
 alias bookp="op item get 'sans book password' --fields label=password | pbcopy"
+alias httpgui="open\ /Applications/HTTPie.app"
