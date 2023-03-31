@@ -58,6 +58,7 @@ dotnet tool install --global csharp-ls
 brew install --cask flutter
 brew install --cask hiddenbar
 brew install --cask raycast
+brew install --cask httpie
 brew tap anchore/syft
 brew install syft
 brew tap azure/functions
@@ -104,9 +105,11 @@ brew install --cask menumeters
 brew install --cask azure-data-studio
 brew install --cask google-cloud-sdk
 brew install kubectx
+brew install --cask losslesscut
 brew install watch
 brew install tfsec
 brew install tfenv
+
 tfenv install latest
 tfenv use latest
 
