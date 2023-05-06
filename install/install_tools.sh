@@ -36,7 +36,7 @@ echo "installing tpm plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 brew install zsh
 brew install highlight
-brew install nvm
+brew install fnm
 brew install z
 brew install markdown
 brew install node
