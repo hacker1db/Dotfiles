@@ -44,7 +44,7 @@ alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulato
 
 
 # IP addresses
-alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias publicip="pwsh -c "(Invoke-WebRequest ifconfig.me/ip).Content.Trim()"
 alias localip="ipconfig getifaddr en1"
 alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
 alias k="kubectl"
