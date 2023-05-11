@@ -93,6 +93,7 @@ brew install --cask krisp
 brew install --cask android-platform-tools
 brew install planetscale/tap/pscale
 brew install mysql-client
+brew install yt-dlp
 
 echo "install yarn and tools"
 npm install --global yarn
