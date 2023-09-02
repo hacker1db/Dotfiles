@@ -16,4 +16,3 @@ require("plugins.formatter")
 require("plugins.gitsigns")
 require("plugins.indent")
 require("plugins.devicons")
-

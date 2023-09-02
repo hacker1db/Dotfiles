@@ -124,3 +124,19 @@ nvim_lsp.csharp_ls.setup({})
 nvim_lsp.pylsp.setup({})
 nvim_lsp.dockerls.setup({})
 nvim_lsp.html.setup({})
+nvim_lsp.astro.setup({})
+
+nvim_lsp.azure_pipelines_ls.setup({
+    settings = {
+        yaml = {
+            schemas = {
+                ["https://raw.githubusercontent.com/microsoft/azure-pipelines-vscode/master/service-schema.json"] = {
+                    "/azure-pipeline*.y*l",
+                    "/*.azure*",
+                    "Azure-Pipelines/**/*.y*l",
+                    "Pipelines/*.y*l",
+                },
+            },
+        },
+    },
+})
