@@ -21,6 +21,7 @@ treesitter.setup({
         "Go",
         "c_sharp",
         "markdown",
+        "astro",
     },
     autotag = {
         enable = true,
