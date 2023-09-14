@@ -15,13 +15,6 @@ if [[ -d ~/code ]]; then
     export CODE_DIR=~/code
 fi
 
-
-if [[ -d ~/go/bin/air ]]; then
- alias air=~/go/bin/air
-fi
-
-
-# eval "$(pandoc --bash-completion)"
 eval "$(op completion zsh)"; compdef _op op
 
 # source z.sh if it exists
@@ -101,12 +94,5 @@ export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
 DOTFILES_LOADED=1
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/hacker1db/.rd/bin:$PATH"
-### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
-# pnpm
-export PNPM_HOME="/Users/hacker1db/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
