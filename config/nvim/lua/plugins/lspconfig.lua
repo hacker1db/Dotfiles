@@ -47,6 +47,7 @@ local on_attach = function(client, bufnr)
         keymap.set("n", "<leader>oi", ":TypescriptOrganizeImports<CR>") -- organize imports (not in youtube nvim video)
         keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>") -- remove unused variables (not in youtube nvim video)
     end
+    require("tailwindcss-colors").buf_attach(bufnr)
 end
 
 -- Set up completion using nvim_cmp with LSP source
@@ -79,11 +80,6 @@ nvim_lsp.cssls.setup({
     on_attach = on_attach,
 })
 
-local on_attach = function(client, bufnr)
-    -- other stuff --
-    require("tailwindcss-colors").buf_attach(bufnr)
-end
-
 -- configure tailwindcss server
 nvim_lsp.tailwindcss.setup({
     capabilities = capabilities,
@@ -110,12 +106,34 @@ nvim_lsp.lua_ls.setup({
     },
 })
 
-nvim_lsp.gopls.setup({})
+nvim_lsp.gopls.setup({
+    capabilities = capabilities,
+    on_attach = on_attach,
+    cmd = { "gopls" },
+    filetypes = { "go", "gomod", "go.mod", "gowork", "gotmpl" },
+    root_dir = nvim_lsp.util.root_pattern("go.mod", ".git", "go.work"),
+    settings = {
+        gopls = {
+            completeUnimported = true,
+            usePlaceholders = true,
+            analyses = {
+                unusedparams = true,
+            },
+            staticcheck = true,
+        },
+    },
+})
 nvim_lsp.csharp_ls.setup({})
 nvim_lsp.golangci_lint_ls.setup({})
 nvim_lsp.jedi_language_server.setup({})
 nvim_lsp.anakin_language_server.setup({})
-nvim_lsp.terraform_lsp.setup({})
+nvim_lsp.terraform_lsp.setup({
+    cmd = { "terraform-lsp" },
+    filetypes = { "terraform", "tf" },
+    root_dir = nvim_lsp.util.root_pattern(".git", ".terraform", "terraform.tf"),
+    on_attach = on_attach,
+    capabilities = capabilities,
+})
 nvim_lsp.powershell_es.setup({
 
     cmd = { "pwsh", "-NoLogo", "-NoProfile", "-Command" },
@@ -124,9 +142,16 @@ nvim_lsp.csharp_ls.setup({})
 nvim_lsp.pylsp.setup({})
 nvim_lsp.dockerls.setup({})
 nvim_lsp.html.setup({})
-nvim_lsp.astro.setup({})
+nvim_lsp.astro.setup({
+    cmd = { "astro", "lsp" },
+    on_attach = on_attach,
+    filetypes = { "astro" },
+    root_dir = nvim_lsp.util.root_pattern(".git", "astro.toml"),
+})
 
 nvim_lsp.azure_pipelines_ls.setup({
+    cmd = { "azure-pipelines-language-server", "--stdio" },
+    filetypes = { "azure-pipelines", "azure-pipelines.yml", "pipelines" },
     settings = {
         yaml = {
             schemas = {

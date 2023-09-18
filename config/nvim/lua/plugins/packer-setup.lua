@@ -57,7 +57,17 @@ return packer.startup(function(use)
     -- file explorer
     use({ "nvim-tree/nvim-tree.lua", requires = "kyazdani42/nvim-web-devicons" })
     -- language plugins
-    use({ "fatih/vim-go", cmd = ":GoUpdateBinaries" })
+    use({
+        "olexsmir/gopher.nvim",
+        requires = { -- dependencies
+            "nvim-lua/plenary.nvim",
+            "nvim-treesitter/nvim-treesitter",
+            build = function()
+                vim.cmd("silent! GoInstallDeps")
+            end,
+        },
+        ft = { "go" },
+    })
 
     -- Markdown files
     use({
@@ -100,6 +110,7 @@ return packer.startup(function(use)
 
     -- Debugging
     use("mfussenegger/nvim-dap")
+    use("leoluz/nvim-dap-go")
 
     -- statusline
     use("nvim-lualine/lualine.nvim")
@@ -162,6 +173,7 @@ return packer.startup(function(use)
             -- pass config options here (or nothing to use defaults)
             require("tailwindcss-colors").setup()
         end,
+        ft = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "astro" },
     })
 
     -- git integration
