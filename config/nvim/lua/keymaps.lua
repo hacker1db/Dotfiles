@@ -37,6 +37,15 @@ keymap.set("n", "<leader>s", ":so<CR>")
 -- Plugin Keybinds
 ----------------------
 
+-- gopher
+-- json tags
+keymap.set("n", "<leader>gtj", ":GoTagAdd json<CR>") -- generate tags for json
+-- yaml tags
+keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>") -- generate tags for yaml
+-- gopher tests and iferr
+keymap.set("n", "<leader>gt", ":GoTestsAll<CR>") -- generate tests for current file
+keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for current file
+
 -- vim-maximizer
 keymap.set("n", "<leader>sm", ":MaximizerToggle<CR>") -- toggle split window maximization
 
