@@ -47,7 +47,9 @@ local on_attach = function(client, bufnr)
         keymap.set("n", "<leader>oi", ":TypescriptOrganizeImports<CR>") -- organize imports (not in youtube nvim video)
         keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>") -- remove unused variables (not in youtube nvim video)
     end
-    require("tailwindcss-colors").buf_attach(bufnr)
+    if client.name == "tailwindcss" then
+        require("tailwindcss-colors").buf_attach(bufnr)
+    end
 end
 
 -- Set up completion using nvim_cmp with LSP source
