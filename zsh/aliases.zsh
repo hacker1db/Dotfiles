@@ -39,6 +39,7 @@ alias dotfiles="cd ~/.dotfiles"
 # Applications
 alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
 alias pnp='pnpm'
+alias jwtp='jwt $(pbpaste)' 
 
 
 
