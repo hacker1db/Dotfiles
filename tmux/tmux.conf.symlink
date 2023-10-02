@@ -124,6 +124,8 @@ set -g @tmux-last-color on
 set -g @tmux-last-pager 'less -r'
 set -g @tmux-last-pager 'less'
 set -g @tmux-nerd-font-window-name-show-name false
+set -g @tmux-nerd-font-window-name-shell-icon ''
+set -g @tmux-nerd-font-window-name-show-name false
 
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
