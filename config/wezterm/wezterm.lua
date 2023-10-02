@@ -6,7 +6,7 @@ local config = {
 	enable_tab_bar = false,
 	window_decorations = "RESIZE",
 	font = wezterm.font("CaskaydiaCove Nerd Font", { weight = "Regular" }),
-	font_size = 14,
+	font_size = 16,
 	adjust_window_size_when_changing_font_size = true,
 	native_macos_fullscreen_mode = true,
 	keys = {

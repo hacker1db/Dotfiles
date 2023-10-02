@@ -21,6 +21,7 @@ brew install httpie
 brew install --cask rancher
 brew install kubectx
 berw install helem
+brew install lazygit # Git terminal UI
 
 # terminals cause why not!
 brew install go
@@ -72,7 +73,7 @@ brew install neovim
 
 echo "Installing desktop application..."
 
-brew install --cask iterm2
+brew install --cask wezterm
 brew install --cask burp-suite-professional
 brew install --cask darwio
 brew install --cask spotify

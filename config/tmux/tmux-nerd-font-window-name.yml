@@ -1,0 +1,11 @@
+config:
+    fallback-icon: "?"
+    show-name: false
+
+icons:
+    nvim: "📝"
+    stripe: "💳"
+    stripe-mock: "💳"
+    btop: "📈"
+    bun: "🥟"
+    zsh: "" # overwrite with your own symbol (Nerd Font icon, emoji, whatever!)

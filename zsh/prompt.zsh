@@ -11,6 +11,21 @@ zstyle ':vcs_info:git*' actionformats ' %b|%a' 'x%R'
 
 autoload colors && colors
 
+node_prompt() {
+    [[ -f package.json || -d node_modules ]] || return
+
+    local version=''
+    local node_icon='\ue718'
+
+    if exists node; then
+        version=$(node -v 2>/dev/null)
+    fi
+
+    [[ -n version ]] || return
+
+    write '029' "$node_icon $version"
+}
+
 git_dirty() {
     # check if we're in a git repo
     command git rev-parse --is-inside-work-tree &>/dev/null || return

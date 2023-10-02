@@ -3,7 +3,8 @@ set -g default-command "login-shell"
 # tmux display things in 256 colors
 set -g default-terminal "screen-256color"
 set-option -ga terminal-overrides ",xterm-256color:Tc"
-
+set -g status-style 'bg=default' # transparent
+set -g status-position top       # macOS / darwin style
 set -g history-limit 20000
 
 # automatically renumber tmux windows
@@ -82,6 +83,10 @@ bind -r M resize-pane -Z
 # enable mouse support for switching panes/windows miuse support
 setw -g mouse on
 
+# open lazygit in a new window
+bind-key g display-popup -w "80%" -h "80%" -d "#{pane_current_path}" -E "lazygit"
+bind-key G display-popup -w "80%" -h "80%" -d "#{pane_current_path}" -E "gh dash"
+
 
 # maximizing and restoring windows
 unbind Up
@@ -107,7 +112,18 @@ bind C-v run "tmux set-buffer $(reattach-to-user-namespace pbpaste); tmux paste-
 ### Color & Style Settings ###
 ##############################
 
+# source ~/.dotfiles/tmux/bubbles.conf
 source ~/.dotfiles/tmux/theme.sh
+
+set -g @fzf-url-fzf-options '-p 60%,30% --prompt="   " --border-label=" Open URL "'
+set -g @fzf-url-history-limit '2000'
+set -g @t-bind 'T'
+set -g @t-fzf-find-binding 'ctrl-f:change-prompt(  )+reload(fd -H -d 2 -t d -E .Trash . ~)'
+set -g @t-fzf-prompt '🔭 '
+set -g @tmux-last-color on
+set -g @tmux-last-pager 'less -r'
+set -g @tmux-last-pager 'less'
+set -g @tmux-nerd-font-window-name-show-name false
 
 # List of plugins
 set -g @plugin 'tmux-plugins/tpm'
@@ -116,6 +132,10 @@ set -g @plugin 'tmux-plugins/tmux-cpu'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 set -g @plugin 'tmux-plugins/tmux-resurrect' # persist tmux sessions after computer restart
 set -g @plugin 'tmux-plugins/tmux-continuum' # automatically saves sessions for you every 15 minutes
+set -g @plugin 'joshmedeski/tmux-fzf-url'
+set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
+set -g @plugin 'git@github.com:joshmedeski/t-smart-tmux-session-manager'
+
 
 set -g @resurrect-capture-pane-contents 'on'
 set -g @continuum-restore 'on'

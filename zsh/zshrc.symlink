@@ -1,12 +1,19 @@
-autoload -Uz compinit
-compinit
-
 export DOTFILES=$HOME/.dotfiles
 export ZSH=$DOTFILES/zsh
+
+if [[ -d $DOTFILES/zsh/functions ]]; then
+    for func in $DOTFILES/zsh/functions/*(:t); autoload -U $func
+fi
+# initialize autocomplete
+autoload -U compinit add-zsh-hook
+compinit
+
+
 eval $(/opt/homebrew/bin/brew shellenv)
 
-# display how long all tasks over 10 seconds take
-export REPORTTIME=10
+
+export REPORTTIME=10 # display how long all tasks over 10 seconds take
+export KEYTIMEOUT=1  # 10ms delay for key sequences
 
 [[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo 
 # define the code directory
@@ -29,10 +36,6 @@ for config ($ZSH/**/*.zsh) source $config
 if [[ -a ~/.localrc ]]; then
     source ~/.localrc
 fi
-
-# initialize autocomplete
-autoload -U compinit add-zsh-hook
-compinit
 
 for config ($ZSH/**/*completion.sh) source $config
 
@@ -74,6 +77,14 @@ export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export ANDROID_NDK_HOME="$(brew --prefix)/share/android-ndk"
 
+
+if [ -f $HOME/.fzf.zsh ]; then
+  source $HOME/.fzf.zsh
+  export FZF_DEFAULT_COMMAND='fd --type f'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_DEFAULT_OPTS="--color bg:-1,bg+:-1,fg:-1,fg+:#feffff,hl:#993f84,hl+:#d256b5,info:#676767,prompt:#676767,pointer:#676767"
+fi
+
 # Gcloud
 source "$(brew --prefix)/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
 source "$(brew --prefix)/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
@@ -96,3 +107,48 @@ DOTFILES_LOADED=1
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+### Testing
+#
+# matches case insensitive for lowercase
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# pasting with tabs doesn't perform completion
+zstyle ':completion:*' insert-tab pending
+
+# default to file completion
+zstyle ':completion:*' completer _expand _complete _files _correct _approximate
+
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format '%B%d%b'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*' group-name ''
+
+
+########################################################
+# Plugin setup
+########################################################
+
+export ZPLUGDIR="$CACHEDIR/zsh/plugins"
+[[ -d "$ZPLUGDIR" ]] || mkdir -p "$ZPLUGDIR"
+# array containing plugin information (managed by zfetch)
+typeset -A plugins
+
+zfetch mafredri/zsh-async async.plugin.zsh
+zfetch zsh-users/zsh-syntax-highlighting
+zfetch zsh-users/zsh-autosuggestions
+zfetch grigorii-zander/zsh-npm-scripts-autocomplete
+zfetch Aloxaf/fzf-tab
+
+if [[ -x "$(command -v fnm)" ]]; then
+    eval "$(fnm env --use-on-cd)"
+fi
+
+[[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
+
+
+# look for all .zsh files and source them
+config_files=($DOTFILES/**/*.zsh)
+for file in $config_files[@]; do
+  source "$file"
+done
