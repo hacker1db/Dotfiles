@@ -60,6 +60,6 @@ tm_session_name="#[fg=$tm_color_feature,bold]#S"
 tm_git='#[fg=$thm_fg]#[fg=$thm_bk,bg=$thm_blue] #[bg=$thm_gray]#[fg=$thm_fg] #(gitmux -cfg $HOME/.dotfiles/config/tmux/gitmux.conf "#{pane_current_path}")'
 tm_clock="#[fg=$thm_cyan]#[fg=$thm_fg]#[fg=$thm_bg,bg=$thm_cyan] #[bg=$thm_gray]#[fg=$thm_fg] %a %h-%d %H:%M"
 
-## Configure status bars 
+## Configure status bars
 set -g status-left " $tm_session_name $tm_git$tm_icon"
 set -g status-right "$tm_tunes_display $tm_icon $tm_clock $tm_icon $tm_battery"
