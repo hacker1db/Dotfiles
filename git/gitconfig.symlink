@@ -3,8 +3,6 @@
 [user]
     name = hacker1db
     email = 6212228+hacker1db@users.noreply.github.com
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHfhf9ktvvn5ulxNQnZMUf7dc8TW2OP+uo6/zz3pLYdz
-
   # @hacker1db on twitter :D
 [github]
     user = hacker1db 
