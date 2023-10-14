@@ -13,6 +13,10 @@ function colours() {
         fi
     done
 }
+function gitsign(){
+    git config --system user.signingkey "$(op item get "$@" --fields="public key")"
+}
+
 
 # Create a new directory and enter it
 function md() {
