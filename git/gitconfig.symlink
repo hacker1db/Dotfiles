@@ -12,8 +12,7 @@
 [alias]
     # list all aliases
     la = "!git config -l | grep alias | cut -c 7-"
-    delete-merged-branches = "!f() { git checkout --quiet master && git branch --merged | grep --invert-match '\\*' | xargs -n 1 git branch --delete; git checkout --quiet @{-1}; }; f"
-    diff = diff --ignore-space-at-eol -b -w --ignore-blank-lines
+    delete-merged-branches = "!f() { git checkout --quiet master && git branch --merged | grep --invert-match '\\*' | xargs -n 1 git branch --delete; git checkout --quiet @{-1}; }; f" diff = diff --ignore-space-at-eol -b -w --ignore-blank-lines
     cnv = commit --no-verify
     co = checkout
     cob = checkout -b
@@ -151,11 +150,13 @@
 	instructionFormat = "[%an - %ar] %s"
 [pull]
 	ff = only
-[commit]
-	gpgsign = true
+# Add signing 
 [gpg]
-	program = gpg2
-	format = ssh
+  format = ssh
+
 [gpg "ssh"]
-	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
-	allowedSignersFile = /Users/hacker1db/.ssh/allowed_signers
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+[commit]
+  gpgsign = true
+
