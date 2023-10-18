@@ -23,6 +23,18 @@ function md() {
     mkdir -p "$@" && cd "$@"
 }
 
+function db() {
+    DOCKERFILE="${1:-.}"
+    IMAGENAME="${2:-tempname}"
+    PATTOKEN="${3:-$PAT}"
+
+    echo "Building $DOCKERFILE with $IMAGENAME"
+
+    docker build -f "$DOCKERFILE" -t $IMAGENAME:tempbuild$RANDOM --build-arg PAT=$PATTOKEN .
+
+
+}
+
 alias bathelp='bat --plain --language=help'
 help() {
     "$@" --help 2>&1 | bathelp
@@ -45,11 +57,12 @@ function f() {
 
 # Start an HTTP server from a directory, optionally specifying the port
 function server() {
-    local port="${1:-8000}"
-    open "http://localhost:${port}/"
+    # local port="${1:-8000}"
+    # open "http://localhost:${port}/"
     # Set the default Content-Type to `text/plain` instead of `application/octet-stream`
     # And serve everything as UTF-8 (although not technically correct, this doesn’t break anything for binary files)
-    python3 -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
+    # python3 -c $'import SimpleHTTPServer;\nmap = SimpleHTTPServer.SimpleHTTPRequestHandler.extensions_map;\nmap[""] = "text/plain";\nfor key, value in map.items():\n\tmap[key] = value + ";charset=UTF-8";\nSimpleHTTPServer.test();' "$port"
+    python3 -m http.server
 }
 
 
