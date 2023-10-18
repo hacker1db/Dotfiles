@@ -99,7 +99,7 @@ return packer.startup(function(use)
         end,
     })
 
-    -- pyhton
+    -- python
     use("jmcomets/vim-pony")
     use("Vimjas/vim-python-pep8-indent")
 
@@ -112,7 +112,7 @@ return packer.startup(function(use)
     use("mfussenegger/nvim-dap")
     use("leoluz/nvim-dap-go")
 
-    -- statusline
+    -- status line
     use("nvim-lualine/lualine.nvim")
 
     -- fuzzy finding w/ telescope
@@ -178,6 +178,7 @@ return packer.startup(function(use)
 
     -- git integration
     use("lewis6991/gitsigns.nvim") -- show line modifications on left hand side
+    use({ "jonarrien/telescope-cmdline.nvim" })
 
     if packer_bootstrap then
         require("packer").sync()

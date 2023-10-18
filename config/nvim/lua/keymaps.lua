@@ -1,8 +1,6 @@
 -- set leader key to space
 vim.g.mapleader = ";"
-local keymap = vim.keymap -- for conciseness
-local opts = { noremap = true, silent = true }
-
+local keymap = vim.keymap -- for conciseness local opts = { noremap = true, silent = true }
 ---------------------
 -- General Keymaps
 ---------------------
