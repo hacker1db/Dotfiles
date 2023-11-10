@@ -28,7 +28,7 @@ vim.opt.colorcolumn = "80"
 opt.backspace = "indent,eol,start"
 
 -- clipboard
-opt.clipboard:append("unnamedplus") -- use system clipboard as default register
+opt.clipboard:append("unnamedplus", "unnamed") -- use system clipboard as default register
 -- use mouse in all modes
 opt.mouse = "a" -- set mouse mode to all modes
 
