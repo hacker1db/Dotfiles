@@ -10,6 +10,8 @@ return {
     },
  config = function()
       local treesitter = require("nvim-treesitter.configs")
+      local comment = require("ts_context_commentstring").setup{}
+
     treesitter.setup({
 ensure_installed = {
             "bash",
@@ -28,6 +30,13 @@ ensure_installed = {
             "c_sharp",
             "markdown",
             "astro",
+
+ -- vim.g.skip_ts_context_commentstring_module = true
+
+
+
+
+
         },
         autotag = {
             enable = true,
@@ -37,10 +46,7 @@ ensure_installed = {
             enable = true,
             use_languagetree = true,
         },
-        context_commentstring = {
-            enable = true,
-            enable_autocmd = false,
-        },
+             
         indent = { enable = true },
         rainbow = {
             enable = true,

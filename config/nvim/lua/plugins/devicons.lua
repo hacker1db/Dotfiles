@@ -1,8 +1,10 @@
-local setup, devicon = pcall(require, "nvim-web-devicons")
-if not setup then
-	return
-end
-
+return{
+    
+ 'nvim-tree/nvim-web-devicons'
+ },
+ {
+config = function()
+local devicon = require("nvim-web-devicons")
 devicon.setup({
 	-- your personnal icons can go here (to override)
 	-- you can specify color or cterm_color instead of specifying both of them
@@ -22,3 +24,5 @@ devicon.setup({
 	-- will get overriden by `get_icons` option
 	default = true,
 })
+end
+}

@@ -1,8 +1,13 @@
-local status, lualine = pcall(require, "lualine")
-if not status then
-	return
-end
+return{
+    {
+'nvim-lualine/lualine.nvim',
+ dependencies = {
+        'nvim-tree/nvim-web-devicons'
+    },
 
+  config = function()
+--
+local lualine = require("lualine") 
 lualine.setup({
 	options = {
 		icons_enabled = true,
@@ -50,3 +55,6 @@ lualine.setup({
 	tabline = {},
 	extensions = { "fugitive" },
 })
+end,
+}
+}
