@@ -1,4 +1,4 @@
-local api = vim.api
+ api = vim.api
 local fn = vim.fn
 local utils = {}
 

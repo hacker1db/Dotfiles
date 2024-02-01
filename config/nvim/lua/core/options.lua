@@ -24,7 +24,6 @@ opt.cursorline = true
 opt.termguicolors = true
 opt.signcolumn = "yes"
 vim.opt.colorcolumn = "80"
-
 -- backsapce key
 
 opt.backspace = "indent,eol,start"

@@ -1,5 +1,3 @@
-
-
 require("plugins.colorscheme")
 -- import plugin's
 require("plugins.comment")
@@ -17,6 +15,7 @@ require("plugins.indent")
 require("plugins.devicons")
 require("plugins.dapgo")
 require("plugins.gopher")
+require("plugins.obsidian")
 
 require("core.options")
 require("core.keymaps")

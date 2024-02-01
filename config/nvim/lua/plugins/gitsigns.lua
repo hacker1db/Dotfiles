@@ -1,10 +1,8 @@
--- import gitsigns plugin safely
-local setup, gitsigns = pcall(require, "gitsigns")
-if not setup then
-    return
-end
-
--- configure/enable gitsigns
+return {
+    "lewis6991/gitsigns.nvim",
+    config = function()
+	  local gitsigns = require("gitsigns")
+  -- configure/enable gitsigns
 gitsigns.setup({
     signs = {
         add = { text = "│" },
@@ -46,3 +44,5 @@ gitsigns.setup({
         enable = false,
     },
 })
+end
+}

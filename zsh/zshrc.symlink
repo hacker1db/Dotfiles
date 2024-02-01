@@ -57,6 +57,7 @@ export PATH=$DOTFILES/bin:$PATH
 if [[ -d ~/bin ]]; then
     export PATH=~/bin:$PATH
 fi
+export PATH=$PATH:$HOME.rd/bin/
 
 # eport node version manager.
 export NVM_DIR="$HOME/.nvm"

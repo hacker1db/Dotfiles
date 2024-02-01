@@ -22,6 +22,7 @@ brew install --cask rancher
 brew install kubectx
 berw install helem
 brew install lazygit # Git terminal UI
+brew install --cask iina
 
 # terminals cause why not!
 brew install go
@@ -95,6 +96,7 @@ brew install --cask android-platform-tools
 brew install planetscale/tap/pscale
 brew install mysql-client
 brew install yt-dlp
+brew install --cask flux
 
 echo "install yarn and tools"
 npm install --global yarn
@@ -111,6 +113,7 @@ brew install --cask losslesscut
 brew install watch
 brew install tfsec
 brew install tfenv
+
 
 tfenv install latest
 tfenv use latest

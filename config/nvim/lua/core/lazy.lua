@@ -30,12 +30,10 @@ require("lazy").setup({ { import = "plugins" } }, {
 
 -- local plugins = {
 
---     -- packer can manage itself
 --     "github/copilot.vim",
 --     "tpope/vim-sleuth",
 --     "hashivim/vim-terraform", -- terraform
 --     "nvim-lua/plenary.nvim", -- lua functions that many plugins
---     "christoomey/vim-tmux-navigator", -- tmux & split window navigation
 --     "szw/vim-maximizer", -- maximizes and restores current window
 --     "lukas-reineke/indent-blankline.nvim",
 --     -- essential plugins
@@ -44,19 +42,6 @@ require("lazy").setup({ { import = "plugins" } }, {
 --     -- commenting with gc
 --     "numToStr/Comment.nvim",
 --     "JoosepAlviste/nvim-ts-context-commentstring",
-
---     -- file explorer
---     {
---         "nvim-tree/nvim-tree.lua",
---         version = "*",
---         lazy = false,
---         dependencies = {
---             "nvim-tree/nvim-web-devicons",
---         },
---         config = function()
---             require("nvim-tree").setup({})
---         end,
---     },
 
 --     -- language plugins
 --     {
@@ -72,41 +57,20 @@ require("lazy").setup({ { import = "plugins" } }, {
 --     },
 
 --     -- Markdown files
---     {
 --         "iamcco/markdown-preview.nvim",
 --         run = function()
 --             vim.fn["mkdp#util#install"]()
 --         end,
---     },
-
---     -- todo comments
---     {
---         "folke/todo-comments.nvim",
---         dependencies = { "nvim-lua/plenary.nvim" },
---         opts = {},
---     },
-
---     {
---         "folke/trouble.nvim",
---         dependencies = { "nvim-tree/nvim-web-devicons" },
---         opts = {},
---     },
 
 --     -- python
 --     "jmcomets/vim-pony",
 --     "Vimjas/vim-python-pep8-indent",
-
---     -- vs-code like icons
---     "kyazdani42/nvim-web-devicons",
 
 --     "simrat39/rust-tools.nvim",
 
 --     -- Debugging
 --     "mfussenegger/nvim-dap",
 --     "leoluz/nvim-dap-go",
-
---     -- status line
---     "nvim-lualine/lualine.nvim",
 
 --     -- fuzzy finding w/ telescope
 --     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
@@ -172,7 +136,6 @@ require("lazy").setup({ { import = "plugins" } }, {
 --     },
 
 --     -- git integration
---     "lewis6991/gitsigns.nvim", -- show line modifications on left hand side
 --     "jonarrien/telescope-cmdline.nvim",
 -- }
 
