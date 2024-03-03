@@ -5,9 +5,7 @@ return {
  
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
-      -- load the colorscheme here
-      vim.cmd([[colorscheme dracula]])
-	  local dracula = require("dracula")
+      	  local dracula = require("dracula")
 
 	  dracula.setup({
 		-- customize dracula color palette
@@ -50,6 +48,9 @@ return {
 			Nothing = {}, -- clear highlight of Nothing
 		},
 	})
+-- load the colorscheme here
+      vim.cmd([[colorscheme dracula]])
+
     end,
   }
 

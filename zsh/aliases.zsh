@@ -29,7 +29,8 @@ alias tree='exa -l --icons --tree -a -g'
 alias wv='gh repo view --web'
 # moving dir 
 alias sites='cd ~/Code/Sites/'
-alias notes='cd ~/Library/Mobile\ Documents/iCloud\~md\~obsidian/Documents/Notes'
+alias notes='cd ~/notes/Second\ Brain'
+
 # Helpers
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
