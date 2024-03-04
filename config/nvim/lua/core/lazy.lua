@@ -11,7 +11,6 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-
 require("lazy").setup({ { import = "plugins" } }, {
     install = {
         colorscheme = { "dracula" },
@@ -25,9 +24,6 @@ require("lazy").setup({ { import = "plugins" } }, {
     },
 })
 
-
-
-
 -- local plugins = {
 
 --     "github/copilot.vim",
@@ -35,7 +31,6 @@ require("lazy").setup({ { import = "plugins" } }, {
 --     "hashivim/vim-terraform", -- terraform
 --     "nvim-lua/plenary.nvim", -- lua functions that many plugins
 --     "szw/vim-maximizer", -- maximizes and restores current window
---     "lukas-reineke/indent-blankline.nvim",
 --     -- essential plugins
 --     "tpope/vim-surround", -- add, delete, change surroundings (it's awesome)
 --     "vim-scripts/ReplaceWithRegister", -- replace with register contents using motion (gr + motion)
@@ -66,26 +61,7 @@ require("lazy").setup({ { import = "plugins" } }, {
 --     "jmcomets/vim-pony",
 --     "Vimjas/vim-python-pep8-indent",
 
---     "simrat39/rust-tools.nvim",
-
---     -- Debugging
---     "mfussenegger/nvim-dap",
---     "leoluz/nvim-dap-go",
-
---     -- fuzzy finding w/ telescope
---     { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
-
---     { "nvim-telescope/telescope.nvim", branch = "0.1.x" }, -- fuzzy finder
-
---     "nvim-telescope/telescope-ui-select.nvim", -- for showing lsp code actions
-
---     {
---         "smjonas/inc-rename.nvim",
---         config = function()
---             require("inc_rename").setup()
---         end,
---     },
-
+--  --
 --     -- autocompletion
 --     "hrsh7th/nvim-cmp", -- completion plugin
 --     "hrsh7th/cmp-buffer", -- source for text in buffer
@@ -138,5 +114,3 @@ require("lazy").setup({ { import = "plugins" } }, {
 --     -- git integration
 --     "jonarrien/telescope-cmdline.nvim",
 -- }
-
-

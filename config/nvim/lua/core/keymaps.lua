@@ -57,6 +57,8 @@ keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>") -- find string u
 keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<cr>") -- list open buffers in current neovim instance
 keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>") -- list git_files
 keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>") -- list available help tags
+-- vim.api.nvim_set_keymap("n", ":", ":Telescope cmdline<CR>", { noremap = true, desc = "Cmdline" })
+-- vim.api.nvim_set_keymap("n", "<leader><leader>", ":Telescope cmdline<CR>", { noremap = true, desc = "Cmdline" })
 
 -- telescope git commands
 keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>") -- list all git commits (use <cr> to checkout) ["gc" for git commits]

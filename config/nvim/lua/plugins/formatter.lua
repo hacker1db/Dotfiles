@@ -1,9 +1,9 @@
--- import null-ls plugin safely
-local setup, null_ls = pcall(require, "null-ls")
-if not setup then
-    return
-end
+return {
 
+"nvimtools/none-ls.nvim",
+
+config = function()
+local null_ls = require("null-ls")
 -- for conciseness
 local formatting = null_ls.builtins.formatting -- to setup formatters
 local diagnostics = null_ls.builtins.diagnostics -- to setup linters
@@ -16,18 +16,20 @@ local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 null_ls.setup({
     -- setup formatters & linters
     sources = {
-        formatting.prettier, -- js/ts formatter
-        formatting.stylua, -- lua formatter
         completion.spell, -- spell check
         completion.luasnip, -- luasnip
-        code_actions.cspell, -- spelling is hard
-        diagnostics.eslint_d.with({ -- js/ts linter
+        completion.spell, -- spelling is hard
+
+        formatting.stylua, -- lua formatter
+        formatting.prettier, -- js/ts formatter
+        formatting.prettierd.with({ -- js/ts linter
             condition = function(utils)
                 return utils.root_has_file(".eslintrc.js", ".eslintrc.json") -- change file extension if you use something else
             end,
         }),
         formatting.goimports, -- go formatter
         formatting.gofmt, -- go formatter
+        code_actions.gitsigns
     },
     -- configure format on save
     on_attach = function(current_client, bufnr)
@@ -49,3 +51,5 @@ null_ls.setup({
         end
     end,
 })
+end
+}
