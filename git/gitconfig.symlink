@@ -6,6 +6,7 @@
   # @hacker1db on twitter :D
 [github]
     user = hacker1db 
+	signingkey = !$SIGNING_KEY
     
 [init]
     templatedir = ~/.dotfiles/git/templates
