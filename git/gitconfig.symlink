@@ -6,6 +6,8 @@
   # @hacker1db on twitter :D
 [github]
     user = hacker1db 
+    signingkey = ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDjRNrw1lC2X6Q7aYIB9wchlBH6md8LGvjVXwpP9n2Kpp2uOwkxJq/VN5x4SOJzIEIulNzbiWZn4ahhpmS/tfYgq0dMKx/OAg35qZkSDfN8Qx/XrnW8QNQBkVJPtsN2p+X+2GmPhavDMl4wdXrsW8R0md4qYSTlEpYsS8xTvJYNgx80adtwSH0q0t5LfKGV12Rmtyb9PCuSfQpyqaRB88KC9BR6+09QjkPBT0OfBUP53tBN9c3GpKpIvzLMxPztMIjC4gJKlTOQMXddigrSi7zxbvCBBJGuHtbO+x+q4ExEYSNdxjh92/qMa5Z0wx7GzeJsnFqRTaDhpw1xtNnH+zZax8loTZCXMq2+yrWEOmRxALz8hJ2+8BOKt/4T4vtj6ytZhMOMD8+C5x047Vsq0R74z2PWBMGb6p5GgvHgEoTXzJVCsqwYPMPLqaIdjoELKpTLd9xFxM1fUvZJm7y9busLmhAXne4HRavoqsCzErsGIa152xYOWl0dCD5ItYu6p1pI0dnsXxGBMrFU6fOq1bnXw4S9NLzCRt4NBkIbXpVd8XkX9cFLa21hGvJGyeQKpSgWU7yuaOXsmt8ptL5RCS1O70IRkLExEiPBLNP+KvlMSaAWSEnG6FRIoACUhMgO3NDp2ODUoRq5vefGxVnAVWikFmIz+k7410eXHbwALk8H2w==
+    
 [init]
     templatedir = ~/.dotfiles/git/templates
 	defaultBranch = main
@@ -156,6 +158,7 @@
 
 [gpg "ssh"]
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+  allowedSignersFile = ~/.ssh/allowed_signers
 
 [commit]
   gpgsign = true

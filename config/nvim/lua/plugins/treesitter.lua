@@ -31,15 +31,12 @@ treesitter.setup({
         enable = true,
         use_languagetree = true,
     },
-    context_commentstring = {
-        enable = true,
-        enable_autocmd = false,
-    },
+
     indent = { enable = true },
     rainbow = {
         enable = true,
         extended_mode = true,
-        max_file_lines = 1000,
+        max_file_lines = 100000,
     },
     textobjects = {
         select = {
