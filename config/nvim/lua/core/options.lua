@@ -5,12 +5,13 @@ vim.g.maplocalleader = ";"
 
 opt.syntax = "enable"
 opt.number = true
-
 -- tabs
 opt.tabstop = 4
 opt.shiftwidth = 4
 opt.expandtab = true
 opt.autoindent = true
+opt.conceallevel = 2
+opt.relativenumber = true
 
 -- line wrap
 opt.wrap = false
