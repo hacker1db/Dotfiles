@@ -1,6 +1,5 @@
 require("core.options")
 require("core.keymaps")
-
 require("core.lazy")
 require("plugins.colorscheme")
 -- import plugin's
@@ -74,8 +73,6 @@ require("plugins.terraform")
 --         ft = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "astro" },
 --     },
 
---     -- git integration
---     "jonarrien/telescope-cmdline.nvim",
 -- }
 --
 --

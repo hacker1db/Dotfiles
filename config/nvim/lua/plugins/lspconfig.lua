@@ -7,34 +7,34 @@ return {
         local nvim_lsp = require("lspconfig")
         local cmp_nvim_lsp = require("cmp-nvim-lsp")
 
-
         local keymap = vim.keymap -- for conciseness
 
         local on_attach = function(client, bufnr)
-        --     -- keybind options
-            local opts = { noremap = true, silent = true, buffer = bufnr }
-        --
+            --     -- keybind options
+            -- local opts = { noremap = true, silent = true, buffer = bufnr }
+            local opts = {}
+            --
             -- set keybinds
-            keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts)             -- show definition, references
-            keymap.set("n", "gD", vim.lsp.buf.declaration, opts)                         -- got to declaration
-            keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)            -- see definition and make edits in window
-            keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)        -- go to implementation
-            keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)       -- go to implementation
-            keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)                 -- see available code actions
-            keymap.set({ "n", f "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)      -- see available code actions, in visual mode will apply to selection
-            keymap.set("n", "<leader>rn", ":IncRename ", opts)                           -- smart rename
-            keymap.set("n", "<leader>a", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
-            keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)                -- show diagnostics for line
-            keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)                        -- jump to previous diagnostic in buffer
-            keymap.set("n", "]d", vim.diagnostic.goto_next, opts)                        -- jump to next diagnostic in buffer
-keymap.set("n", "K", vim.lsp.buf.hover, opts)                                -- show documentation for what is under cursor
-            keymap.set("n", "<leader>o", "<cmd>LSoutlineToggle<CR>", opts)               -- see outline on right hand side
+            keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
+            keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- got to declaration
+            keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- see definition and make edits in window
+            keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- go to implementation
+            keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- go to implementation
+            keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions
+            keymap.set({ "n", f("v") }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+            keymap.set("n", "<leader>rn", "<cmd>IncRename", opts) -- smart rename
+            keymap.set("n", "<leader>a", "<cmd>Telescope builtin.diagnostics bufnr=0", opts) -- show  diagnostics for file
+            keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
+            keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
+            keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
+            keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+            keymap.set("n", "<leader>o", "<cmd>LSoutlineToggle<CR>", opts) -- see outline on right hand side
 
             -- typescript specific keymaps (e.g. rename file and update imports)
             if client.name == "tsserver" then
-                keymap.set("n", "<leader>rf", ":TypescriptRenameFile<CR>")      -- rename file and update imports
+                keymap.set("n", "<leader>rf", ":TypescriptRenameFile<CR>") -- rename file and update imports
                 keymap.set("n", "<leader>oi", ":TypescriptOrganizeImports<CR>") -- organize imports (not in youtube nvim video)
-                keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>")    -- remove unused variables (not in youtube nvim video)
+                keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>") -- remove unused variables (not in youtube nvim video)
             end
             if client.name == "tailwindcss" then
                 require("tailwindcss-colors").buf_attach(bufnr)
@@ -51,7 +51,14 @@ keymap.set("n", "K", vim.lsp.buf.hover, opts)                                -- 
 
         nvim_lsp.tsserver.setup({
             on_attach = on_attach,
-            filetypes = { "typescript", "typescriptreact", "typescript.tsx", "javascript", "javascriptreact", "javascript.jsx" },
+            filetypes = {
+                "typescript",
+                "typescriptreact",
+                "typescript.tsx",
+                "javascript",
+                "javascriptreact",
+                "javascript.jsx",
+            },
             capabilities = capabilities,
         })
 
@@ -156,5 +163,5 @@ keymap.set("n", "K", vim.lsp.buf.hover, opts)                                -- 
                 },
             },
         })
-    end
+    end,
 }

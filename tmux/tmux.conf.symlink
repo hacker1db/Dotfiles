@@ -138,7 +138,6 @@ set -g @plugin 'joshmedeski/tmux-fzf-url'
 set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
 set -g @plugin 'git@github.com:joshmedeski/t-smart-tmux-session-manager'
 
-
 set -g @resurrect-capture-pane-contents 'on'
 set -g @continuum-restore 'on'
 run '~/.tmux/plugins/tpm/tpm'

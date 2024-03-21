@@ -38,11 +38,6 @@ if [[ -a ~/.localrc ]]; then
 fi
 
 for config ($ZSH/**/*completion.sh) source $config
-
-export EDITOR='nvim'
-export GIT_EDITOR='nvim'
-
-
 export PATH=/usr/local/bin:$PATH
 
 # add /usr/local/sbin
@@ -124,7 +119,6 @@ zstyle ':completion:*:descriptions' format '%B%d%b'
 zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*' group-name ''
-
 
 ########################################################
 # Plugin setup
