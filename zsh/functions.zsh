@@ -34,6 +34,15 @@ function db() {
 
 
 }
+function clitools(){
+if [ -d $HOME/code/clitools ]; then
+     cd $HOME/code/clitools
+else
+gh repo clone hacker1db/clitools ~/code/
+fi
+
+
+}
 
 alias bathelp='bat --plain --language=help'
 help() {
