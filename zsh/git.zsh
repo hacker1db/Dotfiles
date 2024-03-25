@@ -3,8 +3,8 @@ alias ga='git add'
 alias gb='git branch'
 alias gl='git pull'
 alias gp='git push'
-alias gd='batdiff'
-alias gdc='git diff --cached'
+alias gd='git diff --name-only --relative --diff-filter=d | xargs bat --diff'
+alias gdc='git diff --cached --name-only --relative --diff-filter=d | xargs bat --diff'
 alias gs='git s'
 alias gss='git stash save'
 alias gsp='git stash pop'
@@ -14,7 +14,7 @@ alias grn='git-rename'
 alias glog="git l"
 alias gcm="git commit -am"
 alias gcs="git commit -S -am"
-alias gds="batdiff --staged"
+alias gds="git diff --name-only --relative --diff-filter=d --staged | xargs bat --diff"
 
 # alias git-amend='git commit --amend -C HEAD'
 alias git-undo='git reset --soft HEAD~1'
