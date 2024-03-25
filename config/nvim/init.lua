@@ -21,14 +21,9 @@ require("plugins.obsidian")
 require("plugins.todo")
 require("plugins.completion")
 require("plugins.terraform")
+require("plugins.markdownpreview")
 
 -- TODO: convert this to lazy
-
---     -- Markdown files
---         "iamcco/markdown-preview.nvim",
---         run = function()
---             vim.fn["mkdp#util#install"]()
---         end,
 
 --     -- python
 --     "jmcomets/vim-pony",

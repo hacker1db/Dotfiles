@@ -11,7 +11,7 @@ compinit
 
 eval $(/opt/homebrew/bin/brew shellenv)
 
-
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export REPORTTIME=10 # display how long all tasks over 10 seconds take
 export KEYTIMEOUT=1  # 10ms delay for key sequences
 
@@ -65,9 +65,7 @@ if [ -z ${DOTFILES_LOADED+x} ]; then
     # install zsh autosuggestions
     source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi
-export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
-
-
+# export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
 [ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
 export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
@@ -103,6 +101,9 @@ DOTFILES_LOADED=1
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+
+
+
 ### Testing
 #
 # matches case insensitive for lowercase
