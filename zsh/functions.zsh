@@ -151,5 +151,8 @@ function set-ns() {
 kubectl config set-context --current --namespace="$@"
 }
 
+function mds(){
+    glow -p "$@"
+}
 
 
