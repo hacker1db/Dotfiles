@@ -6,7 +6,7 @@ fi
 
 # cli tools
 echo "Installing cli tools.."
-brew install gh
+brew install gh # GitHub CLI 
 brew tap homebrew/cask-fonts  
 brew cask install font-dejavusansmono-nerd-font
 brew install git
@@ -126,10 +126,11 @@ echo "install wordlists"
 git clone https://github.com/danielmiessler/SecLists.git ~/wordlists
 echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
-echo "install deoplete requirements for neovim"
- pip3 install neovim
 echo "Install tools for blogging"
 brew install hugo
-echo "go get your cli tools from github"
-
+echo "golang -- getting your cli tools from github"
+go install github.com/cosmtrek/air@latest
+echo "install Github extensions" 
+gh extension upgrade gh-copilot
+gh extension install dlvhdr/gh-dash
 exit 0
