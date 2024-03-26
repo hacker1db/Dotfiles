@@ -23,11 +23,3 @@ require("plugins.completion")
 require("plugins.terraform")
 require("plugins.markdownpreview")
 require("plugins.typescrpit_tools")
-
--- TODO: convert this to lazy
-
---     -- python
---     "jmcomets/vim-pony",
---     "Vimjas/vim-python-pep8-indent",
-
---     "onsails/lspkind.nvim", -- vs-code like icons for autocompletion
