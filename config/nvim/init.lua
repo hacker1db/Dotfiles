@@ -22,6 +22,7 @@ require("plugins.todo")
 require("plugins.completion")
 require("plugins.terraform")
 require("plugins.markdownpreview")
+require("plugins.typescrpit_tools")
 
 -- TODO: convert this to lazy
 
@@ -29,41 +30,4 @@ require("plugins.markdownpreview")
 --     "jmcomets/vim-pony",
 --     "Vimjas/vim-python-pep8-indent",
 
---     -- configuring lsp servers
---     "neovim/nvim-lspconfig", -- easily configure language servers
-
---     "hrsh7th/cmp-nvim-lsp", -- for autocompletion
-
---     "jose-elias-alvarez/typescript.nvim", -- additional functionality for typescript server (e.g. rename file & update imports)
 --     "onsails/lspkind.nvim", -- vs-code like icons for autocompletion
-
---     -- formatting & linting
---     "nvimtools/none-ls.nvim", -- configure formatters & linters
---     "jayp0521/mason-null-ls.nvim", -- bridges gap b/w mason & null-ls
-
---     -- treesitter configuration
---     {
---         "nvim-treesitter/nvim-treesitter",
---         run = function()
---             require("nvim-treesitter.install").update({ with_sync = true })
---         end,
---     },
-
---     -- auto closing
---     { "windwp/nvim-ts-autotag", after = "nvim-treesitter" }, -- autoclose tags
-
---     {
---         "themaxmarchuk/tailwindcss-colors.nvim",
---         -- load only on require("tailwindcss-colors")
---         module = "tailwindcss-colors",
---         -- run the.init function after plugin is loaded
---         config = function()
---             -- pass config options here (or nothing to use defaults)
---             require("tailwindcss-colors").init()
---         end,
---         ft = { "html", "css", "scss", "javascript", "javascriptreact", "typescript", "typescriptreact", "astro" },
---     },
-
--- }
---
---
