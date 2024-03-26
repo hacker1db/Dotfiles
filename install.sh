@@ -24,7 +24,8 @@ mkdir -p ~/Code/Sites
 mkdir -p ~/.pandoc/templates
 echo "Creating personalizable exports i.e for work duh..api keys?"
 touch ~/.localrc
-
+echo "set limactl to start up at login.."
+limactl start-at-login
 
 echo "Configuring zsh as default shell"
 chsh -s $(which zsh)

@@ -10,6 +10,7 @@ brew install gh # GitHub CLI
 brew tap homebrew/cask-fonts  
 brew cask install font-dejavusansmono-nerd-font
 brew install git
+brew install lazygit # Git terminal UI
 brew install ack
 brew install tree
 brew install wget 
@@ -17,11 +18,21 @@ brew install fzf # Fuzzy file finder
 brew install lnav # for viewing log files in terminal 
 brew install azure-cli
 brew instal bat
+brew install bat-extras
 brew install httpie
+# Image management tools
+echo "install image tools"
 brew install --cask rancher
+brew tap anchore/grype
+brew install grype
 brew install kubectx
 berw install helem
-brew install lazygit # Git terminal UI
+brew install lima
+echo "Start limactl"
+limactl start
+
+
+## GUI tools
 brew install --cask iina
 
 # terminals cause why not!
@@ -45,6 +56,7 @@ brew install node
 brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
 brew install --cask powershell
+brew install 1password-cli
 echo "Install Azure powershell"
 pwsh -c "Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force"
 brew tap homebrew/cask-fonts
@@ -130,6 +142,7 @@ echo "Install tools for blogging"
 brew install hugo
 echo "golang -- getting your cli tools from github"
 go install github.com/cosmtrek/air@latest
+go install github.com/charmbracelet/glow@latest
 echo "install Github extensions" 
 gh extension upgrade gh-copilot
 gh extension install dlvhdr/gh-dash

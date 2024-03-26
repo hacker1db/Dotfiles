@@ -29,10 +29,6 @@ require("plugins.markdownpreview")
 --     "jmcomets/vim-pony",
 --     "Vimjas/vim-python-pep8-indent",
 
---     -- managing & installing lsp servers, linters & formatters
---     "williamboman/mason.nvim", -- in charge of managing lsp servers, linters & formatters
---     "williamboman/mason-lspconfig.nvim", -- bridges gap b/w mason & lspconfig
-
 --     -- configuring lsp servers
 --     "neovim/nvim-lspconfig", -- easily configure language servers
 

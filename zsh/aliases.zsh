@@ -17,7 +17,6 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
-
 alias cat='bat'
 alias tf="terraform"
 alias l="ls -lah ${colorflag}"
@@ -41,7 +40,7 @@ alias dotfiles="cd ~/.dotfiles"
 alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
 alias pnp='pnpm'
 alias jwtp='jwt $(pbpaste)' 
-# alias docker='nerdctl.lima'
+alias docker='nerdctl.lima'
 
 
 

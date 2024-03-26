@@ -35,12 +35,14 @@ function db() {
 
 }
 function clitools(){
-if [ -d $HOME/code/clitools ]; then
-     cd $HOME/code/clitools
+if [[ -d ~/code/clitools ]]; then
+     cd ~/code/clitools
 else
-gh repo clone hacker1db/clitools ~/code/
+gh repo clone hacker1db/clitools ~/code/clitools
 fi
-
+# if [[ ! -d ~/code/Clitools ]]; then
+# gh repo clone hacker1db/clitools ~/code/clitools
+# fi
 
 }
 
@@ -152,7 +154,12 @@ kubectl config set-context --current --namespace="$@"
 }
 
 function mds(){
-    glow -p "$@"
+    glow -p "$@" -s dark | less -r
+}
+
+function docker-init(){
+    limactl start template://docker
+    export DOCKER_HOST=$(limactl list docker --format 'unix://{{.Dir}}/sock/docker.sock')
 }
 
 
