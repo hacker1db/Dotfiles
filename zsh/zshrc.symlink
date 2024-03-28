@@ -18,7 +18,7 @@ export KEYTIMEOUT=1  # 10ms delay for key sequences
 [[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo 
 # define the code directory
 # This is where my code exists and where I want the `c` autocomplete to work from exclusively
-if [[ -d ~/code ]]; then
+if [[ -d ~/Developer ]]; then
     export CODE_DIR=~/Developer
 fi
 
