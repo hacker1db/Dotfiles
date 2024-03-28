@@ -46,24 +46,3 @@ vim and neovim should just work once the correct plugins are installed. To insta
 
 
 ```
-
----
-
-### TODO's:
-
----
-
--   [golang air](https://github.com/cosmtrek/air)
-
--   [x] `npm install -g typescript typescript-language-server eslint prettier` add this to insall script.
--   migrate to full lua
-    -   [x] Bring over main config
-    -   [ ] Check that you captured all of your settings
-    -   [ ] Fix HJKL with ctrl not working as expected
-    -   [ ] Fix on save error with formating
--   Update brew install with new tools
--   [ ] Update install scripts to correctly install with new hombrew
--   [ ] Configure [GitHub - folke/todo-comments.nvim: ✅ Highlight, list and search todo comments in your projects](https://github.com/folke/todo-comments.nvim)
-
--   [ ] Configure [GitHub - folke/todo-comments.nvim: ✅ Highlight, list and search todo comments in your projects](https://github.com/folke/todo-comments.nvim)
--   [ ] https://github.com/jonarrien/telescope-cmdline.nvim
