@@ -9,7 +9,6 @@ autoload -U compinit add-zsh-hook
 compinit
 
 
-eval $(/opt/homebrew/bin/brew shellenv)
 
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export REPORTTIME=10 # display how long all tasks over 10 seconds take
@@ -24,11 +23,6 @@ fi
 
 eval "$(op completion zsh)"; compdef _op op
 
-# source z.sh if it exists
-zpath="$(brew --prefix)/etc/profile.d/z.sh"
-if [ -f "$zpath" ]; then
-    source "$zpath"
-fi
 
 # source all .zsh files inside of the zsh/ directory
 for config ($ZSH/**/*.zsh) source $config
@@ -56,20 +50,10 @@ export PATH=$PATH:$HOME.rd/bin/
 
 # eport node version manager.
 export NVM_DIR="$HOME/.nvm"
-[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && . "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && . "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
-if [ -z ${DOTFILES_LOADED+x} ]; then
-    # install zsh-syntax-highlighting
-    source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-    # install zsh autosuggestions
-    source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
 # export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
 [ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
 export FZF_DEFAULT_COMMAND='ag -g ""'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export ANDROID_NDK_HOME="$(brew --prefix)/share/android-ndk"
 
 
 if [ -f $HOME/.fzf.zsh ]; then
@@ -79,16 +63,11 @@ if [ -f $HOME/.fzf.zsh ]; then
   export FZF_DEFAULT_OPTS="--color bg:-1,bg+:-1,fg:-1,fg+:#feffff,hl:#993f84,hl+:#d256b5,info:#676767,prompt:#676767,pointer:#676767"
 fi
 
-# Gcloud
-source "$(brew --prefix)/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
-source "$(brew --prefix)/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
-
 source <(kubectl completion zsh)
 alias k=kubectl
 compdef __start_kubectl k
 
 autoload bashcompinit && bashcompinit
-source /opt/homebrew/etc/bash_completion.d/az
 export GPG_TTY=$(tty)
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 export PATH="$PATH:/Users/hacker1db/.kit/bin"

@@ -41,8 +41,7 @@ Inside of [`.zshrc`](zsh/zshrc.symlink), the `EDITOR` shell variable is set to `
 vim and neovim should just work once the correct plugins are installed. To install the plugins, you will need to open Neovim in the following way:
 
 ```bash
-         Run the following in a terminal to install neovim and vim plugins
+    # Run the following in a terminal to install neovim and vim plugins
     nvim +PlugInstall
-
 
 ```
