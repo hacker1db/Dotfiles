@@ -1,4 +1,5 @@
 return {
+    -- TODO: Fix copilot
     {
         "zbirenbaum/copilot.lua",
         cmd = "Copilot",

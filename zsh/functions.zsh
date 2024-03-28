@@ -35,14 +35,11 @@ function db() {
 
 }
 function clitools(){
-if [[ -d ~/code/clitools ]]; then
-     cd ~/code/clitools
+if [[ -d $CODE_DIR/clitools ]]; then
+     cd $CODE_DIR/clitools
 else
-gh repo clone hacker1db/clitools ~/code/clitools
+gh repo clone hacker1db/clitools $CODE_DIR/clitools
 fi
-# if [[ ! -d ~/code/Clitools ]]; then
-# gh repo clone hacker1db/clitools ~/code/clitools
-# fi
 
 }
 

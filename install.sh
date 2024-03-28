@@ -19,8 +19,8 @@ if [ "$(uname)" == "Darwin" ]; then
 echo "creating vim directories"
 mkdir -p ~/.vim-tmp
 echo "Creating Sites, Code, Notes directories! :D Its the little things!" 
-mkdir -p ~/Code
-mkdir -p ~/Code/Sites
+mkdir -p ~/Developer
+mkdir -p ~/Developer/Sites
 mkdir -p ~/.pandoc/templates
 echo "Creating personalizable exports i.e for work duh..api keys?"
 touch ~/.localrc

@@ -27,7 +27,7 @@ alias rmf="rm -rf"
 alias tree='exa -l --icons --tree -a -g'
 alias wv='gh repo view --web'
 # moving dir 
-alias sites='cd ~/Code/Sites/'
+alias sites='cd $CODE_DIR/Sites/'
 alias notes='cd ~/notes/Second\ Brain'
 
 # Helpers
