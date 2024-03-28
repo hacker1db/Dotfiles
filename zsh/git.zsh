@@ -47,6 +47,15 @@ function g() {
     fi
 }
 
+function ghi(){
+ if [[ $# > 0 ]]; then
+    number="#"
+    gh issue view "${number}$@"
+    else
+        gh issue list 
+    fi
+}
+
 
 
 
