@@ -34,6 +34,14 @@ function db() {
 
 
 }
+function clitools(){
+if [[ -d $CODE_DIR/clitools ]]; then
+     cd $CODE_DIR/clitools
+else
+gh repo clone hacker1db/clitools $CODE_DIR/clitools
+fi
+
+}
 
 alias bathelp='bat --plain --language=help'
 help() {
@@ -142,5 +150,16 @@ function set-ns() {
 kubectl config set-context --current --namespace="$@"
 }
 
+function mds(){
+    glow -p "$@" -s dark | less -r
+}
+
+function docker-init(){
+    limactl start template://docker
+    export DOCKER_HOST=$(limactl list docker --format 'unix://{{.Dir}}/sock/docker.sock')
+}
+function cytj(){
+    yq -Poy "$@"
+}
 
 

@@ -3,13 +3,16 @@ if test ! $(which brew); then
     echo "Installing homebrew"
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
+echo "getting brew file requirements"
+brew install rcmdnk/file/brew-file
 
 # cli tools
 echo "Installing cli tools.."
-brew install gh
+brew install gh # GitHub CLI 
 brew tap homebrew/cask-fonts  
 brew cask install font-dejavusansmono-nerd-font
 brew install git
+brew install lazygit # Git terminal UI
 brew install ack
 brew install tree
 brew install wget 
@@ -17,11 +20,22 @@ brew install fzf # Fuzzy file finder
 brew install lnav # for viewing log files in terminal 
 brew install azure-cli
 brew instal bat
+brew install bat-extras
 brew install httpie
+# Image management tools
+echo "install image tools"
 brew install --cask rancher
+brew tap anchore/grype
+brew install grype
 brew install kubectx
 berw install helem
-brew install lazygit # Git terminal UI
+brew install lima
+echo "Start limactl"
+limactl start
+
+
+## GUI tools
+brew install --cask iina
 
 # terminals cause why not!
 brew install go
@@ -44,6 +58,7 @@ brew install node
 brew install zsh-syntax-highlighting
 brew install zsh-autosuggestions
 brew install --cask powershell
+brew install 1password-cli
 echo "Install Azure powershell"
 pwsh -c "Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force"
 brew tap homebrew/cask-fonts
@@ -95,6 +110,7 @@ brew install --cask android-platform-tools
 brew install planetscale/tap/pscale
 brew install mysql-client
 brew install yt-dlp
+brew install --cask flux
 
 echo "install yarn and tools"
 npm install --global yarn
@@ -112,6 +128,7 @@ brew install watch
 brew install tfsec
 brew install tfenv
 
+
 tfenv install latest
 tfenv use latest
 
@@ -123,10 +140,12 @@ echo "install wordlists"
 git clone https://github.com/danielmiessler/SecLists.git ~/wordlists
 echo "import the iterm dracula theme"
 git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
-echo "install deoplete requirements for neovim"
- pip3 install neovim
 echo "Install tools for blogging"
 brew install hugo
-echo "go get your cli tools from github"
-
+echo "golang -- getting your cli tools from github"
+go install github.com/cosmtrek/air@latest
+go install github.com/charmbracelet/glow@latest
+echo "install Github extensions" 
+gh extension upgrade gh-copilot
+gh extension install dlvhdr/gh-dash
 exit 0

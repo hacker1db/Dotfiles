@@ -1,15 +1,19 @@
--- import comment plugin safely
-local setup, gopher = pcall(require, "gopher")
-if not setup then
-    return
-end
+return {
 
-gopher.setup({
-    commands = {
-        go = "go",
-        gomodifytags = "gomodifytags",
-        gotests = "~/go/bin/gotests", -- also you can set custom command path
-        impl = "impl",
-        iferr = "iferr",
+    "olexsmir/gopher.nvim",
+    dependencies = { -- dependencies
+        "nvim-lua/plenary.nvim",
+        "nvim-treesitter/nvim-treesitter",
     },
-})
+    config = function()
+        require("gopher").setup({
+            commands = {
+                go = "go",
+                gomodifytags = "gomodifytags",
+                gotests = "~/go/bin/gotests", -- also you can set custom command path
+                impl = "impl",
+                iferr = "iferr",
+            },
+        })
+    end,
+}

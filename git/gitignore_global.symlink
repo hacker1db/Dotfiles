@@ -29,5 +29,7 @@ tscommand*.txt
 config.json
 .hugo_build.lock
 tmp
-.terrafrom
-.terrafrom.lock.hcl
+
+.terraform
+.terraform.lock
+

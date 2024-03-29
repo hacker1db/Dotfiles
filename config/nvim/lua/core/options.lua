@@ -1,14 +1,17 @@
 local opt = vim.opt -- save me time later and stop repeating myself
 local cmd = vim.cmd
+vim.g.mapleader = ";"
+vim.g.maplocalleader = ";"
+
 opt.syntax = "enable"
 opt.number = true
--- opt.relativenumber = true
-
 -- tabs
 opt.tabstop = 4
 opt.shiftwidth = 4
 opt.expandtab = true
 opt.autoindent = true
+opt.conceallevel = 2
+opt.relativenumber = true
 
 -- line wrap
 opt.wrap = false
@@ -22,7 +25,6 @@ opt.cursorline = true
 opt.termguicolors = true
 opt.signcolumn = "yes"
 vim.opt.colorcolumn = "80"
-
 -- backsapce key
 
 opt.backspace = "indent,eol,start"
