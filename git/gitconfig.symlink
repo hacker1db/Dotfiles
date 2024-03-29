@@ -6,6 +6,8 @@
   # @hacker1db on twitter :D
 [github]
     user = hacker1db 
+	signingkey = !$SIGNING_KEY_PUBLIC
+    
 [init]
     templatedir = ~/.dotfiles/git/templates
 	defaultBranch = main
@@ -156,6 +158,7 @@
 
 [gpg "ssh"]
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+  allowedSignersFile = ~/.ssh/allowed_signers
 
 [commit]
   gpgsign = true

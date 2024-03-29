@@ -6,6 +6,7 @@ return {
         "nvim-treesitter/nvim-treesitter-textobjects",
         "windwp/nvim-ts-autotag",
     },
+
     config = function()
         local treesitter = require("nvim-treesitter.configs")
 
@@ -27,6 +28,7 @@ return {
                 "c_sharp",
                 "markdown",
                 "astro",
+
             },
             autotag = {
                 enable = true,
