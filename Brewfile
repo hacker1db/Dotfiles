@@ -1,9 +1,13 @@
+# vim:ft=ruby
+
 tap "azure/functions"
 tap "brandonskerritt/rustscan"
 tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/core"
+tap "oven-sh/bun"
+
 brew "ack"
 brew "ansible"
 brew "python@3.8"
@@ -79,3 +83,5 @@ cask "flux"
 brew "bat-extras"
 brew "bash"
 brew "yq"
+brew "zoxide" 
+brew "bun"
