@@ -89,7 +89,6 @@ echo "Installing neovim..."
 brew install neovim
 
 echo "Installing desktop application..."
-
 brew install --cask wezterm
 brew install --cask burp-suite-professional
 brew install --cask darwio
@@ -106,7 +105,6 @@ brew install --cask obs
 brew install --cask obsidian
 brew install --cask wireshark
 brew install rustscan
-brew install --cask min
 brew install --cask krisp
 brew install --cask android-platform-tools
 brew install planetscale/tap/pscale

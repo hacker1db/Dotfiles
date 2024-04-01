@@ -162,4 +162,13 @@ function cytj(){
     yq -Poy "$@"
 }
 
-
+function azdlogin(){
+        if [ -z "$1" ]; then
+            echo "Usage: dlogin <registry>"
+            return 1
+       fi
+    az acr login -n "$@" --expose-token --query 'accessToken' -o tsv | lima nerdctl login -u 00000000-0000-0000-0000-000000000000 --password-stdin "$@.azurecr.io"
+}
+function gha(){
+       gh project item-add 16 --owner Alaska-ITS --url "$@"
+}
