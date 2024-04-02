@@ -1,13 +1,12 @@
-
+# vim:ft=gitconfig
 # gitconfig
 [user]
     name = hacker1db
-    email = 6212228+hacker1db@users.noreply.github.com
-  # @hacker1db on twitter :D
+    author = 6212228+hacker1db@users.noreply.github.com
+    # @hacker1db on twitter :D
 [github]
     user = hacker1db 
 	signingkey = !$SIGNING_KEY_PUBLIC
-    
 [init]
     templatedir = ~/.dotfiles/git/templates
 	defaultBranch = main
@@ -89,7 +88,8 @@
     # check out a local copy of a PR. https://gist.github.com/gnarf/5406589
 	pr = "!f() { exec vsts code pr \"$@\"; }; f"
     pr-clean = "!git for-each-ref refs/heads/pr/* --format='%(refname)' | while read ref ; do branch=${ref#refs/heads/} ; git branch -D $branch ; done"
-	repo = "!f() { exec vsts code repo \"$@\"; }; f"
+    repo = "!f() { exec vsts code repo \"$@\"; }; f"
+
 [color]
     diff = auto
     status = auto
@@ -116,8 +116,7 @@
     default = current
 [branch]
     # set up 'git pull' to rebase instead of merge
-    # autosetuprebase = always
-    rebase = true
+    autosetuprebase = always
 [diff]
     renames = copies
     mnemonicprefix = true
