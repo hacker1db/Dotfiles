@@ -44,7 +44,7 @@ brew "delve"
 # Tool for exploring each layer in a docker image
 brew "dive"
 # Text processing system for reStructuredText
-brew "docutils", link: false
+brew "docutils"
 # .NET Core
 brew "dotnet@6"
 # Modern replacement for 'ls'
@@ -188,7 +188,7 @@ brew "terraform-docs"
 # Language Server Protocol for Terraform
 brew "terraform-lsp"
 # Terraform version manager inspired by rbenv
-brew "tfenv", link: false
+brew "tfenv"
 # Static analysis security scanner for your terraform code
 brew "tfsec"
 # Code-search similar to ack
@@ -217,14 +217,10 @@ brew "z"
 brew "zplug"
 # UNIX shell (command interpreter)
 brew "zsh"
-# Fish-like fast/unobtrusive autosuggestions for zsh
-brew "zsh-autosuggestions"
-# Fish shell like syntax highlighting for zsh
-brew "zsh-syntax-highlighting"
 # Scanner for vulnerabilities in container images, file systems, and Git repositories, as well as for configuration issues
 brew "aquasecurity/trivy/trivy"
 # Azure Functions Core Tools 3.0
-brew "azure/functions/azure-functions-core-tools@3", link: false
+brew "azure/functions/azure-functions-core-tools@3"
 # Azure Functions Core Tools 4.0
 brew "azure/functions/azure-functions-core-tools@4"
 # In-depth Attack Surface Mapping and Asset Discovery
@@ -232,7 +228,7 @@ brew "caffix/amass/amass"
 # Client for Dapr.
 brew "dapr/tap/dapr-cli"
 # SDK
-brew "dart-lang/dart/dart", link: false
+brew "dart-lang/dart/dart"
 # prettier, on SPEED!
 brew "fsouza/prettierd/prettierd"
 # Detect secrets in source code, scan your repos and docker images for leaks

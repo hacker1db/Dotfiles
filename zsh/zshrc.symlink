@@ -8,8 +8,6 @@ fi
 autoload -U compinit add-zsh-hook
 compinit
 
-
-
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export REPORTTIME=10 # display how long all tasks over 10 seconds take
 export KEYTIMEOUT=1  # 10ms delay for key sequences
@@ -117,6 +115,11 @@ for file in $config_files[@]; do
   source "$file"
 done
 [[ -z "${SIGNING_KEY_PUBLIC}" ]] && gitsign
+
+########################################################
+# Plugin setup
+########################################################
+
 export ZPLUGDIR="$CACHEDIR/zsh/plugins"
 [[ -d "$ZPLUGDIR" ]] || mkdir -p "$ZPLUGDIR"
 # array containing plugin information (managed by zfetch)
@@ -127,5 +130,21 @@ zfetch zsh-users/zsh-syntax-highlighting
 zfetch zsh-users/zsh-autosuggestions
 zfetch grigorii-zander/zsh-npm-scripts-autocomplete
 zfetch Aloxaf/fzf-tab
+## Set up better cd
+if [[ -x "$(command -v fnm)" ]]; then
+    eval "$(fnm env --use-on-cd)"
+fi
 
+[[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
+# prefer zoxide over z.sh
+if [[ -x "$(command -v zoxide)" ]]; then
+    eval "$(zoxide init zsh --hook pwd)"
+else
+  # source z.sh if it exists
+  zpath="$(brew --prefix)/etc/profile.d/z.sh"
+  if [ -f "$zpath" ]; then
+      source "$zpath"
+  fi
+fi
 
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
