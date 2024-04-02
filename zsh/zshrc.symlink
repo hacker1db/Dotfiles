@@ -127,5 +127,4 @@ config_files=($DOTFILES/**/*.zsh)
 for file in $config_files[@]; do
   source "$file"
 done
-
-export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+[[ -z "${SIGNING_KEY_PUBLIC}" ]] && gitsign
