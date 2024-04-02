@@ -1,5 +1,4 @@
 # vim:ft=gitconfig
-# gitconfig
 [user]
     name = hacker1db
     author = 6212228+hacker1db@users.noreply.github.com
