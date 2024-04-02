@@ -8,6 +8,9 @@ return {
     {
 
         "williamboman/mason-lspconfig.nvim",
+        dependencies = {
+            "williamboman/mason.nvim",
+        },
         config = function()
             local mason_lspconfig = require("mason-lspconfig")
             mason_lspconfig.setup({
@@ -44,6 +47,9 @@ return {
     },
     {
         "neovim/nvim-lspconfig",
+        dependencies = {
+            "williamboman/mason.nvim",
+        },
         config = function()
             local lspconfig = require("lspconfig")
             local keymap = vim.keymap -- for conciseness
