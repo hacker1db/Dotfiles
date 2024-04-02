@@ -178,3 +178,7 @@ function azdlogin(){
 function gha(){
        gh project item-add 16 --owner Alaska-ITS --url "$@"
 }
+
+function brew-cleanup(){
+sudo softwareupdate -ia --verbose && brew bundle dump --mas --tap --cask --describe --all -v --cleanup --file="~/.dotfiles/brewfile" -f && brew bundle && brew cleanup && brew doctor
+}

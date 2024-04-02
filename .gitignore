@@ -16,3 +16,4 @@ bin/pycharm
 bin/fleet
 config/nvim/plugin/
 !/config/nvim/plugin/packer_compiled.lua
+Brewfile.lock.json

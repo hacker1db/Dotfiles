@@ -1,8 +1,5 @@
-export HOMEBREW_BREWFILE=~/.dotfiles/Brewfile
+# export HOMEBREW_BREWFILE=~/.dotfiles/Brewfile
 eval $(/opt/homebrew/bin/brew shellenv)
-if [ -f $(brew --prefix)/etc/brew-wrap ];then
-  source $(brew --prefix)/etc/brew-wrap
-fi
 # source z.sh if it exists
 zpath="$(brew --prefix)/etc/profile.d/z.sh"
 if [ -f "$zpath" ]; then
@@ -24,4 +21,3 @@ export ANDROID_NDK_HOME="$(brew --prefix)/share/android-ndk"
 source "$(brew --prefix)/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
 source "$(brew --prefix)/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
 source /opt/homebrew/etc/bash_completion.d/az
-
