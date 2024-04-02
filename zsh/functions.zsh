@@ -17,9 +17,8 @@ function gitsign(){
     if [[ ! -z "$SIGNING_KEY_PUBLIC" ]]; then
         export SIGNING_KEY_PUBLIC=$(op item get "Github Work" --format json | jq -r '.fields[] | select(.id=="public_key") | .value' )
     fi
-    export SIGNING_KEY_PUBLIC=$(op item get "Github Work" --format json | jq -r '.fields[] | select(.id=="public_key") | .value' )
     if [[ ! -f ~/.ssh/allowed_signers ]]; then
-        echo "$(git config user.email) $SIGNING_KEY" >> ~/.ssh/allowed_signers
+        echo "$(git config user.email) $SIGNING_KEY_PUBLIC" >> ~/.ssh/allowed_signers
     fi
 }
 
