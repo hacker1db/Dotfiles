@@ -52,8 +52,6 @@ brew install fnm
 brew install z
 brew install markdown
 brew install node
-brew install zsh-syntax-highlighting
-brew install zsh-autosuggestions
 brew install --cask powershell
 brew install 1password-cli
 echo "Install Azure powershell"

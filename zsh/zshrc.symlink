@@ -8,13 +8,15 @@ fi
 autoload -U compinit add-zsh-hook
 compinit
 
+autoload bashcompinit && bashcompinit
+
+setopt COMPLETE_ALIASES
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export REPORTTIME=10 # display how long all tasks over 10 seconds take
 export KEYTIMEOUT=1  # 10ms delay for key sequences
 
 [[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo 
-# define the code directory
-# This is where my code exists and where I want the `c` autocomplete to work from exclusively
+# define the code (Developer) directory
 if [[ -d ~/Developer ]]; then
     export CODE_DIR=~/Developer
 fi
@@ -27,14 +29,6 @@ for config ($ZSH/**/*.zsh) source $config
 
 if [[ -a ~/.localrc ]]; then
     source ~/.localrc
-fi
-
-for config ($ZSH/**/*completion.sh) source $config
-export PATH=/usr/local/bin:$PATH
-
-# add /usr/local/sbin
-if [[ -d /usr/local/sbin ]]; then
-    export PATH=/usr/local/sbin:$PATH
 fi
 
 # adding path directory for custom scripts
@@ -65,56 +59,34 @@ source <(kubectl completion zsh)
 alias k=kubectl
 compdef __start_kubectl k
 
-autoload bashcompinit && bashcompinit
-export GPG_TTY=$(tty)
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 export PATH="$PATH:/Users/hacker1db/.kit/bin"
 export PATH="$PATH:/Users/hacker1db/.dotnet/tools"
 
-export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
 
-DOTFILES_LOADED=1
-
-### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-
-
-
-### Testing
 #
-# matches case insensitive for lowercase
+# # matches case insensitive for lowercase
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-
-# pasting with tabs doesn't perform completion
+#
+# # pasting with tabs doesn't perform completion
 zstyle ':completion:*' insert-tab pending
-
-# default to file completion
+#
+# # default to file completion
 zstyle ':completion:*' completer _expand _complete _files _correct _approximate
-
+#
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*:descriptions' format '%B%d%b'
 zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*' group-name ''
 
-########################################################
-# Plugin setup
-########################################################
-
-if [[ -x "$(command -v fnm)" ]]; then
-    eval "$(fnm env --use-on-cd)"
-fi
-
-[[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
-
-
 # look for all .zsh files and source them
 config_files=($DOTFILES/**/*.zsh)
 for file in $config_files[@]; do
   source "$file"
 done
-[[ -z "${SIGNING_KEY_PUBLIC}" ]] && gitsign
 
 ########################################################
 # Plugin setup
@@ -130,7 +102,7 @@ zfetch zsh-users/zsh-syntax-highlighting
 zfetch zsh-users/zsh-autosuggestions
 zfetch grigorii-zander/zsh-npm-scripts-autocomplete
 zfetch Aloxaf/fzf-tab
-## Set up better cd
+
 if [[ -x "$(command -v fnm)" ]]; then
     eval "$(fnm env --use-on-cd)"
 fi
@@ -147,4 +119,5 @@ else
   fi
 fi
 
+[[ -z "${SIGNING_KEY_PUBLIC}" ]] && gitsign
 export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
