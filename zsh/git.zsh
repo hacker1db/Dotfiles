@@ -14,7 +14,8 @@ alias grn='git-rename'
 alias glog="git l"
 alias gcm="git commit -am"
 alias gcs="git commit -S -am"
-alias gds="git diff --name-only --relative --diff-filter=d --staged | xargs bat --diff"
+# alias gds="git diff --name-only --relative --diff-filter=d --staged | xargs bat --diff"
+alias gds="git diff --relative --staged | bat"
 
 # alias git-amend='git commit --amend -C HEAD'
 alias git-undo='git reset --soft HEAD~1'
