@@ -114,7 +114,22 @@ bind C-v run "tmux set-buffer $(reattach-to-user-namespace pbpaste); tmux paste-
 
 # source ~/.dotfiles/tmux/bubbles.conf
 source ~/.dotfiles/tmux/theme.sh
+# List of plugins
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-battery'
+set -g @plugin 'tmux-plugins/tmux-cpu'
+set -g @plugin 'christoomey/vim-tmux-navigator'
+set -g @plugin 'tmux-plugins/tmux-resurrect' # persist tmux sessions after computer restart
+set -g @plugin 'tmux-plugins/tmux-continuum' # automatically saves sessions for you every 15 minutes
+set -g @plugin 'wfxr/tmux-fzf-url'
+set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
+set -g @plugin 'git@github.com:joshmedeski/t-smart-tmux-session-manager'
 
+set -g @resurrect-capture-pane-contents 'on'
+set -g @continuum-restore 'on'
+run '~/.tmux/plugins/tpm/tpm'
+
+# Plugin confi
 set -g @fzf-url-fzf-options '-p 60%,30% --prompt="   " --border-label=" Open URL "'
 set -g @fzf-url-history-limit '2000'
 set -g @t-bind 'T'
@@ -123,23 +138,5 @@ set -g @t-fzf-prompt '🔭 '
 set -g @tmux-last-color on
 set -g @tmux-last-pager 'less -r'
 set -g @tmux-last-pager 'less'
-set -g @tmux-nerd-font-window-name-show-name false
-set -g @tmux-nerd-font-window-name-shell-icon ''
-set -g @tmux-nerd-font-window-name-show-name false
-
-# List of plugins
-set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-battery'
-set -g @plugin 'tmux-plugins/tmux-cpu'
-set -g @plugin 'christoomey/vim-tmux-navigator'
-set -g @plugin 'tmux-plugins/tmux-resurrect' # persist tmux sessions after computer restart
-set -g @plugin 'tmux-plugins/tmux-continuum' # automatically saves sessions for you every 15 minutes
-set -g @plugin 'joshmedeski/tmux-fzf-url'
-set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
-set -g @plugin 'git@github.com:joshmedeski/t-smart-tmux-session-manager'
-
-set -g @resurrect-capture-pane-contents 'on'
-set -g @continuum-restore 'on'
-run '~/.tmux/plugins/tpm/tpm'
 
 
