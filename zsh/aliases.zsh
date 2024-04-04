@@ -22,7 +22,10 @@ alias cat='bat'
 alias tf="terraform"
 alias l="ls -lah ${colorflag}"
 alias la="ls -AF ${colorflag}"
-alias ll="exa -g -l --icons -a"
+if [[ -x "$(command -v exa)" ]]; then
+  alias ll="exa --icons --git --long -a"
+  alias l="exa --icons --git --all --long"
+fi
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
 alias tree='exa -l --icons --tree -a -g'

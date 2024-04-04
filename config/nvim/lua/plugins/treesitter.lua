@@ -3,8 +3,10 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     build = ":TSUpdate",
     dependencies = {
-        "nvim-treesitter/nvim-treesitter-textobjects",
         "windwp/nvim-ts-autotag",
+        "nvim-treesitter/playground",
+        "nvim-treesitter/nvim-treesitter-textobjects",
+        "JoosepAlviste/nvim-ts-context-commentstring",
     },
 
     config = function()
@@ -28,7 +30,7 @@ return {
                 "c_sharp",
                 "markdown",
                 "astro",
-
+                "regex",
             },
             autotag = {
                 enable = true,

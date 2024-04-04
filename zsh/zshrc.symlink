@@ -123,3 +123,7 @@ else
   fi
 fi
 
+if [[ -x "$(command -v exa)" ]]; then
+  alias ll="exa --icons --git --long"
+  alias l="exa --icons --git --all --long"
+fi

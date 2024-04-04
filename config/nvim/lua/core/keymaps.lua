@@ -47,9 +47,6 @@ keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for curre
 -- vim-maximizer
 keymap.set("n", "<leader>sm", ":MaximizerToggle<CR>") -- toggle split window maximization
 
--- nvim-tree
-keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>") -- toggle file explorer
-
 -- telescope
 keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>") -- find files within current working directory, respects .gitignore
 keymap.set("n", "<leader>fr", "<cmd>Telescope live_grep<cr>") -- find string in current working directory as you type
@@ -73,5 +70,11 @@ keymap.set("n", "<leader>mps", ":MarkdownPreviewStop<CR>")
 
 -- Git Stuff
 keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
-
 keymap.set("n", "<leader>gt", ":Gitsigns toggle_current_line_blame<CR>", {})
+
+-- twilight
+keymap.set("n", "tw", ":Twilight<enter>", { noremap = false })
+
+-- Noice
+keymap.set("n", "<leader>nn", ":NoiceDismiss<CR>", { noremap = true })
+keymap.set("n", "<leader>ee", "<cmd>GoIfErr<cr>", { silent = true, noremap = true })
