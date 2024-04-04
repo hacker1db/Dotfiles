@@ -6,7 +6,6 @@ return {
         { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
         "nvim-tree/nvim-web-devicons",
         "nvim-telescope/telescope-ui-select.nvim",
-        "jonarrien/telescope-cmdline.nvim",
     },
     config = function()
         local telescope = require("telescope")
@@ -42,8 +41,8 @@ return {
                 },
             },
         })
+        -- See `:help telescope.builtin`
         telescope.load_extension("fzf")
         telescope.load_extension("ui-select")
-        -- telescope.load_extension("cmdline")
     end,
 }
