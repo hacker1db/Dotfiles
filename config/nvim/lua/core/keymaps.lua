@@ -43,9 +43,6 @@ keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate j
 keymap.set("n", "<leader>gt", ":GoTestsAll<CR>") -- generate tests for current file
 keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for current file
 
--- vim-maximizer
-keymap.set("n", "<leader>sm", ":MaximizerToggle<CR>") -- toggle split window maximization
-
 -- telescope
 keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>", { desc = "Telescope Show files in current directory" }) -- find files within current working directory, respects .gitignore
 keymap.set("n", "<leader>fr", "<cmd>Telescope live_grep<cr>", { desc = "Telescope Find string under cursor in cwd" }) -- find string in current working directory as you type
@@ -59,6 +56,8 @@ keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telesc
 keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>", { desc = "Telescope show current commits from file" }) -- list git commits for current file/buffer (use <cr> to checkout) ["gfc" for git file commits]
 keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Telescope show branches" }) -- list git branches (use <cr> to checkout) ["gb" for git branch]
 keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Telescope show git status" }) -- list current changes per file with diff preview ["gs" for git status]
+-- telescope todo comments
+keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 
 -- restart lsp server
 keymap.set("n", "<leader>rs", ":LspRestart<CR>") -- mapping to restart lsp if necessary
@@ -85,6 +84,7 @@ keymap.set("n", "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", { s
 keymap.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<cr>", { silent = true, noremap = true })
 keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { silent = true, noremap = true })
 keymap.set("n", "gR", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, noremap = true })
+keymap.set("n", "<leader>xt", "<cmd>TodoTrouble<CR>", { desc = "Open todos in trouble" })
 
 -- Obsidian
 -- TODO: Fix key mappings for Obsidian
