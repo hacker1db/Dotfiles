@@ -31,6 +31,9 @@ return {
                 "markdown",
                 "astro",
                 "regex",
+                "markdown_inline",
+                "go",
+                "dockerfile",
             },
             autotag = {
                 enable = true,

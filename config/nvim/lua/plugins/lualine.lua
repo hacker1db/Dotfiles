@@ -4,7 +4,6 @@ return {
         dependencies = {
             "nvim-tree/nvim-web-devicons",
         },
-
         config = function()
             --
             local lualine = require("lualine")
@@ -58,3 +57,5 @@ return {
         end,
     },
 }
+
+--
