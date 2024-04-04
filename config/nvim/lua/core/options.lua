@@ -25,6 +25,7 @@ opt.cursorline = true
 opt.termguicolors = true
 opt.signcolumn = "yes"
 vim.opt.colorcolumn = "80"
+opt.background = "dark" -- colorschemes that can be light or dark will be made dark
 -- backsapce key
 
 opt.backspace = "indent,eol,start"

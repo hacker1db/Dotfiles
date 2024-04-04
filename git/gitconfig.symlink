@@ -2,10 +2,10 @@
 [user]
     name = hacker1db
     email = 6212228+hacker1db@users.noreply.github.com
+    ; signingkey = !$SIGNING_KEY_PUBLIC TODO: Fix the pull of my key from 1p
 [github]
     # @hacker1db on twitter/X :D
     user = hacker1db 
-    signingkey = !$SIGNING_KEY_PUBLIC
 [include]
     # A local gitconfig, outside of version control.
     # If the file doesn't exist it is silently ignored
