@@ -4,6 +4,7 @@ export ZSH=$DOTFILES/zsh
 if [[ -d $DOTFILES/zsh/functions ]]; then
     for func in $DOTFILES/zsh/functions/*(:t); autoload -U $func
 fi
+
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
 compinit
@@ -14,7 +15,7 @@ autoload bashcompinit && bashcompinit
 autoload -Uz compinit
 compinit
 source <(kubectl completion zsh)
-
+eval "$(op completion zsh)"; compdef _op op
 
 setopt COMPLETE_ALIASES
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
@@ -27,7 +28,6 @@ if [[ -d ~/Developer ]]; then
     export CODE_DIR=~/Developer
 fi
 
-eval "$(op completion zsh)"; compdef _op op
 
 
 # source all .zsh files inside of the zsh/ directory
