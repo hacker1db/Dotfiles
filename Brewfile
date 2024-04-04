@@ -1,3 +1,4 @@
+#vim: ft=ruby
 tap "1password/tap"
 tap "anchore/grype"
 tap "anchore/syft"
@@ -51,6 +52,8 @@ brew "dotnet@6"
 brew "exa"
 # Command-line tool to interact with exercism.io
 brew "exercism"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
 # Fast, simple, recursive content discovery tool written in Rust
 brew "feroxbuster"
 # Fast web fuzzer written in Go
@@ -217,6 +220,10 @@ brew "z"
 brew "zplug"
 # UNIX shell (command interpreter)
 brew "zsh"
+# Fish-like fast/unobtrusive autosuggestions for zsh
+brew "zsh-autosuggestions"
+# Fish shell like syntax highlighting for zsh
+brew "zsh-syntax-highlighting"
 # Scanner for vulnerabilities in container images, file systems, and Git repositories, as well as for configuration issues
 brew "aquasecurity/trivy/trivy"
 # Azure Functions Core Tools 3.0

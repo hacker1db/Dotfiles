@@ -14,6 +14,12 @@ return {
             -- local opts = { noremap = true, silent = true, buffer = bufnr }
             local opts = {}
             --
+
+            -- TODO: Add keymaps for LSP commands
+            -- See `:help K` for why this keymap
+            -- nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
+            -- nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+            --
             -- set keybinds
             keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
             keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- got to declaration
