@@ -6,6 +6,7 @@ set-option -ga terminal-overrides ",xterm-256color:Tc"
 set -g status-style 'bg=default' # transparent
 set -g status-position top       # macOS / darwin style
 set -g history-limit 20000
+set -g set-clipboard on          # use system clipboard
 
 # automatically renumber tmux windows
 set -g renumber-windows on
@@ -115,15 +116,17 @@ bind C-v run "tmux set-buffer $(reattach-to-user-namespace pbpaste); tmux paste-
 # source ~/.dotfiles/tmux/bubbles.conf
 source ~/.dotfiles/tmux/theme.sh
 # List of plugins
+set -g @plugin 'tmux-plugins/tmux-yank'
 set -g @plugin 'tmux-plugins/tpm'
 set -g @plugin 'tmux-plugins/tmux-battery'
 set -g @plugin 'tmux-plugins/tmux-cpu'
+set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'christoomey/vim-tmux-navigator'
 set -g @plugin 'tmux-plugins/tmux-resurrect' # persist tmux sessions after computer restart
 set -g @plugin 'tmux-plugins/tmux-continuum' # automatically saves sessions for you every 15 minutes
 set -g @plugin 'wfxr/tmux-fzf-url'
 set -g @plugin 'joshmedeski/tmux-nerd-font-window-name'
-set -g @plugin 'git@github.com:joshmedeski/t-smart-tmux-session-manager'
+
 
 set -g @resurrect-capture-pane-contents 'on'
 set -g @continuum-restore 'on'
@@ -137,6 +140,5 @@ set -g @t-fzf-find-binding 'ctrl-f:change-prompt(  )+reload(fd -H -d 2 -t d -
 set -g @t-fzf-prompt '🔭 '
 set -g @tmux-last-color on
 set -g @tmux-last-pager 'less -r'
-set -g @tmux-last-pager 'less'
 
 
