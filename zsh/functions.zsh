@@ -22,7 +22,7 @@ function gitsign(){
     fi
 }
 
-
+function cx() { cd "$@" && l; }
 # Create a new directory and enter it
 function md() {
     mkdir -p "$@" && cd "$@"

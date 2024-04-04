@@ -7,8 +7,14 @@ fi
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
 compinit
-
+# Reevaluate the prompt string each time it's displaying a prompt
+setopt prompt_subst
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 autoload bashcompinit && bashcompinit
+autoload -Uz compinit
+compinit
+source <(kubectl completion zsh)
+
 
 setopt COMPLETE_ALIASES
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
@@ -50,7 +56,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 if [ -f $HOME/.fzf.zsh ]; then
   source $HOME/.fzf.zsh
-  export FZF_DEFAULT_COMMAND='fd --type f'
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
   export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
   export FZF_DEFAULT_OPTS="--color bg:-1,bg+:-1,fg:-1,fg+:#feffff,hl:#993f84,hl+:#d256b5,info:#676767,prompt:#676767,pointer:#676767"
 fi
@@ -96,10 +102,7 @@ export ZPLUGDIR="$CACHEDIR/zsh/plugins"
 [[ -d "$ZPLUGDIR" ]] || mkdir -p "$ZPLUGDIR"
 # array containing plugin information (managed by zfetch)
 typeset -A plugins
-
 zfetch mafredri/zsh-async async.plugin.zsh
-zfetch zsh-users/zsh-syntax-highlighting
-zfetch zsh-users/zsh-autosuggestions
 zfetch grigorii-zander/zsh-npm-scripts-autocomplete
 zfetch Aloxaf/fzf-tab
 
@@ -108,9 +111,10 @@ if [[ -x "$(command -v fnm)" ]]; then
 fi
 
 [[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
+
 # prefer zoxide over z.sh
 if [[ -x "$(command -v zoxide)" ]]; then
-    eval "$(zoxide init zsh --hook pwd)"
+    eval "$(zoxide init zsh --cmd cd --hook pwd)"
 else
   # source z.sh if it exists
   zpath="$(brew --prefix)/etc/profile.d/z.sh"
@@ -119,5 +123,3 @@ else
   fi
 fi
 
-[[ -z "${SIGNING_KEY_PUBLIC}" ]] && gitsign
-export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock

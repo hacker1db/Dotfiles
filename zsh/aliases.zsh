@@ -94,6 +94,9 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chrome"
 alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\ Chrome\\ Canary"
 alias rundj="python manage.py runserver 7000"
-alias azlocations='az account list-locations -o table'
-alias bookp="op item get 'sans book password' --fields label=password | pbcopy"
 alias httpgui="open\ /Applications/HTTPie.app"
+
+# Azure CLI aliases
+alias azlocations='az account list-locations -o table'
+alias azlogin='az login'
+alias azlogout='az logout'

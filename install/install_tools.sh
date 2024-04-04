@@ -122,6 +122,7 @@ brew install --cask losslesscut
 brew install watch
 brew install tfsec
 brew install tfenv
+brew install fd
 
 
 tfenv install latest
