@@ -1,4 +1,3 @@
-#vim: ft=ruby
 tap "1password/tap"
 tap "anchore/grype"
 tap "anchore/syft"
@@ -192,6 +191,8 @@ brew "terraform-docs"
 brew "terraform-lsp"
 # Terraform version manager inspired by rbenv
 brew "tfenv"
+# Linter for Terraform files
+brew "tflint"
 # Static analysis security scanner for your terraform code
 brew "tfsec"
 # Code-search similar to ack

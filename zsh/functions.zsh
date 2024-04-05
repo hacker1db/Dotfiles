@@ -179,5 +179,5 @@ function gha(){
 }
 
 function brew-cleanup(){
-sudo softwareupdate -ia --verbose && brew bundle dump --mas --tap --cask --describe --all -v --cleanup --file="~/.dotfiles/brewfile" -f && brew bundle && brew cleanup && brew doctor
+sudo softwareupdate -ia --verbose && brew bundle dump --mas --tap --cask --describe --all -v --cleanup --file="~/.dotfiles/brewfile" -f  && brew cleanup && brew doctor
 }
