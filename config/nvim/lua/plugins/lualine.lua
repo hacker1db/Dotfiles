@@ -16,7 +16,7 @@ return {
                     disabled_filetypes = {},
                 },
                 sections = {
-                    lualine_a = { "mode" },
+                    lualine_a = { "mode", "buffers" },
                     lualine_b = { "branch" },
                     lualine_c = {
                         {

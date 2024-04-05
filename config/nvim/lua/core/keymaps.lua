@@ -25,11 +25,9 @@ keymap.set("n", ",,", ":w<CR>", { desc = "Save file" })
 keymap.set("n", "<leader>ff", ":lua vim.lsp.buf.format()<CR>", { desc = "Format file" })
 keymap.set("n", "<leader>s", ":so<CR>", { desc = "Source file" })
 
-keymap.set("n", "<leader>to", "<cmd>tabnew<CR>", { desc = "Open new tab" }) -- open new tab
-keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  go to next tab
-keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previous tab" }) --  go to previous tab
-keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
-
+-- window management buffers
+keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" }) -- go to next buffer
+keymap.set("n", "bp", "<cmd>bp<CR>", { desc = "Go to previous buffer" }) -- go to previous buffer
 ----------------------
 -- Plugin Keybinds
 ----------------------
@@ -47,7 +45,7 @@ keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for curre
 keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>", { desc = "Telescope Show files in current directory" }) -- find files within current working directory, respects .gitignore
 keymap.set("n", "<leader>fr", "<cmd>Telescope live_grep<cr>", { desc = "Telescope Find string under cursor in cwd" }) -- find string in current working directory as you type
 keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Telescope Find current word" }) -- find string under cursor in current working directory
-keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<cr>", { desc = "Telescope show buffers list" }) -- list open buffers in current neovim instance
+keymap.set("n", "<leader>bl", "<cmd>Telescope buffers<cr>", { desc = "Telescope show buffers list" }) -- list open buffers in current neovim instance
 keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Telscope list git files" }) -- list git_files
 keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Telescope show help tags" }) -- list available help tags
 

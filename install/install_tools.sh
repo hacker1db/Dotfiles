@@ -144,4 +144,5 @@ go install github.com/charmbracelet/glow@latest
 echo "install Github extensions" 
 gh extension upgrade gh-copilot
 gh extension install dlvhdr/gh-dash
+gh ext install advanced-security/gh-sbom
 exit 0
