@@ -16,6 +16,8 @@ keymap.set("i", "jk", "<ESC>", { desc = "exit insert mode with jk" })
 keymap.set("n", "<space>", ":nohl<CR>", { desc = "Clear search highlights" })
 
 -- window management
+-- nvim-tree
+keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "open file explorer" }) -- toggle file explorer
 keymap.set("n", "<leader>\\", "<C-w>v", { desc = "split virtically" })
 keymap.set("n", "<leader>-", "<C-w>s", { desc = "split horizontally" })
 keymap.set("n", "<leader>=", "<C-w>=", { desc = "make split windows equal width & height" })
@@ -84,10 +86,3 @@ keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { silent = true
 keymap.set("n", "gR", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, noremap = true })
 keymap.set("n", "<leader>xt", "<cmd>TodoTrouble<CR>", { desc = "Open todos in trouble" })
 
--- Obsidian
--- TODO: Fix key mappings for Obsidian
--- keymap.set("<leader>on", "<cmd>ObsidianNew<cr>", desc = "New Obsidian note", mode = "n" )
--- keymap.set({ "<leader>oo", "<cmd>ObsidianSearch<cr>", desc = "Search Obsidian notes", mode = "n" })
--- keymap.set({ "<leader>os", "<cmd>ObsidianQuickSwitch<cr>", desc = "Quick Switch", mode = "n" })
--- keymap.set({ "<leader>ob", "<cmd>ObsidianBacklinks<cr>", desc = "Show location list of backlinks", mode = "n" })
--- keympa.set({ "<leader>ot", "<cmd>ObsidianTemplate<cr>", desc = "Follow link under cursor", mode = "n" })
