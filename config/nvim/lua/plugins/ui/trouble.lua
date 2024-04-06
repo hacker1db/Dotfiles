@@ -1,6 +1,7 @@
 return {
     "folke/trouble.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons", "folke/todo-comments.nvim" },
+    config = true,
     keys = {
         { "<leader>xx", "<cmd>TroubleToggle<CR>", desc = "Open/close trouble list" },
         { "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<CR>", desc = "Open trouble workspace diagnostics" },

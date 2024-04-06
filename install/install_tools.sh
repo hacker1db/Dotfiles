@@ -5,16 +5,16 @@ if test ! $(which brew); then
 fi
 # cli tools
 echo "Installing cli tools.."
-brew install gh # GitHub CLI 
-brew tap homebrew/cask-fonts  
+brew install gh # GitHub CLI
+brew tap homebrew/cask-fonts
 brew cask install font-dejavusansmono-nerd-font
 brew install git
 brew install lazygit # Git terminal UI
 brew install ack
 brew install tree
-brew install wget 
-brew install fzf # Fuzzy file finder
-brew install lnav # for viewing log files in terminal 
+brew install wget
+brew install fzf  # Fuzzy file finder
+brew install lnav # for viewing log files in terminal
 brew install azure-cli
 brew instal bat
 brew install bat-extras
@@ -29,7 +29,6 @@ berw install helem
 brew install lima
 echo "Start limactl"
 limactl start
-
 
 ## GUI tools
 brew install --cask iina
@@ -58,8 +57,8 @@ echo "Install Azure powershell"
 pwsh -c "Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force"
 brew tap homebrew/cask-fonts
 brew install --cask font-hack-nerd-font
-brew install --cask  font-Caskaydia-Cove-Nerd-Font
-brew install nmap 
+brew install --cask font-Caskaydia-Cove-Nerd-Font
+brew install nmap
 brew tap caffix/amass
 brew install amass
 brew install tree-sitter
@@ -124,24 +123,21 @@ brew install tfsec
 brew install tfenv
 brew install fd
 
-
 tfenv install latest
 tfenv use latest
 
 echo "set node version"
 nvm use --lts
-nvm install --lts 
+nvm install --lts
 
 echo "install wordlists"
 git clone https://github.com/danielmiessler/SecLists.git ~/wordlists
-echo "import the iterm dracula theme"
-git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
 echo "Install tools for blogging"
 brew install hugo
 echo "golang -- getting your cli tools from github"
 go install github.com/cosmtrek/air@latest
 go install github.com/charmbracelet/glow@latest
-echo "install Github extensions" 
+echo "install Github extensions"
 gh extension upgrade gh-copilot
 gh extension install dlvhdr/gh-dash
 gh ext install advanced-security/gh-sbom

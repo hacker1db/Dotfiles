@@ -62,14 +62,13 @@ backup() {
     done
 }
 
-
 setup_symlinks() {
     title "Creating symlinks"
 
-    for file in $(get_linkables) ; do
+    for file in $(get_linkables); do
         target="$HOME/.$(basename "$file" '.symlink')"
         if [ -e "$target" ]; then
-            info "~${target#$HOME} already exists... Skipping."
+            info "~${target#"$HOME"} already exists... Skipping."
         else
             info "Creating symlink for $file"
             ln -s "$file" "$target"
@@ -87,7 +86,7 @@ setup_symlinks() {
     for config in $config_files; do
         target="$HOME/.config/$(basename "$config")"
         if [ -e "$target" ]; then
-            info "~${target#$HOME} already exists... Skipping."
+            info "~${target#"$HOME"} already exists... Skipping."
         else
             info "Creating symlink for $config"
             ln -s "$config" "$target"
@@ -235,42 +234,42 @@ setup_macos() {
 }
 
 case "$1" in
-    backup)
-        backup
-        ;;
-    link)
-        setup_symlinks
-        ;;
-    git)
-        setup_git
-        ;;
-    homebrew)
-        setup_homebrew
-        ;;
-    shell)
-        setup_shell
-        ;;
-    terminfo)
-        setup_terminfo
-        ;;
-    macos)
-        setup_macos
-        ;;
-    catppuccin)
-        fetch_catppuccin_theme
-        ;;
-    all)
-        setup_symlinks
-        setup_terminfo
-        setup_homebrew
-        setup_shell
-        setup_git
-        setup_macos
-        ;;
-    *)
-        echo -e $"\nUsage: $(basename "$0") {backup|link|git|homebrew|shell|terminfo|macos|all}\n"
-        exit 1
-        ;;
+backup)
+    backup
+    ;;
+link)
+    setup_symlinks
+    ;;
+git)
+    setup_git
+    ;;
+homebrew)
+    setup_homebrew
+    ;;
+shell)
+    setup_shell
+    ;;
+terminfo)
+    setup_terminfo
+    ;;
+macos)
+    setup_macos
+    ;;
+catppuccin)
+    fetch_catppuccin_theme
+    ;;
+all)
+    setup_symlinks
+    setup_terminfo
+    setup_homebrew
+    setup_shell
+    setup_git
+    setup_macos
+    ;;
+*)
+    echo -e $"\nUsage: $(basename "$0") {backup|link|git|homebrew|shell|terminfo|macos|all}\n"
+    exit 1
+    ;;
 esac
 
 echo -e

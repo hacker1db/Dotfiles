@@ -33,3 +33,4 @@ return {
         end
     end,
 }
+-- tell notify stop telling me I cannnot save in readonl mode TODO: fix this
