@@ -17,12 +17,6 @@ require("lazy").setup({
     { import = "plugins.ui" },
     { import = "plugins.lsp" },
 }, {
-    opts = {
-        colorscheme = "dracula",
-    },
-    install = {
-        colorscheme = { "dracula" },
-    },
     checker = {
         enabled = true,
         notify = false,

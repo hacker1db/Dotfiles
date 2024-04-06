@@ -32,16 +32,16 @@ opt.backspace = "indent,eol,start"
 -- clipboard
 opt.clipboard:append("unnamedplus", "unnamed") -- use system clipboard as default register
 -- use mouse in all modes
-opt.mouse = "a" -- set mouse mode to all modes
+opt.mouse = "a"                                -- set mouse mode to all modes
 
 -- split windows
-opt.splitright = true -- split vertical window to the right
-opt.splitbelow = true -- split horizontal window to the bottom
+opt.splitright = true     -- split vertical window to the right
+opt.splitbelow = true     -- split horizontal window to the bottom
 
 opt.iskeyword:append("-") -- consider string-string as whole word
 
-opt.hlsearch = true -- highlight search results
-opt.title = true -- set terminal title
+opt.hlsearch = true       -- highlight search results
+opt.title = true          -- set terminal title
 -- mappings
 opt.pastetoggle = "<leader>v"
 
