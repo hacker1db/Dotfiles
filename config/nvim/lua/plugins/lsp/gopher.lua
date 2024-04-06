@@ -5,6 +5,7 @@ return {
         "nvim-lua/plenary.nvim",
         "nvim-treesitter/nvim-treesitter",
     },
+    ft = { "go" },
     config = function()
         require("gopher").setup({
             commands = {
@@ -15,5 +16,8 @@ return {
                 iferr = "iferr",
             },
         })
+    end,
+    build = function()
+        vim.cmd([[slient! GoInstallDeps]])
     end,
 }

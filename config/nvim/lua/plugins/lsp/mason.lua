@@ -39,9 +39,10 @@ return {
                     "svelte",
                     "spectral",
                     "jqls",
-                    "markdown_oxide",
+                    "bashls",
                     "mdx_analyzer",
                     "tflint",
+                    "marksman",
                 },
                 -- auto-install configured servers (with lspconfig)
                 automatic_installation = true, -- not the same as ensure_installed

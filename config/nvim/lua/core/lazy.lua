@@ -11,7 +11,8 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({ { import = "plugins" }}, {
+require("lazy").setup({ { import = "plugins" }, 
+    { import = "plugins.language" }, { import = "plugins.ui"} }, {
     opts = {
         colorscheme = "dracula",
     },
@@ -25,13 +26,4 @@ require("lazy").setup({ { import = "plugins" }}, {
     change_detection = {
         notify = false,
     },
-})
--- extra go configuration
-local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
-vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = "*.go",
-    callback = function()
-        require("go.format").goimport()
-    end,
-    group = format_sync_grp,
 })
