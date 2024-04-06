@@ -11,8 +11,12 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({ { import = "plugins" }, 
-    { import = "plugins.language" }, { import = "plugins.ui"} }, {
+require("lazy").setup({
+    { import = "plugins.extra" },
+    { import = "plugins.git" },
+    { import = "plugins.lsp" },
+    { import = "plugins.ui" },
+}, {
     opts = {
         colorscheme = "dracula",
     },

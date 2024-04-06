@@ -49,17 +49,4 @@ return {
             })
         end,
     },
-    {
-        "neovim/nvim-lspconfig",
-        dependencies = {
-            "williamboman/mason.nvim",
-        },
-        config = function()
-            local lspconfig = require("lspconfig")
-            local keymap = vim.keymap -- for conciseness
-            lspconfig.lua_ls.setup({})
-            -- keymap.set("n", "K", vim.lsp.buf.hover, {})                    -- show documentation for what is under cursor
-            keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {}) -- see available code actions
-        end,
-    },
 }
