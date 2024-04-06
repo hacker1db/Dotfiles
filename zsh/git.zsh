@@ -56,8 +56,9 @@ function ghi(){
         gh issue list 
     fi
 }
-
-
+function gitinit(){
+ pwsh -f ~/Developer/clitools/initializeGitRepo.ps1 -GithubOrg $1
+}
 
 
 # TODO: FIX the follow GitHub issue script
