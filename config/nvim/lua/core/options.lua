@@ -12,7 +12,6 @@ opt.expandtab = true
 opt.autoindent = true
 opt.conceallevel = 2
 opt.relativenumber = true
-
 -- line wrap
 opt.wrap = false
 

@@ -9,8 +9,8 @@ return {
             local lazy_status = require("lazy.status") -- to configure lazy pending updates count
             lualine.setup({
                 options = {
+                    theme = "catppuccin",
                     icons_enabled = true,
-                    theme = "auto",
                     section_separators = { left = "", right = "" },
                     component_separators = { left = "", right = "" },
                     disabled_filetypes = {},
@@ -58,9 +58,12 @@ return {
                 },
                 tabline = {},
                 extensions = { "fugitive" },
+                buffers_color = {
+                    -- Same values as the general color option can be used here.
+                    active = "lualine_{section}_normal",     -- Color for active buffer.
+                    inactive = "lualine_{section}_inactive", -- Color for inactive buffer.
+                },
             })
         end,
     },
 }
-
---
