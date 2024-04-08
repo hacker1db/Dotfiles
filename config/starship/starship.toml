@@ -1,32 +1,21 @@
 add_newline = false
 # A minimal left prompt
-format = """$directory$character"""
 palette = "catppuccin_mocha"
+# A minimal left prompt
+format = """$directory$golang$rust$nodejs$fill
+$character"""
 # move the rest of the prompt to the right
-right_format = """$all"""
+right_format = """$git_branch$git_state$git_status"""
 command_timeout = 1000
 continuation_prompt = '▷'
 
-# [aws]
-# format = 'on [$symbol($profile )(\($region\) )]($style)'
-# style = 'bold blue'
-# symbol = "  "
-#
-# ~/.config/starship.toml
+[username]
+disabled = true
+show_always = false
 
-# [azure]
-# disabled = false
-# format = 'on [$symbol($subscription)]($style) '
-# symbol = '󰠅 '
-# style = 'blue bold'
-#
-# [gcloud]
-# format = '[$symbol$active]($style) '
-# style = 'bold yellow'
-# symbol = '️🇬️ '
-#
 [golang]
 format = '[ ](bold cyan)'
+version_format = '[$symbol$version ]($style)'
 
 [git_status]
 conflicted = '🏳'
@@ -51,14 +40,7 @@ format = '[$context(\[$namespace\])]($style) '
 disabled = true
 
 
-[dotnet]
-symbol = '🥅 '
-style = 'green'
-heuristic = false
 
-# [directory]
-# truncation_length = 8
-# truncation_symbol = '…/'
 [terraform]
 format = '[🏎💨 $version$workspace]($style) '
 
@@ -90,19 +72,6 @@ base = "#1e1e2e"
 mantle = "#181825"
 crust = "#11111b"
 
-format = """
-$username\
-$hostname\
-$directory\
-$git_branch\
-$git_state\
-$git_status\
-$git_metrics\
-$fill\
-$nodejs\
-$cmd_duration $jobs $time\
-$line_break\
-$character"""
 
 [nodejs]
 format = "[$symbol($version )]($style)"
@@ -132,10 +101,6 @@ style = "bold red"
 number_threshold = 1
 format = "[$symbol]($style)"
 
-# [git_status]
-# format = '([\[$all_status$ahead_behind\]]($style) )'
-# style = "cyan"
-#
 [git_state]
 format = '\([$state( $progress_current/$progress_total)]($style)\) '
 style = "bright-black"
@@ -158,8 +123,4 @@ disabled = false
 style = "bold white"
 format = "[$time]($style)"
 
-[custom.stunnel]
-when = "ps aux | grep stunnel | grep -v grep"
-command = "ps -o etime= -p $(ps aux | grep stunnel | grep -v grep | awk '{print $2}')"
-style = "red"
-format = "[TUNNEL OPEN for $output]($style)"
+

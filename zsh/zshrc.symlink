@@ -5,7 +5,6 @@ if [[ -d $DOTFILES/zsh/functions ]]; then
     for func in $DOTFILES/zsh/functions/*(:t); autoload -U $func
 fi
 
-setopt prompt_subst
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
@@ -14,6 +13,7 @@ compinit
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit
 compinit
+setopt prompt_subst
 source <(kubectl completion zsh)
 eval "$(op completion zsh)"; compdef _op op
 setopt COMPLETE_ALIASES
@@ -45,6 +45,24 @@ if [[ -d ~/bin ]]; then
 fi
 export PATH=$PATH:$HOME.rd/bin/
 
+
+
+########################################################
+# Plugin setup
+########################################################
+
+export ZPLUGDIR="$CACHEDIR/zsh/plugins"
+[[ -d "$ZPLUGDIR" ]] || mkdir -p "$ZPLUGDIR"
+# array containing plugin information (managed by zfetch)
+typeset -A plugins
+
+zfetch Aloxaf/fzf-tab
+
+if [[ -x "$(command -v fnm)" ]]; then
+    eval "$(fnm env --use-on-cd)"
+fi
+
+[[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
 # eport node version manager.
 export NVM_DIR="$HOME/.nvm"
 # export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
