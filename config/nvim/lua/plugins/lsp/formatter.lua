@@ -11,7 +11,7 @@ local formatters = {
     css = { "stylelint", "prettierd" },
     sh = { "shellcheck", "shfmt" },
     go = { "gofmt", "goimports" },
-    lua = { "stylua" },
+    lua = { "stylua", "lua_ls" },
     python = { "isort", "black" },
     csharp = { "omnisharp" },
 }

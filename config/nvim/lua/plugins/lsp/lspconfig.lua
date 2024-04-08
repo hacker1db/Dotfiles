@@ -4,7 +4,7 @@ return {
     dependencies = {
         "hrsh7th/cmp-nvim-lsp",
         { "antosha417/nvim-lsp-file-operations", config = true },
-        { "folke/neodev.nvim",                   opts = {} },
+        { "folke/neodev.nvim", opts = {} },
     },
     config = function()
         -- import lspconfig plugin
@@ -93,6 +93,18 @@ return {
                 -- configure lua server (with special settings)
                 lspconfig["tailwindcss"].setup({
                     capabilities = capabilities,
+                    validate = true,
+                    tailwindCSS = {
+                        lint = {
+                            cssConflict = "warning",
+                            invalidApply = "error",
+                            invalidConfigPath = "error",
+                            invalidScreen = "error",
+                            invalidTailwindDirective = "error",
+                            invalidVariant = "error",
+                            recommendedVariantOrder = "warning",
+                        },
+                    },
                 })
             end,
             ["eslint"] = function()
@@ -134,6 +146,7 @@ return {
                 lspconfig.azure_pipelines_ls.setup({
                     cmd = { "azure-pipelines-language-server", "--stdio" },
                     filetypes = { "azure-pipelines", "azure-pipelines.yml", "pipelines" },
+                    root_dir = lspconfig.util.root_pattern(".git", ".azure-pipelines", "azure-pipelines.yml"),
                     settings = {
                         yaml = {
                             schemas = {
@@ -142,8 +155,25 @@ return {
                                     "/*.azure*",
                                     "Azure-Pipelines/**/*.y*l",
                                     "Pipelines/*.y*l",
+                                    "YAML/*.y*l",
                                 },
                             },
+                        },
+                    },
+                })
+            end,
+            ["yamlls"] = function()
+                lspconfig.yamlls.setup({
+                    capabilities = capabilities,
+                    schemas = {
+                        ["https://raw.githubusercontent.com/instrumenta/kubernetes-json-schema/master/v1.18.0-standalone-strict/all.json"] = "/*.k8s.yaml",
+                        kubernetes = {
+                            "/*.yaml",
+                            "/*.yml",
+                            "kustomization.yaml",
+                            "kustomization.yml",
+                            "kustomization",
+                            "manifests/*.yaml",
                         },
                     },
                 })
