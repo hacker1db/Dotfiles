@@ -2,183 +2,214 @@ return {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-        { "hrsh7th/cmp-nvim-lsp" },
+        "hrsh7th/cmp-nvim-lsp",
         { "antosha417/nvim-lsp-file-operations", config = true },
-        { "folke/neodev.nvim", opts = {} },
+        { "folke/neodev.nvim",                   opts = {} },
     },
-
     config = function()
-        local nvim_lsp = require("lspconfig")
+        -- import lspconfig plugin
+        local lspconfig = require("lspconfig")
 
         -- import mason_lspconfig plugin
         local mason_lspconfig = require("mason-lspconfig")
 
         -- import cmp-nvim-lsp plugin
         local cmp_nvim_lsp = require("cmp_nvim_lsp")
-        local keymap = vim.keymap -- for conciseness
 
-        -- vim.api.nvim_create_autocmd("LspAttach", {
-        --     group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-        --     callback = function(ev)
-        --         -- Buffer local mappings.
-        --         -- See `:help vim.lsp.*` for documentation on any of the below functions
-        --         local opts = { buffer = ev.buf, silent = true } -- buffer local mappings
-        --         --
-        --         -- set keybinds -- TODO: Add description and possibly move to a separate file for better organization
-        --         keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
-        --         keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- got to declaration
-        --         keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- see definition and make edits in window
-        --         keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- go to implementation
-        --         keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- go to implementation
-        --         keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions
-        --         -- keymap.set({ "n", f("v") }, "<leader>ca", vim.lsp.buf.code_action, opts)         -- see available code actions, in visual mode will apply to selection
-        --         keymap.set("n", "<leader>rn", "<cmd>IncRename", opts) -- smart rename
-        --         keymap.set("n", "<leader>a", "<cmd>Telescope builtin.diagnostics bufnr=0", opts) -- show  diagnostics for file
-        --         keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
-        --         keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
-        --         keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
-        --         keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
-        --         keymap.set("n", "<leader>o", "<cmd>LSoutlineToggle<CR>", opts) -- see outline on right hand side
-        --         keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts) -- show signature help
-        --
-        --         -- typescript specific keymaps (e.g. rename file and update imports)
-        --         keymap.set("n", "<leader>rf", ":TypescriptRenameFile<CR>") -- rename file and update imports
-        --         keymap.set("n", "<leader>oi", ":TypescriptOrganizeImports<CR>") -- organize imports (not in youtube nvim video)
-        --         keymap.set("n", "<leader>ru", ":TypescriptRemoveUnused<CR>") -- remove unused variables (not in youtube nvim video)
-        -- other stuff --
-        --
-        -- require("tailwindcss-colors")
-
-        -- nvim_lsp["tailwindcss"].setup({
-        --     -- other settings --
-        --     on_attach = on_attach,
-        -- })
-
-        -- Set up completion using nvim_cmp with LSP source
+        -- used to enable autocompletion (assign to every lsp server config)
         local capabilities = cmp_nvim_lsp.default_capabilities()
 
-        nvim_lsp.flow.setup({
-            on_attach = on_attach,
-            capabilities = capabilities,
-        })
+        -- Change the Diagnostic symbols in the sign column (gutter)
+        -- (not in youtube nvim video)
+        local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+        for type, icon in pairs(signs) do
+            local hl = "DiagnosticSign" .. type
+            vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+        end
 
-        nvim_lsp.tsserver.setup({
-            on_attach = on_attach,
-            filetypes = {
-                "typescript",
-                "typescriptreact",
-                "typescript.tsx",
-                "javascript",
-                "javascriptreact",
-                "javascript.jsx",
-            },
-            capabilities = capabilities,
-        })
-
-        -- icon
-        vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-            underline = true,
-            -- This sets the spacing and the prefix, obviously.
-            virtual_text = {
-                spacing = 4,
-                prefix = "",
-            },
-        })
-
-        -- configure css server
-        nvim_lsp.cssls.setup({
-            capabilities = capabilities,
-            on_attach = on_attach,
-        })
-
-        -- configure tailwindcss server
-        nvim_lsp.tailwindcss.setup({
-            capabilities = capabilities,
-            on_attach = on_attach,
-        })
-        -- configure lua server (with special settings)
-        nvim_lsp.lua_ls.setup({
-            filetypes = { "lua" },
-            capabilities = capabilities,
-            on_attach = on_attach,
-            settings = { -- custom settings for lua
-                Lua = {
-                    -- make the language server recognize "vim" global
-                    diagnostics = {
-                        globals = { "vim" },
+        mason_lspconfig.setup_handlers({
+            -- default handler for installed servers
+            function(server_name)
+                lspconfig[server_name].setup({
+                    capabilities = capabilities,
+                })
+            end,
+            ["svelte"] = function()
+                -- configure svelte server
+                lspconfig["svelte"].setup({
+                    capabilities = capabilities,
+                    on_attach = function(client, _)
+                        vim.api.nvim_create_autocmd("BufWritePost", {
+                            pattern = { "*.js", "*.ts" },
+                            callback = function(ctx)
+                                -- Here use ctx.match instead of ctx.file
+                                client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
+                            end,
+                        })
+                    end,
+                })
+            end,
+            ["graphql"] = function()
+                -- configure graphql language server
+                lspconfig["graphql"].setup({
+                    capabilities = capabilities,
+                    filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
+                })
+            end,
+            ["emmet_ls"] = function()
+                -- configure emmet language server
+                lspconfig["emmet_ls"].setup({
+                    capabilities = capabilities,
+                    filetypes = {
+                        "html",
+                        "typescriptreact",
+                        "javascriptreact",
+                        "css",
+                        "sass",
+                        "scss",
+                        "less",
+                        "svelte",
                     },
-                    workspace = {
-                        -- make language server aware of runtime files
-                        library = {
-                            [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-                            [vim.fn.stdpath("config") .. "/lua"] = true,
+                })
+            end,
+            ["lua_ls"] = function()
+                -- configure lua server (with special settings)
+                lspconfig["lua_ls"].setup({
+                    capabilities = capabilities,
+                    settings = {
+                        Lua = {
+                            -- make the language server recognize "vim" global
+                            diagnostics = {
+                                globals = { "vim" },
+                            },
+                            completion = {
+                                callSnippet = "Replace",
+                            },
                         },
                     },
-                },
-            },
-        })
-
-        nvim_lsp.gopls.setup({
-            capabilities = capabilities,
-            on_attach = on_attach,
-            cmd = { "gopls" },
-            filetypes = { "go", "gomod", "go.mod", "gowork", "gotmpl" },
-            root_dir = nvim_lsp.util.root_pattern("go.mod", ".git", "go.work"),
-            settings = {
-                gopls = {
-                    completeUnimported = true,
-                    usePlaceholders = true,
-                    analyses = {
-                        unusedparams = true,
-                    },
-                    staticcheck = true,
-                },
-            },
-        })
-        nvim_lsp.csharp_ls.setup({})
-        nvim_lsp.golangci_lint_ls.setup({})
-        nvim_lsp.jedi_language_server.setup({})
-        nvim_lsp.anakin_language_server.setup({})
-        nvim_lsp.terraform_lsp.setup({
-            cmd = { "terraform-lsp" },
-            filetypes = { "terraform", "tf" },
-            root_dir = nvim_lsp.util.root_pattern(".git", ".terraform", "terraform.tf"),
-            on_attach = on_attach,
-            capabilities = capabilities,
-        })
-        nvim_lsp.powershell_es.setup({
-
-            cmd = { "pwsh", "-NoLogo", "-NoProfile", "-Command" },
-        })
-        nvim_lsp.csharp_ls.setup({})
-        nvim_lsp.pylsp.setup({})
-        nvim_lsp.pyright.setup({})
-        nvim_lsp.dockerls.setup({})
-        nvim_lsp.html.setup({})
-        nvim_lsp.astro.setup({
-            cmd = { "astro", "lsp" },
-            on_attach = on_attach,
-            filetypes = { "astro" },
-            root_dir = nvim_lsp.util.root_pattern(".git", "astro.toml"),
-        })
-
-        nvim_lsp.azure_pipelines_ls.setup({
-            cmd = { "azure-pipelines-language-server", "--stdio" },
-            filetypes = { "azure-pipelines", "azure-pipelines.yml", "pipelines" },
-            settings = {
-                yaml = {
-                    schemas = {
-                        ["https://raw.githubusercontent.com/microsoft/azure-pipelines-vscode/master/service-schema.json"] = {
-                            "/azure-pipeline*.y*l",
-                            "/*.azure*",
-                            "Azure-Pipelines/**/*.y*l",
-                            "Pipelines/*.y*l",
+                })
+            end,
+            ["tailwindcss"] = function()
+                -- configure lua server (with special settings)
+                lspconfig["tailwindcss"].setup({
+                    capabilities = capabilities,
+                })
+            end,
+            ["eslint"] = function()
+                lspconfig.eslint.setup({
+                    root_dir = require("lspconfig").util.root_pattern(
+                        "eslint.config.js",
+                        ".eslintrc.js",
+                        ".eslintrc.json",
+                        ".eslintrc"
+                    ),
+                    on_attach = function(_, bufnr)
+                        vim.api.nvim_create_autocmd("BufWritePre", {
+                            buffer = bufnr,
+                            command = "EslintFixAll",
+                        })
+                    end,
+                })
+            end,
+            ["gopls"] = function()
+                -- configure gopls server (with special settings)
+                lspconfig.gopls.setup({
+                    capabilities = capabilities,
+                    cmd = { "gopls" },
+                    filetypes = { "go", "gomod", "go.mod", "gowork", "gotmpl" },
+                    root_dir = lspconfig.util.root_pattern("go.mod", ".git", "go.work"),
+                    settings = {
+                        gopls = {
+                            completeUnimported = true,
+                            usePlaceholders = true,
+                            analyses = {
+                                unusedparams = true,
+                            },
+                            staticcheck = true,
                         },
                     },
-                },
-            },
+                })
+            end,
+            ["azure_pipelines_ls"] = function()
+                lspconfig.azure_pipelines_ls.setup({
+                    cmd = { "azure-pipelines-language-server", "--stdio" },
+                    filetypes = { "azure-pipelines", "azure-pipelines.yml", "pipelines" },
+                    settings = {
+                        yaml = {
+                            schemas = {
+                                ["https://raw.githubusercontent.com/microsoft/azure-pipelines-vscode/master/service-schema.json"] = {
+                                    "/azure-pipeline*.y*l",
+                                    "/*.azure*",
+                                    "Azure-Pipelines/**/*.y*l",
+                                    "Pipelines/*.y*l",
+                                },
+                            },
+                        },
+                    },
+                })
+            end,
+            ["csharp_ls"] = function()
+                lspconfig.csharp_ls.setup({
+                    capabilities = capabilities,
+                })
+            end,
+            ["golangci_lint_ls"] = function()
+                lspconfig.golangci_lint_ls.setup({
+                    capabilities = capabilities,
+                })
+            end,
+            ["jedi_language_server"] = function()
+                lspconfig.jedi_language_server.setup({
+                    capabilities = capabilities,
+                })
+            end,
+            -- ["anakin_language_server"] = function()
+            --     lspconfig.anakin_language_server.setup({
+            --         capabilities = capabilities,
+            --     })
+            -- end,
+            -- ["terraform_ls"] = function()
+            --     lspconfig.terraform_ls.setup({
+            --         cmd = { "terraform-ls" },
+            --         filetypes = { "terraform", "tf" },
+            --         root_dir = lspconfig.util.root_pattern(".git", ".terraform", "terraform.tf", "main.tf", "data.tf"),
+            --         capabilities = capabilities,
+            --     })
+            -- end,
+            ["powershell_es"] = function()
+                lspconfig.powershell_es.setup({
+                    cmd = { "pwsh", "-NoLogo", "-NoProfile", "-Command" },
+                    capabilities = capabilities,
+                })
+            end,
+            ["pylsp"] = function()
+                lspconfig.pylsp.setup({
+                    capabilities = capabilities,
+                })
+            end,
+            ["pyright"] = function()
+                lspconfig.pyright.setup({
+                    capabilities = capabilities,
+                })
+            end,
+            ["dockerls"] = function()
+                lspconfig.dockerls.setup({
+                    capabilities = capabilities,
+                })
+            end,
+            ["html"] = function()
+                lspconfig.html.setup({
+                    capabilities = capabilities,
+                })
+            end,
+            ["astro"] = function()
+                lspconfig.astro.setup({
+                    cmd = { "astro", "lsp" },
+                    filetypes = { "astro" },
+                    root_dir = lspconfig.util.root_pattern(".git", "astro.toml"),
+                    capabilities = capabilities,
+                })
+            end,
         })
     end,
-    -- })
-    -- end,
 }
