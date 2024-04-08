@@ -163,19 +163,19 @@ return {
                     capabilities = capabilities,
                 })
             end,
-            -- ["anakin_language_server"] = function()
-            --     lspconfig.anakin_language_server.setup({
-            --         capabilities = capabilities,
-            --     })
-            -- end,
-            -- ["terraform_ls"] = function()
-            --     lspconfig.terraform_ls.setup({
-            --         cmd = { "terraform-ls" },
-            --         filetypes = { "terraform", "tf" },
-            --         root_dir = lspconfig.util.root_pattern(".git", ".terraform", "terraform.tf", "main.tf", "data.tf"),
-            --         capabilities = capabilities,
-            --     })
-            -- end,
+            ["terraformls"] = function()
+                lspconfig.terraformls.setup({
+                    filetypes = { "terraform", "tf" },
+                    root_dir = lspconfig.util.root_pattern(".git", ".terraform", "terraform.tf", "main.tf", "data.tf"),
+                    capabilities = capabilities,
+                })
+                vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+                    pattern = { "*.tf", "*.tfvars" },
+                    callback = function()
+                        vim.lsp.buf.format()
+                    end,
+                })
+            end,
             ["powershell_es"] = function()
                 lspconfig.powershell_es.setup({
                     cmd = { "pwsh", "-NoLogo", "-NoProfile", "-Command" },
