@@ -19,6 +19,12 @@ return {
                 svelete = { "svelte-check" },
                 terraform = { "tflint" },
                 dockerfile = { "hadolint" },
+                codespell = { "codespell" },
+                primisma = { "prisma-lint" },
+                ruby = { "rubocop" },
+                rust = { "cargo" },
+                ansible = { "ansible-lint" },
+                zsh = { "shellcheck", "zsh" },
             }
 
             -- Create autocommand which carries out the actual linting
