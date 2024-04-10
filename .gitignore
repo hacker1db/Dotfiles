@@ -18,3 +18,4 @@ config/nvim/plugin/
 !/config/nvim/plugin/packer_compiled.lua
 Brewfile.lock.json
 config/tmux/plugins/
+./config/gh-dash/config.yml

@@ -15,6 +15,7 @@ autoload -Uz compinit
 compinit
 setopt prompt_subst
 source <(kubectl completion zsh)
+source <(limactl completion zsh)
 eval "$(op completion zsh)"; compdef _op op
 setopt COMPLETE_ALIASES
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
