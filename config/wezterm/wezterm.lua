@@ -12,7 +12,8 @@ local config = {
     macos_window_background_blur = 30,
     enable_tab_bar = false,
     window_decorations = "RESIZE",
-    font = wezterm.font("CaskaydiaCove Nerd Font", { weight = "Regular" }),
+    font = wezterm.font("CaskaydiaCove Nerd Font", { weight = "Regular", italic = true }),
+
     font_size = 16,
     adjust_window_size_when_changing_font_size = true,
     native_macos_fullscreen_mode = true,

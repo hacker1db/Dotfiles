@@ -4,7 +4,10 @@ local keymap = vim.keymap -- for conciseness local opts = { noremap = true, sile
 ---------------------
 -- General Keymaps
 ---------------------
-
+-- make quitting stuff easier map command Wq to :wq
+vim.cmd("command! Wq wq!")
+-- save all buffers and quit neovim
+keymap.set("n", "<leader>qa", ":wa<CR>:qa<CR>", { desc = "Save all buffers and quit" })
 -- indentation carry
 keymap.set("v", "<leader>[", "<gv", { desc = "indent selection left" })
 keymap.set("v", "<leader>]", ">gv", { desc = "indent selection right" })
@@ -29,7 +32,7 @@ keymap.set("n", "<leader>ff", ":lua vim.lsp.buf.format()<CR>", { desc = "Format 
 keymap.set("n", "<leader>s", ":so<CR>", { desc = "Source file" })
 
 -- window management buffers
-keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" })     -- go to next buffer
+keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" }) -- go to next buffer
 keymap.set("n", "bp", "<cmd>bp<CR>", { desc = "Go to previous buffer" }) -- go to previous buffer
 ----------------------
 -- Plugin Keybinds
@@ -41,22 +44,22 @@ keymap.set("n", "<leader>gtj", ":GoTagAdd json<CR>", { desc = "gopher generate j
 -- yaml tags
 keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate json tags" }) -- generate tags for yaml
 -- gopher tests and iferr
-keymap.set("n", "<leader>gt", ":GoTestsAll<CR>")                                             -- generate tests for current file
-keymap.set("n", "<leader>gi", ":GoIfErr<CR>")                                                -- generate if err check for current file
+keymap.set("n", "<leader>gt", ":GoTestsAll<CR>") -- generate tests for current file
+keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for current file
 
 -- telescope
 keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>", { desc = "Telescope Show files in current directory" }) -- find files within current working directory, respects .gitignore
 keymap.set("n", "<leader>fr", "<cmd>Telescope live_grep<cr>", { desc = "Telescope Find string under cursor in cwd" }) -- find string in current working directory as you type
-keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Telescope Find current word" })             -- find string under cursor in current working directory
-keymap.set("n", "<leader>bl", "<cmd>Telescope buffers<cr>", { desc = "Telescope show buffers list" })                 -- list open buffers in current neovim instance
-keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Telscope list git files" })                   -- list git_files
-keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Telescope show help tags" })                          -- list available help tags
+keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Telescope Find current word" }) -- find string under cursor in current working directory
+keymap.set("n", "<leader>bl", "<cmd>Telescope buffers<cr>", { desc = "Telescope show buffers list" }) -- list open buffers in current neovim instance
+keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Telscope list git files" }) -- list git_files
+keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Telescope show help tags" }) -- list available help tags
 
 -- telescope git commands
-keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" })                -- list all git commits (use <cr> to checkout) ["gc" for git commits]
+keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" }) -- list all git commits (use <cr> to checkout) ["gc" for git commits]
 keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>", { desc = "Telescope show current commits from file" }) -- list git commits for current file/buffer (use <cr> to checkout) ["gfc" for git file commits]
-keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Telescope show branches" })                   -- list git branches (use <cr> to checkout) ["gb" for git branch]
-keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Telescope show git status" })                   -- list current changes per file with diff preview ["gs" for git status]
+keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Telescope show branches" }) -- list git branches (use <cr> to checkout) ["gb" for git branch]
+keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Telescope show git status" }) -- list current changes per file with diff preview ["gs" for git status]
 -- telescope todo comments
 keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 
