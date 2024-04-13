@@ -39,6 +39,9 @@ alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
 alias du='du -h -c' # calculate disk usage for a folder
 alias dotfiles="cd ~/.dotfiles"
+alias tfd="terraform apply --destroy --auto-approve"
+alias tfp="terraform plan"
+alias tfa="terraform apply --auto-approve"
 
 # Applications
 alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'

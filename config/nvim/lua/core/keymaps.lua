@@ -14,7 +14,7 @@ keymap.set("v", "<leader>]", ">gv", { desc = "indent selection right" })
 
 -- use jk to exit insert mode
 keymap.set("i", "jk", "<ESC>", { desc = "exit insert mode with jk" })
-keymap.set("n", "<leader>q", ":q<CR>", { desc = "quit" }) -- quit
+keymap.set("n", "<leader>q", ":q!<CR>", { desc = "quit" }) -- quit
 
 -- clear search highlights
 keymap.set("n", "<space>", ":nohl<CR>", { desc = "Clear search highlights" })
