@@ -37,6 +37,9 @@ return {
             gh_env = {}, -- extra environment variables to pass on to GitHub CLI, can be a table or function returning a table
             timeout = 5000, -- timeout for requests between the remote server
             default_to_projects_v2 = true, -- use projects v2 for the `Octo card ...` command by default. Both legacy and v2 commands are available under `Octo cardlegacy ...` and `Octo cardv2 ...` respectively.
+            suppress_missing_scope = {
+                projects_v2 = true,
+            },
             ui = {
                 use_signcolumn = true, -- show "modified" marks on the sign column
             },
