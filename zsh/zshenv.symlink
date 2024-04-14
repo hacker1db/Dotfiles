@@ -17,5 +17,9 @@ fpath=(
 
 typeset -aU path
 
+
+## Only source this if it exsits
+FILE="$HOME/.config/op/plugins.sh"
+test -f $FILE && source "$FILE"
 export EDITOR='nvim'
 export GIT_EDITOR='nvim'
