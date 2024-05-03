@@ -16,13 +16,13 @@ return {
                     disabled_filetypes = {},
                 },
                 sections = {
-                    lualine_a = { "mode", "buffers" },
+                    lualine_a = { "mode" }, --"buffers"
                     lualine_b = { "branch" },
                     lualine_c = {
                         {
                             "filename",
                             file_status = true, -- displays file status (readonly status, modified status)
-                            path = 0,           -- 0 = just filename, 1 = relative path, 2 = absolute path
+                            path = 0, -- 0 = just filename, 1 = relative path, 2 = absolute path
                         },
                     },
                     lualine_x = {
@@ -36,7 +36,7 @@ return {
                             sources = { "nvim_diagnostic" },
                             symbols = { error = " ", warn = " ", info = " ", hint = " " },
                         },
-                        "encoding",
+                        -- "encoding",
                         "filetype",
                     },
                     lualine_y = { "progress" },
@@ -49,7 +49,7 @@ return {
                         {
                             "filename",
                             file_status = true, -- displays file status (readonly status, modified status)
-                            path = 1,           -- 0 = just filename, 1 = relative path, 2 = absolute path
+                            path = 1, -- 0 = just filename, 1 = relative path, 2 = absolute path
                         },
                     },
                     lualine_x = { "location" },
@@ -60,7 +60,7 @@ return {
                 extensions = { "fugitive" },
                 buffers_color = {
                     -- Same values as the general color option can be used here.
-                    active = "lualine_{section}_normal",     -- Color for active buffer.
+                    active = "lualine_{section}_normal", -- Color for active buffer.
                     inactive = "lualine_{section}_inactive", -- Color for inactive buffer.
                 },
             })
