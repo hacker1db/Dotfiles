@@ -15,7 +15,7 @@ return {
                 typescript = { "eslint" },
                 javascript = { "eslint" },
                 json = { "jsonlint" },
-                go = { "golangci-lint" },
+                go = {},
                 svelete = { "svelte-check" },
                 terraform = { "tflint" },
                 dockerfile = { "hadolint" },

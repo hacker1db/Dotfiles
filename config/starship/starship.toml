@@ -2,7 +2,7 @@ add_newline = false
 # A minimal left prompt
 palette = "catppuccin_mocha"
 # A minimal left prompt
-format = """$directory$golang$rust$nodejs$fill
+format = """$directory$python$golang$rust$nodejs$fill
 $character"""
 # move the rest of the prompt to the right
 right_format = """$git_branch$git_state$git_status"""
@@ -39,7 +39,11 @@ format = '[$context(\[$namespace\])]($style) '
 [docker_context]
 disabled = true
 
-
+[python]
+python_binary = 'python3'
+pyenv_version_name = true
+format = '[${symbol}(${version} )(\($virtualenv\) )]($style)'
+symbol = '🐍 '
 
 [terraform]
 format = '[🏎💨 $version$workspace]($style) '
