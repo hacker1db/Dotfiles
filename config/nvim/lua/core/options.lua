@@ -9,6 +9,7 @@ opt.number = true
 opt.tabstop = 4
 opt.shiftwidth = 4
 opt.expandtab = true
+opt.shiftwidth = 4
 opt.autoindent = true
 opt.conceallevel = 2
 opt.relativenumber = true
@@ -25,7 +26,6 @@ opt.termguicolors = true
 opt.signcolumn = "yes"
 vim.opt.colorcolumn = "80"
 -- backsapce key
-
 opt.backspace = "indent,eol,start"
 
 -- clipboard
@@ -41,8 +41,6 @@ opt.iskeyword:append("-") -- consider string-string as whole word
 
 opt.hlsearch = true -- highlight search results
 opt.title = true -- set terminal title
--- mappings
-opt.pastetoggle = "<leader>v"
 
 -- toggle invisible characters
 opt.list = true

@@ -23,3 +23,4 @@ FILE="$HOME/.config/op/plugins.sh"
 test -f $FILE && source "$FILE"
 export EDITOR='nvim'
 export GIT_EDITOR='nvim'
+# export OPENAI_API_KEY=$(op item get "OpenAI API Key" | jq -r '.details.sections[0].fields[0].value')
