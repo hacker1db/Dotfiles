@@ -48,9 +48,7 @@ alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulato
 alias pnp='pnpm'
 alias jwtp='jwt $(pbpaste)' 
 alias docker='nerdctl.lima'
-
-
-
+alias lzd='lazydocker'
 
 
 # IP addresses
