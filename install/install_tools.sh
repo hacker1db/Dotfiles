@@ -22,6 +22,7 @@ brew install httpie
 # Image management tools
 echo "install image tools"
 brew install --cask rancher
+brew install lazydocker
 brew tap anchore/grype
 brew install grype
 brew install kubectx
