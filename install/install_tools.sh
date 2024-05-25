@@ -34,6 +34,8 @@ limactl start
 brew install --cask iina
 
 # terminals cause why not!
+brew install yazi
+brew install yazi
 brew install go
 brew install hub
 brew install reattach-to-user-namespace
