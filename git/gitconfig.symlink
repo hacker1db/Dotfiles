@@ -167,6 +167,7 @@
   allowedSignersFile = ~/.ssh/allowed_signers
 
 [commit]
-  gpgsign = true
+    gpgsign = true
+
 [url "ssh://git@github.com/"]
-	insteadOf = https://github.com/
+    insteadOf = https://github.com/
