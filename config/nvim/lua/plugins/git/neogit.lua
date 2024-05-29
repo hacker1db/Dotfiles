@@ -7,6 +7,6 @@ return {
         -- Only one of these is needed, not both.
         "nvim-telescope/telescope.nvim", -- optional
     },
-    branch = "nightly",
+    branch = "master",
     config = true,
 }
