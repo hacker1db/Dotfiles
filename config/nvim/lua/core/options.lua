@@ -2,6 +2,7 @@ local opt = vim.opt -- save me time later and stop repeating myself
 local cmd = vim.cmd
 vim.g.mapleader = ";"
 vim.g.maplocalleader = ";"
+vim.lsp.set_log_level("off") -- set log level to off
 
 opt.syntax = "enable"
 opt.number = true

@@ -22,13 +22,13 @@ alias cat='bat'
 alias tf="terraform"
 alias l="ls -lah ${colorflag}"
 alias la="ls -AF ${colorflag}"
-if [[ -x "$(command -v exa)" ]]; then
-  alias ll="exa --icons --git --long -a"
-  alias l="exa --icons --git --all --long"
+if [[ -x "$(command -v eza)" ]]; then
+  alias ll="eza --icons --git --long -a"
+  alias l="eza --icons --git --all --long"
 fi
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
-alias tree='exa -l --icons --tree -a -g'
+alias tree='eza -l --icons --tree -a -g'
 alias wv='gh repo view --web'
 # moving dir 
 alias sites='cd $CODE_DIR/Sites/'
