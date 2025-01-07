@@ -18,6 +18,6 @@ return {
         })
     end,
     build = function()
-        vim.cmd([[slient! GoInstallDeps]])
+        vim.cmd.GoInstallDeps()
     end,
 }
