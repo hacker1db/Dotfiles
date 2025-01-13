@@ -1,0 +1,8 @@
+# Appearance Settings
+background-opacity = 0.90
+# Font Settings
+font-family = "CaskaydiaCove Nerd Font"
+font-style = "Italic"
+font-size = 16
+# Color Scheme Based on Appearance
+theme = "catppuccin-mocha"
