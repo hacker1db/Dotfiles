@@ -6,3 +6,7 @@ font-style = "Italic"
 font-size = 14
 # Color Scheme Based on Appearance
 theme = "catppuccin-mocha"
+link-url = true
+window-decoration = true
+window-padding-balance = true
+macos-titlebar-style = hidden
