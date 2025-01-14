@@ -119,6 +119,8 @@ brew "kube-linter"
 brew "kubernetes-cli"
 # Tool that can switch between kubectl contexts easily and create aliases
 brew "kubectx"
+# Lazier way to manage everything docker
+brew "lazydocker"
 # Simple terminal UI for git commands
 brew "lazygit"
 # C library of Git core methods that is re-entrant and linkable

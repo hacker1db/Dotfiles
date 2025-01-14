@@ -10,3 +10,5 @@ link-url = true
 window-decoration = true
 window-padding-balance = true
 macos-titlebar-style = hidden
+window-padding-y = 11
+window-padding-x = 11
