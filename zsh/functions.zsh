@@ -21,6 +21,9 @@ function gitsign(){
         echo "$(git config user.email) $SIGNING_KEY_PUBLIC" >> ~/.ssh/allowed_signers
     fi
 }
+function ts(){
+  sesh connect "$(sesh list -i | gum filter --limit 1 --placeholder 'Pick a sesh' --prompt='⚡')"
+}
 
 function cx() { cd "$@" && l; }
 # Create a new directory and enter it

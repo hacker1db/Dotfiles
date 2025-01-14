@@ -3,7 +3,7 @@ background-opacity = 0.95
 # Font Settings
 #font-family = "CaskaydiaCove Nerd Font"
 font-family = "JetBrains Mono"
-font-size = 16
+font-size = 14
 # Color Scheme Based on Appearance
 theme = "catppuccin-mocha"
 link-url = true
