@@ -1,9 +1,9 @@
 # Appearance Settings
-background-opacity = 0.90
+background-opacity = 0.95
 # Font Settings
-font-family = "CaskaydiaCove Nerd Font"
-font-style = "Italic"
-font-size = 14
+#font-family = "CaskaydiaCove Nerd Font"
+font-family = "JetBrains Mono"
+font-size = 16
 # Color Scheme Based on Appearance
 theme = "catppuccin-mocha"
 link-url = true
