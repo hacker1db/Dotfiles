@@ -104,3 +104,5 @@ alias httpgui="open\ /Applications/HTTPie.app"
 alias azlocations='az account list-locations -o table'
 alias azlogin='az login'
 alias azlogout='az logout'
+# applications
+alias devtoy='open /Applications/DevToy.app'

@@ -65,3 +65,5 @@ cmd([[filetype plugin indent on]])
 -- make the highlighting of tabs and other non-text less annoying
 cmd([[highlight SpecialKey ctermfg=19 guifg=#333333]])
 cmd([[highlight NonText ctermfg=19 guifg=#333333]])
+
+vim.g.copilot_settings = { selectedCompletionModel = "gpt-4o-copilot" }
