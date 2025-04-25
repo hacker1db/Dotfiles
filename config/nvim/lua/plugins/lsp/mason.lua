@@ -49,7 +49,6 @@ return {
                 "bashls",
                 "mdx_analyzer",
                 "tflint",
-                "marksman",
             },
         })
     end,

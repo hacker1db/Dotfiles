@@ -3,10 +3,18 @@ return {
     { -- Linting
         "mfussenegger/nvim-lint",
         event = { "BufReadPre", "BufNewFile" },
+        opts = {
+            linters = {
+                -- https://github.com/LazyVim/LazyVim/discussions/4094#discussioncomment-10178217
+                ["markdownlint-cli2"] = {
+                    args = { "--config", os.getenv("HOME") .. "/.dotfiles/.markdownlint.yaml", "--" },
+                },
+            },
+        },
         config = function()
             local lint = require("lint")
             lint.linters_by_ft = {
-                markdown = { "markdownlint" },
+                markdown = { "markdownlint", "markdownlint-cli2" },
                 lua = { "luacheck" },
                 python = { "flake8" },
                 sh = { "shellcheck" },
@@ -27,12 +35,6 @@ return {
                 zsh = { "shellcheck", "zsh" },
             }
 
-            lint.linters["markdownlint-cli2"] = {
-                args = { "--config", os.getenv("HOME") .. "/github/dotfiles-latest/.markdownlint.yaml", "--" },
-            }
-
-            -- Create autocommand which carries out the actual linting
-            -- on the specified events.
             local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
             vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
                 group = lint_augroup,
