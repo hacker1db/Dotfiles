@@ -27,6 +27,10 @@ return {
                 zsh = { "shellcheck", "zsh" },
             }
 
+            lint.linters["markdownlint-cli2"] = {
+                args = { "--config", os.getenv("HOME") .. "/github/dotfiles-latest/.markdownlint.yaml", "--" },
+            }
+
             -- Create autocommand which carries out the actual linting
             -- on the specified events.
             local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
