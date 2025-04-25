@@ -19,4 +19,8 @@ return {
         end,
         ft = { "markdown" },
     },
+    {
+        "bullets-vim/bullets.vim",
+        ft = { "markdown", "text", "gitcommit", "gitrebase" },
+    },
 }
