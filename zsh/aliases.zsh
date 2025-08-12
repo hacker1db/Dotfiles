@@ -106,3 +106,4 @@ alias azlogin='az login'
 alias azlogout='az logout'
 # applications
 alias devtoy='open /Applications/DevToy.app'
+alias scan='ggshield secret scan path --recursive --yes ./'

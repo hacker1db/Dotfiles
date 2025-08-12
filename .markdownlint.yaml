@@ -63,6 +63,8 @@ MD030: false
 MD033: false
   # allowed_elements: ["a", "img", "div"]
   #
+MD025: false
+
 MD026: false
   # Punctuation characters
   # punctuation: ".,;:!。，；：！"
