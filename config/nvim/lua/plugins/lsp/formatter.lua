@@ -1,19 +1,19 @@
 local formatters = {
-    javascript = { "prettierd" },
+    javascript      = { "prettierd" },
     javascriptreact = { "prettierd" },
-    typescript = { "prettierd" },
+    typescript      = { "prettierd" },
     typescriptreact = { "prettierd" },
-    astro = { "prettierd" },
-    json = { "prettierd" },
-    jsonc = { "prettierd" },
-    html = { "prettierd" },
-    yaml = { "prettierd" },
-    css = { "stylelint", "prettierd" },
-    sh = { "shellcheck", "shfmt" },
-    go = { "gofmt", "goimports" },
-    lua = { "stylua", "lua_ls" },
-    python = { "isort", "black" },
-    csharp = { "omnisharp" },
+    astro           = { "prettierd" },
+    json            = { "prettierd" },
+    jsonc           = { "prettierd" },
+    html            = { "prettierd" },
+    yaml            = { "prettierd" },
+    css             = { "prettierd", "stylelint" },
+    sh              = { "shfmt" },
+    go              = { "goimports", "gofmt" },
+    lua             = { "stylua" },
+    python          = { "isort", "black" },
+    csharp          = { "csharpier" }, -- or { "dotnet_format" }
 }
 
 return {
@@ -22,8 +22,9 @@ return {
         opts = {
             format_on_save = {
                 timeout_ms = 2000,
-                lsp_fallback = false,
+                lsp_fallback = true,
             },
+            notify_on_error = true,
             formatters_by_ft = formatters,
         },
     },
