@@ -13,6 +13,11 @@ function colours() {
         fi
     done
 }
+
+function ghmerge(){
+gh pr view "$1" --json state -q '.state' -q '.state' | grep -q "OPEN" && gh pr diff "$1" && printf "Approve and merge PR #$1? [y/N] " && read ans && { [[ $ans =~ ^[Yy]$ ]] && gh pr review "$1" --approve && gh pr merge "$1" --rebase || echo "Canceled."; }
+}
+
 function gitsign(){
     if [[ ! -z "$SIGNING_KEY_PUBLIC" ]]; then
         export SIGNING_KEY_PUBLIC=$(op item get "Github Work" --format json | jq -r '.fields[] | select(.id=="public_key") | .value' )
