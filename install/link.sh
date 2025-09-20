@@ -4,9 +4,9 @@ DOTFILES=$HOME/.dotfiles
 
 echo -e "\nCreating symlinks"
 echo "=============================="
-linkables=$( find -H "$DOTFILES" -maxdepth 3 -name '*.symlink' )
-for file in $linkables ; do
-    target="$HOME/.$( basename $file '.symlink' )"
+linkables=$(find -H "$DOTFILES" -maxdepth 3 -name '*.symlink')
+for file in $linkables; do
+    target="$HOME/.$(basename $file '.symlink')"
     if [ -e $target ]; then
         echo "~${target#$HOME} already exists... Skipping."
     else
@@ -23,7 +23,7 @@ if [ ! -d $HOME/.config ]; then
 fi
 
 for config in $DOTFILES/config/*; do
-    target=$HOME/.config/$( basename $config )
+    target=$HOME/.config/$(basename $config)
     if [ -e $target ]; then
         echo "~${target#$HOME} already exists... Skipping."
     else
@@ -34,13 +34,14 @@ done
 
 echo -e "\n\nCreating vim symlinks"
 echo "=============================="
-VIMFILES=( "$HOME/.vim:$DOTFILES/vim/.vim"
-        "$HOME/.vimrc:$DOTFILES/vim/.vimrc" )
+VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim"
+    "$HOME/.vimrc:$DOTFILES/vim/.vimrc")
 
 for file in "${VIMFILES[@]}"; do
     KEY=${file%%:*}
     VALUE=${file#*:}
-    if [ -e ${KEY} ]; then echo "${KEY} already exists... skipping."
+    if [ -e ${KEY} ]; then
+        echo "${KEY} already exists... skipping."
     else
         echo "Creating symlink for $KEY"
         ln -s ${VALUE} ${KEY}
@@ -49,7 +50,7 @@ done
 
 echo -e "\n\nCreating zshrc symlinks"
 echo "=============================="
-ZSHRC=( "$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")
+ZSHRC=("$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")
 
 for file in "${ZSHRC[@]}"; do
     KEY=${file%%:*}

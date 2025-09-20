@@ -118,26 +118,17 @@ for file in $config_files[@]; do
   source "$file"
 done
 
-# prefer zoxide over z.sh
 if [[ -x "$(command -v zoxide)" ]]; then
-    eval "$(zoxide init zsh --cmd cd --hook pwd)"
-else
-  # source z.sh if it exists
-  zpath="$(brew --prefix)/etc/profile.d/z.sh"
-  if [ -f "$zpath" ]; then
-      source "$zpath"
-  fi
+    # eval "$(zoxide init zsh --hook pwd)"
+    eval "$(zoxide init zsh --hook pwd)"
 fi
 
-if [[ -x "$(command -v exa)" ]]; then
-  alias ll="exa --icons --git --long"
-  alias l="exa --icons --git --all --long"
+if [[ -x "$(command -v eza)" ]]; then
+  alias ll="eza --icons --git --long"
+  alias l="eza --icons --git --all --long"
 fi
 
 eval "$(starship init zsh)"
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
-
-### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/David.Walters@AlaskaAir.com/.rd/bin:$PATH"
-### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+export PATH="/Users/$Home/.rd/bin:$PATH"
