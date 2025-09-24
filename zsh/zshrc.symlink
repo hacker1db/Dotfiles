@@ -132,3 +132,11 @@ eval "$(starship init zsh)"
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
 export PATH="/Users/$Home/.rd/bin:$PATH"
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/David.Walters@AlaskaAir.com/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/David.Walters@AlaskaAir.com/.lmstudio/bin"
+# End of LM Studio CLI section

@@ -33,6 +33,7 @@ alias wv='gh repo view --web'
 # moving dir 
 alias sites='cd $CODE_DIR/Sites/'
 alias notes='cd $HOME/notes/SecondBrain'
+alias code="code-insiders"
 
 # Helpers
 alias grep='grep --color=auto'
@@ -47,7 +48,6 @@ alias tfa="terraform apply --auto-approve"
 alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
 alias pnp='pnpm'
 alias jwtp='jwt $(pbpaste)' 
-alias docker='nerdctl.lima'
 alias lzd='lazydocker'
 
 
