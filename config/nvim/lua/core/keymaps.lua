@@ -30,6 +30,7 @@ keymap.set("n", "<leader>w", ":close<CR>", { desc = "close current buffer or tab
 keymap.set("n", ",,", ":w<CR>", { desc = "Save file" })
 keymap.set("n", "<leader>ff", ":lua vim.lsp.buf.format()<CR>", { desc = "Format file" })
 keymap.set("n", "<leader>s", ":so<CR>", { desc = "Source file" })
+keymap.set("n", "<leader>fp", ':let @+=expand("<cfile>:p")<CR>', { desc = "Copy full path under cursor" })
 
 -- window management buffers
 keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" }) -- go to next buffer
