@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Reload tmux config for all sessions and clients
+
+CONFIG="${HOME}/.config/tmux/tmux.conf"
+TPM="${HOME}/.tmux/plugins/tpm/tpm"
+
+# reload server config
+tmux source-file "$CONFIG"
+
+# reload TPM plugins if installed
+if [ -f "$TPM" ]; then
+    "$TPM"
+fi
+
+# refresh all attached clients
+tmux list-clients -F "#{client_tty}" | while read -r tty; do
+    [ -n "$tty" ] && tmux refresh-client -t "$tty"
+done
+
+# show confirmation
+tmux display-message "Reloaded tmux.conf for all sessions"
