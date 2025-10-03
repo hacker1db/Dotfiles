@@ -190,7 +190,7 @@ function brew-cleanup(){
  brew bundle dump --mas --tap --cask --describe --all -v --cleanup --file="~/.dotfiles/install/brewfile" -f  && brew cleanup && brew doctor
 }
 
-function upddate-npm(){
+function update-npm-tools(){
 echo "🔍 Getting list of globally installed npm packages..."
 packages=$(npm list -g --depth=0 --parseable | awk -F/ '{print $NF}' | tail -n +2)
 

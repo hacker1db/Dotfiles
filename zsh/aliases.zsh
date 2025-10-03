@@ -104,6 +104,12 @@ alias httpgui="open\ /Applications/HTTPie.app"
 alias azlocations='az account list-locations -o table'
 alias azlogin='az login'
 alias azlogout='az logout'
+
+## AI Tools and alias
+alias chatgpt='open /Applications/ChatGPT.app'
+alias oc='opencode'
+alias occ='copilot'
+
 # applications
 alias devtoy='open /Applications/DevToy.app'
 alias scan='ggshield secret scan path --recursive --yes ./'
