@@ -51,7 +51,7 @@ return {
     }
 
     return {
-      notifier = { enabled = true, timeout = 3000, top_down = true },
+      notifier = { enabled = true, timeout = 3000, top_down = true, style = { border = "rounded", zindex = 100, ft = "markdown", wo = { winblend = 5, wrap = false, conceallevel = 2, colorcolumn = "" }, bo = { filetype = "snacks_notif" } } },
       indent = { enabled = true, char = "┊" },
       scroll = { enabled = true },
       words = { enabled = true },
@@ -76,6 +76,37 @@ return {
     local suppress_dashboard = (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1)
     snacks.setup(opts)
     vim.notify = snacks.notifier.notify
+    -- save notification via snacks notifier
+    vim.api.nvim_create_autocmd("BufWritePost", {
+      callback = function(ev)
+        local ok, notifier = pcall(require, "snacks.notifier")
+        if ok then
+          local file = vim.fn.fnamemodify(ev.file or "", ":~:.")
+          if file == "" then file = "[No Name]" end
+          notifier.notify("Saved " .. file, { level = "info", title = "Write" })
+        end
+      end,
+    })
+
+    -- lsp progress spinner notifications
+    vim.api.nvim_create_autocmd("LspProgress", {
+      callback = function(ev)
+        local spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
+        local icon = spinner[math.floor(vim.uv.hrtime() / (1e6 * 80)) % #spinner + 1]
+        local val = ev.data.params.value or {}
+        if val.kind == "end" then icon = " " end
+        local msg = val.message or val.title or "";
+        if val.percentage then msg = msg .. string.format(" (%d%%)", val.percentage) end
+        if msg == "" then msg = "Working" end
+        pcall(vim.notify, msg, "info", {
+          id = "lsp_progress",
+          title = "LSP Progress",
+          icon = icon,
+          replace = true,
+        })
+      end,
+    })
+
     if suppress_dashboard then
       vim.schedule(function()
         for _, win in ipairs(vim.api.nvim_list_wins()) do

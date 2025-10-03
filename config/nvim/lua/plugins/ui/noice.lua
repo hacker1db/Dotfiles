@@ -3,8 +3,8 @@ return {
     "folke/noice.nvim",
     event = "VeryLazy",
     opts = {
-      messages = { enabled = false },
-      notify = { enabled = false },
+      messages = { enabled = true },
+      notify = { enabled = true },
       lsp = {
         progress = { enabled = false },
         override = {
@@ -13,7 +13,7 @@ return {
         },
       },
       presets = {
-        bottom_search = false,
+         bottom_search = false,
         long_message_to_split = false,
         inc_rename = false,
         lsp_doc_border = true,
