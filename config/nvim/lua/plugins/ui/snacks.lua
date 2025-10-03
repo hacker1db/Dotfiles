@@ -3,7 +3,8 @@ return {
   lazy = false,
   priority = 1000,
   opts = function()
-    local suppress_dashboard = (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1)
+    local argc = vim.fn.argc()
+    local suppress_dashboard = false
     local dashboard_sections = {
       {
         section = "header",
@@ -73,7 +74,7 @@ return {
   end,
   config = function(_, opts)
     local snacks = require("snacks")
-    local suppress_dashboard = (vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1)
+    local suppress_dashboard = false
     snacks.setup(opts)
     vim.notify = snacks.notifier.notify
     -- save notification via snacks notifier
@@ -107,16 +108,6 @@ return {
       end,
     })
 
-    if suppress_dashboard then
-      vim.schedule(function()
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-          local buf = vim.api.nvim_win_get_buf(win)
-          local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-          if ft == "snacks_dashboard" then pcall(vim.api.nvim_win_close, win, true) end
-        end
-        local ok, picker = pcall(require, "snacks.picker")
-        if ok then picker.files() end
-      end)
-    end
+    -- dashboard always shown on startup; auto file picker disabled
   end,
 }
