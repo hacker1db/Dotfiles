@@ -37,19 +37,29 @@
 
 **Estimated improvement:** 50-80% faster startup (from ~2-3s to ~500ms)
 
-## 6. Consider Snacks.nvim for neovim consolidation
-- Evaluate replacing multiple plugins with [snacks.nvim](https://github.com/folke/snacks.nvim) QoL collection:
-  - **snacks.picker** - Alternative to mini.pick/telescope for fuzzy finding
-  - **snacks.explorer** - Alternative to mini.files for file exploration
-  - **snacks.notifier** - Replace nvim-notify with prettier notifications
-  - **snacks.dashboard** - Alternative to alpha-nvim for startup screen
-  - **snacks.indent** - Alternative to indent-blankline.nvim
-  - **snacks.scroll** - Smooth scrolling functionality
-  - **snacks.statuscolumn** - Enhanced status column
-  - **snacks.terminal** - Better terminal integration
-  - **snacks.lazygit** - LazyGit integration with colorscheme sync
-  - **snacks.bufdelete** - Delete buffers without disrupting layout
-  - **snacks.zen** - Zen mode for distraction-free coding
-  - **snacks.words** - LSP reference highlighting and navigation
-- Benefits: Single plugin with cohesive design, reduced plugin count, better integration, maintained by folke (LazyVim author)
-- Can be adopted incrementally - enable individual snacks as needed while keeping existing plugins
+## 6. Snacks.nvim (selective integration strategy)
+- Status: Introduced `snacks.nvim` with a focused set of non-invasive quality-of-life modules.
+- Adopted Now:
+  - **snacks.notifier** – Replaces `nvim-notify` (cleaner UI, unified style)
+  - **snacks.indent** – Replaces `indent-blankline.nvim` (lighter config)
+  - **snacks.scroll** – Smooth scrolling
+  - **snacks.words** – LSP reference / word highlight navigation
+  - **snacks.bufdelete** – Safe buffer closing without layout churn
+  - **snacks.zen** – Distraction-free coding mode (replaces twilight use-cases gradually)
+  - **snacks.terminal** – Integrated floating / split terminal ergonomics
+  - **snacks.lazygit** – Native LazyGit integration with colorscheme sync
+- Deferred / Not Enabled (by design):
+  - **snacks.picker** – Keeping Telescope for now (better git/LSP ecosystem). Only enable if it demonstrably improves performance or ergonomics.
+  - **snacks.explorer** – Keeping `nvim-tree` (stable + muscle memory). Explorer will be reconsidered only if it adds clear workflow advantages.
+- Potential Future Enhancements (evaluate later):
+  - **snacks.dashboard** – Could replace any future startup screen need
+  - **snacks.quickfile** – Rapid scratch / transient file workflow (if enabled in upstream)
+  - **snacks.image** – Inline / floating image preview support (depends on workflow need)
+  - **snacks.gitbrowse / gitbrows** – If/when upstream provides quick repo file/GitHub navigation
+  - **snacks.statuscolumn** – Optional UI polish (low priority)
+- Rationale: Minimize churn while consolidating lightweight UX layers under one maintained plugin. Preserve existing Telescope + nvim-tree flows until a net advantage is proven.
+- Next Evaluation Triggers:
+  - Benchmark picker startup vs Telescope on large repos
+  - Need for richer explorer features (git decorators performance, preview panels)
+  - Desire for startup dashboard or image preview workflows.
+- Action Items (if adopting more later): Add module enable flags in `snacks.lua`, migrate keymaps behind alternate leader prefixes, then phase out redundant plugins after trial period.
