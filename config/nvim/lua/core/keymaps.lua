@@ -48,36 +48,24 @@ keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate j
 keymap.set("n", "<leader>gt", ":GoTestsAll<CR>")                                             -- generate tests for current file
 keymap.set("n", "<leader>gi", ":GoIfErr<CR>")                                                -- generate if err check for current file
 
--- Snacks picker
-local function close_explorer_if_open()
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-        local buf = vim.api.nvim_win_get_buf(win)
-        local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-        if ft == "snacks_explorer" then
-            pcall(vim.api.nvim_win_close, win, true)
-        end
-    end
-end
+-- Snacks picker keymaps (simplified, removed one-shot explorer close logic)
 keymap.set("n", "<leader>f", function()
-    close_explorer_if_open()
     local ok, picker = pcall(require, "snacks.picker")
     if ok then picker.files() else vim.cmd("Telescope find_files") end
 end, { desc = "Files" })
 keymap.set("n", "<leader>fr", function()
-    close_explorer_if_open()
     local ok, picker = pcall(require, "snacks.picker")
     if ok then picker.grep() else vim.cmd("Telescope live_grep") end
 end, { desc = "Search" })
 keymap.set("n", "<leader>sb", function()
-    close_explorer_if_open()
     local ok, picker = pcall(require, "snacks.picker")
     if ok then picker.buffers() else vim.cmd("Telescope buffers") end
 end, { desc = "Buffers" })
 keymap.set("n", "<leader>sh", function()
-    close_explorer_if_open()
     local ok, picker = pcall(require, "snacks.picker")
     if ok then picker.help() else vim.cmd("Telescope help_tags") end
 end, { desc = "Help" })
+
 keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Git files" })
 keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Help tags (Telescope fallback)" })
 
@@ -128,27 +116,7 @@ keymap.set("n", "<leader>un", function()
     if ok then notifier.hide() end
 end, { desc = "Dismiss notifications" })
 
--- Auto open explorer on start when launched on a directory (e script uses $EDITOR .)
-vim.api.nvim_create_autocmd("BufEnter", {
-    callback = function(args)
-        local buf = args.buf
-        if vim.bo[buf].buftype ~= "" then return end
-        if vim.api.nvim_buf_get_option(buf, "filetype") == "snacks_explorer" then return end
-        -- close explorer if it's open when entering a real file buffer
-        close_explorer_if_open()
-    end,
-})
-
-vim.api.nvim_create_autocmd("VimEnter", {
-    callback = function()
-        if vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
-            vim.schedule(function()
-                local ok, explorer = pcall(require, "snacks.explorer")
-                if ok then explorer.open() end
-            end)
-        end
-    end,
-})
+-- (Dashboard suppression for directory launches handled inside snacks plugin config)
 keymap.set("n", "<leader>uh", function()
     local ok, notifier = pcall(require, "snacks.notifier")
     if ok and notifier.history then notifier.history() end
