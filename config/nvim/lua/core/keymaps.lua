@@ -20,8 +20,10 @@ keymap.set("n", "<leader>q", ":q!<CR>", { desc = "quit" }) -- quit
 keymap.set("n", "<space>", ":nohl<CR>", { desc = "Clear search highlights" })
 
 -- window management
--- nvim-tree
-keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "open file explorer" }) -- toggle file explorer
+-- mini.files
+keymap.set("n", "<leader>e", function()
+    require("mini.files").open()
+end, { desc = "open file explorer" })
 keymap.set("n", "<leader>\\", "<C-w>v", { desc = "split virtically" })
 keymap.set("n", "<leader>-", "<C-w>s", { desc = "split horizontally" })
 keymap.set("n", "<leader>=", "<C-w>=", { desc = "make split windows equal width & height" })
@@ -81,6 +83,14 @@ keymap.set("n", "tw", ":Twilight<enter>", { noremap = false })
 -- Noice
 keymap.set("n", "<leader>nn", ":NoiceDismiss<CR>", { noremap = true })
 keymap.set("n", "<leader>ee", "<cmd>GoIfErr<cr>", { silent = true, noremap = true })
+
+-- Avante
+keymap.set("n", "<leader>aa", ":AvanteAsk<CR>", { desc = "Avante ask" })
+keymap.set("n", "<leader>at", ":AvanteToggle<CR>", { desc = "Avante toggle sidebar" })
+keymap.set("n", "<leader>ar", ":AvanteRefresh<CR>", { desc = "Avante refresh" })
+keymap.set("n", "<leader>af", ":AvanteFocus<CR>", { desc = "Avante focus" })
+keymap.set("v", "<leader>ae", ":AvanteEdit<CR>", { desc = "Avante edit selection" })
+keymap.set("n", "<leader>ac", ":AvanteChat<CR>", { desc = "Avante chat" })
 
 -- trouble
 keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>", { silent = true, noremap = true })

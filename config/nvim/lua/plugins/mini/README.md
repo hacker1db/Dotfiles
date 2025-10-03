@@ -30,6 +30,21 @@ This directory contains configuration for various mini.nvim plugins that provide
 - **Replaces**: windwp/nvim-autopairs (disabled in ui/autopair.lua and extra/autopair.lua)
 - **Key features**: Lightweight autopairs with smart neighbor detection
 
+### mini.files
+- **Purpose**: File explorer with Miller columns navigation
+- **Replaces**: nvim-tree/nvim-tree.lua (disabled in ui/filetree.lua)
+- **Key mappings**:
+  - `;e` - Open file explorer
+  - `h/j/k/l` - Navigate (vim-like)
+  - `q` - Close explorer
+  - `=` - Synchronize file system changes
+  - `g?` - Show help
+- **Key features**: 
+  - Column view (Miller columns) for nested directory navigation
+  - Preview enabled by default
+  - Edit-based file manipulation (create, delete, rename, move, copy)
+  - Replaces netrw as default file explorer
+
 ### mini.statusline
 - **Purpose**: Simple statusline
 - **Replaces**: nvim-lualine/lualine.nvim (optional)
@@ -42,7 +57,8 @@ To switch from the current plugins to mini equivalents:
 
 1. **For autopairs**: The old nvim-autopairs plugins are already disabled
 2. **For comments**: The old Comment.nvim plugin is already disabled
-3. **For statusline**: Set `enabled = true` in `mini/statusline.lua` and `enabled = false` in `ui/lualine.lua`
+3. **For file explorer**: mini.files is now active, nvim-tree is disabled
+4. **For statusline**: Set `enabled = true` in `mini/statusline.lua` and `enabled = false` in `ui/lualine.lua`
 
 ## Configuration
 
