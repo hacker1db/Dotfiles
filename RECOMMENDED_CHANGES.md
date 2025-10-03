@@ -17,7 +17,27 @@
 - Wrap `source <(kubectl completion zsh)` (and similar blocks) in `command -v` guards so missing commands don't spam errors in new shells.
 - Audit the PATH exports in `zsh/zshrc.symlink` and remove hard-coded usernames or redundant lines to avoid broken paths.
 
-## 5. Consider Snacks.nvim for neovim consolidation
+## 5. Fix slow zsh startup (critical performance issues)
+**Major Performance Problems:**
+- **Line 88**: `source <(kubectl completion zsh)` runs UNCONDITIONALLY (even though line 17-19 already does this conditionally!)
+  - This is a DUPLICATE that generates completion code every shell start
+  - Should be removed entirely (already handled by guarded version at line 17-19)
+- **Line 11 & 15**: `compinit` called TWICE (massive slowdown on each startup)
+- **Lines 40 & 116-119**: All .zsh files sourced TWICE (complete duplication of work)
+- **Line 88-90**: kubectl completion runs without checking if kubectl exists
+- **Lines 68-70, 121-124, 131**: Multiple `eval` calls (fnm, zoxide, starship) - each spawns subprocess
+- **Line 14**: `compinit` called again without check flag (should use `-C` to skip check on subsequent runs)
+
+**Quick fixes (will dramatically improve startup):**
+1. Remove line 88 (duplicate kubectl completion)
+2. Remove one of the duplicate `compinit` calls (line 15)
+3. Remove duplicate .zsh sourcing (either lines 40 OR 116-119, not both)
+4. Add `-C` flag to second compinit call to skip security check
+5. Consider lazy-loading completions only when needed
+
+**Estimated improvement:** 50-80% faster startup (from ~2-3s to ~500ms)
+
+## 6. Consider Snacks.nvim for neovim consolidation
 - Evaluate replacing multiple plugins with [snacks.nvim](https://github.com/folke/snacks.nvim) QoL collection:
   - **snacks.picker** - Alternative to mini.pick/telescope for fuzzy finding
   - **snacks.explorer** - Alternative to mini.files for file exploration
