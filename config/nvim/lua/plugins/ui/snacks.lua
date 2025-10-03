@@ -23,14 +23,36 @@ return {
     { "<leader>ff", function() Snacks.picker.files() end, desc = "Find Files" },
     { "<leader>fg", function() Snacks.picker.git_files() end, desc = "Find Git Files" },
     { "<leader>fp", function() Snacks.picker.projects() end, desc = "Projects" },
-    { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent" },
-    { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Branches" },
+      { "<leader>fr", function() Snacks.picker.recent() end, desc = "Recent" },
+      { "<leader>fs", function() Snacks.picker.grep() end, desc = "Find String (Grep)" },
+      { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Branches" },
     { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git Log" },
     { "<leader>gL", function() Snacks.picker.git_log_line() end, desc = "Git Log Line" },
     { "<leader>gs", function() Snacks.picker.git_status() end, desc = "Git Status" },
     { "<leader>gS", function() Snacks.picker.git_stash() end, desc = "Git Stash" },
     { "<leader>gd", function() Snacks.picker.git_diff() end, desc = "Git Diff (Hunks)" },
-    { "<leader>gf", function() Snacks.picker.git_log_file() end, desc = "Git Log File" },
+      { "<leader>gf", function() Snacks.picker.git_log_file() end, desc = "Git Log File" },
+      { "<leader>gbl", function()
+          local file = vim.api.nvim_buf_get_name(0)
+          if file == "" then return end
+          local ok, picker = pcall(require, "snacks.picker")
+          if ok and picker.git_blame then
+            picker.git_blame()
+            return
+          end
+          local blame = vim.fn.systemlist("git --no-pager blame -c " .. vim.fn.shellescape(file))
+          if vim.v.shell_error ~= 0 then return end
+          Snacks.win({
+            width = 0.6,
+            height = 0.6,
+            border = "rounded",
+            title = " Git Blame ",
+            title_pos = "center",
+            ft = "git",
+            text = blame,
+            bo = { modifiable = false, readonly = true },
+          })
+        end, desc = "Git Blame File" },
     { "<leader>sb", function() Snacks.picker.lines() end, desc = "Buffer Lines" },
     { "<leader>sB", function() Snacks.picker.grep_buffers() end, desc = "Grep Open Buffers" },
     { "<leader>sg", function() Snacks.picker.grep() end, desc = "Grep" },
@@ -147,7 +169,7 @@ return {
       zen = { enabled = true },
       terminal = { enabled = true },
       lazygit = { enabled = true },
-      picker = { enabled = true },
+      picker = { enabled = true, layout = { preset = "telescope", width = 0.95, height = 0.9, preview = 0.75 } },
       explorer = { enabled = true, layout = { preset = "left", width = 30 } },
       quickfile = { enabled = true },
       image = { enabled = true },
