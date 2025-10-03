@@ -28,9 +28,9 @@ keymap.set("n", "<leader>=", "<C-w>=", { desc = "make split windows equal width 
 keymap.set("n", "<leader>w", ":close<CR>", { desc = "close current buffer or tab" })
 
 keymap.set("n", ",,", ":w<CR>", { desc = "Save file" })
-keymap.set("n", "<leader>ff", ":lua vim.lsp.buf.format()<CR>", { desc = "Format file" })
+keymap.set("n", "<leader>cf", ":lua vim.lsp.buf.format()<CR>", { desc = "Format file" })
 keymap.set("n", "<leader>s", ":so<CR>", { desc = "Source file" })
-keymap.set("n", "<leader>fp", ':let @+=expand("<cfile>:p")<CR>', { desc = "Copy full path under cursor" })
+keymap.set("n", "<leader>yf", ':let @+=expand("<cfile>:p")<CR>', { desc = "Yank file path under cursor" })
 
 -- window management buffers
 keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" })     -- go to next buffer
@@ -49,25 +49,13 @@ keymap.set("n", "<leader>gt", ":GoTestsAll<CR>")                                
 keymap.set("n", "<leader>gi", ":GoIfErr<CR>")                                                -- generate if err check for current file
 
 -- Snacks picker keymaps (simplified, removed one-shot explorer close logic)
-keymap.set("n", "<leader>f", function()
-    local ok, picker = pcall(require, "snacks.picker")
-    if ok then picker.files() else vim.cmd("Telescope find_files") end
-end, { desc = "Files" })
-keymap.set("n", "<leader>fr", function()
-    local ok, picker = pcall(require, "snacks.picker")
-    if ok then picker.grep() else vim.cmd("Telescope live_grep") end
-end, { desc = "Search" })
-keymap.set("n", "<leader>sb", function()
-    local ok, picker = pcall(require, "snacks.picker")
-    if ok then picker.buffers() else vim.cmd("Telescope buffers") end
-end, { desc = "Buffers" })
-keymap.set("n", "<leader>sh", function()
-    local ok, picker = pcall(require, "snacks.picker")
-    if ok then picker.help() else vim.cmd("Telescope help_tags") end
-end, { desc = "Help" })
 
-keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Git files" })
-keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Help tags (Telescope fallback)" })
+
+
+
+
+
+
 
 -- telescope git commands (keep telescope for git, mini.pick doesn't have built-in git support)
 keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" })
@@ -87,44 +75,17 @@ keymap.set("n", "<leader>mps", ":MarkdownPreviewStop<CR>")
 -- Git Stuff
 keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
 keymap.set("n", "<leader>gt", ":Gitsigns toggle_current_line_blame<CR>", {})
-keymap.set("n", "<leader>gg", function()
-    local ok, lg = pcall(require, "snacks.lazygit")
-    if ok then lg.open() else vim.cmd("LazyGit") end
-end, { desc = "LazyGit" })
+
 
 -- Snacks explorer
 -- Toggle logic: if an explorer buffer is visible, close it; otherwise open/reveal
-keymap.set("n", "<leader>e", function()
-    local ok, explorer = pcall(require, "snacks.explorer")
-    if not ok then return end
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-        local buf = vim.api.nvim_win_get_buf(win)
-        local ft = vim.api.nvim_buf_get_option(buf, "filetype")
-        if ft == "snacks_explorer" then
-            vim.api.nvim_win_close(win, true)
-            return
-        end
-    end
-    -- if a file is loaded, reveal it; else open root
-    local name = vim.api.nvim_buf_get_name(0)
-    if name ~= "" and vim.loop.fs_stat(name) then
-        explorer.reveal()
-    else
-        explorer.open()
-    end
-end, { desc = "Explorer" })
+
 
 -- Snacks notifier
-keymap.set("n", "<leader>un", function()
-    local ok, notifier = pcall(require, "snacks.notifier")
-    if ok then notifier.hide() end
-end, { desc = "Dismiss notifications" })
+
 
 -- (Dashboard suppression for directory launches handled inside snacks plugin config)
-keymap.set("n", "<leader>uh", function()
-    local ok, notifier = pcall(require, "snacks.notifier")
-    if ok and notifier.history then notifier.history() end
-end, { desc = "Notification history" })
+
 keymap.set("n", "<leader>ee", "<cmd>GoIfErr<cr>", { silent = true, noremap = true })
 
 -- Avante
