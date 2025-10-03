@@ -239,13 +239,7 @@ Key items:
 4. Source changes before committing: `source ~/.zshrc`
 
 ### Commit Checklist
-- [ ] No secrets or credentials committed
-- [ ] Follows existing code style
-- [ ] No unnecessary comments added
-- [ ] Tested manually (no automated tests)
-- [ ] Commit message follows conventional commits format
-- [ ] `lazy-lock.json` updated if nvim plugins changed
-
+- Never Commit anything let me manage the git lifecycle.
 ## Getting Help
 
 - Issues/Feedback: https://github.com/sst/opencode/issues
