@@ -6,15 +6,7 @@ return {
         event = "InsertEnter",
         opts = {
             suggestion = {
-                enabled = true,
-                auto_trigger = true,
-                keymap = {
-                    accept = "<Tab>",
-                    close = "<Esc>",
-                    next = "<C-J>",
-                    prev = "<C-K>",
-                    dismiss = "<C-X>",
-                },
+                enabled = false,
             },
             panel = {
                 enabled = false,
@@ -22,24 +14,18 @@ return {
         },
     },
     {
-        "zbirenbaum/copilot-cmp",
-        enabled = false, -- Disabled in favor of blink.cmp
-        dependencies = {
-            "hrsh7th/nvim-cmp",
-        },
-        config = true,
+        "giuxtaposition/blink-cmp-copilot",
+        dependencies = { "zbirenbaum/copilot.lua" },
     },
     {
         "CopilotC-Nvim/CopilotChat.nvim",
         branch = "main",
         dependencies = {
-            { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
-            { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
+            { "zbirenbaum/copilot.lua" },
+            { "nvim-lua/plenary.nvim" },
         },
         opts = {
-            debug = true, -- Enable debugging
-            -- See Configuration section for rest
+            debug = false,
         },
-        -- See Commands section for default commands if you want to lazy load on them
     },
 }

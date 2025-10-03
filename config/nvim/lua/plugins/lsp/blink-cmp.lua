@@ -8,6 +8,7 @@ return {
             "moyiz/blink-emoji.nvim",
             "ribru17/blink-cmp-spell",
             "friedow/blink-cmp-zsh",
+            "giuxtaposition/blink-cmp-copilot",
             {
                 "folke/lazydev.nvim",
                 ft = "lua",
@@ -34,12 +35,18 @@ return {
             },
 
             sources = {
-                default = { "lazydev", "lsp", "path", "snippets", "buffer", "emoji", "spell", "zsh" },
+                default = { "lazydev", "lsp", "path", "snippets", "buffer", "copilot", "emoji", "spell", "zsh" },
                 providers = {
                     lazydev = {
                         name = "LazyDev",
                         module = "lazydev.integrations.blink",
                         score_offset = 100,
+                    },
+                    copilot = {
+                        name = "copilot",
+                        module = "blink-cmp-copilot",
+                        score_offset = 100,
+                        async = true,
                     },
                     lsp = {
                         name = "LSP",
@@ -88,23 +95,6 @@ return {
 
             snippets = {
                 preset = "luasnip",
-            },
-
-            cmdline = {
-                enabled = true,
-                sources = {
-                    default = { "cmdline", "path" },
-                    providers = {
-                        cmdline = {
-                            name = "cmdline",
-                            module = "blink.cmp.sources.cmdline",
-                        },
-                        path = {
-                            name = "path",
-                            module = "blink.cmp.sources.path",
-                        },
-                    },
-                },
             },
 
             completion = {
