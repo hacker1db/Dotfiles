@@ -30,35 +30,6 @@ This directory contains configuration for various mini.nvim plugins that provide
 - **Replaces**: windwp/nvim-autopairs (disabled in ui/autopair.lua and extra/autopair.lua)
 - **Key features**: Lightweight autopairs with smart neighbor detection
 
-### mini.files
-- **Purpose**: File explorer with Miller columns navigation
-- **Replaces**: nvim-tree/nvim-tree.lua (disabled in ui/filetree.lua)
-- **Key mappings**:
-  - `;e` - Open file explorer
-  - `h/j/k/l` - Navigate (vim-like)
-  - `q` - Close explorer
-  - `=` - Synchronize file system changes
-  - `g?` - Show help
-- **Key features**: 
-  - Column view (Miller columns) for nested directory navigation
-  - Preview enabled by default
-  - Edit-based file manipulation (create, delete, rename, move, copy)
-  - Replaces netrw as default file explorer
-
-### mini.pick
-- **Purpose**: Fuzzy finder and picker
-- **Replaces**: nvim-telescope/telescope.nvim (for most use cases)
-- **Key mappings**:
-  - `;f` - Find files
-  - `;fr` - Live grep
-  - `;fc` - Grep current word
-  - `;bl` - Show buffers
-  - `;;` - Help tags
-- **Key features**:
-  - Fast fuzzy finding with minimal dependencies
-  - Builtin pickers for files, grep, buffers, help
-  - Used by obsidian.nvim for note picking
-  - Telescope still used for git commands (commits, branches, status)
 
 ### mini.statusline
 - **Purpose**: Simple statusline
@@ -72,9 +43,15 @@ To switch from the current plugins to mini equivalents:
 
 1. **For autopairs**: The old nvim-autopairs plugins are already disabled
 2. **For comments**: The old Comment.nvim plugin is already disabled
-3. **For file explorer**: mini.files is now active, nvim-tree is disabled
-4. **For fuzzy finder**: mini.pick is now primary picker, telescope kept for git operations
-5. **For statusline**: Set `enabled = true` in `mini/statusline.lua` and `enabled = false` in `ui/lualine.lua`
+3. **For statusline**: Set `enabled = true` in `mini/statusline.lua` and `enabled = false` in `ui/lualine.lua`
+
+## Current Exclusions
+
+The repository previously experimented with `mini.files` (as a replacement for `nvim-tree`) and `mini.pick` (as a partial replacement for `telescope.nvim`). Both have been removed in favor of restoring:
+- `nvim-tree` for the primary file explorer (`<leader>e` toggles it)
+- `telescope.nvim` for all fuzzy finding (files, grep, buffers, help, git)
+
+If re‑evaluated later, reintroduce by adding plugin specs back under this directory and restoring their keymaps.
 
 ## Configuration
 

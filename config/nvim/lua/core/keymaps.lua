@@ -20,10 +20,8 @@ keymap.set("n", "<leader>q", ":q!<CR>", { desc = "quit" }) -- quit
 keymap.set("n", "<space>", ":nohl<CR>", { desc = "Clear search highlights" })
 
 -- window management
--- mini.files
-keymap.set("n", "<leader>e", function()
-    require("mini.files").open()
-end, { desc = "open file explorer" })
+-- nvim-tree
+keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "open file explorer" })
 keymap.set("n", "<leader>\\", "<C-w>v", { desc = "split virtically" })
 keymap.set("n", "<leader>-", "<C-w>s", { desc = "split horizontally" })
 keymap.set("n", "<leader>=", "<C-w>=", { desc = "make split windows equal width & height" })
@@ -50,22 +48,13 @@ keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate j
 keymap.set("n", "<leader>gt", ":GoTestsAll<CR>") -- generate tests for current file
 keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for current file
 
--- mini.pick
-keymap.set("n", "<leader>f", function()
-    require("mini.pick").builtin.files()
-end, { desc = "Pick files in current directory" })
-keymap.set("n", "<leader>fr", function()
-    require("mini.pick").builtin.grep_live()
-end, { desc = "Pick live grep" })
-keymap.set("n", "<leader>fc", function()
-    require("mini.pick").builtin.grep({ pattern = vim.fn.expand("<cword>") })
-end, { desc = "Pick grep current word" })
-keymap.set("n", "<leader>bl", function()
-    require("mini.pick").builtin.buffers()
-end, { desc = "Pick show buffers list" })
-keymap.set("n", ";;", function()
-    require("mini.pick").builtin.help()
-end, { desc = "Pick show help tags" })
+-- telescope
+keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>", { desc = "Telescope Show files in current directory" })
+keymap.set("n", "<leader>fr", "<cmd>Telescope live_grep<cr>", { desc = "Telescope Find string under cursor in cwd" })
+keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Telescope Find current word" })
+keymap.set("n", "<leader>bl", "<cmd>Telescope buffers<cr>", { desc = "Telescope show buffers list" })
+keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Telscope list git files" })
+keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Telescope show help tags" })
 
 -- telescope git commands (keep telescope for git, mini.pick doesn't have built-in git support)
 keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" })
