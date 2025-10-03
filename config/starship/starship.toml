@@ -1,6 +1,6 @@
 add_newline = false
 # A minimal left prompt
-palette = "catppuccin_mocha"
+palette = "eldritch"
 # A minimal left prompt
 format = """$directory$python$golang$rust$nodejs$fill
 $character"""
@@ -48,6 +48,38 @@ symbol = '🐍 '
 [terraform]
 format = '[🏎💨 $version$workspace]($style) '
 
+[palettes.eldritch]
+# Based on Eldritch theme colors from eldritch.nvim
+bg_dark = "#171928"
+bg = "#212337"
+bg_highlight = "#292e42"
+terminal_black = "#414868"
+fg = "#ebfafa"
+fg_dark = "#ABB4DA"
+fg_gutter = "#3b4261"
+fg_gutter_light = "#7081d0"
+dark3 = "#6473B7"
+comment = "#7081d0"
+dark5 = "#5866A2"
+bright_cyan = "#39DDFD"
+visual = "#76639e"
+bg_visual = "#76639e"
+cyan = "#04d1f9"
+dark_cyan = "#10A1BD"
+magenta = "#a48cf2"
+magenta2 = "#bf4f8e"
+magenta3 = "#722f55"
+pink = "#f265b5"
+purple = "#a48cf2"
+orange = "#f7c67f"
+yellow = "#f1fc79"
+dark_yellow = "#c0c95f"
+green = "#37f499"
+bright_green = "#00FA82"
+dark_green = "#33C57F"
+red = "#f16c75"
+bright_red = "#f0313e"
+
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
 flamingo = "#f2cdcd"
@@ -84,7 +116,7 @@ format = "[$symbol($version )]($style)"
 symbol = " "
 
 [directory]
-style = "blue"
+style = "cyan"
 read_only = " "
 truncation_length = 4
 truncate_to_repo = false

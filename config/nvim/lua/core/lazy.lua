@@ -18,10 +18,10 @@ require("lazy").setup({
     { import = "plugins.lsp" },
 }, {
     opts = {
-        colorscheme = "catppuccin",
+        colorscheme = "eldritch",
     },
     install = {
-        colorscheme = { "catppuccin" },
+        colorscheme = { "eldritch" },
     },
     checker = {
         enabled = true,

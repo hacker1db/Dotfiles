@@ -9,7 +9,7 @@ return {
             local lazy_status = require("lazy.status") -- to configure lazy pending updates count
             lualine.setup({
                 options = {
-                    theme = "catppuccin",
+                    theme = "eldritch",
                     icons_enabled = true,
                     section_separators = { left = "", right = "" },
                     component_separators = { left = "", right = "" },
