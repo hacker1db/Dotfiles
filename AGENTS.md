@@ -52,7 +52,7 @@ This is a personal dotfiles repository for macOS development environment configu
 - **Formatting**: conform.nvim
 - **Linting**: nvim-lint
 - **Treesitter**: Syntax highlighting and text objects
-- **UI**: noice.nvim, nvim-notify, lualine, indent-blankline
+- **UI**: snacks.nvim (notifier/indent/etc.), lualine
 
 ### Languages & LSPs
 Configured LSP servers include:

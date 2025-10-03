@@ -1,4 +1,4 @@
--- set leader key to space
+-- leader key ; (was space previously)
 vim.g.mapleader = ";"
 local keymap = vim.keymap -- for conciseness local opts = { noremap = true, silent = true }
 ---------------------
@@ -21,7 +21,7 @@ keymap.set("n", "<space>", ":nohl<CR>", { desc = "Clear search highlights" })
 
 -- window management
 -- nvim-tree
-keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "open file explorer" })
+
 keymap.set("n", "<leader>\\", "<C-w>v", { desc = "split virtically" })
 keymap.set("n", "<leader>-", "<C-w>s", { desc = "split horizontally" })
 keymap.set("n", "<leader>=", "<C-w>=", { desc = "make split windows equal width & height" })
@@ -33,7 +33,7 @@ keymap.set("n", "<leader>s", ":so<CR>", { desc = "Source file" })
 keymap.set("n", "<leader>fp", ':let @+=expand("<cfile>:p")<CR>', { desc = "Copy full path under cursor" })
 
 -- window management buffers
-keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" }) -- go to next buffer
+keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" })     -- go to next buffer
 keymap.set("n", "bp", "<cmd>bp<CR>", { desc = "Go to previous buffer" }) -- go to previous buffer
 ----------------------
 -- Plugin Keybinds
@@ -45,16 +45,41 @@ keymap.set("n", "<leader>gtj", ":GoTagAdd json<CR>", { desc = "gopher generate j
 -- yaml tags
 keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate json tags" }) -- generate tags for yaml
 -- gopher tests and iferr
-keymap.set("n", "<leader>gt", ":GoTestsAll<CR>") -- generate tests for current file
-keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for current file
+keymap.set("n", "<leader>gt", ":GoTestsAll<CR>")                                             -- generate tests for current file
+keymap.set("n", "<leader>gi", ":GoIfErr<CR>")                                                -- generate if err check for current file
 
--- telescope
-keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>", { desc = "Telescope Show files in current directory" })
-keymap.set("n", "<leader>fr", "<cmd>Telescope live_grep<cr>", { desc = "Telescope Find string under cursor in cwd" })
-keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Telescope Find current word" })
-keymap.set("n", "<leader>bl", "<cmd>Telescope buffers<cr>", { desc = "Telescope show buffers list" })
-keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Telscope list git files" })
-keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Telescope show help tags" })
+-- Snacks picker
+local function close_explorer_if_open()
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+        if ft == "snacks_explorer" then
+            pcall(vim.api.nvim_win_close, win, true)
+        end
+    end
+end
+keymap.set("n", "<leader>f", function()
+    close_explorer_if_open()
+    local ok, picker = pcall(require, "snacks.picker")
+    if ok then picker.files() else vim.cmd("Telescope find_files") end
+end, { desc = "Files" })
+keymap.set("n", "<leader>fr", function()
+    close_explorer_if_open()
+    local ok, picker = pcall(require, "snacks.picker")
+    if ok then picker.grep() else vim.cmd("Telescope live_grep") end
+end, { desc = "Search" })
+keymap.set("n", "<leader>sb", function()
+    close_explorer_if_open()
+    local ok, picker = pcall(require, "snacks.picker")
+    if ok then picker.buffers() else vim.cmd("Telescope buffers") end
+end, { desc = "Buffers" })
+keymap.set("n", "<leader>sh", function()
+    close_explorer_if_open()
+    local ok, picker = pcall(require, "snacks.picker")
+    if ok then picker.help() else vim.cmd("Telescope help_tags") end
+end, { desc = "Help" })
+keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Git files" })
+keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Help tags (Telescope fallback)" })
 
 -- telescope git commands (keep telescope for git, mini.pick doesn't have built-in git support)
 keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" })
@@ -75,11 +100,59 @@ keymap.set("n", "<leader>mps", ":MarkdownPreviewStop<CR>")
 keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
 keymap.set("n", "<leader>gt", ":Gitsigns toggle_current_line_blame<CR>", {})
 
--- twilight
-keymap.set("n", "tw", ":Twilight<enter>", { noremap = false })
+-- Snacks explorer
+-- Toggle logic: if an explorer buffer is visible, close it; otherwise open/reveal
+keymap.set("n", "<leader>e", function()
+    local ok, explorer = pcall(require, "snacks.explorer")
+    if not ok then return end
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+        if ft == "snacks_explorer" then
+            vim.api.nvim_win_close(win, true)
+            return
+        end
+    end
+    -- if a file is loaded, reveal it; else open root
+    local name = vim.api.nvim_buf_get_name(0)
+    if name ~= "" and vim.loop.fs_stat(name) then
+        explorer.reveal()
+    else
+        explorer.open()
+    end
+end, { desc = "Explorer" })
 
--- Noice
-keymap.set("n", "<leader>nn", ":NoiceDismiss<CR>", { noremap = true })
+-- Snacks notifier
+keymap.set("n", "<leader>un", function()
+    local ok, notifier = pcall(require, "snacks.notifier")
+    if ok then notifier.hide() end
+end, { desc = "Dismiss notifications" })
+
+-- Auto open explorer on start when launched on a directory (e script uses $EDITOR .)
+vim.api.nvim_create_autocmd("BufEnter", {
+    callback = function(args)
+        local buf = args.buf
+        if vim.bo[buf].buftype ~= "" then return end
+        if vim.api.nvim_buf_get_option(buf, "filetype") == "snacks_explorer" then return end
+        -- close explorer if it's open when entering a real file buffer
+        close_explorer_if_open()
+    end,
+})
+
+vim.api.nvim_create_autocmd("VimEnter", {
+    callback = function()
+        if vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
+            vim.schedule(function()
+                local ok, explorer = pcall(require, "snacks.explorer")
+                if ok then explorer.open() end
+            end)
+        end
+    end,
+})
+keymap.set("n", "<leader>uh", function()
+    local ok, notifier = pcall(require, "snacks.notifier")
+    if ok and notifier.history then notifier.history() end
+end, { desc = "Notification history" })
 keymap.set("n", "<leader>ee", "<cmd>GoIfErr<cr>", { silent = true, noremap = true })
 
 -- Avante

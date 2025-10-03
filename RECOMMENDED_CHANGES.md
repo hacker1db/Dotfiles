@@ -38,6 +38,7 @@
 **Estimated improvement:** 50-80% faster startup (from ~2-3s to ~500ms)
 
 ## 6. Snacks.nvim (selective integration strategy)
+
 - Status: Introduced `snacks.nvim` with a focused set of non-invasive quality-of-life modules.
 - Adopted Now:
   - **snacks.notifier** – Replaces `nvim-notify` (cleaner UI, unified style)
@@ -63,3 +64,9 @@
   - Need for richer explorer features (git decorators performance, preview panels)
   - Desire for startup dashboard or image preview workflows.
 - Action Items (if adopting more later): Add module enable flags in `snacks.lua`, migrate keymaps behind alternate leader prefixes, then phase out redundant plugins after trial period.
+
+## 7. Undotree Integration (deferred)
+- Candidate plugin: `mbbill/undotree`
+- Rationale: Visual exploration of persistent undo history, time-travel diff comparisons
+- Deferred Because: Core workflows currently satisfied; adds another UI panel; evaluate only if complex refactors make deep history inspection frequent
+- Trial Plan (later): Add spec under `lua/plugins/extra/undotree.lua` with `<leader>u` toggle; benchmark memory/perf on large undo histories

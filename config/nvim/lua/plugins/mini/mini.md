@@ -47,11 +47,12 @@ To switch from the current plugins to mini equivalents:
 
 ## Current Exclusions
 
-The repository previously experimented with `mini.files` (as a replacement for `nvim-tree`) and `mini.pick` (as a partial replacement for `telescope.nvim`). Both have been removed in favor of restoring:
-- `nvim-tree` for the primary file explorer (`<leader>e` toggles it)
-- `telescope.nvim` for all fuzzy finding (files, grep, buffers, help, git)
+`mini.files` and `mini.pick` are not currently used because their roles are now handled by `snacks.nvim`:
+- Snacks Explorer replaces `nvim-tree` (toggle with `<leader>e`)
+- Snacks Picker handles files/grep/buffers/help
+- Telescope remains for git-centric pickers and any advanced extensions
 
-If re‑evaluated later, reintroduce by adding plugin specs back under this directory and restoring their keymaps.
+If mini equivalents are reconsidered later, reintroduce their specs and keymaps under this directory.
 
 ## Configuration
 
