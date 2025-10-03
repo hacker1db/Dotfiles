@@ -8,11 +8,10 @@ fi
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
-compinit
+compinit -C
 # Reevaluate the prompt string each time it's displaying a prompt
 autoload bashcompinit && bashcompinit
 autoload -Uz compinit
-compinit
 setopt prompt_subst
 if command -v kubectl &> /dev/null; then
     source <(kubectl completion zsh)
@@ -85,7 +84,6 @@ if [ -f $HOME/.fzf.zsh ]; then
   export FZF_DEFAULT_OPTS="--color bg:-1,bg+:-1,fg:-1,fg+:#feffff,hl:#993f84,hl+:#d256b5,info:#676767,prompt:#676767,pointer:#676767"
 fi
 
-source <(kubectl completion zsh)
 alias k=kubectl
 compdef __start_kubectl k
 
@@ -112,14 +110,7 @@ zstyle ':completion:*:messages' format '%d'
 zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*' group-name ''
 
-# look for all .zsh files and source them
-config_files=($DOTFILES/**/*.zsh)
-for file in $config_files[@]; do
-  source "$file"
-done
-
 if [[ -x "$(command -v zoxide)" ]]; then
-    # eval "$(zoxide init zsh --hook pwd)"
     eval "$(zoxide init zsh --hook pwd)"
 fi
 
