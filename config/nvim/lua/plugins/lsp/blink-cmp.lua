@@ -115,6 +115,8 @@ return {
                 },
                 menu = {
                     border = "rounded",
+                    auto_show = true,
+                    max_height = 15,
                     draw = {
                         treesitter = { "lsp" },
                         columns = {
@@ -129,6 +131,7 @@ return {
                     auto_show_delay_ms = 200,
                     window = {
                         border = "rounded",
+                        max_height = 15,
                     },
                 },
                 ghost_text = {
