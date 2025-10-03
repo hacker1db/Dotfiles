@@ -13,8 +13,6 @@ return {
     dependencies = {
         -- Required.
         "nvim-lua/plenary.nvim",
-        -- obsidian.nvim requires nvim-cmp to be present even if disabled
-        "hrsh7th/nvim-cmp",
 
         -- see below for full list of optional dependencies 👇
     },
