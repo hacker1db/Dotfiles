@@ -50,20 +50,29 @@ keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate j
 keymap.set("n", "<leader>gt", ":GoTestsAll<CR>") -- generate tests for current file
 keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for current file
 
--- telescope
-keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>", { desc = "Telescope Show files in current directory" }) -- find files within current working directory, respects .gitignore
-keymap.set("n", "<leader>fr", "<cmd>Telescope live_grep<cr>", { desc = "Telescope Find string under cursor in cwd" }) -- find string in current working directory as you type
-keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Telescope Find current word" }) -- find string under cursor in current working directory
-keymap.set("n", "<leader>bl", "<cmd>Telescope buffers<cr>", { desc = "Telescope show buffers list" }) -- list open buffers in current neovim instance
-keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>", { desc = "Telscope list git files" }) -- list git_files
-keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>", { desc = "Telescope show help tags" }) -- list available help tags
+-- mini.pick
+keymap.set("n", "<leader>f", function()
+    require("mini.pick").builtin.files()
+end, { desc = "Pick files in current directory" })
+keymap.set("n", "<leader>fr", function()
+    require("mini.pick").builtin.grep_live()
+end, { desc = "Pick live grep" })
+keymap.set("n", "<leader>fc", function()
+    require("mini.pick").builtin.grep({ pattern = vim.fn.expand("<cword>") })
+end, { desc = "Pick grep current word" })
+keymap.set("n", "<leader>bl", function()
+    require("mini.pick").builtin.buffers()
+end, { desc = "Pick show buffers list" })
+keymap.set("n", ";;", function()
+    require("mini.pick").builtin.help()
+end, { desc = "Pick show help tags" })
 
--- telescope git commands
-keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" }) -- list all git commits (use <cr> to checkout) ["gc" for git commits]
-keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>", { desc = "Telescope show current commits from file" }) -- list git commits for current file/buffer (use <cr> to checkout) ["gfc" for git file commits]
-keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Telescope show branches" }) -- list git branches (use <cr> to checkout) ["gb" for git branch]
-keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Telescope show git status" }) -- list current changes per file with diff preview ["gs" for git status]
--- telescope todo comments
+-- telescope git commands (keep telescope for git, mini.pick doesn't have built-in git support)
+keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" })
+keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>", { desc = "Telescope show current commits from file" })
+keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Telescope show branches" })
+keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Telescope show git status" })
+-- todo comments (keep TodoTelescope for now)
 keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 
 -- restart lsp server

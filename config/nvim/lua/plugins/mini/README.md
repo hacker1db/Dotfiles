@@ -45,6 +45,21 @@ This directory contains configuration for various mini.nvim plugins that provide
   - Edit-based file manipulation (create, delete, rename, move, copy)
   - Replaces netrw as default file explorer
 
+### mini.pick
+- **Purpose**: Fuzzy finder and picker
+- **Replaces**: nvim-telescope/telescope.nvim (for most use cases)
+- **Key mappings**:
+  - `;f` - Find files
+  - `;fr` - Live grep
+  - `;fc` - Grep current word
+  - `;bl` - Show buffers
+  - `;;` - Help tags
+- **Key features**:
+  - Fast fuzzy finding with minimal dependencies
+  - Builtin pickers for files, grep, buffers, help
+  - Used by obsidian.nvim for note picking
+  - Telescope still used for git commands (commits, branches, status)
+
 ### mini.statusline
 - **Purpose**: Simple statusline
 - **Replaces**: nvim-lualine/lualine.nvim (optional)
@@ -58,7 +73,8 @@ To switch from the current plugins to mini equivalents:
 1. **For autopairs**: The old nvim-autopairs plugins are already disabled
 2. **For comments**: The old Comment.nvim plugin is already disabled
 3. **For file explorer**: mini.files is now active, nvim-tree is disabled
-4. **For statusline**: Set `enabled = true` in `mini/statusline.lua` and `enabled = false` in `ui/lualine.lua`
+4. **For fuzzy finder**: mini.pick is now primary picker, telescope kept for git operations
+5. **For statusline**: Set `enabled = true` in `mini/statusline.lua` and `enabled = false` in `ui/lualine.lua`
 
 ## Configuration
 
