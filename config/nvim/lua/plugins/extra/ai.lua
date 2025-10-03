@@ -10,7 +10,6 @@ return {
                 auto_trigger = true,
                 keymap = {
                     accept = "<Tab>",
-                    select = "<CR>",
                     close = "<Esc>",
                     next = "<C-J>",
                     prev = "<C-K>",
@@ -24,6 +23,7 @@ return {
     },
     {
         "zbirenbaum/copilot-cmp",
+        enabled = false, -- Disabled in favor of blink.cmp
         dependencies = {
             "hrsh7th/nvim-cmp",
         },

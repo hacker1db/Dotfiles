@@ -16,6 +16,7 @@ require("lazy").setup({
     { import = "plugins.git" },
     { import = "plugins.ui" },
     { import = "plugins.lsp" },
+    { import = "plugins.mini" },
 }, {
     opts = {
         colorscheme = "eldritch",

@@ -1,5 +1,6 @@
 return {
     "windwp/nvim-autopairs",
+    enabled = false, -- Disabled in favor of mini.pairs
     event = { "InsertEnter" },
     dependencies = {
         "hrsh7th/nvim-cmp",

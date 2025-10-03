@@ -6,7 +6,6 @@ return {
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
 
-        "hrsh7th/cmp-nvim-lsp",
         { "antosha417/nvim-lsp-file-operations", config = true },
         { "folke/neodev.nvim",                   opts = {} },
     },
@@ -15,10 +14,9 @@ return {
         local lspconfig = require("lspconfig")
         local mason = require("mason")
         local mason_lspconfig = require("mason-lspconfig")
-        local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-        -- capabilities (nvim-cmp)
-        local capabilities = cmp_nvim_lsp.default_capabilities()
+        -- capabilities for blink.cmp
+        local capabilities = require('blink.cmp').get_lsp_capabilities()
 
         -- diagnostic signs (per-severity) -- Fix for deprecated `vim.lsp.diagnostic` API
         local signs = {
