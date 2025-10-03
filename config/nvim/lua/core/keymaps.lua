@@ -87,6 +87,10 @@ keymap.set("n", "<leader>mps", ":MarkdownPreviewStop<CR>")
 -- Git Stuff
 keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
 keymap.set("n", "<leader>gt", ":Gitsigns toggle_current_line_blame<CR>", {})
+keymap.set("n", "<leader>gg", function()
+    local ok, lg = pcall(require, "snacks.lazygit")
+    if ok then lg.open() else vim.cmd("LazyGit") end
+end, { desc = "LazyGit" })
 
 -- Snacks explorer
 -- Toggle logic: if an explorer buffer is visible, close it; otherwise open/reveal
