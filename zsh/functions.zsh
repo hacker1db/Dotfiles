@@ -221,3 +221,9 @@ done
 
 echo "✅ All global npm packages updated!"
 }
+
+function get-azsubcount(){
+
+    count=$(az account list --all | jq '.[].name' | wc | awk '{print $1}')
+    echo "You have $count Azure subscriptions"
+}

@@ -1,11 +1,10 @@
 # Appearance Settings
 background-opacity = 0.95
 # Font Settings
-#font-family = "CaskaydiaCove Nerd Font"
 font-family = "JetBrains Mono"
+font-style = italic
 font-size = 14
 # Color Scheme Based on Appearance
-# theme = catppuccin mocha
 theme = Eldritch
 link-url = true
 window-decoration = true
