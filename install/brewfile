@@ -2,49 +2,64 @@ tap "1password/tap"
 tap "anchore/grype"
 tap "anchore/syft"
 tap "aquasecurity/trivy"
+tap "arl/arl"
 tap "azure/functions"
+tap "azure/kubelogin"
 tap "brandonskerritt/rustscan"
 tap "caffix/amass"
+tap "cantino/mcfly"
 tap "dapr/tap"
 tap "dart-lang/dart"
+tap "derailed/k9s"
+tap "felixkratz/formulae"
 tap "fsouza/prettierd"
 tap "gitguardian/tap"
 tap "hashicorp/tap"
 tap "homebrew/bundle"
 tap "homebrew/cask-fonts"
+tap "iina/mpv-iina"
+tap "jesseduffield/lazygit"
 tap "majd/repo"
+tap "mondoohq/mondoo"
 tap "noahgorstein/tap"
 tap "oven-sh/bun"
 tap "planetscale/tap"
 tap "rcmdnk/file"
+tap "robscott/tap"
+tap "sst/tap"
+tap "trufflesecurity/trufflehog"
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
 cask "1password-cli"
 # Application launcher and productivity software
 cask "alfred"
-# Toolset to implement parts of Android apps in native code
-cask "android-ndk"
 # Android SDK component
 cask "android-platform-tools"
-# Chromium based browser
-cask "arc"
 # Data management tool that enables working with SQL Server
 cask "azure-data-studio"
-# Virtual Audio Driver
-cask "blackhole-2ch"
+# Compact TeX distribution as alternative to the full TeX Live / MacTeX
+cask "basictex"
+# Web browser focusing on privacy
+cask "brave-browser"
 # Web security testing toolkit
 cask "burp-suite-professional"
-# OpenAI's official ChatGPT desktop app
-cask "chatgpt"
-# Anthropic's official Claude AI desktop app
-cask "claude"
-# Browser for SQLite databases
-cask "db-browser-for-sqlite"
+# Terminal-based AI coding assistant
+cask "claude-code"
+# Write, edit, and chat about your code with AI
+cask "cursor"
+# Universal database tool and SQL client
+cask "dbeaver-community"
 # Utilities designed to make common development tasks easier
 cask "devtoys"
+# Provides developers secure tunnels to share local web services
+cask "devtunnel"
 # Voice and text chat software
 cask "discord"
+# App to build and share containerised applications and microservices
+cask "docker-desktop"
+# Developer platform
+cask "dotnet-sdk"
 # Online diagram software
 cask "drawio"
 # Collaborative team software
@@ -53,52 +68,71 @@ cask "figma"
 cask "firefox"
 # UI toolkit for building applications for mobile, web and desktop
 cask "flutter"
+# Screen colour temperature controller
+cask "flux-app"
 cask "font-cascadia-code"
 cask "font-caskaydia-cove-nerd-font"
-cask "font-fira-code"
+cask "font-dejavu-sans-mono-nerd-font"
 cask "font-hack-nerd-font"
+cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
+cask "font-monaspace"
+cask "font-monaspice-nerd-font"
+cask "font-symbols-only-nerd-font"
 # Set of tools to manage resources and applications hosted on Google Cloud
 cask "gcloud-cli"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-cask "google-chat"
-# Web browser
-cask "google-chrome"
-# Client for the Google Drive storage service
-cask "google-drive"
 # Tools to protect your files
 cask "gpg-suite-no-mail"
 # Open-source video transcoder
 cask "handbrake-app"
-# CLI tool for searching and downloading iOS app packages from the App Store
-cask "ipatool"
+# Utility to hide menu bar items
+cask "hiddenbar"
+# Testing client for REST, GraphQL, and HTTP APIs
+cask "httpie-desktop"
+# HTTP and GraphQL Client
+cask "insomnia"
 # JetBrains tools manager
 cask "jetbrains-toolbox"
-# Menu bar manager
-cask "jordanbaird-ice"
 # Keyboard customiser
 cask "karabiner-elements"
 # Open-source keystroke visualiser
 cask "keycastr"
+# Interface for reading and syncing eBooks
+cask "kindle"
 # Noise cancelling application
 cask "krisp"
-# Bible study software
-cask "logos"
+# Menu bar app for managing Kubernetes contexts
+cask "kubecontext"
+# Custom Discord client
+cask "legcord"
+# Kubernetes IDE
+cask "lens"
+# Discover, download, and run local LLMs
+cask "lm-studio"
 # Trims video and audio files losslessly
 cask "losslesscut"
 # Set of CPU, memory, disk, and network monitoring tools
 cask "menumeters"
-# Penetration testing framework
-cask "metasploit"
 # Provides updates to various Microsoft products
 cask "microsoft-auto-update"
+# Explorer for Azure Storage
+cask "microsoft-azure-storage-explorer"
 # Multi-platform web browser
 cask "microsoft-edge"
+# Remote desktop client
+cask "microsoft-remote-desktop"
 # Meet, chat, call, and collaborate in just one place
 cask "microsoft-teams"
-# Interactive tool for analyzing MongoDB data
-cask "mongodb-compass"
+# Minimal browser that protects privacy
+cask "min"
+# Online collaborative whiteboard platform
+cask "miro"
+# Utility to move and zoom windows—on one display
+cask "moom"
+# Free and open-source RSS reader
+cask "netnewswire"
 # App to write, plan, collaborate, and get organised
 cask "notion"
 # Calendar for professionals and teams
@@ -109,6 +143,8 @@ cask "notion-mail"
 cask "obs"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
+# Browse, manage, inspect containers and images
+cask "podman-desktop"
 # Collaboration platform for API development
 cask "postman"
 # Command-line shell and scripting language
@@ -121,61 +157,25 @@ cask "rancher"
 cask "raycast"
 # Save articles to read, highlight key content, and organise notes for review
 cask "reader"
-# GUI for streamlined Redis application development
-cask "redis-insight"
 # Instant messaging application focusing on security
 cask "signal"
-# Digital design and prototyping platform
-cask "sketch"
+# Team communication and collaboration software
+cask "slack"
 # API testing tool
 cask "soapui"
 # Music streaming service
 cask "spotify"
-# Video game digital distribution service
-cask "steam"
-# Messaging app with a focus on speed and security
-cask "telegram"
 # To-do list
 cask "todoist-app"
-# Open-source BitTorrent client
-cask "transmission"
 # Tool to install Linux/BSD distributions to a partition or USB drive
 cask "unetbootin"
-# Development environment
-cask "vagrant"
 # Open-source code editor
 cask "visual-studio-code@insiders"
-# Multimedia player
-cask "vlc"
-# Create, manage, and run virtual machines
-cask "vmware-fusion"
-# Native desktop client for WhatsApp
-cask "whatsapp"
-# Wine wrapper built with SwiftUI
-cask "whisky"
+# Rust-based terminal
+cask "warp"
 # Network protocol analyzer
 cask "wireshark-app"
 # Free and open source web app scanner
 cask "zap"
 # Gecko based web browser
 cask "zen"
-# Video communication and virtual meeting platform
-cask "zoom"
-mas "Amphetamine", id: 937984704
-mas "Final Cut Pro", id: 424389933
-mas "GarageBand", id: 682658836
-mas "Goodnotes", id: 1444383602
-mas "iMovie", id: 408981434
-mas "Keynote", id: 409183694
-mas "Kindle", id: 302584613
-mas "Moom Classic", id: 419330170
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
-mas "Pluralsight", id: 431748264
-mas "ScreenBrush", id: 1233965871
-mas "Slack", id: 803453959
-mas "Spark Desktop", id: 6445813049
-mas "Speechify", id: 1624912180
-mas "Wallpapers HD Lite", id: 441812880
-mas "Windows App", id: 1295203466
-mas "Xcode", id: 497799835
