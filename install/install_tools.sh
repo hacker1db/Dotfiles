@@ -112,7 +112,6 @@ CASKS=(
   android-platform-tools
   azure-data-studio
   basictex
-  brave-browser
   burp-suite-professional
   claude-code
   cursor
@@ -120,11 +119,8 @@ CASKS=(
   devtoys
   devtunnel
   discord
-  dotnet-runtime
-  dotnet-sdk
   drawio
   figma
-  firefox
   flutter
   flux-app
   font-cascadia-code
@@ -143,14 +139,10 @@ CASKS=(
   hiddenbar
   httpie-desktop
   iina
-  jetbrains-toolbox
   karabiner-elements
   keycastr
   krisp
   kubecontext
-  legcord
-  lens
-  lm-studio
   losslesscut
   menumeters
   microsoft-auto-update

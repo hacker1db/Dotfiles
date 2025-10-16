@@ -92,6 +92,8 @@ brew "nmap"
 brew "opencode"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
+# Tool for managing OCI containers and pods
+brew "podman"
 # Reattach process (e.g., tmux) to background
 brew "reattach-to-user-namespace"
 # Search tool like grep and The Silver Searcher

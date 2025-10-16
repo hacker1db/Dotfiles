@@ -64,3 +64,9 @@
 - Rationale: Visual exploration of persistent undo history, time-travel diff comparisons
 - Deferred Because: Core workflows currently satisfied; adds another UI panel; evaluate only if complex refactors make deep history inspection frequent
 - Trial Plan (later): Add spec under `lua/plugins/extra/undotree.lua` with `<leader>u` toggle; benchmark memory/perf on large undo histories
+
+
+
+## add 
+- dotnet install update using the dotnet-install script 
+- Fix the explore with mini just being really annoying
