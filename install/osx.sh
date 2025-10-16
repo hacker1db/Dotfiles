@@ -8,7 +8,7 @@ defaults write com.apple.Finder AppleShowAllFiles -bool true
 
 # echo "only use UTF-8 in Terminal.app"
 defaults write com.apple.terminal StringEncodings -array 4
-link.s
+
 # echo "expand save dialog by default"
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 

@@ -1,40 +1,58 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTFILES="$SCRIPT_DIR"
+source "$DOTFILES/install/lib/log.sh"
 
-echo "Installing dotfiles!"
+usage() {
+  echo "Usage: $(basename "$0") {backup|link|git|homebrew|shell|terminfo|macos|extras|theme|all}" >&2
+  exit 1
+}
 
-source install/link.sh
+if [ $# -lt 1 ]; then
+  usage
+fi
 
-if [ "$(uname)" == "Darwin" ]; then
-    echo "Running on OSX"
-    echo "Brewing all the things"
-    source install/install_tools.sh
+cmd="$1"; shift || true
 
-    echo "Updating OSX settings"
-    source install/osx.sh
+# Map subcommand to script path
+script_for() {
+  case "$1" in
+    backup) echo "$DOTFILES/install/backup.sh" ;;
+    link) echo "$DOTFILES/install/link.sh" ;;
+    git) echo "$DOTFILES/install/git.sh" ;;
+    homebrew) echo "$DOTFILES/install/install_tools.sh" ;;
+    shell) echo "$DOTFILES/install/shell.sh" ;;
+    terminfo) echo "$DOTFILES/install/terminfo.sh" ;;
+    macos) echo "$DOTFILES/install/osx.sh" ;;
+    extras) echo "$DOTFILES/install/extras.sh" ;;
+    theme) echo "$DOTFILES/install/theme.sh" ;;
+    *) return 1 ;;
+  esac
+}
 
-    echo "Installing node (from nvm)"
-    source install/nvm.sh
-    fi
-    
-echo "creating vim directories"
-mkdir -p ~/.vim-tmp
-echo "Creating Sites, Code, Notes directories! :D Its the little things!" 
-mkdir -p ~/Developer
-mkdir -p ~/Developer/Sites
-mkdir -p ~/Screenshots
-echo "Creating personalizable exports i.e for work duh..api keys?"
-touch ~/.localrc
-echo "set limactl to start up at login.."
-limactl start-at-login
-mv ~/Library/Application\ Support/rancher-desktop/lima ~/.rdlima
-ln -s ~/.rdlima ~/Library/Application\ Support/rancher-desktop/lima
+run_script() {
+  local sc
+  sc="$(script_for "$1")" || usage
+  if [ ! -f "$sc" ]; then
+    error "Script missing: $sc"
+    exit 1
+  fi
+  source "$sc" "$@"
+}
 
-echo "Configuring zsh as default shell"
-chsh -s $(which zsh)
+if [ "$cmd" = "all" ]; then
+  title "Running full install"
+  for part in backup link terminfo homebrew shell git macos extras theme; do
+    info "Executing $part"
+    run_script "$part"
+  done
+  echo
+  success "All tasks complete"
+  exit 0
+fi
 
-echo "Done."
+run_script "$cmd" "$@"
 
-
-#TODO: Add the notes directories
-#TODO: add missing tools i.e your install script it broken.
-
+echo
+success "Done."

@@ -100,7 +100,7 @@ nvim --headless "+Lazy! sync" +qa
 brew bundle --file=~/.dotfiles/install/brewfile
 
 # Run full installation script
-~/.dotfiles/installupdate.sh
+~/.dotfiles/install.sh
 
 # Install tools and create symlinks
 ~/.dotfiles/install/install_tools.sh
