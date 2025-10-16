@@ -26,6 +26,8 @@ echo "Creating personalizable exports i.e for work duh..api keys?"
 touch ~/.localrc
 echo "set limactl to start up at login.."
 limactl start-at-login
+mv ~/Library/Application\ Support/rancher-desktop/lima ~/.rdlima
+ln -s ~/.rdlima ~/Library/Application\ Support/rancher-desktop/lima
 
 echo "Configuring zsh as default shell"
 chsh -s $(which zsh)
