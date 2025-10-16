@@ -97,6 +97,14 @@ setup_symlinks() {
 setup_git() {
     title "Setting up Git"
 
+
+    if [[ -x "$(command -v gh)" ]]; then
+        if ! gh auth status &>/dev/null; then
+            info "GitHub CLI not authenticated. Running 'gh auth login'"
+            gh auth login
+        fi
+    fi
+
     defaultName=$(git config user.name)
     defaultEmail=$(git config user.email)
     defaultGithub=$(git config github.user)
@@ -137,7 +145,7 @@ setup_homebrew() {
     fi
 
     # install brew dependencies from Brewfile
-    brew bundle
+    brew bundle --file ./install/brewfile
 
     # install fzf
     echo -e

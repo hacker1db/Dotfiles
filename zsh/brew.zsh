@@ -11,7 +11,7 @@ fi
 
 export ANDROID_NDK_HOME="$(brew --prefix)/share/android-ndk"
 # Gcloud
-source "$(brew --prefix)/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc"
-source "$(brew --prefix)/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/completion.zsh.inc"
+source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
+source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
 source /opt/homebrew/etc/bash_completion.d/az
 export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"

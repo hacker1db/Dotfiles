@@ -185,9 +185,8 @@ function azdlogin(){
 function gha(){
        gh project item-add 16 --owner Alaska-ITS --url "$@"
 }
-## TODO: Review this function with brew bundle dump --file=~/.dotfiles/install/brewfile --cleanup --zap --describe --force
 function brew-cleanup(){
- brew bundle dump --mas --tap --cask --describe --all -v --cleanup --file="~/.dotfiles/install/brewfile" -f  && brew cleanup && brew doctor
+ brew bundle dump --mas --tap --cask --brews --describe -v  --file="$HOME/.dotfiles/install/brewfile" -f  && brew cleanup && brew doctor
 }
 
 function update-npm-tools(){

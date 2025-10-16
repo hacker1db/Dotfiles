@@ -88,8 +88,7 @@ alias k=kubectl
 compdef __start_kubectl k
 
 export PATH="$PATH":"$HOME/.pub-cache/bin"
-export PATH="$PATH:/Users/hacker1db/.kit/bin"
-export PATH="$PATH:/Users/hacker1db/.dotnet/tools"
+export PATH="$PATH:$HOME/.dotnet/tools"
 
 
 export GOPATH=$HOME/go
@@ -111,8 +110,13 @@ zstyle ':completion:*:warnings' format 'No matches for: %d'
 zstyle ':completion:*' group-name ''
 
 if [[ -x "$(command -v zoxide)" ]]; then
-    eval "$(zoxide init zsh --hook pwd)"
+    eval "$(zoxide init zsh --hook pwd --cmd cd)"
 fi
+
+if [[ -x "$(command -v bun)" ]]; then
+    export PATH="$PATH:$HOME/.bun/bin"
+fi
+
 
 if [[ -x "$(command -v eza)" ]]; then
   alias ll="eza --icons --git --long"
@@ -123,6 +127,7 @@ eval "$(starship init zsh)"
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
 export PATH="/Users/$Home/.rd/bin:$PATH"
+autoload -Uz compinit && compinit
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 export PATH="/Users/David.Walters@AlaskaAir.com/.rd/bin:$PATH"

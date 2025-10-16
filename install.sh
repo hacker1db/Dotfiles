@@ -21,7 +21,6 @@ mkdir -p ~/.vim-tmp
 echo "Creating Sites, Code, Notes directories! :D Its the little things!" 
 mkdir -p ~/Developer
 mkdir -p ~/Developer/Sites
-mkdir -p ~/.pandoc/templates
 mkdir -p ~/Screenshots
 echo "Creating personalizable exports i.e for work duh..api keys?"
 touch ~/.localrc
@@ -32,3 +31,8 @@ echo "Configuring zsh as default shell"
 chsh -s $(which zsh)
 
 echo "Done."
+
+
+#TODO: Add the notes directories
+#TODO: add missing tools i.e your install script it broken.
+

@@ -2,7 +2,6 @@
 if test ! $(which brew); then
     echo "Installing homebrew"
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-fi
 # cli tools
 echo "Installing cli tools.."
 brew install gh # GitHub CLI
@@ -17,6 +16,7 @@ brew install fzf  # Fuzzy file finder
 brew install lnav # for viewing log files in terminal
 brew install azure-cli
 brew instal bat
+brew install zoxide
 brew install bat-extras
 brew install httpie
 # Image management tools
@@ -47,10 +47,13 @@ brew install pandoc
 brew cask install mactex
 echo "installing tpm plugin manager"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+brew install zsh-autosuggestions
+brew install zsh-syntax-highlighting
 brew install zsh
+brew install starship
 brew install highlight
 brew install fnm
-brew install z
 brew install markdown
 brew install node
 brew install --cask powershell
@@ -75,8 +78,9 @@ brew tap anchore/syft
 brew install syft
 brew tap azure/functions
 brew install azure-functions-core-tools@4
-brew tap oven-sh/bun
-brew install bun
+brew install oven-sh/bun/bun
+
+
 # if upgrading on a machine that has 2.x or 3.x installed:
 brew link --overwrite azure-functions-core-tools@4
 
@@ -85,35 +89,23 @@ echo "Installing neovim..."
 brew install neovim
 
 echo "Installing desktop application..."
-brew install --cask wezterm
 brew install --cask burp-suite-professional
 brew install --cask darwio
 brew install --cask spotify
-brew install --cask slack
 brew install --cask discord
 brew install --cask 1password-cli
 brew install --cask keycastr
 brew install --cask jetbrains-toolbox
-brew install --cask private-internet-access
 brew install --cask unetbootin
-brew install --cask soapui
 brew install --cask obs
 brew install --cask obsidian
 brew install --cask wireshark
 brew install rustscan
 brew install --cask krisp
 brew install --cask android-platform-tools
-brew install planetscale/tap/pscale
 brew install mysql-client
 brew install yt-dlp
 brew install --cask flux
-
-echo "install yarn and tools"
-npm install --global yarn
-yarn global add prisma
-yarn global add expo-cli
-npm i -g vercel
-npm install -g typescript typescript-language-server eslint prettier
 
 brew install --cask menumeters
 brew install --cask azure-data-studio
@@ -124,6 +116,16 @@ brew install watch
 brew install tfsec
 brew install tfenv
 brew install fd
+fi
+
+if [[ -x "$(command -v bun)" ]]; then
+echo "install ts stuff and js tools"
+brew install oven-sh/bun/bun
+npm install --global yarn
+yarn global add expo-cli
+bun i -g vercel
+bun install -g typescript typescript-language-server eslint prettier
+fi
 
 tfenv install latest
 tfenv use latest
@@ -136,11 +138,17 @@ echo "install wordlists"
 git clone https://github.com/danielmiessler/SecLists.git ~/wordlists
 echo "Install tools for blogging"
 brew install hugo
+if [[ -x "$(command -v go)" ]]; then
 echo "golang -- getting your cli tools from github"
 go install github.com/cosmtrek/air@latest
 go install github.com/charmbracelet/glow@latest
-echo "install Github extensions"
-gh extension upgrade gh-copilot
-gh extension install dlvhdr/gh-dash
-gh ext install advanced-security/gh-sbom
+fi
+if [[ -x "$(command -v gh)" ]]; then
+    echo "install Github tools"
+    gh auth login
+    gh extension upgrade gh-copilot
+    gh extension install dlvhdr/gh-dash
+    gh ext install advanced-security/gh-sbom
+    gh repo clone hacker1db/clitools ~/Developer/clitools
+fi
 exit 0
