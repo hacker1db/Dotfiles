@@ -44,7 +44,6 @@ return {
                 "bashls",
                 "tailwindcss",
                 "svelte",
-                "spectral",
                 "jqls",
                 "bashls",
                 "mdx_analyzer",
