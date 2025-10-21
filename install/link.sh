@@ -46,6 +46,21 @@ for config in $DOTFILES/config/*; do
     fi
 done
 
+OPENCODE_SRC="$DOTFILES/config/opencode"
+OPENCODE_DEST="$HOME/.config/opencode"
+if [ -e "$OPENCODE_SRC" ]; then
+  if [ -L "$OPENCODE_DEST" ]; then
+    CURRENT=$(readlink "$OPENCODE_DEST")
+    if [ "$CURRENT" != "$OPENCODE_SRC" ]; then
+      rm "$OPENCODE_DEST"
+      ln -s "$OPENCODE_SRC" "$OPENCODE_DEST"
+    fi
+  else
+    rm -rf "$OPENCODE_DEST"
+    ln -s "$OPENCODE_SRC" "$OPENCODE_DEST"
+  fi
+fi
+
 echo -e "\n\nCreating vim symlinks"
 echo "=============================="
 VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim" "$HOME/.vimrc:$DOTFILES/vim/.vimrc")
