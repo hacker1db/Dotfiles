@@ -109,6 +109,7 @@ alias customrole="az role definition list --custom-role-only true --output json 
 alias chatgpt='open /Applications/ChatGPT.app'
 alias oc='opencode'
 alias occ='copilot'
+alias ocr='opencode run'
 
 # applications
 alias devtoy='open /Applications/DevToy.app'

@@ -1,4 +1,4 @@
-# Security Intelligence Brief
+# Security Intelligence Brief - IMPROVED SEARCH CRITERIA
 
 Daily security intelligence digest combining CVEs, Readwise, and your vault notes.
 
@@ -16,208 +16,284 @@ Generate a comprehensive security intelligence briefing from multiple sources.
 5. **Action Items**: Prioritized recommendations
 6. **Daily Digest**: Saves for historical reference
 
-## Usage
+## IMPROVED: Readwise Search Strategy
 
+### Multi-Layered Search Approach
+
+Instead of searching for exact keywords in titles, use this cascading search:
+
+```bash
+# Step 1: Get ALL recent unread articles (location=new)
+curl -s -H "Authorization: Token $READWISE_TOKEN" \
+     "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=YYYY-MM-DD" \
+     | jq '.results[]'
+
+# Step 2: Filter by multiple criteria (more permissive)
+# A. Direct security keywords in title OR author OR source
+# B. Security-adjacent topics (auth, risk, AI safety, containers, cloud)
+# C. Known security sources (Anthropic, CIS, CISA, security vendors)
 ```
-/security-brief
+
+### Expanded Keyword Lists
+
+**Tier 1 - Direct Security Terms:**
+```regex
+(vulnerability|CVE|exploit|breach|attack|malware|ransomware|
+ zero-day|0day|patch|security|cybersecurity|infosec|appsec|
+ devsecops|pentesting|threat|incident)
 ```
 
-Run **every morning** as part of your daily routine.
-
-### With Options
+**Tier 2 - Security-Adjacent Topics:**
+```regex
+(authentication|passkey|password|2FA|MFA|biometric|
+ authorization|access control|IAM|identity|
+ encryption|cryptography|TLS|SSL|certificate|
+ risk|FAIR|compliance|audit|governance|
+ container|kubernetes|docker|cloud|AWS|Azure|GCP|
+ AI safety|model poisoning|adversarial|
+ eBPF|Cilium|service mesh|zero-trust|
+ SAST|DAST|SCA|secret scanning|
+ firewall|VPN|network|IDS|IPS|SIEM|SOC)
 ```
-/security-brief --days=7        # Weekly brief
-/security-brief --cvss-min=9.0  # Only critical
-/security-brief --focus=kubernetes  # Specific technology
+
+**Tier 3 - Known Security Sources:**
+```regex
+(anthropic\.com|cisa\.gov|sans\.org|owasp\.org|
+ nist\.gov|mitre\.org|nvd\.nist\.gov|
+ bleepingcomputer|thehackernews|krebsonsecurity|
+ schneier\.com|Center for Internet Security|
+ CIS Benchmarks|NIST|NSA|CISA)
 ```
 
-## Output Format
+### Implementation Example
 
-Saves to: `2.Areas/Work Notes/Security Briefs/YYYY-MM-DD Security Brief.md`
+```bash
+#!/bin/bash
+
+# Security Brief - Improved Readwise Search
+READWISE_TOKEN=$(op item get YOUR_ITEM_ID --reveal --fields apikey 2>/dev/null)
+SEVEN_DAYS_AGO=$(date -v-7d +%Y-%m-%dT%H:%M:%S)
+
+# Fetch all recent articles
+ARTICLES=$(curl -s -H "Authorization: Token $READWISE_TOKEN" \
+  "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=$SEVEN_DAYS_AGO")
+
+# Tier 1: Direct security matches (title, author, source)
+TIER1=$(echo "$ARTICLES" | jq -r '
+  .results[] | 
+  select(
+    (.title // "" | test("vulnerability|CVE|exploit|breach|attack|malware|ransomware|zero-day|0day|patch|security|cybersecurity|infosec|appsec|devsecops|threat|incident"; "i")) or
+    (.author // "" | test("security|CISA|SANS|OWASP|NIST"; "i")) or
+    (.source // "" | test("bleepingcomputer|thehackernews|krebsonsecurity"; "i"))
+  ) | 
+  {title, url, author, source, created_at, id, reader_url: ("https://read.readwise.io/read/" + .id)}
+')
+
+# Tier 2: Security-adjacent topics
+TIER2=$(echo "$ARTICLES" | jq -r '
+  .results[] | 
+  select(
+    (.title // "" | test("authentication|passkey|password|2FA|MFA|authorization|IAM|identity|encryption|cryptography|risk|FAIR|compliance|container|kubernetes|docker|cloud|AI safety|model poisoning|eBPF|Cilium|zero-trust|SAST|DAST|firewall|VPN"; "i")) or
+    (.author // "" | test("anthropic|Center for Internet Security|CIS"; "i"))
+  ) | 
+  {title, url, author, source, created_at, id, reader_url: ("https://read.readwise.io/read/" + .id)}
+')
+
+# Tier 3: From your specific RSS feeds (use your feed IDs)
+TIER3=$(echo "$ARTICLES" | jq -r '
+  .results[] | 
+  select(
+    .source | test("rssSource:01fsm3jqp5jr28n1jnf1ge3fpm|rssSource:01g9rf6jz3ajm924qwhh981e17"; "i")
+  ) | 
+  {title, url, author, source, created_at, id, reader_url: ("https://read.readwise.io/read/" + .id)}
+')
+
+# Combine all tiers (remove duplicates)
+ALL_SECURITY=$(echo "$TIER1 $TIER2 $TIER3" | jq -s 'unique_by(.id)')
+
+echo "$ALL_SECURITY"
+```
+
+### Readwise Reader Filter Integration
+
+Your Tauri filter shows you have ~38 RSS feeds. Add this to config:
+
+```bash
+# If you want to search ONLY your security RSS feeds, use this filter:
+YOUR_SECURITY_FEEDS=(
+  "01fsm3jqp5jr28n1jnf1ge3fpm"
+  "01g9rf6jz3ajm924qwhh981e17"
+  "01h1ff1txgfqnehqy2k0pc0zjp"
+  # ... add your security feed IDs here
+)
+
+# Build query for only those feeds
+FEED_FILTER=$(printf "rssSource:%s OR " "${YOUR_SECURITY_FEEDS[@]}" | sed 's/ OR $//')
+
+curl -s -H "Authorization: Token $READWISE_TOKEN" \
+  "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=$SEVEN_DAYS_AGO" \
+  | jq --arg feeds "$FEED_FILTER" '
+    .results[] | 
+    select(.source | test($feeds))
+  '
+```
+
+## Improved Article Categorization
+
+Once you have the articles, categorize them:
 
 ```markdown
----
-title: "Security Intelligence Brief - January 17, 2025"
-date: 2025-01-17
-type: security-brief
-tags: [security, intelligence, devsecops]
----
+#### 📚 From Readwise Reader (This Week)
 
-# Security Intelligence Brief
-*January 17, 2025*
+**🔴 Direct Security Threats & Vulnerabilities**
+- [Article Title] - Contains CVE, exploit, breach keywords
+- Connection to this week's CVE findings
 
-## 🚨 Critical Alerts (CVSS >= 9.0)
+**🟡 Security Architecture & Best Practices**
+- [FAIR Framework] - Risk quantification
+- [Passkeys vs Security Keys] - Authentication
+- Connection to prevention strategies
 
-### CVE-2025-0123 - Remote Code Execution in Kubernetes
-**CVSS:** 9.8 (Critical)
-**Published:** 2025-01-16
-**Affected:** Kubernetes 1.25.x - 1.28.x
-**Summary:** Unauthenticated RCE via API server endpoint
-**Your Exposure:** ⚠️ HIGH - You have notes on Kubernetes deployments
-**Action Required:**
-- [ ] Review cluster versions in use
-- [ ] Apply patch or mitigations
-- [ ] Update security runbooks
+**🟢 Infrastructure & DevSecOps**
+- [Cilium/eBPF] - Container security
+- [Kubernetes] - Platform security
+- Indirect security impact
 
-**Related Reading:**
-- Your note: `2.Areas/Work Notes/DevSecOps Notes/K8s Security.md`
-- Readwise: "Kubernetes Security Best Practices" (highlighted yesterday)
+**🔵 Emerging Risks (AI/ML, Supply Chain)**
+- [LLM Poisoning] - AI security
+- [Source Code Theft] - Supply chain
+- Forward-looking threats
+```
 
----
+## Template Updates
 
-### CVE-2025-0124 - SQL Injection in Popular ORM
-**CVSS:** 9.1 (Critical)
-**Published:** 2025-01-17
-**Summary:** SQL injection bypass in prepared statements
-**Your Exposure:** 🟡 MEDIUM - General awareness
-**Action Required:**
-- [ ] Verify ORM versions in projects
-- [ ] Review SAST findings for SQL injection
+### Search Parameters to Store in Config
 
----
+```bash
+# ~/.dotfiles/config/opencode/readwise-security-config.sh
 
-## 📊 High-Priority Vulnerabilities (CVSS 7.0-8.9)
+# Timeframes
+DAILY_LOOKBACK="1d"
+WEEKLY_LOOKBACK="7d"
+MONTHLY_LOOKBACK="30d"
 
-**Count:** 12 new CVEs in past 24 hours
+# Keyword tiers (space-separated for easy grepping)
+TIER1_KEYWORDS="vulnerability CVE exploit breach attack malware ransomware zero-day 0day patch security cybersecurity infosec appsec devsecops threat incident"
 
-**By Technology:**
-- Docker/Containers: 4
-- Cloud (AWS/Azure/GCP): 3
-- API Frameworks: 2
-- CI/CD Tools: 2
-- Other: 1
+TIER2_KEYWORDS="authentication passkey password 2FA MFA authorization IAM identity encryption cryptography risk FAIR compliance container kubernetes docker cloud AI-safety model-poisoning eBPF Cilium zero-trust SAST DAST firewall VPN"
 
-**Top 3 Relevant:**
-1. CVE-2025-0125 - Container escape in Docker
-2. CVE-2025-0126 - GitHub Actions environment leak
-3. CVE-2025-0127 - AWS IAM privilege escalation
+TIER3_SOURCES="anthropic.com cisa.gov sans.org owasp.org nist.gov mitre.org bleepingcomputer thehackernews krebsonsecurity schneier.com"
 
-**See:** Full list in appendix below
+# Your RSS feed IDs (from Readwise Reader)
+SECURITY_RSS_FEEDS=(
+  "01fsm3jqp5jr28n1jnf1ge3fpm"
+  "01g9rf6jz3ajm924qwhh981e17"
+  # Add more as needed
+)
+```
 
----
+## Output Format Enhancement
 
-## 📚 Readwise Security Highlights (Past 24h)
+Add this section to the standard output:
 
-### From: "API Security in Action" (Book)
-> "Rate limiting should be applied at multiple layers: WAF, API gateway, and application level. Relying on a single layer creates a single point of failure."
+```markdown
+## 🔍 Readwise Search Methodology
 
-**Your Note:** Consider for blog post on API security patterns
-**Related:** `2.Areas/Work Notes/Ecomm/API Security.md`
+**This Week's Search Results:**
+- Tier 1 (Direct Security): 3 articles
+- Tier 2 (Security-Adjacent): 6 articles  
+- Tier 3 (Security RSS Feeds): 2 articles
+- **Total Unique Articles:** 8 articles reviewed
 
----
+**Sources Breakdown:**
+- Anthropic.com: 1
+- Center for Internet Security: 2
+- Cilium.io: 2
+- Web Highlighter (Manual Saves): 3
 
-### From: "Container Security Best Practices" (Article)
-> "The most critical container security control is minimizing the attack surface. Use distroless images when possible."
+**Keywords Matched:**
+- "passkey", "authentication" (2 articles)
+- "risk", "FAIR" (2 articles)
+- "LLM", "poison" (1 article)
+- "eBPF", "Cilium", "container" (2 articles)
 
-**Tags:** #containers #security #best-practices
-**Action:** Update container security runbook
+**Not Matched (Recommendations):**
+- No articles with CVE keywords → Add CVE RSS feeds
+- No ransomware coverage → Subscribe to BleepingComputer
+- No cloud security → Add AWS/Azure security blogs
+```
 
----
+## Suggested RSS Feeds to Add
 
-### From: "DevSecOps Maturity Model" (Article)
-> "Security champions are force multipliers. One champion per team is more effective than a centralized security team gate."
+Add these to your Readwise Reader for better coverage:
 
-**Your Thought:** Aligns with current program strategy
-**Related:** `1.Projects/DevSecOps - Roadmap 2024.md`
+```markdown
+### High-Priority Security Feeds
 
----
+**CVE & Vulnerability Tracking:**
+- https://www.cisa.gov/cybersecurity-advisories/rss.xml
+- https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss.xml
+- https://feeds.feedburner.com/TheHackersNews (already added?)
+- https://www.bleepingcomputer.com/feed/
 
-## 🗂️ Your Recent Security Work (Past 7 Days)
+**Cloud Security:**
+- https://aws.amazon.com/blogs/security/feed/
+- https://azure.microsoft.com/en-us/blog/topics/security/feed/
+- https://cloud.google.com/blog/products/identity-security/rss
 
-**Notes Created/Updated:**
-- `2.Areas/Work Notes/DevSecOps Notes/SAST Integration.md` (updated 2 days ago)
-- `2.Areas/Work Notes/Ecomm/Secret Management.md` (created 5 days ago)
+**DevSecOps & Container Security:**
+- https://blog.aquasec.com/rss.xml
+- https://www.wiz.io/blog/rss.xml
+- https://snyk.io/blog/feed
 
-**Key Themes:**
-- SAST tool evaluation and integration
-- Secret scanning implementation
-- API security patterns
+**Threat Intelligence:**
+- https://krebsonsecurity.com/feed/
+- https://www.schneier.com/feed/
+- https://www.recordedfuture.com/feed
 
-**Blog Ideas Generated:**
-- "Implementing Pre-Commit Hooks for Secret Detection"
-- "SAST vs DAST: When to Use Which"
+**Compliance & Frameworks:**
+- https://www.cisecurity.org/feed
+- https://www.nist.gov/news-events/cybersecurity/rss.xml
+```
 
----
+## Automation Improvements
 
-## 🎯 Trend Analysis
+### Daily Cron Job
 
-### Emerging Threats (This Week)
-1. **Supply Chain Attacks** - 3 CVEs related to compromised dependencies
-2. **Container Escapes** - Increase in container runtime vulnerabilities
-3. **API Security** - Growing focus on API authorization bypasses
+```bash
+# Add to crontab
+0 8 * * * /Users/YOUR_USER/.dotfiles/bin/security-brief --days=1 >> ~/security-brief.log 2>&1
+```
 
-### Technology Focus
-**Most CVEs:** Kubernetes, Docker, GitHub Actions
-**Most Readwise Saves:** API security, DevSecOps culture
-**Your Work Focus:** SAST integration, secret management
+### Weekly Summary
 
-**Alignment:** ✅ Your learning and work align with threat landscape
-
----
-
-## ✅ Recommended Actions (Prioritized)
-
-### Immediate (Today)
-- [ ] Review CVE-2025-0123 impact on K8s deployments
-- [ ] Update container base images for CVE-2025-0125
-- [ ] Document API rate limiting strategy (Readwise insight)
-
-### This Week
-- [ ] Complete SAST integration project
-- [ ] Draft blog post: "Secret Detection in CI/CD"
-- [ ] Review security champions program (Readwise insight)
-
-### This Month
-- [ ] Conduct container security training
-- [ ] Implement API security improvements
-- [ ] Update DevSecOps roadmap with supply chain focus
+```bash
+# Every Monday at 8am
+0 8 * * 1 /Users/YOUR_USER/.dotfiles/bin/security-brief --days=7 --weekly-summary
+```
 
 ---
 
-## 📈 Program Metrics (Auto-tracked)
+## Testing Your Improved Search
 
-**CVEs Monitored:** 147 (past 30 days)
-- Critical: 12
-- High: 45
-- Medium: 90
+Run this to test the new criteria:
 
-**Learning Velocity:**
-- Readwise highlights: 23 (this week)
-- Blog posts drafted: 2
-- Work notes: 5 new, 8 updated
+```bash
+# Test script
+READWISE_TOKEN=$(op item get 37nc3retjhuxh6qafon4b65i6q --reveal --fields apikey 2>/dev/null)
+SEVEN_DAYS_AGO=$(date -v-7d +%Y-%m-%dT%H:%M:%S)
 
-**Content Output:**
-- Blog drafts: 3 in progress
-- Published posts: 1 this month
+curl -s -H "Authorization: Token $READWISE_TOKEN" \
+  "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=$SEVEN_DAYS_AGO" \
+  | jq -r '
+    .results[] | 
+    select(
+      (.title // "" | test("security|vulnerability|CVE|authentication|passkey|risk|FAIR|container|kubernetes|cloud|AI safety|eBPF|Cilium"; "i")) or
+      (.author // "" | test("anthropic|CISA|CIS|SANS|OWASP"; "i")) or
+      (.source | test("thehackernews|bleepingcomputer|krebsonsecurity"; "i"))
+    ) | 
+    {title, author, source, created_at}
+  ' | jq -s 'length as $count | "Found \($count) security-relevant articles"'
+```
 
----
-
-## 🔗 Quick Links
-
-**CVE Sources:**
-- [NVD Search](https://nvd.nist.gov/vuln/search)
-- [GitHub Security Advisories](https://github.com/advisories)
-
-**Your Resources:**
-- [Work Notes: DevSecOps](file://2.Areas/Work Notes/DevSecOps Notes/)
-- [Blog Posts](file://2.Areas/Personal Home/Blog Posts 🕸/)
-- [Readwise](https://readwise.io/)
-
----
-
-## Appendix: Full CVE List (CVSS >= 7.0)
-
-[Collapsed by default - expand for details]
-
-<details>
-<summary>Show 12 High-Priority CVEs</summary>
-
-1. CVE-2025-0125 (8.8) - Docker container escape...
-2. CVE-2025-0126 (8.1) - GitHub Actions leak...
-[...]
-</details>
-
----
-
-*Generated by /security-brief on 2025-01-17 08:00 AM*
-*Next brief: 2025-01-18 08:00 AM*
+Expected output: Should find your 6+ articles from this week that we identified.
