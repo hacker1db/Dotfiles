@@ -23,14 +23,14 @@ Available options:
 -h, --help                    Print this help and exit
 -v, --verbose                 Print script debug info
 -b, --branch                  The branch to create
--B, --base                    The branch to use as the base for the new worktree (default: main)
+-B, --base                    The branch to use as the base for the new worktree (default: develop)
 -p, --prefix                  The prefix to apply to the branch name (default: $(git config github.user)/)
 -N, --no-create-upstream      Do not create an upstream branch
 
 
 This script performs the following steps:
 
-1. Create a new worktree, based off the base branch (default: main)
+1. Create a new worktree, based off the base branch (default: develop)
 2. Create a new upstream branch to track the work
 2. Install dependencies
 3. Run a build
@@ -113,8 +113,13 @@ run_command() {
 parse_params() {
   # default values of variables set from params
   create_upstream=1
-  prefix="$(git config github.user)/"
-  base='origin/main'
+  gh_user="$(git config github.user 2>/dev/null || true)"
+  if [[ -n "$gh_user" ]]; then
+    prefix="${gh_user}/"
+  else
+    prefix=""
+  fi
+  base='origin/develop'
   branch=''
 
   while :; do
@@ -182,7 +187,8 @@ fi
 msg "${GRAY}Moving into worktree: $worktree${NOFORMAT}"
 cd "$worktree"
 update_remote "$branch"
-# run_command "Setting Node version" fnm use < .nvmrc
-# run_command "Installing dependencies" npm --no-progress --silent install
-# run_command "Building App" npm run --silent build
+run_command "Setting Node version" fnm use "$(< .nvmrc)"
+run_command "Installing dependencies" npm --no-progress --silent install
+run_command "Building App" npm run --silent build
 msg "${GREEN}Success.${NOFORMAT}"
+
