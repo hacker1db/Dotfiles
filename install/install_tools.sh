@@ -201,7 +201,7 @@ if command -v bun >/dev/null 2>&1; then
   npm install --global yarn || true
   yarn global add expo-cli || true
   bun i -g vercel || true
-  bun install -g typescript typescript-language-server eslint prettier || true
+  bun install -g typescript typescript-language-server eslint prettier @fission-ai/openspec@latest @github/copilot || true
 fi
 
 # Wordlists
