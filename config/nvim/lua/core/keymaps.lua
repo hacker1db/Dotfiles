@@ -26,6 +26,11 @@ keymap.set("n", "<leader>\\", "<C-w>v", { desc = "split virtically" })
 keymap.set("n", "<leader>-", "<C-w>s", { desc = "split horizontally" })
 keymap.set("n", "<leader>=", "<C-w>=", { desc = "make split windows equal width & height" })
 keymap.set("n", "<leader>w", ":close<CR>", { desc = "close current buffer or tab" })
+keymap.set("n", "<C-h>", "<cmd>TmuxNavigateLeft<CR>", { desc = "Tmux navigate left" })
+keymap.set("n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", { desc = "Tmux navigate down" })
+keymap.set("n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", { desc = "Tmux navigate up" })
+keymap.set("n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", { desc = "Tmux navigate right" })
+keymap.set("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", { desc = "Tmux navigate previous" })
 
 keymap.set("n", ",,", ":w<CR>", { desc = "Save file" })
 keymap.set("n", "<leader>cf", ":lua vim.lsp.buf.format()<CR>", { desc = "Format file" })
@@ -47,15 +52,7 @@ keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate j
 -- gopher tests and iferr
 keymap.set("n", "<leader>gt", ":GoTestsAll<CR>")                                             -- generate tests for current file
 keymap.set("n", "<leader>gi", ":GoIfErr<CR>")                                                -- generate if err check for current file
-
--- Snacks picker keymaps (simplified, removed one-shot explorer close logic)
-
-
-
-
-
-
-
+keymap.set("n", "<leader>ee", "<cmd>GoIfErr<cr>", { silent = true, noremap = true })
 
 -- telescope git commands (keep telescope for git, mini.pick doesn't have built-in git support)
 keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" })
@@ -79,23 +76,16 @@ keymap.set("n", "<leader>gt", ":Gitsigns toggle_current_line_blame<CR>", {})
 
 -- Snacks explorer
 -- Toggle logic: if an explorer buffer is visible, close it; otherwise open/reveal
-
-
--- Snacks notifier
-
-
--- (Dashboard suppression for directory launches handled inside snacks plugin config)
-
-keymap.set("n", "<leader>ee", "<cmd>GoIfErr<cr>", { silent = true, noremap = true })
-
--- Avante
-keymap.set("n", "<leader>aa", ":AvanteAsk<CR>", { desc = "Avante ask" })
-keymap.set("n", "<leader>at", ":AvanteToggle<CR>", { desc = "Avante toggle sidebar" })
-keymap.set("n", "<leader>ar", ":AvanteRefresh<CR>", { desc = "Avante refresh" })
-keymap.set("n", "<leader>af", ":AvanteFocus<CR>", { desc = "Avante focus" })
-keymap.set("v", "<leader>ae", ":AvanteEdit<CR>", { desc = "Avante edit selection" })
-keymap.set("n", "<leader>ac", ":AvanteChat<CR>", { desc = "Avante chat" })
-
+keymap.set("n", "<leader>bp", "<Cmd>BufferLineTogglePin<CR>", { desc = "Toggle Pin" })
+keymap.set("n", "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", { desc = "Delete Non-Pinned Buffers" })
+keymap.set("n", "<leader>br", "<Cmd>BufferLineCloseRight<CR>", { desc = "Delete Buffers to the Right" })
+keymap.set("n", "<leader>bl", "<Cmd>BufferLineCloseLeft<CR>", { desc = "Delete Buffers to the Left" })
+keymap.set("n", "<S-h>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev Buffer" })
+keymap.set("n", "<S-l>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next Buffer" })
+keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev Buffer" })
+keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next Buffer" })
+keymap.set("n", "[B", "<cmd>BufferLineMovePrev<cr>", { desc = "Move buffer prev" })
+keymap.set("n", "]B", "<cmd>BufferLineMoveNext<cr>", { desc = "Move buffer next" })
 -- trouble
 keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>", { silent = true, noremap = true })
 keymap.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { silent = true, noremap = true })
@@ -154,3 +144,30 @@ vim.api.nvim_create_autocmd("LspAttach", {
         keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
     end,
 })
+
+-- OpenCode keymaps
+keymap.set({ "n", "x" }, "<leader>oa", function() require("opencode").ask("@this: ", { submit = true }) end,
+    { desc = "Ask about this" })
+keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end, { desc = "Select prompt" })
+keymap.set({ "n", "x" }, "<leader>o+", function() require("opencode").prompt("@this") end, { desc = "Add this" })
+keymap.set("n", "<leader>ot", function() require("opencode").toggle() end, { desc = "Toggle embedded" })
+keymap.set("n", "<leader>oc", function() require("opencode").command() end, { desc = "Select command" })
+keymap.set("n", "<leader>on", function() require("opencode").command("session_new") end, { desc = "New session" })
+keymap.set("n", "<leader>oi", function() require("opencode").command("session_interrupt") end,
+    { desc = "Interrupt session" })
+keymap.set("n", "<leader>oA", function() require("opencode").command("agent_cycle") end,
+    { desc = "Cycle selected agent" })
+keymap.set("n", "<S-C-u>", function() require("opencode").command("messages_half_page_up") end,
+    { desc = "Messages half page up" })
+keymap.set("n", "<S-C-d>", function() require("opencode").command("messages_half_page_down") end,
+    { desc = "Messages half page down" })
+keymap.set("n", "]t", function() require("todo-comments").jump_next() end, { desc = "Next todo comment" })
+keymap.set("n", "[t", function() require("todo-comments").jump_prev() end, { desc = "Previous todo comment" })
+keymap.set("n", "<leader>ds", function() require("dap").continue() end, { desc = "Debug: Start/Continue" })
+keymap.set("n", "<F1>", function() require("dap").step_into() end, { desc = "Debug: Step Into" })
+keymap.set("n", "<F2>", function() require("dap").step_over() end, { desc = "Debug: Step Over" })
+keymap.set("n", "<F3>", function() require("dap").step_out() end, { desc = "Debug: Step Out" })
+keymap.set("n", "<leader>b", function() require("dap").toggle_breakpoint() end, { desc = "Debug: Toggle Breakpoint" })
+keymap.set("n", "<leader>B", function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end,
+    { desc = "Debug: Set Breakpoint" })
+keymap.set("n", "<F7>", function() require("dapui").toggle() end, { desc = "Debug: See last session result." })

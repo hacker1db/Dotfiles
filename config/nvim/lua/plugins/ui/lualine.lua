@@ -1,6 +1,7 @@
 return {
     {
         "nvim-lualine/lualine.nvim",
+        enabled = true,
         dependencies = {
             "nvim-tree/nvim-web-devicons",
         },
@@ -22,7 +23,7 @@ return {
                         {
                             "filename",
                             file_status = true, -- displays file status (readonly status, modified status)
-                            path = 0, -- 0 = just filename, 1 = relative path, 2 = absolute path
+                            path = 0,           -- 0 = just filename, 1 = relative path, 2 = absolute path
                         },
                     },
                     lualine_x = {
@@ -49,7 +50,7 @@ return {
                         {
                             "filename",
                             file_status = true, -- displays file status (readonly status, modified status)
-                            path = 1, -- 0 = just filename, 1 = relative path, 2 = absolute path
+                            path = 1,           -- 0 = just filename, 1 = relative path, 2 = absolute path
                         },
                     },
                     lualine_x = { "location" },
@@ -60,7 +61,7 @@ return {
                 extensions = { "fugitive" },
                 buffers_color = {
                     -- Same values as the general color option can be used here.
-                    active = "lualine_{section}_normal", -- Color for active buffer.
+                    active = "lualine_{section}_normal",     -- Color for active buffer.
                     inactive = "lualine_{section}_inactive", -- Color for inactive buffer.
                 },
             })
