@@ -2,7 +2,7 @@
 
 **Command:** `/commit-msg`  
 **Aliases:** `/commit`, `/cm`  
-**Provider:** Anthropic Claude Haiku  
+**Provider:** GitHub Copilot (GPT-5)  
 **Type:** Secondary Agent
 
 ## Purpose
@@ -13,8 +13,8 @@ Analyzes staged changes and generates meaningful commit messages following Conve
 
 ```yaml
 model:
-  provider: anthropic
-  name: claude-3-5-haiku-20241022
+  provider: copilot
+  name: gpt-5-commit
   temperature: 0.3
   max_tokens: 1024
 ```
@@ -155,7 +155,7 @@ Select variant (1/2/3) or edit:
 ## Environment Variables
 
 ```bash
-export ANTHROPIC_API_KEY="your-anthropic-key"
+export COPILOT_TOKEN="your-github-copilot-token"
 ```
 
 ## Capabilities
