@@ -113,21 +113,6 @@ Resolves #123
 
 ```bash
 $ /commit
-
-Analyzing staged changes...
-
-Branch: feature/oauth-login
-Files changed: 3 (+142, -8)
-
-Suggested commit messages:
-
-1. Concise:
-   feat(auth): add oauth2 support
-
-2. Detailed:
-   feat(auth): add oauth2 authentication with github provider
-
-3. With Body:
    feat(auth): add oauth2 authentication
    
    Implement OAuth2 flow with GitHub as identity provider to enable
@@ -139,7 +124,6 @@ Suggested commit messages:
    
    Resolves #123
 
-Select variant (1/2/3) or edit:
 ```
 
 ## Rate Limiting

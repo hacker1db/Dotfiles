@@ -187,8 +187,14 @@ fi
 msg "${GRAY}Moving into worktree: $worktree${NOFORMAT}"
 cd "$worktree"
 update_remote "$branch"
-run_command "Setting Node version" fnm use "$(< .nvmrc)"
-run_command "Installing dependencies" npm --no-progress --silent install
-run_command "Building App" npm run --silent build
+if [[ -f package.json ]] && command -v npm &>/dev/null; then
+  if [[ -f .nvmrc ]] && command -v fnm &>/dev/null; then
+    run_command "Setting Node version" fnm use "$(< .nvmrc)"
+  fi
+  run_command "Installing dependencies" npm --no-progress --silent install
+  if [[ "$(npm pkg get scripts.build 2>/dev/null || echo null)" != "null" ]]; then
+    run_command "Building App" npm run --silent build
+  fi
+fi
 msg "${GREEN}Success.${NOFORMAT}"
 
