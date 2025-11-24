@@ -24,6 +24,7 @@ tap "oven-sh/bun"
 tap "planetscale/tap"
 tap "rcmdnk/file"
 tap "robscott/tap"
+tap "slp/krunkit"
 tap "sst/tap"
 tap "trufflesecurity/trufflehog"
 # Search tool like grep, but optimized for programmers
@@ -32,7 +33,7 @@ brew "ack"
 brew "act"
 # In-depth attack surface mapping and asset discovery
 brew "amass"
-# Platform built on V8 to build network applications
+# Open-source, cross-platform JavaScript runtime environment
 brew "node"
 # CLI tool for Angular
 brew "angular-cli"
@@ -42,6 +43,8 @@ brew "azure-cli"
 brew "bat"
 # Bash scripts that integrate bat with various command-line tools
 brew "bat-extras"
+# Isolated development environments using Docker
+brew "docker-compose"
 # Modern, maintained replacement for ls
 brew "eza"
 # Simple, fast and user-friendly alternative to find
@@ -66,6 +69,10 @@ brew "httpie"
 brew "hub"
 # Configurable static site generator
 brew "hugo"
+# Kubernetes CLI To Manage Your Clusters In Style!
+brew "k9s"
+# Run local Kubernetes cluster in Docker
+brew "kind"
 # Tool that can switch between kubectl contexts easily and create aliases
 brew "kubectx"
 # Lazier way to manage everything docker
@@ -76,8 +83,12 @@ brew "lazygit"
 brew "lima"
 # Curses-based tool for viewing and analyzing log files
 brew "lnav"
+# Tool for linting and static analysis of Lua code
+brew "luacheck"
 # Text-to-HTML conversion tool
 brew "markdown"
+# Fast, flexible, config-based cli for linting Markdown/CommonMark files
+brew "markdownlint-cli2"
 # Mac App Store command-line interface
 brew "mas"
 # Open source relational database management system
@@ -94,6 +105,8 @@ brew "opencode"
 brew "pandoc"
 # Tool for managing OCI containers and pods
 brew "podman"
+# Alternative to docker-compose using podman
+brew "podman-compose"
 # Reattach process (e.g., tmux) to background
 brew "reattach-to-user-namespace"
 # Search tool like grep and The Silver Searcher
@@ -138,6 +151,8 @@ brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 # Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one.
 brew "oven-sh/bun/bun"
+# A CLI tool to start Linux KVM or macOS Hypervisor framework virtual machines using the libkrun platform.
+brew "slp/krunkit/krunkit"
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
@@ -152,12 +167,6 @@ cask "azure-data-studio"
 cask "basictex"
 # Web browser focusing on privacy
 cask "brave-browser"
-# Web security testing toolkit
-cask "burp-suite-professional"
-# Terminal-based AI coding assistant
-cask "claude-code"
-# Write, edit, and chat about your code with AI
-cask "cursor"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Utilities designed to make common development tasks easier
@@ -249,8 +258,6 @@ cask "podman-desktop"
 cask "postman"
 # Command-line shell and scripting language
 cask "powershell"
-# Kubernetes and container management on the desktop
-cask "rancher"
 # Control your tools with a few keystrokes
 cask "raycast"
 # Save articles to read, highlight key content, and organise notes for review
@@ -263,6 +270,8 @@ cask "spotify"
 cask "todoist-app"
 # Tool to install Linux/BSD distributions to a partition or USB drive
 cask "unetbootin"
+# Open-source code editor
+cask "visual-studio-code"
 # Open-source code editor
 cask "visual-studio-code@insiders"
 # Network protocol analyzer
