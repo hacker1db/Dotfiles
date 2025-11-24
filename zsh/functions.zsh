@@ -44,9 +44,8 @@ function db() {
     echo "Building $DOCKERFILE with $IMAGENAME"
 
     docker build -f "$DOCKERFILE" -t $IMAGENAME:tempbuild$RANDOM --build-arg PAT=$PATTOKEN .
-
-
 }
+
 function clitools(){
 if [[ -d $CODE_DIR/clitools ]]; then
      cd $CODE_DIR/clitools
@@ -167,10 +166,6 @@ function mds(){
     glow -p "$@" -s dark | less -r
 }
 
-function docker-init(){
-    limactl start template://docker
-    export DOCKER_HOST=$(limactl list docker --format 'unix://{{.Dir}}/sock/docker.sock')
-}
 function cytj(){
     yq -Poy "$@"
 }
@@ -180,7 +175,7 @@ function azdlogin(){
             echo "Usage: dlogin <registry>"
             return 1
        fi
-    az acr login -n "$@" --expose-token --query 'accessToken' -o tsv | lima nerdctl login -u 00000000-0000-0000-0000-000000000000 --password-stdin "$@.azurecr.io"
+    az acr login -n "$@" --expose-token --query 'accessToken' -o tsv | podman login -u 00000000-0000-0000-0000-000000000000 --password-stdin "$@.azurecr.io"
 }
 function gha(){
        gh project item-add 16 --owner Alaska-ITS --url "$@"
@@ -225,4 +220,12 @@ function get-azsubcount(){
 
     count=$(az account list --all | jq '.[].name' | wc | awk '{print $1}')
     echo "You have $count Azure subscriptions"
+}
+## Set DOCKER_HOST to point to Podman socket
+function docker_set_host_to_podman_socket()
+{
+    local socket_path="$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+    local unix_domain_socket="unix://$socket_path"
+    echo "Setting DOCKER_HOST=$unix_domain_socket"
+    export DOCKER_HOST="$unix_domain_socket"
 }

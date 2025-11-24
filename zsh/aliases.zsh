@@ -48,6 +48,7 @@ alias tfa="terraform apply --auto-approve"
 alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
 alias jwtp='jwt $(pbpaste)' 
 alias lzd='lazydocker'
+alias docker='podman'
 
 
 # IP addresses
