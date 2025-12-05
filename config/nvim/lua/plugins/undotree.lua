@@ -12,8 +12,5 @@ return {
 
         -- Set focus to undotree window when opened
         vim.g.undotree_SetFocusWhenToggle = 1
-
-        -- Keybinding to toggle undotree
-        vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle, { desc = "Toggle Undotree" })
     end,
 }

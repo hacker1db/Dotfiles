@@ -44,11 +44,5 @@ return {
                 enable = false,
             },
         })
-
-        -- Keybindings
-        vim.keymap.set("n", "<leader>gd", gitsigns.diffthis, { desc = "Git diff this" })
-        vim.keymap.set("n", "<leader>gD", function()
-            gitsigns.diffthis("~")
-        end, { desc = "Git diff this ~" })
     end,
 }
