@@ -89,3 +89,8 @@ keymap.set("n", "<leader>gh", "<cmd>GH<cr>", { desc = "Open GH (GitHub)" })
 keymap.set("n", "<leader>ghp", "<cmd>GH pulls<cr>", { desc = "GH Pull Requests" })
 keymap.set("n", "<leader>ghi", "<cmd>GH issues<cr>", { desc = "GH Issues" })
 keymap.set("n", "<leader>ghr", "<cmd>GH repos<cr>", { desc = "GH Repositories" })
+
+-- mini.diff
+keymap.set("n", "<leader>go", function()
+    require("mini.diff").toggle_overlay()
+end, { desc = "Toggle git overlay (mini.diff)" })
