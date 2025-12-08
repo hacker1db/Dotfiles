@@ -38,7 +38,7 @@ keymap.set("n", "<leader>s", ":so<CR>", { desc = "Source file" })
 keymap.set("n", "<leader>yf", ':let @+=expand("<cfile>:p")<CR>', { desc = "Yank file path under cursor" })
 
 -- window management buffers
-keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" })     -- go to next buffer
+keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" }) -- go to next buffer
 keymap.set("n", "bp", "<cmd>bp<CR>", { desc = "Go to previous buffer" }) -- go to previous buffer
 ----------------------
 -- Plugin Keybinds
@@ -50,8 +50,8 @@ keymap.set("n", "<leader>gtj", ":GoTagAdd json<CR>", { desc = "gopher generate j
 -- yaml tags
 keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate json tags" }) -- generate tags for yaml
 -- gopher tests and iferr
-keymap.set("n", "<leader>gt", ":GoTestsAll<CR>")                                             -- generate tests for current file
-keymap.set("n", "<leader>gi", ":GoIfErr<CR>")                                                -- generate if err check for current file
+keymap.set("n", "<leader>gt", ":GoTestsAll<CR>") -- generate tests for current file
+keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for current file
 keymap.set("n", "<leader>ee", "<cmd>GoIfErr<cr>", { silent = true, noremap = true })
 
 -- telescope git commands (keep telescope for git, mini.pick doesn't have built-in git support)
@@ -72,7 +72,6 @@ keymap.set("n", "<leader>mps", ":MarkdownPreviewStop<CR>")
 -- Git Stuff
 keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
 keymap.set("n", "<leader>gt", ":Gitsigns toggle_current_line_blame<CR>", {})
-
 
 -- Snacks explorer
 -- Toggle logic: if an explorer buffer is visible, close it; otherwise open/reveal
@@ -146,28 +145,63 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 -- OpenCode keymaps
-keymap.set({ "n", "x" }, "<leader>oa", function() require("opencode").ask("@this: ", { submit = true }) end,
-    { desc = "Ask about this" })
-keymap.set({ "n", "x" }, "<leader>os", function() require("opencode").select() end, { desc = "Select prompt" })
-keymap.set({ "n", "x" }, "<leader>o+", function() require("opencode").prompt("@this") end, { desc = "Add this" })
-keymap.set("n", "<leader>ot", function() require("opencode").toggle() end, { desc = "Toggle embedded" })
-keymap.set("n", "<leader>oc", function() require("opencode").command() end, { desc = "Select command" })
-keymap.set("n", "<leader>on", function() require("opencode").command("session_new") end, { desc = "New session" })
-keymap.set("n", "<leader>oi", function() require("opencode").command("session_interrupt") end,
-    { desc = "Interrupt session" })
-keymap.set("n", "<leader>oA", function() require("opencode").command("agent_cycle") end,
-    { desc = "Cycle selected agent" })
-keymap.set("n", "<S-C-u>", function() require("opencode").command("messages_half_page_up") end,
-    { desc = "Messages half page up" })
-keymap.set("n", "<S-C-d>", function() require("opencode").command("messages_half_page_down") end,
-    { desc = "Messages half page down" })
-keymap.set("n", "]t", function() require("todo-comments").jump_next() end, { desc = "Next todo comment" })
-keymap.set("n", "[t", function() require("todo-comments").jump_prev() end, { desc = "Previous todo comment" })
-keymap.set("n", "<leader>ds", function() require("dap").continue() end, { desc = "Debug: Start/Continue" })
-keymap.set("n", "<F1>", function() require("dap").step_into() end, { desc = "Debug: Step Into" })
-keymap.set("n", "<F2>", function() require("dap").step_over() end, { desc = "Debug: Step Over" })
-keymap.set("n", "<F3>", function() require("dap").step_out() end, { desc = "Debug: Step Out" })
-keymap.set("n", "<leader>b", function() require("dap").toggle_breakpoint() end, { desc = "Debug: Toggle Breakpoint" })
-keymap.set("n", "<leader>B", function() require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: ")) end,
-    { desc = "Debug: Set Breakpoint" })
-keymap.set("n", "<F7>", function() require("dapui").toggle() end, { desc = "Debug: See last session result." })
+keymap.set({ "n", "x" }, "<leader>oa", function()
+    require("opencode").ask("@this: ", { submit = true })
+end, { desc = "Ask about this" })
+keymap.set({ "n", "x" }, "<leader>os", function()
+    require("opencode").select()
+end, { desc = "Select prompt" })
+keymap.set({ "n", "x" }, "<leader>o+", function()
+    require("opencode").prompt("@this")
+end, { desc = "Add this" })
+keymap.set("n", "<leader>ot", function()
+    require("opencode").toggle()
+end, { desc = "Toggle embedded" })
+keymap.set("n", "<leader>oc", function()
+    require("opencode").command()
+end, { desc = "Select command" })
+keymap.set("n", "<leader>on", function()
+    require("opencode").command("session_new")
+end, { desc = "New session" })
+keymap.set("n", "<leader>oi", function()
+    require("opencode").command("session_interrupt")
+end, { desc = "Interrupt session" })
+keymap.set("n", "<leader>oA", function()
+    require("opencode").command("agent_cycle")
+end, { desc = "Cycle selected agent" })
+keymap.set("n", "<S-C-u>", function()
+    require("opencode").command("messages_half_page_up")
+end, { desc = "Messages half page up" })
+keymap.set("n", "<S-C-d>", function()
+    require("opencode").command("messages_half_page_down")
+end, { desc = "Messages half page down" })
+keymap.set("n", "]t", function()
+    require("todo-comments").jump_next()
+end, { desc = "Next todo comment" })
+keymap.set("n", "[t", function()
+    require("todo-comments").jump_prev()
+end, { desc = "Previous todo comment" })
+keymap.set("n", "<leader>ds", function()
+    require("dap").continue()
+end, { desc = "Debug: Start/Continue" })
+keymap.set("n", "<F1>", function()
+    require("dap").step_into()
+end, { desc = "Debug: Step Into" })
+keymap.set("n", "<F2>", function()
+    require("dap").step_over()
+end, { desc = "Debug: Step Over" })
+keymap.set("n", "<F3>", function()
+    require("dap").step_out()
+end, { desc = "Debug: Step Out" })
+keymap.set("n", "<leader>b", function()
+    require("dap").toggle_breakpoint()
+end, { desc = "Debug: Toggle Breakpoint" })
+keymap.set("n", "<leader>B", function()
+    require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+end, { desc = "Debug: Set Breakpoint" })
+keymap.set("n", "<F7>", function()
+    require("dapui").toggle()
+end, { desc = "Debug: See last session result." })
+
+-- Octo keymaps
+keymap.set("n", "<leader>o", "<cmd>Octo<cr>", { desc = "Octo open" })

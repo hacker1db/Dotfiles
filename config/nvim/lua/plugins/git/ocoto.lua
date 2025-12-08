@@ -8,7 +8,7 @@ return {
     config = function()
         require("octo").setup({
             use_local_fs = false, -- use local files on right side of reviews
-            enable_builtin = false, -- shows a list of builtin actions when no action is provided
+            enable_builtin = true, -- shows a list of builtin actions when no action is provided
             default_remote = { "upstream", "origin" }, -- order to try remotes
             default_merge_method = "rebase", -- default merge method for `Octo pr merge`; valid: merge, rebase, squash
             ssh_aliases = {}, -- SSH aliases. e.g. `ssh_aliases = {["github.com-work"] = "github.com"}`
