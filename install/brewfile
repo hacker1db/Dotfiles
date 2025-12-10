@@ -1,0 +1,289 @@
+tap "1password/tap"
+tap "anchore/grype"
+tap "anchore/syft"
+tap "aquasecurity/trivy"
+tap "arl/arl"
+tap "azure/functions"
+tap "azure/kubelogin"
+tap "brandonskerritt/rustscan"
+tap "caffix/amass"
+tap "cantino/mcfly"
+tap "dapr/tap"
+tap "dart-lang/dart"
+tap "derailed/k9s"
+tap "felixkratz/formulae"
+tap "fsouza/prettierd"
+tap "gitguardian/tap"
+tap "hashicorp/tap"
+tap "iina/mpv-iina"
+tap "jesseduffield/lazygit"
+tap "majd/repo"
+tap "mondoohq/mondoo"
+tap "noahgorstein/tap"
+tap "oven-sh/bun"
+tap "planetscale/tap"
+tap "rcmdnk/file"
+tap "robscott/tap"
+tap "slp/krunkit"
+tap "sst/tap"
+tap "trufflesecurity/trufflehog"
+# Search tool like grep, but optimized for programmers
+brew "ack"
+# Run your GitHub Actions locally
+brew "act"
+# In-depth attack surface mapping and asset discovery
+brew "amass"
+# Open-source, cross-platform JavaScript runtime environment
+brew "node"
+# CLI tool for Angular
+brew "angular-cli"
+# Microsoft Azure CLI 2.0
+brew "azure-cli"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Bash scripts that integrate bat with various command-line tools
+brew "bat-extras"
+# Isolated development environments using Docker
+brew "docker-compose"
+# Modern, maintained replacement for ls
+brew "eza"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
+# Fast and simple Node.js version manager
+brew "fnm"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# GitHub command-line tool
+brew "gh"
+# Distributed revision control system
+brew "git"
+# Open source programming language to build simple/reliable/efficient software
+brew "go"
+# Vulnerability scanner for container images and filesystems
+brew "grype"
+# Convert source code to formatted text with syntax highlighting
+brew "highlight"
+# User-friendly cURL replacement (command-line HTTP client)
+brew "httpie"
+# Add GitHub support to git on the command-line
+brew "hub"
+# Configurable static site generator
+brew "hugo"
+# Kubernetes CLI To Manage Your Clusters In Style!
+brew "k9s"
+# Run local Kubernetes cluster in Docker
+brew "kind"
+# Tool that can switch between kubectl contexts easily and create aliases
+brew "kubectx"
+# Lazier way to manage everything docker
+brew "lazydocker"
+# Simple terminal UI for git commands
+brew "lazygit"
+# Linux virtual machines
+brew "lima"
+# Curses-based tool for viewing and analyzing log files
+brew "lnav"
+# Tool for linting and static analysis of Lua code
+brew "luacheck"
+# Text-to-HTML conversion tool
+brew "markdown"
+# Fast, flexible, config-based cli for linting Markdown/CommonMark files
+brew "markdownlint-cli2"
+# Mac App Store command-line interface
+brew "mas"
+# Open source relational database management system
+brew "mysql-client"
+# Incremental parsing library
+brew "tree-sitter"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
+# Port scanning utility for large networks
+brew "nmap"
+# AI coding agent, built for the terminal
+brew "opencode"
+# Swiss-army knife of markup format conversion
+brew "pandoc"
+# Tool for managing OCI containers and pods
+brew "podman"
+# Alternative to docker-compose using podman
+brew "podman-compose"
+# Reattach process (e.g., tmux) to background
+brew "reattach-to-user-namespace"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
+# Modern Day Portscanner
+brew "rustscan"
+# Static analysis and lint tool, for (ba)sh scripts
+brew "shellcheck"
+# Cross-shell prompt for astronauts
+brew "starship"
+# CLI for generating a Software Bill of Materials from container images
+brew "syft"
+# Language Server Protocol for Terraform
+brew "terraform-lsp"
+# Terraform version manager inspired by rbenv
+brew "tfenv"
+# Static analysis security scanner for your terraform code
+brew "tfsec"
+# Terminal multiplexer
+brew "tmux"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
+# Executes a program periodically, showing output fullscreen
+brew "watch"
+# Internet file retriever
+brew "wget"
+# Language Server for Yaml Files
+brew "yaml-language-server"
+# Blazing fast terminal file manager written in Rust, based on async I/O
+brew "yazi"
+# Process YAML, JSON, XML, CSV and properties documents from the CLI
+brew "yq"
+# Feature-rich command-line audio/video downloader
+brew "yt-dlp"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+# UNIX shell (command interpreter)
+brew "zsh"
+# Fish-like fast/unobtrusive autosuggestions for zsh
+brew "zsh-autosuggestions"
+# Fish shell like syntax highlighting for zsh
+brew "zsh-syntax-highlighting"
+# Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one.
+brew "oven-sh/bun/bun"
+# A CLI tool to start Linux KVM or macOS Hypervisor framework virtual machines using the libkrun platform.
+brew "slp/krunkit/krunkit"
+# Password manager that keeps all passwords secure behind one password
+cask "1password"
+# Command-line interface for 1Password
+cask "1password-cli"
+# Application launcher and productivity software
+cask "alfred"
+# Android SDK component
+cask "android-platform-tools"
+# Data management tool that enables working with SQL Server
+cask "azure-data-studio"
+# Compact TeX distribution as alternative to the full TeX Live / MacTeX
+cask "basictex"
+# Web browser focusing on privacy
+cask "brave-browser"
+# Universal database tool and SQL client
+cask "dbeaver-community"
+# Utilities designed to make common development tasks easier
+cask "devtoys"
+# Provides developers secure tunnels to share local web services
+cask "devtunnel"
+# Voice and text chat software
+cask "discord"
+# Developer platform
+cask "dotnet-runtime"
+# Online diagram software
+cask "drawio"
+# Collaborative team software
+cask "figma"
+# Web browser
+cask "firefox"
+# UI toolkit for building applications for mobile, web and desktop
+cask "flutter"
+# Screen colour temperature controller
+cask "flux-app"
+cask "font-cascadia-code"
+cask "font-caskaydia-cove-nerd-font"
+cask "font-dejavu-sans-mono-nerd-font"
+cask "font-hack-nerd-font"
+cask "font-jetbrains-mono"
+cask "font-jetbrains-mono-nerd-font"
+cask "font-monaspace"
+cask "font-monaspice-nerd-font"
+cask "font-symbols-only-nerd-font"
+# Set of tools to manage resources and applications hosted on Google Cloud
+cask "gcloud-cli"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
+# Tools to protect your files
+cask "gpg-suite-no-mail"
+# Open-source video transcoder
+cask "handbrake-app"
+# Utility to hide menu bar items
+cask "hiddenbar"
+# Testing client for REST, GraphQL, and HTTP APIs
+cask "httpie-desktop"
+# Free and open-source media player
+cask "iina"
+# JetBrains tools manager
+cask "jetbrains-toolbox"
+# Keyboard customiser
+cask "karabiner-elements"
+# Open-source keystroke visualiser
+cask "keycastr"
+# Noise cancelling application
+cask "krisp"
+# Menu bar app for managing Kubernetes contexts
+cask "kubecontext"
+# Custom Discord client
+cask "legcord"
+# Kubernetes IDE
+cask "lens"
+# Discover, download, and run local LLMs
+cask "lm-studio"
+# Trims video and audio files losslessly
+cask "losslesscut"
+# Set of CPU, memory, disk, and network monitoring tools
+cask "menumeters"
+# Provides updates to various Microsoft products
+cask "microsoft-auto-update"
+# Explorer for Azure Storage
+cask "microsoft-azure-storage-explorer"
+# Multi-platform web browser
+cask "microsoft-edge"
+# Remote desktop client
+cask "microsoft-remote-desktop"
+# Meet, chat, call, and collaborate in just one place
+cask "microsoft-teams"
+# Free and open-source RSS reader
+cask "netnewswire"
+# App to write, plan, collaborate, and get organised
+cask "notion"
+# Calendar for professionals and teams
+cask "notion-calendar"
+# Email client integrated with Notion workspace
+cask "notion-mail"
+# Open-source software for live streaming and screen recording
+cask "obs"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
+# Browse, manage, inspect containers and images
+cask "podman-desktop"
+# Collaboration platform for API development
+cask "postman"
+# Command-line shell and scripting language
+cask "powershell"
+# Control your tools with a few keystrokes
+cask "raycast"
+# Save articles to read, highlight key content, and organise notes for review
+cask "reader"
+# Instant messaging application focusing on security
+cask "signal"
+# Music streaming service
+cask "spotify"
+# To-do list
+cask "todoist-app"
+# Tool to install Linux/BSD distributions to a partition or USB drive
+cask "unetbootin"
+# Open-source code editor
+cask "visual-studio-code"
+# Open-source code editor
+cask "visual-studio-code@insiders"
+# Network protocol analyzer
+cask "wireshark-app"
+# Free and open source web app scanner
+cask "zap"
+# Gecko based web browser
+cask "zen"
+# Video communication and virtual meeting platform
+cask "zoom"
+mas "Developer", id: 640199958
+mas "Final Cut Pro", id: 424389933
+mas "Kindle", id: 302584613
+mas "Spark Desktop", id: 6445813049
+mas "Xcode", id: 497799835

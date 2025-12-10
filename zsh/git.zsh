@@ -14,13 +14,15 @@ alias grn='git-rename'
 alias glog="git l"
 alias gcm="git commit -am"
 alias gcs="git commit -S -am"
-alias gds="git diff --name-only --relative --diff-filter=d --staged | xargs bat --diff"
+# alias gds="git diff --name-only --relative --diff-filter=d --staged | xargs bat --diff"
+alias gds="git diff --relative --staged | bat"
 
 # alias git-amend='git commit --amend -C HEAD'
 alias git-undo='git reset --soft HEAD~1'
 alias git-count='git shortlog -sn'
 alias git-undopush="git push -f origin HEAD^:master"
 alias cpbr="git rev-parse --abbrev-ref HEAD | pbcopy"
+alias sch="git rev-parse HEAD | pbcopy"
 # git root
 alias gr='[ ! -z `git rev-parse --show-cdup` ] && cd `git rev-parse --show-cdup || pwd`'
 
@@ -55,8 +57,9 @@ function ghi(){
         gh issue list 
     fi
 }
-
-
+function gitinit(){
+ pwsh -f "~/Developer/clitools/initializeGitRepo.ps1 -GithubOrg $1"
+}
 
 
 # TODO: FIX the follow GitHub issue script
@@ -88,3 +91,7 @@ function ghi(){
 #   commandline -f execute
 #
 # }
+# Run for me in the background  
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+
+

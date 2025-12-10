@@ -4,24 +4,35 @@ export ZSH=$DOTFILES/zsh
 if [[ -d $DOTFILES/zsh/functions ]]; then
     for func in $DOTFILES/zsh/functions/*(:t); autoload -U $func
 fi
+
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
-compinit
-
-
-
+compinit -C
+# Reevaluate the prompt string each time it's displaying a prompt
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit
+setopt prompt_subst
+if command -v kubectl &> /dev/null; then
+    source <(kubectl completion zsh)
+fi
+if command -v limactl &> /dev/null; then
+    source <(limactl completion zsh)
+fi
+if command op &> /dev/null; then
+    eval "$(op completion zsh)"; compdef _op op
+fi
+setopt COMPLETE_ALIASES
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export REPORTTIME=10 # display how long all tasks over 10 seconds take
 export KEYTIMEOUT=1  # 10ms delay for key sequences
 
 [[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo 
-# define the code directory
-# This is where my code exists and where I want the `c` autocomplete to work from exclusively
+# define the code (Developer) directory
 if [[ -d ~/Developer ]]; then
     export CODE_DIR=~/Developer
 fi
 
-eval "$(op completion zsh)"; compdef _op op
 
 
 # source all .zsh files inside of the zsh/ directory
@@ -29,14 +40,6 @@ for config ($ZSH/**/*.zsh) source $config
 
 if [[ -a ~/.localrc ]]; then
     source ~/.localrc
-fi
-
-for config ($ZSH/**/*completion.sh) source $config
-export PATH=/usr/local/bin:$PATH
-
-# add /usr/local/sbin
-if [[ -d /usr/local/sbin ]]; then
-    export PATH=/usr/local/sbin:$PATH
 fi
 
 # adding path directory for custom scripts
@@ -48,57 +51,7 @@ if [[ -d ~/bin ]]; then
 fi
 export PATH=$PATH:$HOME.rd/bin/
 
-# eport node version manager.
-export NVM_DIR="$HOME/.nvm"
-# export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
-[ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
-export FZF_DEFAULT_COMMAND='ag -g ""'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-
-if [ -f $HOME/.fzf.zsh ]; then
-  source $HOME/.fzf.zsh
-  export FZF_DEFAULT_COMMAND='fd --type f'
-  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-  export FZF_DEFAULT_OPTS="--color bg:-1,bg+:-1,fg:-1,fg+:#feffff,hl:#993f84,hl+:#d256b5,info:#676767,prompt:#676767,pointer:#676767"
-fi
-
-source <(kubectl completion zsh)
-alias k=kubectl
-compdef __start_kubectl k
-
-autoload bashcompinit && bashcompinit
-export GPG_TTY=$(tty)
-export PATH="$PATH":"$HOME/.pub-cache/bin"
-export PATH="$PATH:/Users/hacker1db/.kit/bin"
-export PATH="$PATH:/Users/hacker1db/.dotnet/tools"
-
-export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
-
-DOTFILES_LOADED=1
-
-### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-
-
-
-### Testing
-#
-# matches case insensitive for lowercase
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-
-# pasting with tabs doesn't perform completion
-zstyle ':completion:*' insert-tab pending
-
-# default to file completion
-zstyle ':completion:*' completer _expand _complete _files _correct _approximate
-
-zstyle ':completion:*' verbose yes
-zstyle ':completion:*:descriptions' format '%B%d%b'
-zstyle ':completion:*:messages' format '%d'
-zstyle ':completion:*:warnings' format 'No matches for: %d'
-zstyle ':completion:*' group-name ''
 
 ########################################################
 # Plugin setup
@@ -109,10 +62,6 @@ export ZPLUGDIR="$CACHEDIR/zsh/plugins"
 # array containing plugin information (managed by zfetch)
 typeset -A plugins
 
-zfetch mafredri/zsh-async async.plugin.zsh
-zfetch zsh-users/zsh-syntax-highlighting
-zfetch zsh-users/zsh-autosuggestions
-zfetch grigorii-zander/zsh-npm-scripts-autocomplete
 zfetch Aloxaf/fzf-tab
 
 if [[ -x "$(command -v fnm)" ]]; then
@@ -120,12 +69,66 @@ if [[ -x "$(command -v fnm)" ]]; then
 fi
 
 [[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
+# eport node version manager.
+export NVM_DIR="$HOME/.nvm"
+# export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
+[ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
+export FZF_DEFAULT_COMMAND='ag -g ""'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
 
-# look for all .zsh files and source them
-config_files=($DOTFILES/**/*.zsh)
-for file in $config_files[@]; do
-  source "$file"
-done
+if [ -f $HOME/.fzf.zsh ]; then
+  source $HOME/.fzf.zsh
+  export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_DEFAULT_OPTS="--color bg:-1,bg+:-1,fg:-1,fg+:#feffff,hl:#993f84,hl+:#d256b5,info:#676767,prompt:#676767,pointer:#676767"
+fi
 
-export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+alias k=kubectl
+compdef __start_kubectl k
+
+export PATH="$PATH":"$HOME/.pub-cache/bin"
+export PATH="$PATH:$HOME/.dotnet/tools"
+
+
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
+#
+# # matches case insensitive for lowercase
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+#
+# # pasting with tabs doesn't perform completion
+zstyle ':completion:*' insert-tab pending
+#
+# # default to file completion
+zstyle ':completion:*' completer _expand _complete _files _correct _approximate
+#
+zstyle ':completion:*' verbose yes
+zstyle ':completion:*:descriptions' format '%B%d%b'
+zstyle ':completion:*:messages' format '%d'
+zstyle ':completion:*:warnings' format 'No matches for: %d'
+zstyle ':completion:*' group-name ''
+
+if [[ -x "$(command -v zoxide)" ]]; then
+    eval "$(zoxide init zsh --hook pwd --cmd cd)"
+fi
+
+if [[ -x "$(command -v bun)" ]]; then
+    export PATH="$PATH:$HOME/.bun/bin"
+fi
+
+
+if [[ -x "$(command -v eza)" ]]; then
+  alias ll="eza --icons --git --long"
+  alias l="eza --icons --git --all --long"
+fi
+
+eval "$(starship init zsh)"
+export STARSHIP_CONFIG=~/.config/starship/starship.toml
+
+export PATH="/Users/$Home/.rd/bin:$PATH"
+autoload -Uz compinit && compinit
+
+### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
+export PATH="/Users/David.Walters@alaskaair.com/.rd/bin:$PATH"
+### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)

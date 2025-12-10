@@ -1,5 +1,6 @@
 # reload zsh config
 alias reload!='source ~/.zshrc'
+alias r!='reload!'
 alias e!="nvim ~/.dotfiles/config/nvim/init.vim"
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
@@ -21,29 +22,33 @@ alias cat='bat'
 alias tf="terraform"
 alias l="ls -lah ${colorflag}"
 alias la="ls -AF ${colorflag}"
-alias ll="exa -g -l --icons -a"
+if [[ -x "$(command -v eza)" ]]; then
+  alias ll="eza --icons --git --long -a"
+  alias l="eza --icons --git --all --long"
+fi
 alias lld="ls -l | grep ^d"
 alias rmf="rm -rf"
-alias tree='exa -l --icons --tree -a -g'
+alias tree='eza -l --icons --tree -a -g'
 alias wv='gh repo view --web'
 # moving dir 
 alias sites='cd $CODE_DIR/Sites/'
-alias notes='cd ~/notes/Second\ Brain'
+alias notes='cd $HOME/notes/SecondBrain'
+alias code="code-insiders"
 
 # Helpers
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
 alias du='du -h -c' # calculate disk usage for a folder
 alias dotfiles="cd ~/.dotfiles"
+alias tfd="terraform apply --destroy --auto-approve"
+alias tfp="terraform plan"
+alias tfa="terraform apply --auto-approve"
 
 # Applications
 alias ios='open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app'
-alias pnp='pnpm'
 alias jwtp='jwt $(pbpaste)' 
-alias docker='nerdctl.lima'
-
-
-
+alias lzd='lazydocker'
+alias docker='podman'
 
 
 # IP addresses
@@ -93,6 +98,20 @@ alias chromekill="ps ux | grep '[C]hrome Helper --type=renderer' | grep -v exten
 alias chrome="/Applications/Google\\ \\Chrome.app/Contents/MacOS/Google\\ \\Chrome"
 alias canary="/Applications/Google\\ Chrome\\ Canary.app/Contents/MacOS/Google\\ Chrome\\ Canary"
 alias rundj="python manage.py runserver 7000"
-alias azlocations='az account list-locations -o table'
-alias bookp="op item get 'sans book password' --fields label=password | pbcopy"
 alias httpgui="open\ /Applications/HTTPie.app"
+
+# Azure CLI aliases
+alias azlocations='az account list-locations -o table'
+alias azlogin='az login'
+alias azlogout='az logout'
+alias customrole="az role definition list --custom-role-only true --output json --query '[].{roleName:roleName, roleType:roleType, id:id}'"
+
+## AI Tools and alias
+alias chatgpt='open /Applications/ChatGPT.app'
+alias oc='opencode'
+alias occ='copilot'
+alias ocr='opencode run'
+
+# applications
+alias devtoy='open /Applications/DevToy.app'
+alias scan='ggshield secret scan path --recursive --yes ./'

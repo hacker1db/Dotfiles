@@ -1,9 +1,10 @@
 config:
     fallback-icon: "?"
-    show-name: false
+    multi-pane-icon: "" # show when window has multiple panes (blank by default)
+    show-name: true # show the window name with the icon (defaults to false)
+    icon-position: "right" # show the icon to the "left" or "right" of the window name (defaults to left)
 
 icons:
-    nvim: "📝"
     stripe: "💳"
     stripe-mock: "💳"
     btop: "📈"

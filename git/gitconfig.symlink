@@ -1,13 +1,10 @@
-
-# gitconfig
-[user]
-    name = hacker1db
-    email = 6212228+hacker1db@users.noreply.github.com
-  # @hacker1db on twitter :D
+# vim:ft=gitconfig
 [github]
-    user = hacker1db 
-	signingkey = !$SIGNING_KEY_PUBLIC
-    
+    # @hacker1db on twitter/X :D
+[include]
+    # A local gitconfig, outside of version control.
+    # If the file doesn't exist it is silently ignored
+    path = ~/.gitconfig-local
 [init]
     templatedir = ~/.dotfiles/git/templates
 	defaultBranch = main
@@ -53,6 +50,9 @@
 
     cleanup = "!git remote prune origin && git gc && git clean -df && git stash clear"
 
+       # gh commands
+    browse = "!gh repo view --web"
+
     # rebase the current branch with changes from upstream remote
     update = !git fetch upstream && git rebase upstream/`git rev-parse --abbrev-ref HEAD`
 
@@ -89,7 +89,8 @@
     # check out a local copy of a PR. https://gist.github.com/gnarf/5406589
 	pr = "!f() { exec vsts code pr \"$@\"; }; f"
     pr-clean = "!git for-each-ref refs/heads/pr/* --format='%(refname)' | while read ref ; do branch=${ref#refs/heads/} ; git branch -D $branch ; done"
-	repo = "!f() { exec vsts code repo \"$@\"; }; f"
+    repo = "!f() { exec vsts code repo \"$@\"; }; f"
+
 [color]
     diff = auto
     status = auto
@@ -116,8 +117,7 @@
     default = current
 [branch]
     # set up 'git pull' to rebase instead of merge
-    # autosetuprebase = always
-    rebase = true
+    autosetuprebase = always
 [diff]
     renames = copies
     mnemonicprefix = true
@@ -141,13 +141,14 @@
     lineNumber = true
 [credential]
 	helper = osxkeychain
-[difftool "Kaleidoscope"] cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
- cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
- cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
- cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
- cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
-	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
-	trustexitcode = true
+; [difftool "Kaleidoscope"] cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
+;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
+;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
+;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
+;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
+;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
+; 	cmd = ksdiff --merge --output \"$MERGED\" --base \"$BASE\" -- \"$LOCAL\" --snapshot \"$REMOTE\" --snapshot
+; 	trustexitcode = true
 [rebase]
 	instructionFormat = "[%an - %ar] %s"
 [pull]
@@ -161,5 +162,13 @@
   allowedSignersFile = ~/.ssh/allowed_signers
 
 [commit]
-  gpgsign = true
+    gpgsign = true
 
+[url "ssh://git@github.com/"]
+    insteadOf = https://github.com/
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential

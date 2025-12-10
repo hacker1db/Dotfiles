@@ -1,0 +1,24 @@
+# Appearance Settings
+background-opacity = 0.95
+# Color Scheme Based on Appearance
+theme = Eldritch
+link-url = true
+window-decoration = true
+window-padding-balance = true
+macos-titlebar-style = hidden
+window-padding-y = 11
+window-padding-x = 11
+shell-integration-features = no-cursor,sudo
+bold-is-bright = true
+
+# Font Settings
+font-family = "JetBrains Mono"
+font-style = "italic"
+font-size = 14
+font-feature = +liga
+
+
+clipboard-read = allow
+clipboard-write = allow
+clipboard-trim-trailing-spaces = true
+copy-on-select = clipboard

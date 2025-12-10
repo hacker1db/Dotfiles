@@ -1,0 +1,10 @@
+# More examples can be found here:
+#  https://developer.1password.com/docs/ssh/agent/config
+[[ssh-keys]]
+vault = "Work"
+[[ssh-keys]]
+vault = "Private"
+
+# Cache SSH key approvals for 8 hours (28800 seconds)
+[agent]
+sign_timeout = 28800

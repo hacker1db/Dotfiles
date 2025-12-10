@@ -13,11 +13,24 @@ function colours() {
         fi
     done
 }
-function gitsign(){
-    git config --system user.signingkey "$(op item get "$@" --fields="public key")"
+
+function ghmerge(){
+gh pr view "$1" --json state -q '.state' -q '.state' | grep -q "OPEN" && gh pr diff "$1" && printf "Approve and merge PR #$1? [y/N] " && read ans && { [[ $ans =~ ^[Yy]$ ]] && gh pr review "$1" --approve && gh pr merge "$1" --rebase || echo "Canceled."; }
 }
 
+function gitsign(){
+    if [[ ! -z "$SIGNING_KEY_PUBLIC" ]]; then
+        export SIGNING_KEY_PUBLIC=$(op item get "Github Work" --format json | jq -r '.fields[] | select(.id=="public_key") | .value' )
+    fi
+    if [[ ! -f ~/.ssh/allowed_signers ]]; then
+        echo "$(git config user.email) $SIGNING_KEY_PUBLIC" >> ~/.ssh/allowed_signers
+    fi
+}
+function ts(){
+  sesh connect "$(sesh list -i | gum filter --limit 1 --placeholder 'Pick a sesh' --prompt='⚡')"
+}
 
+function cx() { cd "$@" && l; }
 # Create a new directory and enter it
 function md() {
     mkdir -p "$@" && cd "$@"
@@ -31,9 +44,8 @@ function db() {
     echo "Building $DOCKERFILE with $IMAGENAME"
 
     docker build -f "$DOCKERFILE" -t $IMAGENAME:tempbuild$RANDOM --build-arg PAT=$PATTOKEN .
-
-
 }
+
 function clitools(){
 if [[ -d $CODE_DIR/clitools ]]; then
      cd $CODE_DIR/clitools
@@ -154,12 +166,66 @@ function mds(){
     glow -p "$@" -s dark | less -r
 }
 
-function docker-init(){
-    limactl start template://docker
-    export DOCKER_HOST=$(limactl list docker --format 'unix://{{.Dir}}/sock/docker.sock')
-}
 function cytj(){
     yq -Poy "$@"
 }
 
+function azdlogin(){
+        if [ -z "$1" ]; then
+            echo "Usage: dlogin <registry>"
+            return 1
+       fi
+    az acr login -n "$@" --expose-token --query 'accessToken' -o tsv | podman login -u 00000000-0000-0000-0000-000000000000 --password-stdin "$@.azurecr.io"
+}
+function gha(){
+       gh project item-add 16 --owner Alaska-ITS --url "$@"
+}
+function brew-cleanup(){
+ brew bundle dump --mas --tap --cask --brews --describe -v  --file="$HOME/.dotfiles/install/brewfile" -f  && brew cleanup && brew doctor
+}
 
+function update-npm-tools(){
+echo "🔍 Getting list of globally installed npm packages..."
+packages=$(npm list -g --depth=0 --parseable | awk -F/ '{print $NF}' | tail -n +2)
+
+if [ -z "$packages" ]; then
+  echo "No global packages found."
+  exit 0
+fi
+
+echo "📦 Updating the following packages:"
+echo "$packages"
+
+# Iterate line by line
+echo "$packages" | while ifs= read -r pkg; do
+  if [ -n "$pkg" ]; then
+    if [ "$pkg" = "npm" ]; then
+      echo "⚠️  skipping npm itself (update separately if needed)"
+      continue
+    fi
+    if [ "$pkg" = "copilot" ]; then
+         echo "⬆️ 🤖 updating copilot separately $pkg..."
+          npm install -g "@github/$pkg@latest"
+          continue
+    fi
+    echo "⬆️  updating $pkg..."
+    npm install -g "$pkg@latest"
+  fi
+done
+
+echo "✅ All global npm packages updated!"
+}
+
+function get-azsubcount(){
+
+    count=$(az account list --all | jq '.[].name' | wc | awk '{print $1}')
+    echo "You have $count Azure subscriptions"
+}
+## Set DOCKER_HOST to point to Podman socket
+function docker_set_host_to_podman_socket()
+{
+    local socket_path="$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+    local unix_domain_socket="unix://$socket_path"
+    echo "Setting DOCKER_HOST=$unix_domain_socket"
+    export DOCKER_HOST="$unix_domain_socket"
+}

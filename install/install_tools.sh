@@ -1,151 +1,235 @@
-#!/bin/sh
-if test ! $(which brew); then
-    echo "Installing homebrew"
-    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if ! command -v brew >/dev/null 2>&1; then
+  echo Installing Homebrew
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
-echo "getting brew file requirements"
-brew install rcmdnk/file/brew-file
 
-# cli tools
-echo "Installing cli tools.."
-brew install gh # GitHub CLI 
-brew tap homebrew/cask-fonts  
-brew cask install font-dejavusansmono-nerd-font
-brew install git
-brew install lazygit # Git terminal UI
-brew install ack
-brew install tree
-brew install wget 
-brew install fzf # Fuzzy file finder
-brew install lnav # for viewing log files in terminal 
-brew install azure-cli
-brew instal bat
-brew install bat-extras
-brew install httpie
-# Image management tools
-echo "install image tools"
-brew install --cask rancher
-brew tap anchore/grype
-brew install grype
-brew install kubectx
-berw install helem
-brew install lima
-echo "Start limactl"
-limactl start
+# Backup installation for when brew bundle is unreliable
 
+TAPS=(
+  1password/tap
+  anchore/grype
+  anchore/syft
+  aquasecurity/trivy
+  arl/arl
+  azure/functions
+  azure/kubelogin
+  brandonskerritt/rustscan
+  caffix/amass
+  cantino/mcfly
+  dapr/tap
+  dart-lang/dart
+  derailed/k9s
+  felixkratz/formulae
+  fsouza/prettierd
+  gitguardian/tap
+  hashicorp/tap
+  iina/mpv-iina
+  jesseduffield/lazygit
+  majd/repo
+  mondoohq/mondoo
+  noahgorstein/tap
+  oven-sh/bun
+  planetscale/tap
+  rcmdnk/file
+  robscott/tap
+  sst/tap
+  trufflesecurity/trufflehog
+)
 
-## GUI tools
-brew install --cask iina
+for tap in "${TAPS[@]}"; do
+  brew tap "$tap" || true
+done
 
-# terminals cause why not!
-brew install go
-brew install hub
-brew install reattach-to-user-namespace
-brew install tmux
-brew install terraform-lsp
-brew install yaml-language-server
-# installing pandoc and latex
-brew install pandoc
-brew cask install mactex
-echo "installing tpm plugin manager"
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-brew install zsh
-brew install highlight
-brew install fnm
-brew install z
-brew install markdown
-brew install node
-brew install zsh-syntax-highlighting
-brew install zsh-autosuggestions
-brew install --cask powershell
-brew install 1password-cli
-echo "Install Azure powershell"
-pwsh -c "Install-Module -Name Az -Scope CurrentUser -Repository PSGallery -Force"
-brew tap homebrew/cask-fonts
-brew install --cask font-hack-nerd-font
-brew install --cask  font-Caskaydia-Cove-Nerd-Font
-brew install nmap 
-brew tap caffix/amass
-brew install amass
-brew install tree-sitter
-brew install --cask dotnet
-brew install --cask dotnet-sdk
-dotnet tool install --global csharp-ls
-brew install --cask flutter
-brew install --cask hiddenbar
-brew install --cask raycast
-brew install --cask httpie
-brew tap anchore/syft
-brew install syft
-brew tap azure/functions
-brew install azure-functions-core-tools@4
-# if upgrading on a machine that has 2.x or 3.x installed:
-brew link --overwrite azure-functions-core-tools@4
+FORMULAS=(
+  ack
+  act
+  amass
+  angular-cli
+  azure-cli
+  bat
+  bat-extras
+  eza
+  fd
+  fnm
+  fzf
+  gh
+  git
+  go
+  grype
+  highlight
+  httpie
+  hub
+  hugo
+  kubectx
+  lazydocker
+  lazygit
+  lima
+  lnav
+  markdown
+  mas
+  mysql-client
+  tree-sitter
+  neovim
+  nmap
+  opencode
+  pandoc
+  reattach-to-user-namespace
+  ripgrep
+  rustscan
+  shellcheck
+  starship
+  syft
+  terraform-lsp
+  tfenv
+  tfsec
+  tmux
+  tree
+  watch
+  wget
+  yaml-language-server
+  yazi
+  yq
+  yt-dlp
+  zoxide
+  zsh
+  zsh-autosuggestions
+  zsh-syntax-highlighting
+  oven-sh/bun/bun
+)
 
-echo "Installing neovim..."
-# install neovim
-brew install neovim
+for f in "${FORMULAS[@]}"; do
+  brew install "$f" || true
+done
 
-echo "Installing desktop application..."
+CASKS=(
+  1password
+  1password-cli
+  alfred
+  android-platform-tools
+  azure-data-studio
+  basictex
+  burp-suite-professional
+  claude-code
+  cursor
+  dbeaver-community
+  devtoys
+  devtunnel
+  discord
+  drawio
+  figma
+  flutter
+  flux-app
+  font-cascadia-code
+  font-caskaydia-cove-nerd-font
+  font-dejavu-sans-mono-nerd-font
+  font-hack-nerd-font
+  font-jetbrains-mono
+  font-jetbrains-mono-nerd-font
+  font-monaspace
+  font-monaspice-nerd-font
+  font-symbols-only-nerd-font
+  gcloud-cli
+  ghostty
+  gpg-suite-no-mail
+  handbrake-app
+  hiddenbar
+  httpie-desktop
+  iina
+  karabiner-elements
+  keycastr
+  krisp
+  kubecontext
+  losslesscut
+  menumeters
+  microsoft-auto-update
+  microsoft-azure-storage-explorer
+  microsoft-edge
+  microsoft-remote-desktop
+  microsoft-teams
+  netnewswire
+  notion
+  notion-calendar
+  notion-mail
+  obs
+  obsidian
+  podman-desktop
+  postman
+  powershell
+  rancher
+  raycast
+  reader
+  signal
+  spotify
+  todoist-app
+  unetbootin
+  visual-studio-code@insiders
+  wireshark-app
+  zap
+  zen
+  zoom
+)
 
-brew install --cask wezterm
-brew install --cask burp-suite-professional
-brew install --cask darwio
-brew install --cask spotify
-brew install --cask slack
-brew install --cask discord
-brew install --cask 1password-cli
-brew install --cask keycastr
-brew install --cask jetbrains-toolbox
-brew install --cask private-internet-access
-brew install --cask unetbootin
-brew install --cask soapui
-brew install --cask obs
-brew install --cask obsidian
-brew install --cask wireshark
-brew install rustscan
-brew install --cask min
-brew install --cask krisp
-brew install --cask android-platform-tools
-brew install planetscale/tap/pscale
-brew install mysql-client
-brew install yt-dlp
-brew install --cask flux
+for c in "${CASKS[@]}"; do
+  brew install --cask "$c" || true
+done
 
-echo "install yarn and tools"
-npm install --global yarn
-yarn global add prisma
-yarn global add expo-cli
-npm i -g vercel
-npm install -g typescript typescript-language-server eslint prettier
+# Fonts via tap already handled; ensure nerd fonts present
+brew tap homebrew/cask-fonts || true
 
-brew install --cask menumeters
-brew install --cask azure-data-studio
-brew install --cask google-cloud-sdk
-brew install kubectx
-brew install --cask losslesscut
-brew install watch
-brew install tfsec
-brew install tfenv
+if command -v limactl >/dev/null 2>&1; then
+  echo Starting lima default instance
+  limactl start || true
+fi
 
+# Terraform setup
+if command -v tfenv >/dev/null 2>&1; then
+  tfenv install latest || true
+  tfenv use latest || true
+fi
 
-tfenv install latest
-tfenv use latest
+# Node / JS toolchain
+if command -v nvm >/dev/null 2>&1; then
+  nvm install --lts || true
+  nvm use --lts || true
+fi
 
-echo "set node version"
-nvm use --lts
-nvm install --lts 
+if command -v bun >/dev/null 2>&1; then
+  npm install --global yarn || true
+  yarn global add expo-cli || true
+  bun i -g vercel || true
+  bun install -g typescript typescript-language-server eslint prettier @fission-ai/openspec@latest @github/copilot || true
+fi
 
-echo "install wordlists"
-git clone https://github.com/danielmiessler/SecLists.git ~/wordlists
-echo "import the iterm dracula theme"
-git clone https://github.com/dracula/iterm.git ~/.dotfiles/zsh/
-echo "Install tools for blogging"
-brew install hugo
-echo "golang -- getting your cli tools from github"
-go install github.com/cosmtrek/air@latest
-go install github.com/charmbracelet/glow@latest
-echo "install Github extensions" 
-gh extension upgrade gh-copilot
-gh extension install dlvhdr/gh-dash
-exit 0
+# Wordlists
+if [ ! -d "$HOME/wordlists" ]; then
+  git clone https://github.com/danielmiessler/SecLists.git "$HOME/wordlists" || true
+fi
+
+# Go tools
+if command -v go >/dev/null 2>&1; then
+  go install github.com/cosmtrek/air@latest || true
+  go install github.com/charmbracelet/glow@latest || true
+fi
+
+# GitHub extensions
+if command -v gh >/dev/null 2>&1; then
+  gh auth login || true
+  gh extension upgrade gh-copilot || true
+  gh extension install dlvhdr/gh-dash || true
+  gh extension install advanced-security/gh-sbom || true
+fi
+
+# MAS apps
+if command -v mas >/dev/null 2>&1; then
+  mas install 640199958 || true
+  mas install 424389933 || true
+  mas install 302584613 || true
+  mas install 6445813049 || true
+  mas install 497799835 || true
+fi
+
+echo Backup install complete
