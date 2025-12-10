@@ -69,6 +69,27 @@ keymap.set("n", "<leader>rs", ":LspRestart<CR>") -- mapping to restart lsp if ne
 keymap.set("n", "<leader>mp", ":MarkdownPreview<CR>")
 keymap.set("n", "<leader>mps", ":MarkdownPreviewStop<CR>")
 
+-- undotree
+keymap.set("n", "<leader>u", ":UndotreeToggle<CR>", { desc = "Toggle Undotree" })
+
+-- gitsigns
+keymap.set("n", "<leader>gd", function()
+    require("gitsigns").diffthis()
+end, { desc = "Git diff this" })
+keymap.set("n", "<leader>gD", function()
+    require("gitsigns").diffthis("~")
+end, { desc = "Git diff this ~" })
+
+-- gh.nvim
+keymap.set("n", "<leader>gh", "<cmd>GH<cr>", { desc = "Open GH (GitHub)" })
+keymap.set("n", "<leader>ghp", "<cmd>GH pulls<cr>", { desc = "GH Pull Requests" })
+keymap.set("n", "<leader>ghi", "<cmd>GH issues<cr>", { desc = "GH Issues" })
+keymap.set("n", "<leader>ghr", "<cmd>GH repos<cr>", { desc = "GH Repositories" })
+
+-- mini.diff
+keymap.set("n", "<leader>go", function()
+    require("mini.diff").toggle_overlay()
+end, { desc = "Toggle git overlay (mini.diff)" })
 -- Git Stuff
 keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
 keymap.set("n", "<leader>gt", ":Gitsigns toggle_current_line_blame<CR>", {})
