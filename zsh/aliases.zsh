@@ -33,7 +33,6 @@ alias wv='gh repo view --web'
 # moving dir 
 alias sites='cd $CODE_DIR/Sites/'
 alias notes='cd $HOME/notes/SecondBrain'
-alias code="code-insiders"
 
 # Helpers
 alias grep='grep --color=auto'
