@@ -31,3 +31,5 @@ tmp
 
 .terraform
 .terraform.lock
+.Claude
+.vscode
