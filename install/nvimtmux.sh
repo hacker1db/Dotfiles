@@ -50,6 +50,12 @@ if command -v duti >/dev/null 2>&1; then
     duti -s "$BUNDLE_ID" public.c-plus-plus-source editor 2>/dev/null
     duti -s "$BUNDLE_ID" public.swift-source editor 2>/dev/null
     
+    # C# (by extension - no built-in UTI)
+    duti -s "$BUNDLE_ID" cs editor 2>/dev/null
+    
+    # Lua (by extension - no built-in UTI)
+    duti -s "$BUNDLE_ID" lua editor 2>/dev/null
+    
     # Web
     duti -s "$BUNDLE_ID" public.html editor 2>/dev/null
     duti -s "$BUNDLE_ID" public.css editor 2>/dev/null
