@@ -50,11 +50,42 @@ if command -v duti >/dev/null 2>&1; then
     duti -s "$BUNDLE_ID" public.c-plus-plus-source editor 2>/dev/null
     duti -s "$BUNDLE_ID" public.swift-source editor 2>/dev/null
     
+    # Go (by extension - no built-in UTI)
+    duti -s "$BUNDLE_ID" go editor 2>/dev/null
+    
+    # Rust (by extension - no built-in UTI)
+    duti -s "$BUNDLE_ID" rs editor 2>/dev/null
+    
+    # TypeScript (by extension - no built-in UTI)
+    duti -s "$BUNDLE_ID" ts editor 2>/dev/null
+    duti -s "$BUNDLE_ID" tsx editor 2>/dev/null
+    
+    # JavaScript extensions
+    duti -s "$BUNDLE_ID" js editor 2>/dev/null
+    duti -s "$BUNDLE_ID" jsx editor 2>/dev/null
+    duti -s "$BUNDLE_ID" mjs editor 2>/dev/null
+    duti -s "$BUNDLE_ID" cjs editor 2>/dev/null
+    
     # C# (by extension - no built-in UTI)
     duti -s "$BUNDLE_ID" cs editor 2>/dev/null
     
     # Lua (by extension - no built-in UTI)
     duti -s "$BUNDLE_ID" lua editor 2>/dev/null
+    
+    # Terraform/HCL (by extension)
+    duti -s "$BUNDLE_ID" tf editor 2>/dev/null
+    duti -s "$BUNDLE_ID" tfvars editor 2>/dev/null
+    duti -s "$BUNDLE_ID" hcl editor 2>/dev/null
+    
+    # Docker
+    duti -s "$BUNDLE_ID" dockerfile editor 2>/dev/null
+    
+    # Config files (by extension)
+    duti -s "$BUNDLE_ID" toml editor 2>/dev/null
+    duti -s "$BUNDLE_ID" ini editor 2>/dev/null
+    duti -s "$BUNDLE_ID" conf editor 2>/dev/null
+    duti -s "$BUNDLE_ID" cfg editor 2>/dev/null
+    duti -s "$BUNDLE_ID" env editor 2>/dev/null
     
     # Web
     duti -s "$BUNDLE_ID" public.html editor 2>/dev/null
