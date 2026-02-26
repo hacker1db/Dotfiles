@@ -1,0 +1,8 @@
+[[ssh-keys]]
+item = "Github Work"
+vault = "Work"
+
+# Shared GitHub SSH key for the Demo account
+[[ssh-keys]]
+item = "Github Personal"
+vault = "Private"

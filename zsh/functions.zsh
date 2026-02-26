@@ -55,6 +55,16 @@ fi
 
 }
 
+# Create a new secure code review worktree
+# Usage: newreview <name> [-i <issue-number>] [-p]
+function newreview(){
+  if [[ ! -d $CODE_DIR/clitools ]]; then
+    echo "clitools not found. Cloning..."
+    gh repo clone hacker1db/clitools $CODE_DIR/clitools
+  fi
+  $CODE_DIR/clitools/new-secure-review.sh "$@"
+}
+
 alias bathelp='bat --plain --language=help'
 help() {
     "$@" --help 2>&1 | bathelp

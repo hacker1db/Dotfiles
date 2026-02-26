@@ -43,8 +43,14 @@ brew "azure-cli"
 brew "bat"
 # Bash scripts that integrate bat with various command-line tools
 brew "bat-extras"
+# Tool for interacting with remote images and registries
+brew "crane"
 # Isolated development environments using Docker
 brew "docker-compose"
+# Platform keystore credential helper for Docker
+brew "docker-credential-helper"
+# Select default apps for documents and URL schemes on macOS
+brew "duti"
 # Modern, maintained replacement for ls
 brew "eza"
 # Simple, fast and user-friendly alternative to find
@@ -57,6 +63,8 @@ brew "fzf"
 brew "gh"
 # Distributed revision control system
 brew "git"
+# GitHub Model Context Protocol server for AI tools
+brew "github-mcp-server"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
 # Vulnerability scanner for container images and filesystems
@@ -73,6 +81,8 @@ brew "hugo"
 brew "k9s"
 # Run local Kubernetes cluster in Docker
 brew "kind"
+# Build and deploy Go applications on Kubernetes
+brew "ko"
 # Tool that can switch between kubectl contexts easily and create aliases
 brew "kubectx"
 # Lazier way to manage everything docker
@@ -91,14 +101,16 @@ brew "markdown"
 brew "markdownlint-cli2"
 # Mac App Store command-line interface
 brew "mas"
+# Publisher CLI tool for the Official Model Context Protocol (MCP) Registry
+brew "mcp-publisher"
 # Open source relational database management system
 brew "mysql-client"
-# Incremental parsing library
-brew "tree-sitter"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # Port scanning utility for large networks
 brew "nmap"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
 # AI coding agent, built for the terminal
 brew "opencode"
 # Swiss-army knife of markup format conversion
@@ -109,8 +121,6 @@ brew "podman"
 brew "podman-compose"
 # Reattach process (e.g., tmux) to background
 brew "reattach-to-user-namespace"
-# Search tool like grep and The Silver Searcher
-brew "ripgrep"
 # Modern Day Portscanner
 brew "rustscan"
 # Static analysis and lint tool, for (ba)sh scripts
@@ -129,6 +139,12 @@ brew "tfsec"
 brew "tmux"
 # Display directories as trees (with optional color/HTML output)
 brew "tree"
+# Incremental parsing library
+brew "tree-sitter"
+# Find and verify credentials
+brew "trufflehog"
+# Extremely fast Python package installer and resolver, written in Rust
+brew "uv"
 # Executes a program periodically, showing output fullscreen
 brew "watch"
 # Internet file retriever
@@ -167,6 +183,12 @@ cask "azure-data-studio"
 cask "basictex"
 # Web browser focusing on privacy
 cask "brave-browser"
+# Anthropic's official Claude AI desktop app
+cask "claude"
+# Terminal-based AI coding assistant
+cask "claude-code"
+# OpenAI's Codex desktop app for managing coding agents
+cask "codex-app"
 # Universal database tool and SQL client
 cask "dbeaver-community"
 # Utilities designed to make common development tasks easier
@@ -175,8 +197,6 @@ cask "devtoys"
 cask "devtunnel"
 # Voice and text chat software
 cask "discord"
-# Developer platform
-cask "dotnet-runtime"
 # Online diagram software
 cask "drawio"
 # Collaborative team software
@@ -220,10 +240,9 @@ cask "keycastr"
 cask "krisp"
 # Menu bar app for managing Kubernetes contexts
 cask "kubecontext"
-# Custom Discord client
-cask "legcord"
 # Kubernetes IDE
 cask "lens"
+cask "livetail"
 # Discover, download, and run local LLMs
 cask "lm-studio"
 # Trims video and audio files losslessly
@@ -240,6 +259,8 @@ cask "microsoft-edge"
 cask "microsoft-remote-desktop"
 # Meet, chat, call, and collaborate in just one place
 cask "microsoft-teams"
+# Online collaborative whiteboard platform
+cask "miro"
 # Free and open-source RSS reader
 cask "netnewswire"
 # App to write, plan, collaborate, and get organised
@@ -272,8 +293,6 @@ cask "todoist-app"
 cask "unetbootin"
 # Open-source code editor
 cask "visual-studio-code"
-# Open-source code editor
-cask "visual-studio-code@insiders"
 # Network protocol analyzer
 cask "wireshark-app"
 # Free and open source web app scanner

@@ -11,6 +11,19 @@
     "azure-devops": {
       "type": "local",
       "command": ["npx", "-y", "@azure-devops/mcp", "itsals"]
+    },
+    "postman": {
+      "type": "remote",
+      "url": "https://mcp.postman.com/mcp",
+      "oauth": {}
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"]
+    },
+    "app-modernization": {
+      "type": "local",
+      "command": ["npx", "-y", "@microsoft/github-copilot-app-modernization-mcp-server@latest"]
     }
   },
   "lsp": {
