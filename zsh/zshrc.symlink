@@ -136,3 +136,5 @@ export PATH="/Users/David.Walters@alaskaair.com/.rd/bin:$PATH"
 # .NET SDK
 export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH"
+
+if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi

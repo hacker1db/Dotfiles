@@ -1,6 +1,7 @@
 tap "1password/tap"
 tap "anchore/grype"
 tap "anchore/syft"
+tap "anomalyco/tap"
 tap "aquasecurity/trivy"
 tap "arl/arl"
 tap "azure/functions"
@@ -51,6 +52,8 @@ brew "docker-compose"
 brew "docker-credential-helper"
 # Select default apps for documents and URL schemes on macOS
 brew "duti"
+# Command-line tool to interact with exercism.io
+brew "exercism"
 # Modern, maintained replacement for ls
 brew "eza"
 # Simple, fast and user-friendly alternative to find
@@ -69,6 +72,8 @@ brew "github-mcp-server"
 brew "go"
 # Vulnerability scanner for container images and filesystems
 brew "grype"
+# Kubernetes package manager
+brew "helm"
 # Convert source code to formatted text with syntax highlighting
 brew "highlight"
 # User-friendly cURL replacement (command-line HTTP client)
@@ -109,16 +114,22 @@ brew "mysql-client"
 brew "neovim"
 # Port scanning utility for large networks
 brew "nmap"
+# Modern shell for the GitHub era
+brew "nushell"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
 # AI coding agent, built for the terminal
 brew "opencode"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
+# Fast, disk space efficient package manager
+brew "pnpm"
 # Tool for managing OCI containers and pods
 brew "podman"
 # Alternative to docker-compose using podman
 brew "podman-compose"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.12"
 # Reattach process (e.g., tmux) to background
 brew "reattach-to-user-namespace"
 # Modern Day Portscanner
@@ -149,6 +160,8 @@ brew "uv"
 brew "watch"
 # Internet file retriever
 brew "wget"
+# CLI for Git worktree management, designed for parallel AI agent workflows
+brew "worktrunk"
 # Language Server for Yaml Files
 brew "yaml-language-server"
 # Blazing fast terminal file manager written in Rust, based on async I/O
