@@ -1,4 +1,7 @@
 worktree-path = "{{ repo_path }}/../{{ branch | sanitize }}"
 
 [commit.generation]
-command = "CLAUDECODE= MAX_THINKING_TOKENS=0 claude -p --model=haiku --tools='' --disable-slash-commands"
+command = "ocr -c \"write a commit message and push\""
+
+[post-switch]
+tmux = "[ -n \"$TMUX\" ] && tmux rename-window \"$(basename $(dirname {{ repo_path }}))/{{ branch | sanitize }}\""
