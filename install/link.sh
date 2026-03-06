@@ -86,6 +86,28 @@ for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands"; do
   fi
 done
 
+echo -e "\n\nInstalling Claude Code MCP servers"
+echo "=============================="
+MCP_SRC="$DOTFILES/claude/mcp.json"
+MCP_DEST="$HOME/.mcp.json"
+if [ -e "$MCP_SRC" ]; then
+  if [ -L "$MCP_DEST" ]; then
+    CURRENT=$(readlink "$MCP_DEST")
+    if [ "$CURRENT" != "$MCP_SRC" ]; then
+      rm "$MCP_DEST"
+      ln -s "$MCP_SRC" "$MCP_DEST"
+      echo "Updated symlink $MCP_DEST -> $MCP_SRC"
+    else
+      echo "~/.mcp.json already symlinked correctly."
+    fi
+  elif [ ! -e "$MCP_DEST" ]; then
+    ln -s "$MCP_SRC" "$MCP_DEST"
+    echo "Created symlink $MCP_DEST -> $MCP_SRC"
+  else
+    echo "~/.mcp.json exists but is not a symlink; skipping."
+  fi
+fi
+
 echo -e "\n\nCreating vim symlinks"
 echo "=============================="
 VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim" "$HOME/.vimrc:$DOTFILES/vim/.vimrc")

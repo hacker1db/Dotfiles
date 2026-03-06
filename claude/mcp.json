@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_TOKEN_MCP}"
+      }
+    },
+    "azure-devops": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@azure-devops/mcp", "itsals"]
+    },
+    "postman": {
+      "type": "http",
+      "url": "https://mcp.postman.com/mcp"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp"]
+    },
+    "app-modernization": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@microsoft/github-copilot-app-modernization-mcp-server@latest"]
+    }
+  }
+}
