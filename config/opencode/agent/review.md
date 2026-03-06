@@ -14,7 +14,7 @@ Comprehensive code review agent that analyzes diffs, identifies issues across mu
 ```yaml
 model:
   provider: copilot
-  name: gpt-4
+  name: gpt-5.2-codex
   temperature: 0.2
   max_tokens: 4096
   streaming: true

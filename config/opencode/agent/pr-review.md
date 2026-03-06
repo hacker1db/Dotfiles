@@ -13,8 +13,8 @@ Comprehensive pull request reviewer that analyzes multi-commit changes, generate
 
 ```yaml
 model:
-  provider: anthropic
-  name: claude-3-5-sonnet-20241022
+  provider: copilot
+  name: gpt-5.2-codex
   temperature: 0.2
   max_tokens: 8192
 

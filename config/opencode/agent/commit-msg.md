@@ -14,7 +14,7 @@ Analyzes staged changes and generates meaningful commit messages following Conve
 ```yaml
 model:
   provider: copilot
-  name: gpt-5-commit
+  name: gpt-5.2-codex
   temperature: 0.3
   max_tokens: 1024
 ```

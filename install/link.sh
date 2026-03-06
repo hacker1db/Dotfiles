@@ -61,6 +61,31 @@ if [ -e "$OPENCODE_SRC" ]; then
   fi
 fi
 
+echo -e "\n\nInstalling Claude Code agents and commands"
+echo "=============================="
+for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands"; do
+  DIR_NAME=$(basename "$CLAUDE_SRC")
+  CLAUDE_DEST="$HOME/.claude/$DIR_NAME"
+  mkdir -p "$HOME/.claude"
+  if [ -e "$CLAUDE_SRC" ]; then
+    if [ -L "$CLAUDE_DEST" ]; then
+      CURRENT=$(readlink "$CLAUDE_DEST")
+      if [ "$CURRENT" != "$CLAUDE_SRC" ]; then
+        rm "$CLAUDE_DEST"
+        ln -s "$CLAUDE_SRC" "$CLAUDE_DEST"
+        echo "Updated symlink $CLAUDE_DEST -> $CLAUDE_SRC"
+      else
+        echo "~/.claude/$DIR_NAME already symlinked correctly."
+      fi
+    elif [ ! -e "$CLAUDE_DEST" ]; then
+      ln -s "$CLAUDE_SRC" "$CLAUDE_DEST"
+      echo "Created symlink $CLAUDE_DEST -> $CLAUDE_SRC"
+    else
+      echo "~/.claude/$DIR_NAME exists but is not a symlink; skipping."
+    fi
+  fi
+done
+
 echo -e "\n\nCreating vim symlinks"
 echo "=============================="
 VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim" "$HOME/.vimrc:$DOTFILES/vim/.vimrc")

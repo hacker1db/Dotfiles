@@ -13,8 +13,8 @@ Safe code refactoring with diff proposals, test impact analysis, semantic preser
 
 ```yaml
 model:
-  provider: anthropic
-  name: claude-3-5-sonnet-20241022
+  provider: copilot
+  name: gpt-5.2-codex
   temperature: 0.3
   max_tokens: 8192
 

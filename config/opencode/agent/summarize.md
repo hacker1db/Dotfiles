@@ -14,7 +14,7 @@ Multi-layered documentation summarization with hierarchical section mapping, key
 ```yaml
 model:
   provider: anthropic
-  name: claude-3-5-sonnet-20241022
+  name: claude-opus-4-6
   temperature: 0.2
   max_tokens: 4096
 

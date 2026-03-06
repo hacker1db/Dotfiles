@@ -14,7 +14,7 @@ Semantic search across Obsidian vault and Readwise highlights using hybrid keywo
 ```yaml
 model:
   provider: anthropic
-  name: claude-3-5-sonnet-20241022
+  name: claude-opus-4-6
   temperature: 0.1
   max_tokens: 4096
 

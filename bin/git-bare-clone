@@ -68,15 +68,35 @@ parse_params() {
   return 0
 }
 
+repo_dir_from_arg() {
+  local repo_arg=${1%%/}
+  local base=${repo_arg##*/}
+  base=${base%.git}
+
+  [[ -z "$base" ]] && die "Could not determine repo directory name from: $1"
+  echo "$base"
+}
+
 parse_params "$@"
 setup_colors
 
+repo_arg=${args[0]}
+repo_dir=$(repo_dir_from_arg "$repo_arg")
+
+if [[ -e "$repo_dir" ]]; then
+  die "Target directory already exists: $repo_dir"
+fi
+
+msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
+mkdir -p "$repo_dir"
+pushd "$repo_dir" > /dev/null
 msg "${YELLOW}Cloning bare repository to $location...${NOFORMAT}"
-git clone --bare "${args[@]}" "$location"
+git clone --bare "$repo_arg" "$location"
 pushd "$location" > /dev/null
 msg "${YELLOW}Adjusting origin fetch locations...${NOFORMAT}"
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 popd > /dev/null
 msg "${YELLOW}Setting .git file contents...${NOFORMAT}"
 echo "gitdir: ./$location" > .git
+popd > /dev/null
 msg "${GREEN}Success.${NOFORMAT}"
