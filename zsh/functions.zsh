@@ -194,36 +194,31 @@ function brew-cleanup(){
  brew bundle dump --mas --tap --cask --brews --describe -v  --file="$HOME/.dotfiles/install/brewfile" -f  && brew cleanup && brew doctor
 }
 
-function update-npm-tools(){
-echo "🔍 Getting list of globally installed npm packages..."
-packages=$(npm list -g --depth=0 --parseable | awk -F/ '{print $NF}' | tail -n +2)
+function update-bun-tools(){
+echo "🔍 Getting list of globally installed bun packages..."
+packages=$(bun pm ls -g 2>/dev/null | awk 'NR>1 {print $1}' | sed 's/@[^@]*$//')
 
 if [ -z "$packages" ]; then
   echo "No global packages found."
-  exit 0
+  return 0
 fi
 
 echo "📦 Updating the following packages:"
 echo "$packages"
 
-# Iterate line by line
-echo "$packages" | while ifs= read -r pkg; do
+echo "$packages" | while IFS= read -r pkg; do
   if [ -n "$pkg" ]; then
-    if [ "$pkg" = "npm" ]; then
-      echo "⚠️  skipping npm itself (update separately if needed)"
+    if [ "$pkg" = "copilot" ]; then
+      echo "⬆️ 🤖 updating copilot separately $pkg..."
+      bun add -g "@github/$pkg@latest"
       continue
     fi
-    if [ "$pkg" = "copilot" ]; then
-         echo "⬆️ 🤖 updating copilot separately $pkg..."
-          npm install -g "@github/$pkg@latest"
-          continue
-    fi
     echo "⬆️  updating $pkg..."
-    npm install -g "$pkg@latest"
+    bun add -g "$pkg@latest"
   fi
 done
 
-echo "✅ All global npm packages updated!"
+echo "✅ All global bun packages updated!"
 }
 
 function get-azsubcount(){

@@ -224,7 +224,7 @@ Template hooks in `git/templates/hooks/`:
 ### Compatibility
 - **Platform**: macOS (darwin)
 - **Shell**: Zsh (not bash)
-- **Terminal**: Ghostty (formerly Wezterm)
+- **Terminal**: Ghostty
 - **Package manager**: Homebrew
 
 ## Known Issues & TODOs

@@ -40,15 +40,4 @@ return {
             debug = false,
         },
     },
-    {
-        "NickvanDyke/opencode.nvim",
-        dependencies = {
-            { "folke/snacks.nvim", opts = { input = {}, picker = {} } },
-        },
-        config = function()
-            vim.g.opencode_opts = {}
-
-            vim.o.autoread = true
-        end,
-    },
 }

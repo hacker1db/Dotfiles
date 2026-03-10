@@ -33,3 +33,4 @@ tmp
 .terraform.lock
 .Claude
 .vscode
+.sonarlint/

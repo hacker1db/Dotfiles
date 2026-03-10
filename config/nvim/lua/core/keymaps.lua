@@ -80,19 +80,13 @@ keymap.set("n", "<leader>gD", function()
     require("gitsigns").diffthis("~")
 end, { desc = "Git diff this ~" })
 
--- gh.nvim
-keymap.set("n", "<leader>gh", "<cmd>GH<cr>", { desc = "Open GH (GitHub)" })
-keymap.set("n", "<leader>ghp", "<cmd>GH pulls<cr>", { desc = "GH Pull Requests" })
-keymap.set("n", "<leader>ghi", "<cmd>GH issues<cr>", { desc = "GH Issues" })
-keymap.set("n", "<leader>ghr", "<cmd>GH repos<cr>", { desc = "GH Repositories" })
-
 -- mini.diff
 keymap.set("n", "<leader>go", function()
     require("mini.diff").toggle_overlay()
 end, { desc = "Toggle git overlay (mini.diff)" })
 -- Git Stuff
 keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
-keymap.set("n", "<leader>gt", ":Gitsigns toggle_current_line_blame<CR>", {})
+keymap.set("n", "<leader>gB", ":Gitsigns toggle_current_line_blame<CR>", { desc = "Toggle git blame" })
 
 -- Snacks explorer
 -- Toggle logic: if an explorer buffer is visible, close it; otherwise open/reveal
@@ -165,37 +159,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end,
 })
 
--- OpenCode keymaps
-keymap.set({ "n", "x" }, "<leader>oa", function()
-    require("opencode").ask("@this: ", { submit = true })
-end, { desc = "Ask about this" })
-keymap.set({ "n", "x" }, "<leader>os", function()
-    require("opencode").select()
-end, { desc = "Select prompt" })
-keymap.set({ "n", "x" }, "<leader>o+", function()
-    require("opencode").prompt("@this")
-end, { desc = "Add this" })
-keymap.set("n", "<leader>ot", function()
-    require("opencode").toggle()
-end, { desc = "Toggle embedded" })
-keymap.set("n", "<leader>oc", function()
-    require("opencode").command()
-end, { desc = "Select command" })
-keymap.set("n", "<leader>on", function()
-    require("opencode").command("session_new")
-end, { desc = "New session" })
-keymap.set("n", "<leader>oi", function()
-    require("opencode").command("session_interrupt")
-end, { desc = "Interrupt session" })
-keymap.set("n", "<leader>oA", function()
-    require("opencode").command("agent_cycle")
-end, { desc = "Cycle selected agent" })
-keymap.set("n", "<S-C-u>", function()
-    require("opencode").command("messages_half_page_up")
-end, { desc = "Messages half page up" })
-keymap.set("n", "<S-C-d>", function()
-    require("opencode").command("messages_half_page_down")
-end, { desc = "Messages half page down" })
 keymap.set("n", "]t", function()
     require("todo-comments").jump_next()
 end, { desc = "Next todo comment" })

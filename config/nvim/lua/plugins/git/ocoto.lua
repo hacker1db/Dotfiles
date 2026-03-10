@@ -1,6 +1,9 @@
+-- NOTE: filename is intentionally kept as "ocoto.lua" to avoid disrupting lazy.nvim cache.
+-- folke/gh.nvim has been disabled (see plugins/gh.lua) — it was conflicting with these mappings.
 return {
     "pwntester/octo.nvim",
-    requires = {
+    -- lazy.nvim uses `dependencies`, not `requires`
+    dependencies = {
         "nvim-lua/plenary.nvim",
         "nvim-telescope/telescope.nvim",
         "nvim-tree/nvim-web-devicons",
@@ -19,10 +22,11 @@ return {
                 search_static = true,
                 mappings = {
                     open_in_browser = { lhs = "<C-b>", desc = "open issue in browser" },
-                    copy_url = { lhs = "<C-y>", desc = "copy url to system clipboard" },
-                    copy_sha = { lhs = "<C-e>", desc = "copy commit SHA to system clipboard" },
-                    checkout_pr = { lhs = "<C-o>", desc = "checkout pull request" },
-                    merge_pr = { lhs = "<C-r>", desc = "merge pull request" },
+                    copy_url        = { lhs = "<C-y>", desc = "copy url to system clipboard" },
+                    copy_sha        = { lhs = "<C-e>", desc = "copy commit SHA to system clipboard" },
+                    -- <C-o> was conflicting with vim's jump-backward; moved to <C-g>o
+                    checkout_pr     = { lhs = "<C-g>o", desc = "checkout pull request" },
+                    merge_pr        = { lhs = "<C-g>m", desc = "merge pull request" },
                 },
                 snacks = {
                     actions = {
