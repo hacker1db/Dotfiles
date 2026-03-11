@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+# gh-pr-review: Check out a PR into a review worktree and open in a tmux "reviews" session
+#
+# Usage: gh-pr-review <pr-number> <repo-owner> <repo-name> <repo-path> <head-ref-name>
+#
+# Called from gh-dash keybinding:
+#   command: "gh-pr-review {{.PrNumber}} {{.RepoOwner}} {{.RepoName}} {{.RepoPath}} {{.HeadRefName}}"
+#
+# {{.RepoPath}} is populated by repoPaths in gh-dash config.yml.
+# With wildcard repoPaths ("*": "~/Developer"), {{.RepoPath}} may be the base dir;
+# the script falls back to appending {{.RepoName}} if the path isn't a git repo.
+
+LOG=/tmp/gh-pr-review.log
+log()    { echo "[$(date +%T)] $*" >> "$LOG"; }
+notify() { log "NOTIFY: $1"; tmux display-message -d 5000 "$1" 2>/dev/null || true; }
+
+PR_NUMBER="${1:?Usage: gh-pr-review <pr-number> <repo-owner> <repo-name> <repo-path> <head-ref-name>}"
+REPO_OWNER="${2:?repo-owner required}"
+REPO_NAME="${3:?repo-name required}"
+REPO_PATH_RAW="${4:-$HOME/Developer}"
+PR_BRANCH="${5:-}"
+
+log "=== gh-pr-review PR=#${PR_NUMBER} OWNER=${REPO_OWNER} REPO=${REPO_NAME} PATH_RAW=${REPO_PATH_RAW} BRANCH=${PR_BRANCH}"
+
+# Expand tilde in path
+REPO_PATH="${REPO_PATH_RAW/#\~/$HOME}"
+
+# If path isn't a git repo, try appending the repo name (wildcard repoPaths case)
+if [[ ! -d "${REPO_PATH}/.git" && ! -f "${REPO_PATH}/.git" ]]; then
+  log "Path ${REPO_PATH} not a git repo, trying ${REPO_PATH}/${REPO_NAME}"
+  REPO_PATH="${REPO_PATH}/${REPO_NAME}"
+fi
+
+# Validate we have a repo
+if [[ ! -d "${REPO_PATH}/.git" && ! -f "${REPO_PATH}/.git" ]]; then
+  notify "gh-pr-review: cannot find repo at ${REPO_PATH} — check repoPaths in gh-dash config"
+  log "ERROR: No git repo found at ${REPO_PATH}"
+  exit 1
+fi
+
+log "Using repo path: ${REPO_PATH}"
+
+# Fall back to querying gh if HeadRefName wasn't passed
+if [[ -z "$PR_BRANCH" ]]; then
+  log "No branch passed, querying gh..."
+  PR_BRANCH=$(GIT_TERMINAL_PROMPT=0 gh pr view "$PR_NUMBER" --repo "${REPO_OWNER}/${REPO_NAME}" --json headRefName -q '.headRefName' 2>>"$LOG")
+  if [[ -z "$PR_BRANCH" ]]; then
+    notify "gh-pr-review: failed to determine branch for PR #${PR_NUMBER}"
+    log "ERROR: Empty branch from gh"
+    exit 1
+  fi
+fi
+
+log "PR branch: ${PR_BRANCH}"
+
+WORKTREE_NAME="review-${PR_NUMBER}"
+WORKTREE_PATH="${REPO_PATH}/${WORKTREE_NAME}"
+SESSION="reviews"
+WINDOW_NAME="pr-${PR_NUMBER}"
+
+# Fetch branch (non-blocking: BatchMode prevents SSH prompts, timeout prevents hangs)
+log "Fetching origin/${PR_BRANCH}..."
+GIT_TERMINAL_PROMPT=0 \
+GIT_SSH_COMMAND="ssh -o BatchMode=yes -o ConnectTimeout=10" \
+  timeout 15 git -C "$REPO_PATH" fetch origin "$PR_BRANCH" >>"$LOG" 2>&1 || {
+    log "WARN: fetch failed or timed out, continuing with local refs"
+  }
+
+# Create worktree if it doesn't exist
+if [[ ! -d "$WORKTREE_PATH" ]]; then
+  log "Creating worktree at ${WORKTREE_PATH}..."
+  git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" "origin/${PR_BRANCH}" >>"$LOG" 2>&1 \
+  || git -C "$REPO_PATH" worktree add "$WORKTREE_PATH" "$PR_BRANCH" >>"$LOG" 2>&1 \
+  || git -C "$REPO_PATH" worktree add -b "${WORKTREE_NAME}" "$WORKTREE_PATH" "origin/${PR_BRANCH}" >>"$LOG" 2>&1
+  if [[ $? -ne 0 ]]; then
+    notify "gh-pr-review: failed to create worktree ${WORKTREE_NAME} — see ${LOG}"
+    log "ERROR: worktree add failed"
+    exit 1
+  fi
+  log "Worktree created"
+else
+  log "Worktree already exists at ${WORKTREE_PATH}"
+fi
+
+# Create tmux session if it doesn't exist
+if ! tmux has-session -t "$SESSION" 2>/dev/null; then
+  log "Creating tmux session: ${SESSION}"
+  tmux new-session -d -s "$SESSION" -c "$WORKTREE_PATH" -n "$WINDOW_NAME"
+else
+  # Add a new window for this PR if one doesn't already exist
+  if ! tmux list-windows -t "$SESSION" -F "#{window_name}" 2>/dev/null | grep -qx "$WINDOW_NAME"; then
+    log "Adding window ${WINDOW_NAME} to session ${SESSION}"
+    tmux new-window -t "$SESSION" -c "$WORKTREE_PATH" -n "$WINDOW_NAME"
+  else
+    log "Window ${WINDOW_NAME} already exists in session ${SESSION}"
+  fi
+fi
+
+notify "✓ ${WORKTREE_NAME} ready — switching to 'reviews'"
+log "Switching to ${SESSION}:${WINDOW_NAME}"
+
+# Switch to the reviews session (works from within a tmux popup)
+tmux switch-client -t "${SESSION}:${WINDOW_NAME}" 2>/dev/null \
+|| tmux switch-client -t "$SESSION" 2>/dev/null \
+|| log "WARN: could not switch tmux client"
+
+log "Done."

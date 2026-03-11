@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# gh-open-octo: Open a PR or issue in octo.nvim in a new tmux window
+#
+# Usage: gh-open-octo <pr|issue> <number> <owner> <repo> [repo-path]
+#
+# Called from gh-dash keybindings:
+#   prs:    command: "gh-open-octo pr {{.PrNumber}} {{.RepoOwner}} {{.RepoName}} {{.RepoPath}}"
+#   issues: command: "gh-open-octo issue {{.IssueNumber}} {{.RepoOwner}} {{.RepoName}} {{.RepoPath}}"
+#
+# Uses the full GitHub URL so octo works regardless of cwd.
+# {{.RepoPath}} is used as the window's working directory if it exists.
+
+LOG=/tmp/gh-open-octo.log
+log() { echo "[$(date +%T)] $*" >> "$LOG"; }
+
+TYPE="${1:?Usage: gh-open-octo <pr|issue> <number> <owner> <repo> [repo-path]}"
+NUMBER="${2:?number required}"
+OWNER="${3:?owner required}"
+REPO="${4:?repo required}"
+REPO_PATH_RAW="${5:-$PWD}"
+
+log "=== gh-open-octo TYPE=${TYPE} NUMBER=${NUMBER} OWNER=${OWNER} REPO=${REPO} PATH=${REPO_PATH_RAW}"
+
+# Expand tilde
+REPO_PATH="${REPO_PATH_RAW/#\~/$HOME}"
+
+# If the path isn't a real directory, fall back to PWD
+if [[ ! -d "$REPO_PATH" ]]; then
+  log "WARN: ${REPO_PATH} not a directory, trying ${REPO_PATH}/${REPO}"
+  REPO_PATH="${REPO_PATH}/${REPO}"
+fi
+if [[ ! -d "$REPO_PATH" ]]; then
+  log "WARN: ${REPO_PATH} not a directory, falling back to PWD"
+  REPO_PATH="$PWD"
+fi
+
+case "$TYPE" in
+  pr)    URL="https://github.com/${OWNER}/${REPO}/pull/${NUMBER}" ;;
+  issue) URL="https://github.com/${OWNER}/${REPO}/issues/${NUMBER}" ;;
+  *)
+    log "ERROR: unknown type '${TYPE}'"
+    tmux display-message -d 3000 "gh-open-octo: unknown type '${TYPE}'" 2>/dev/null || true
+    exit 1
+    ;;
+esac
+
+WINDOW_NAME="${TYPE}-${NUMBER}"
+log "Opening ${URL} in window ${WINDOW_NAME} (cwd: ${REPO_PATH})"
+
+tmux new-window -n "$WINDOW_NAME" -c "$REPO_PATH" "nvim -c \"Octo ${TYPE} edit ${URL}\""
+log "Done."
