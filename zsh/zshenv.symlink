@@ -16,7 +16,6 @@ fpath=(
 )
 
 typeset -aU path
-path=($DOTFILES/bin $path)
 
 
 ## Only source this if it exsits
