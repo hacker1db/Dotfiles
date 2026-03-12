@@ -5,15 +5,16 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 
 usage() {
   cat << EOF # remove the space between << and EOF, this is due to web plugin issue
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l] repository
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l] [-i] repository
 
-Clone a bare git repo and set up environment for working comfortably and exclusively from worktrees.
+Clone a bare git repo (or init a new one) and set up environment for working comfortably and exclusively from worktrees.
 
 Available options:
 
 -h, --help      Print this help and exit
 -v, --verbose   Print script debug info
 -l, --location  Location of the bare repo contents (default: .bare)
+-i, --init      Initialize a new bare repo instead of cloning an existing one
 EOF
   exit
 }
@@ -43,14 +44,16 @@ die() {
 
 parse_params() {
   location='.bare'
+  init=0
 
   while :; do
     case "${1-}" in
     -h | --help) usage ;;
     -v | --verbose) set -x ;;
     --no-color) NO_COLOR=1 ;;
+    -i | --init) init=1 ;;
     -l | --location)
-        location="${2-}" 
+        location="${2-}"
         shift
         ;;
     -?*) die "Unknown option: $1" ;;
@@ -62,7 +65,6 @@ parse_params() {
   args=("$@")
 
   # check required params and arguments
-  # [[ -z "${param-}" ]] && die "Missing required parameter: param"
   [[ ${#args[@]} -eq 0 ]] && die "Missing script arguments"
 
   return 0
@@ -80,23 +82,41 @@ repo_dir_from_arg() {
 parse_params "$@"
 setup_colors
 
-repo_arg=${args[0]}
-repo_dir=$(repo_dir_from_arg "$repo_arg")
+if [[ $init -eq 1 ]]; then
+  repo_dir="${args[0]}"
 
-if [[ -e "$repo_dir" ]]; then
-  die "Target directory already exists: $repo_dir"
+  if [[ -e "$repo_dir" ]]; then
+    die "Target directory already exists: $repo_dir"
+  fi
+
+  msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
+  mkdir -p "$repo_dir"
+  pushd "$repo_dir" > /dev/null
+  msg "${YELLOW}Initializing bare repository in $location...${NOFORMAT}"
+  git init --bare "$location"
+  msg "${YELLOW}Setting .git file contents...${NOFORMAT}"
+  echo "gitdir: ./$location" > .git
+  popd > /dev/null
+  msg "${GREEN}Success.${NOFORMAT}"
+else
+  repo_arg=${args[0]}
+  repo_dir=$(repo_dir_from_arg "$repo_arg")
+
+  if [[ -e "$repo_dir" ]]; then
+    die "Target directory already exists: $repo_dir"
+  fi
+
+  msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
+  mkdir -p "$repo_dir"
+  pushd "$repo_dir" > /dev/null
+  msg "${YELLOW}Cloning bare repository to $location...${NOFORMAT}"
+  git clone --bare "$repo_arg" "$location"
+  pushd "$location" > /dev/null
+  msg "${YELLOW}Adjusting origin fetch locations...${NOFORMAT}"
+  git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  popd > /dev/null
+  msg "${YELLOW}Setting .git file contents...${NOFORMAT}"
+  echo "gitdir: ./$location" > .git
+  popd > /dev/null
+  msg "${GREEN}Success.${NOFORMAT}"
 fi
-
-msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
-mkdir -p "$repo_dir"
-pushd "$repo_dir" > /dev/null
-msg "${YELLOW}Cloning bare repository to $location...${NOFORMAT}"
-git clone --bare "$repo_arg" "$location"
-pushd "$location" > /dev/null
-msg "${YELLOW}Adjusting origin fetch locations...${NOFORMAT}"
-git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-popd > /dev/null
-msg "${YELLOW}Setting .git file contents...${NOFORMAT}"
-echo "gitdir: ./$location" > .git
-popd > /dev/null
-msg "${GREEN}Success.${NOFORMAT}"
