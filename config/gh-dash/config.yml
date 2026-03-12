@@ -1,0 +1,130 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# gh-dash configuration
+# Docs: https://github.com/dlvhdr/gh-dash
+# ──────────────────────────────────────────────────────────────────────────────
+
+# ── PR Sections ───────────────────────────────────────────────────────────────
+prSections:
+  - title: "Needs My Review"
+    filters: "is:open review-requested:@me draft:false"
+    limit: 20
+    layout:
+      updatedAt:
+        width: 7
+
+  - title: "My PRs"
+    filters: "is:open author:@me"
+    limit: 20
+    layout:
+      author:
+        hidden: true
+      updatedAt:
+        width: 7
+
+  - title: "Assigned To Me"
+    filters: "is:open assignee:@me -author:@me"
+    limit: 20
+    layout:
+      updatedAt:
+        width: 7
+
+  - title: "Involved"
+    filters: "is:open involves:@me -author:@me -review-requested:@me"
+    limit: 15
+    layout:
+      updatedAt:
+        width: 7
+
+# ── Issue Sections ────────────────────────────────────────────────────────────
+issuesSections:
+  - title: "My Issues"
+    filters: "is:open author:@me"
+    limit: 20
+
+  - title: "Assigned"
+    filters: "is:open assignee:@me -author:@me"
+    limit: 20
+
+# ── Repo Paths ───────────────────────────────────────────────────────────────
+# Maps GitHub repos to local clone paths — populates {{.RepoPath}} in commands.
+# Update the wildcard to match where you keep your repos (e.g. ~/Developer).
+repoPaths:
+  "*": "~/Developer"
+
+# ── Defaults ─────────────────────────────────────────────────────────────────
+defaults:
+  preview:
+    open: true
+    width: 60
+  diffPager: "delta --side-by-side --line-numbers"
+  prsLimit: 20
+  issuesLimit: 20
+  view: prs
+  layout:
+    prs:
+      updatedAt:
+        width: 7
+      repoName:
+        width: 20
+      title:
+        width: 60
+      author:
+        width: 15
+      assignees:
+        hidden: true
+      reviewStatus:
+        width: 14
+
+# ── Keybindings ───────────────────────────────────────────────────────────────
+# PRs
+#   o  → open in browser on GitHub
+#   O  → open in octo.nvim (new tmux window)
+#   W  → create review-<pr#> worktree + tmux "reviews" session
+#   b  → copy branch name to clipboard
+#
+# Issues
+#   o  → open in browser on GitHub
+#   O  → open in octo.nvim (new tmux window)
+#
+# Untouched gh-dash defaults:
+#   v  toggle preview   c  comment   d  diff
+#   m  merge            r  refresh   /  search
+#   q  quit             ?  help
+keybindings:
+  prs:
+    # DEBUG: press X on any PR — check /tmp/ghdash-debug.txt and watch for tmux notification
+    - key: X
+      command: "echo \"PR={{.PrNumber}} OWNER={{.RepoOwner}} REPO={{.RepoName}} PATH='{{.RepoPath}}' PWD=$PWD\" > /tmp/ghdash-debug.txt && tmux display-message -d 5000 'gh-dash debug: check /tmp/ghdash-debug.txt'"
+
+    # Open PR in browser on GitHub
+    - key: o
+      command: "gh pr view {{.PrNumber}} --repo {{.RepoOwner}}/{{.RepoName}} --web"
+
+    # Open PR in octo.nvim in a new tmux window
+    - key: O
+      command: "$HOME/.dotfiles/bin/gh-open-octo pr {{.PrNumber}} {{.RepoOwner}} {{.RepoName}} {{.RepoPath}}"
+
+    # Create review-<pr#> worktree and open in tmux "reviews" session
+    - key: W
+      command: "$HOME/.dotfiles/bin/gh-pr-review {{.PrNumber}} {{.RepoOwner}} {{.RepoName}} {{.RepoPath}} {{.HeadRefName}}"
+
+    # Copy PR branch name to clipboard
+    - key: b
+      command: "echo -n {{.HeadRefName}} | pbcopy && echo 'Copied: {{.HeadRefName}}'"
+
+  issues:
+    # Open issue in browser on GitHub
+    - key: o
+      command: "gh issue view {{.IssueNumber}} --repo {{.RepoOwner}}/{{.RepoName}} --web"
+
+    # Open issue in octo.nvim in a new tmux window
+    - key: O
+      command: "$HOME/.dotfiles/bin/gh-open-octo issue {{.IssueNumber}} {{.RepoOwner}} {{.RepoName}} {{.RepoPath}}"
+
+# ── Theme ─────────────────────────────────────────────────────────────────────
+theme:
+  ui:
+    table:
+      showSeparator: true
+    sectionsShowCount: true
+    expandableSections: false
