@@ -13,8 +13,8 @@ Generate Alaska Air Group-standard draw.io diagrams as **editable PNG files** �
 ## Workflow
 
 1. Understand the diagram request
-2. Generate the .drawio XML using the template standards below
-3. Install dependencies if needed, then render to editable PNG
+2. Build the diagram using the CLI tool (preferred) or generate raw .drawio XML
+3. Export to PNG
 4. Present the file to the user
 
 ## Step 1 — Understand the Request
@@ -28,7 +28,44 @@ Identify:
 
 If critical info is missing (e.g., no systems listed), ask once. For metadata, use placeholders if not provided.
 
-## Step 2 — Generate the Draw.io XML
+## Step 2 — Build the Diagram
+
+### Primary method: CLI tool (preferred — no temp files)
+
+Copy the AAG template to the target location, then use the CLI to update metadata and add diagram content:
+
+```bash
+# 1. Copy template to working location
+cp ~/.dotfiles/claude/drawio-assets/template/template.drawio /path/to/output.drawio
+
+# 2. Update title and metadata (these IDs exist in the template)
+CLI="/opt/homebrew/bin/cli-anything-drawio"
+$CLI --json --project /path/to/output.drawio shape label title "My Diagram Title"
+$CLI --json --project /path/to/output.drawio shape label metadata "Team Name: Security<br>SME: Jane Doe<br>Copyright: Alaska Air Group, Inc 2026<br>Last Reviewed Date: 2026-03-12"
+
+# 3. Add shapes (diagram content area uses x: -1500 to -250, y: 80 to 800)
+$CLI --json --project /path/to/output.drawio shape add rectangle -l "Web App" --x -1200 --y 200 -w 120 -h 60
+# ... add more shapes, then connect them
+$CLI --json --project /path/to/output.drawio connect add <source_id> <target_id> --style orthogonal -l "HTTPS"
+
+# 4. Save
+$CLI --json --project /path/to/output.drawio project save
+```
+
+**Available shape types**: `rectangle`, `rounded`, `ellipse`, `diamond`, `triangle`, `hexagon`, `cylinder`, `cloud`, `parallelogram`, `process`, `document`, `callout`, `note`, `actor`, `text`
+
+**Available edge styles**: `straight`, `orthogonal`, `curved`, `entity-relation`
+
+**Styling shapes/connectors** after creation:
+```bash
+$CLI --json --project /path/to/output.drawio shape style <cell_id> fillColor "#f8cecc"
+$CLI --json --project /path/to/output.drawio shape style <cell_id> strokeColor "#b85450"
+$CLI --json --project /path/to/output.drawio connect style <connector_id> strokeColor "#6c8ebf"
+```
+
+### Fallback method: Raw XML generation
+
+Use this when the CLI tool cannot express the needed layout or when precise XML control is required.
 
 ### Coordinate System
 
@@ -290,39 +327,40 @@ style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;strokeColor=#e5ad07;strokeWi
 
 **Comment indicator** (dashed oval-end): `style="endArrow=oval;html=1;rounded=0;dashed=1;strokeColor=#404D2C;strokeWidth=1;endFill=0;endSize=8;"`
 
-## Step 3 — Render to Editable PNG via Playwright MCP
+## Step 3 — Export to PNG
 
-Rendering uses the Playwright MCP browser tools instead of a local Playwright install. Follow these sub-steps:
+### Primary method: CLI tool (preferred)
 
-### 3a. Save the .drawio XML and generate the HTML preview
+The CLI tool exports directly — no temp files, no Playwright needed.
 
 ```bash
-# Save the raw .drawio XML
-cat > /tmp/diagram.drawio << 'XML_EOF'
-[YOUR_DRAWIO_XML]
-XML_EOF
+# Export to PNG from the working project file
+/opt/homebrew/bin/cli-anything-drawio --json --project /path/to/diagram.drawio export render /path/to/output.png -f png --crop --overwrite
+```
 
+Save the .drawio file to the user's desired location with `project save` or `cp`, then export the PNG alongside it.
+
+### Fallback method: Playwright MCP rendering
+
+Use this only if the CLI export produces unsatisfactory results or if you need the HTML preview rendering with the custom mxGraph parser.
+
+```bash
 # Install deps if needed (jsdom + mxgraph only, NOT playwright)
 DRAWIO_SCRIPTS="$HOME/.dotfiles/claude/drawio-scripts"
 ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm install)
 
-# Generate the HTML preview file (uses mxGraph to parse, outputs HTML)
-node "$DRAWIO_SCRIPTS/render_drawio_html.js" /tmp/diagram.drawio /tmp/diagram.html 0
+# Generate the HTML preview file
+node "$DRAWIO_SCRIPTS/render_drawio_html.js" /path/to/diagram.drawio /tmp/diagram.html 0
 ```
 
-### 3b. Use Playwright MCP to screenshot the HTML
-
+Then use the Playwright MCP server (enable it in Claude Code settings if not available):
 1. Call `mcp__playwright__browser_navigate` with url `file:///tmp/diagram.html`
 2. Call `mcp__playwright__browser_take_screenshot` to capture the rendered diagram
-3. The screenshot will be saved — note the path
 
-### 3c. Embed the XML into the PNG for editability
-
+Optionally embed XML into the PNG for editability:
 ```bash
-node "$DRAWIO_SCRIPTS/embed_xml.js" /tmp/screenshot.png /tmp/diagram.drawio /tmp/diagram.png
+node "$DRAWIO_SCRIPTS/embed_xml.js" /tmp/screenshot.png /path/to/diagram.drawio /path/to/output.png
 ```
-
-This produces an **editable PNG** — drag it into draw.io to reopen and edit the source XML.
 
 ## Step 4 — Present the File
 
