@@ -13,8 +13,10 @@ Parse `$ARGUMENTS` for:
 - `--date <YYYY-MM-DD>` — change date (default: today's date)
 - `--tier <0|1|2|3>` — urgency tier (default: `[PLACEHOLDER - urgency tier 0-3]`)
 - `--diagrams <conceptual,physical,network,dataflow>` — comma-separated list of diagrams to generate (default: all four)
+- `--email <ADDRESS>` — team email address for the communication plan
 
 If no free-text description is provided, ask the user once before proceeding.
+If no `--email` is provided, ask the user for their team email address before proceeding. This is used in Section 8 (Communication Plan) and the runbook header.
 
 ## Step 0 — Fetch Change Request Template
 
@@ -35,6 +37,8 @@ Before analyzing the repository, fetch the official Change Request template from
 ## Step 1 — Repository Analysis
 
 Scan the repository to build an internal summary. Skip any files or directories that do not exist — never error on missing sources.
+
+**Repository URL** — auto-detect via `git remote get-url origin`. Convert SSH URLs to HTTPS browse URLs (e.g., `git@ssh.dev.azure.com:v3/org/project/repo` → `https://dev.azure.com/org/project/_git/repo`). Store this for use in the runbook header and wiki page.
 
 **App identity** — scan for:
 - `README.md`, `package.json`, `pom.xml`, `*.csproj`, `go.mod`, `Cargo.toml`, `pyproject.toml`, `setup.py`
@@ -93,6 +97,8 @@ Generate the runbook with **all 10 sections** below. Auto-populate from the Step
 | **Change Date** | {change_date} |
 | **Application** | {app_name} |
 | **Tier** | {tier} |
+| **Repository** | {repo_url — auto-detect from `git remote get-url origin`} |
+| **Team Email** | {team_email} |
 | **Prepared By** | [PLACEHOLDER - engineer name] |
 | **Approved By** | [PLACEHOLDER - approver name] |
 
@@ -190,10 +196,10 @@ Generate the runbook with **all 10 sections** below. Auto-populate from the Step
 
 | When | Who | Channel | Message |
 |------|-----|---------|---------|
-| Pre-change | [PLACEHOLDER - stakeholders] | [PLACEHOLDER - channel] | Change window beginning |
-| During | [PLACEHOLDER - on-call team] | [PLACEHOLDER - channel] | Status updates |
-| Post-change | [PLACEHOLDER - stakeholders] | [PLACEHOLDER - channel] | Change complete |
-| Rollback | [PLACEHOLDER - stakeholders] | [PLACEHOLDER - channel] | Rollback initiated |
+| Pre-change | {team_email} | Email / [PLACEHOLDER - channel] | Change window beginning |
+| During | {team_email} | Email / [PLACEHOLDER - channel] | Status updates |
+| Post-change | {team_email} | Email / [PLACEHOLDER - channel] | Change complete |
+| Rollback | {team_email} | Email / [PLACEHOLDER - channel] | Rollback initiated |
 
 ## 9. Architecture Diagrams
 
@@ -229,21 +235,23 @@ Search `docs/diagrams/` for PNGs matching the app name. If a diagram already exi
 
 ### 3b. Generate missing diagrams
 
-For each missing diagram type requested (default: all four), invoke `/drawio` as a separate follow-up action. Each `/drawio` invocation produces a single editable PNG saved to `docs/diagrams/{app_name}-{type}.png`.
+For each missing diagram type requested (default: all four), launch a **parallel Agent** (using the Agent tool with `run_in_background: true`). All four diagrams are independent and must be generated concurrently. Each Agent invokes `/drawio` and produces a single editable PNG saved to `docs/diagrams/{app_name}-{type}.png`.
 
-1. **Conceptual diagram** — invoke `/drawio` with:
+Launch all missing diagram agents in a **single message** so they run in parallel:
+
+1. **Conceptual diagram** — Agent prompt for `/drawio`:
    > Create a conceptual architecture diagram for {app_name}. Show the service flow including: {list components, their relationships, and the blast radius of this change}. Highlight components affected by this change. Save as `docs/diagrams/{app_name}-conceptual.png`.
 
-2. **Physical diagram** — invoke `/drawio` with:
+2. **Physical diagram** — Agent prompt for `/drawio`:
    > Create a physical architecture diagram for {app_name}. Show compute layers, cloud regions, and Azure resources: {list infrastructure components from Terraform/Bicep/ARM analysis}. Include resource types, SKUs where known, and region placement. Save as `docs/diagrams/{app_name}-physical.png`.
 
-3. **Network diagram** — invoke `/drawio` with:
+3. **Network diagram** — Agent prompt for `/drawio`:
    > Create a network architecture diagram for {app_name}. Show routing, load balancers, firewalls, and VNets: {list network topology from infrastructure analysis}. Include traffic flow directions and ports. Save as `docs/diagrams/{app_name}-network.png`.
 
-4. **Data flow diagram** — invoke `/drawio` with:
+4. **Data flow diagram** — Agent prompt for `/drawio`:
    > Create a data flow diagram for {app_name}. Show the request lifecycle from entry point through transformations to persistence: {list API routes, data stores, message queues, and external integrations}. Include data formats and protocols. Save as `docs/diagrams/{app_name}-dataflow.png`.
 
-**Important:** If the repository lacks sufficient data for a diagram type (e.g., no Terraform files for the network diagram), generate the `/drawio` invocation anyway with placeholder descriptions and clearly mark unknown components as `[PLACEHOLDER - description]` in the diagram instruction.
+**Important:** If the repository lacks sufficient data for a diagram type (e.g., no Terraform files for the network diagram), generate the Agent invocation anyway with placeholder descriptions and clearly mark unknown components as `[PLACEHOLDER - description]` in the diagram instruction.
 
 **Output format:** Each diagram is an editable bitmap PNG only — no `.drawio` source file. The draw.io XML is embedded in the PNG via `--embed-diagram`, so users can drag the PNG into draw.io to edit.
 
@@ -251,12 +259,68 @@ For each missing diagram type requested (default: all four), invoke `/drawio` as
 
 1. Create the `docs/runbooks/` directory if it does not exist
 2. Save the runbook to: `docs/runbooks/CR-{app_name}-{change_date}.md`
-3. Present a summary to the user:
+3. Launch parallel `/drawio` Agents for each missing diagram type as described in Step 3b.
+4. **After all diagram Agents complete**, update the saved runbook's Section 9 (Architecture Diagrams) to embed the generated PNG images using markdown image syntax:
+   ```markdown
+   ![Conceptual](../diagrams/{app_name}-conceptual.png)
+   ![Physical](../diagrams/{app_name}-physical.png)
+   ![Network](../diagrams/{app_name}-network.png)
+   ![Data Flow](../diagrams/{app_name}-dataflow.png)
+   ```
+   Use relative paths from the runbook's location (`docs/runbooks/`) to the diagrams directory (`docs/diagrams/`). Only add image embeds for diagrams that were successfully created.
+5. **Generate PDF** from the completed runbook markdown using `md-to-pdf`:
+   ```bash
+   # Ensure md-to-pdf is installed globally
+   which md2pdf >/dev/null 2>&1 || npm install -g md-to-pdf
+
+   # Generate PDF alongside the markdown file
+   md2pdf docs/runbooks/CR-{app_name}-{change_date}.md
+   ```
+   This produces `docs/runbooks/CR-{app_name}-{change_date}.pdf`. Run this **after** the diagram embeds are added (step 4) so the PDF includes the images.
+
+6. **Publish to Azure DevOps Wiki** — create a wiki page with the runbook content and diagram images.
+
+   **Ask the user** for the ADO wiki details (do not guess):
+   > I need to publish the runbook to Azure DevOps wiki.
+   > Please provide the **project name**, **wiki identifier**, and **parent page path** (e.g., `/Runbooks` or `/Change-Requests`).
+
+   Once provided:
+
+   a. **Upload diagram PNGs as wiki attachments** using the Azure DevOps CLI:
+      ```bash
+      # For each generated diagram PNG
+      az devops wiki page create \
+        --project "{project}" \
+        --wiki "{wikiIdentifier}" \
+        --path "{parent_path}/{cr_number}/attachments/{diagram_filename}" \
+        --file-path "docs/diagrams/{diagram_filename}" \
+        --encoding base64
+      ```
+      Alternatively, if the CLI attachment method is unavailable, commit the PNG files directly to the wiki git repo.
+
+   b. **Prepare wiki-compatible markdown** — copy the runbook content and adjust image references to use ADO wiki attachment syntax:
+      ```markdown
+      ![Conceptual](/Runbooks/{cr_number}/attachments/{app_name}-conceptual.png)
+      ```
+
+   c. **Add repo link** — ensure the **Repository** field in the header table links to the source repo using the full URL from `git remote get-url origin`.
+
+   d. **Create the wiki page** using the `mcp__azure-devops__wiki_create_or_update_page` tool:
+      - `wikiIdentifier`: from user input
+      - `project`: from user input
+      - `path`: `{parent_path}/CR-{app_name}-{change_date}`
+      - `content`: the wiki-compatible markdown (with adjusted image paths)
+
+   e. If the page creation fails (e.g., page already exists), fetch the existing page's ETag and update it instead.
+
+7. Present a summary to the user:
 
 ```
 ## Runbook Generated
 
-**File:** docs/runbooks/CR-{app_name}-{change_date}.md
+**Markdown:** docs/runbooks/CR-{app_name}-{change_date}.md
+**PDF:** docs/runbooks/CR-{app_name}-{change_date}.pdf
+**ADO Wiki:** {link to the created wiki page}
 
 ### Auto-populated fields:
 - {list sections/fields that were populated from repo analysis}
@@ -265,10 +329,8 @@ For each missing diagram type requested (default: all four), invoke `/drawio` as
 - {list all [PLACEHOLDER] fields that need human input}
 
 ### Diagrams:
-- {list existing diagrams found and any new /drawio invocations to be made}
+- {list diagrams generated and embedded in the runbook}
 - All diagrams are editable bitmap PNGs (drag into draw.io to edit)
 ```
-
-4. Then proceed to invoke `/drawio` for each **missing** diagram type as described in Step 3.
 
 $ARGUMENTS

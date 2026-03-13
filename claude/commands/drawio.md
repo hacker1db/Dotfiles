@@ -1,20 +1,19 @@
 ---
-description: Create, generate, and render draw.io diagrams (.drawio) as editable PNG images using the Alaska Air Group standard template. Use for architecture, network, PCI flow, CSP, SRI, or any technical diagram.
+description: Create, generate, and render draw.io diagrams (.drawio) using the standard corporate template. Use for architecture, network, PCI flow, CSP, SRI, or any technical diagram.
 ---
 # Draw.io Diagram Skill
 
-Generate Alaska Air Group-standard draw.io diagrams as **editable PNG files** — PNGs that contain the full XML embedded so they can be reopened and edited in draw.io.
+Generate corporate-standard draw.io diagrams as **editable PNG files** — PNGs that contain the full XML embedded so they can be reopened and edited in draw.io.
 
 **CLI tool**: `/opt/homebrew/bin/cli-anything-drawio` — stateful Draw.io CLI for creating diagrams, adding shapes/connectors, and exporting to PNG/PDF/SVG.
 **Scripts location**: `~/.dotfiles/claude/drawio-scripts/`
 **Template location**: `~/.dotfiles/claude/drawio-assets/template/template.drawio`
-**Rendering**: Primary export via CLI tool. Fallback uses the Playwright MCP server (browser tools) — if Playwright MCP tools are not available, enable the Playwright MCP server in your tool's settings (Claude Code, OpenCode, or GitHub Copilot CLI).
 
 ## Workflow
 
 1. Understand the diagram request
 2. Build the diagram using the CLI tool (preferred) or generate raw .drawio XML
-3. Export to PNG
+3. Export to editable PNG
 4. Present the file to the user
 
 ## Step 1 — Understand the Request
@@ -22,34 +21,34 @@ Generate Alaska Air Group-standard draw.io diagrams as **editable PNG files** �
 Identify:
 - **Application name**: The name of the application or service being diagrammed. If not provided, ask the user.
 - **Systems/components** to include
-- **Metadata**: team name, SME name, year, review date
+- **Metadata**: team name, team email, SME name, year, review date
 - **Data flows**: what connects to what, and what kind of traffic
-- **GitHub source path**: the repo path where this diagram lives (e.g. `Alaska-Airlines-Shared/pci-audit/tree/main/diagrams/my-diagram.drawio`)
+- **GitHub source path**: the repo path where this diagram lives. **Always use the `main` branch** in the URL (e.g. `{ORG}/{REPO}/tree/main/diagrams/my-diagram.drawio`) — never use a feature branch or commit SHA.
 
-If critical info is missing (e.g., no systems listed), ask once. For metadata, use placeholders if not provided.
+If critical info is missing (e.g., no systems listed), ask once. For metadata, use placeholders if not provided. When invoked from `/runbook`, the team email will be passed in the prompt — use it in the metadata block.
 
 ## Step 2 — Build the Diagram
 
 ### Primary method: CLI tool (preferred — no temp files)
 
-Copy the AAG template to the target location, then use the CLI to update metadata and add diagram content:
+Copy the corporate template to the target location, then use the CLI to update metadata and add diagram content:
 
 ```bash
 # 1. Copy template to working location
-cp ~/.dotfiles/claude/drawio-assets/template/template.drawio /path/to/output.drawio
+cp ~/.dotfiles/claude/drawio-assets/template/template.drawio docs/diagrams/<application-name>.drawio
 
 # 2. Update title and metadata (these IDs exist in the template)
 CLI="/opt/homebrew/bin/cli-anything-drawio"
-$CLI --json --project /path/to/output.drawio shape label title "My Diagram Title"
-$CLI --json --project /path/to/output.drawio shape label metadata "Team Name: Security<br>SME: Jane Doe<br>Copyright: Alaska Air Group, Inc 2026<br>Last Reviewed Date: 2026-03-12"
+$CLI --json --project docs/diagrams/<application-name>.drawio shape label title "My Diagram Title"
+$CLI --json --project docs/diagrams/<application-name>.drawio shape label metadata "Team Name: Security<br>Team Email: team@example.com<br>SME: Jane Doe<br>Copyright: [COMPANY], Inc 2026<br>Last Reviewed Date: 2026-03-12"
 
 # 3. Add shapes (diagram content area uses x: -1500 to -250, y: 80 to 800)
-$CLI --json --project /path/to/output.drawio shape add rectangle -l "Web App" --x -1200 --y 200 -w 120 -h 60
+$CLI --json --project docs/diagrams/<application-name>.drawio shape add rectangle -l "Web App" --x -1200 --y 200 -w 120 -h 60
 # ... add more shapes, then connect them
-$CLI --json --project /path/to/output.drawio connect add <source_id> <target_id> --style orthogonal -l "HTTPS"
+$CLI --json --project docs/diagrams/<application-name>.drawio connect add <source_id> <target_id> --style orthogonal -l "HTTPS"
 
 # 4. Save
-$CLI --json --project /path/to/output.drawio project save
+$CLI --json --project docs/diagrams/<application-name>.drawio project save
 ```
 
 **Available shape types**: `rectangle`, `rounded`, `ellipse`, `diamond`, `triangle`, `hexagon`, `cylinder`, `cloud`, `parallelogram`, `process`, `document`, `callout`, `note`, `actor`, `text`
@@ -58,9 +57,9 @@ $CLI --json --project /path/to/output.drawio project save
 
 **Styling shapes/connectors** after creation:
 ```bash
-$CLI --json --project /path/to/output.drawio shape style <cell_id> fillColor "#f8cecc"
-$CLI --json --project /path/to/output.drawio shape style <cell_id> strokeColor "#b85450"
-$CLI --json --project /path/to/output.drawio connect style <connector_id> strokeColor "#6c8ebf"
+$CLI --json --project docs/diagrams/<application-name>.drawio shape style <cell_id> fillColor "#f8cecc"
+$CLI --json --project docs/diagrams/<application-name>.drawio shape style <cell_id> strokeColor "#b85450"
+$CLI --json --project docs/diagrams/<application-name>.drawio connect style <connector_id> strokeColor "#6c8ebf"
 ```
 
 ### Fallback method: Raw XML generation
@@ -69,7 +68,7 @@ Use this when the CLI tool cannot express the needed layout or when precise XML 
 
 ### Coordinate System
 
-The AAG template uses **negative x coordinates** for the right-side panel (legend/metadata) and **positive/negative x** for the main diagram area. The coordinate origin is near the top-center of the canvas.
+The corporate template uses **negative x coordinates** for the right-side panel (legend/metadata) and **positive/negative x** for the main diagram area. The coordinate origin is near the top-center of the canvas.
 
 ```
 x: -1560     x: -1480          x: -200    x: 160   x: 240   x: 320
@@ -139,8 +138,8 @@ y=840 CONFIDENTIAL + GitHub link
 
 **Metadata block** (below title, NO Version field):
 ```xml
-<mxCell id="metadata" value="Team Name: [TEAM]&lt;br&gt;SME: [SME]&lt;br&gt;Copyright: Alaska Air Group, Inc [YEAR]&lt;br&gt;Last Reviewed Date: [YYYY-MM-DD]" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#000000;opacity=75;" parent="1" vertex="1">
-  <mxGeometry x="-192" y="140" width="440" height="80" as="geometry"/>
+<mxCell id="metadata" value="Team Name: [TEAM]&lt;br&gt;Team Email: [EMAIL]&lt;br&gt;SME: [SME]&lt;br&gt;Copyright: [COMPANY], Inc [YEAR]&lt;br&gt;Last Reviewed Date: [YYYY-MM-DD]" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#000000;opacity=75;" parent="1" vertex="1">
+  <mxGeometry x="-192" y="140" width="440" height="100" as="geometry"/>
 </mxCell>
 ```
 
@@ -363,17 +362,30 @@ Add Azure stencil icons inside component boxes for visual identification. Place 
 </mxCell>
 ```
 
-**Available Azure stencil shapes** (use `shape=mxgraph.azure.<name>`):
-- `api_management` — API Management
-- `application_gateway` — Application Gateway
-- `load_balancer_generic` — Load Balancer
+**Available stencil shapes** — two stencil libraries exist. Use the correct prefix:
+
+**`mxgraph.azure.*`** (legacy Azure stencils — `stencils/azure.xml`):
 - `virtual_machine` — VM / VM Scale Set
-- `key_vault` — Key Vault
+- `load_balancer_generic` — Load Balancer
 - `cloud` — Cloud / SaaS service
-- `gateway` — NAT Gateway / VPN Gateway
 - `virtual_network` — Virtual Network
 - `server_rack` — Generic server
-- `storage` — Storage Account
+
+**`mxgraph.mscae.cloud.*`** (Microsoft Cloud & AI stencils — `stencils/mscae/cloud.xml`):
+- `api_management` — API Management
+- `application_gateway` — Application Gateway
+- `key_vault` — Key Vault
+- `gateway` — NAT Gateway / VPN Gateway
+- `azure_storage` — Storage Account
+- `vm_scale_set` — VM Scale Set
+- `nsg` — Network Security Group
+- `azure_dns` — Azure DNS
+- `vpn_gateway` — VPN Gateway
+- `cosmos_db` — Cosmos DB
+- `functions` — Azure Functions
+- `service_bus` — Service Bus
+
+**IMPORTANT:** Do NOT mix up the prefixes. Shapes only render if they match the correct stencil library. If an icon appears as a blank box, the shape name or prefix is wrong.
 - `sql_database_sql_azure` — SQL Database
 - `active_directory` — Active Directory / Entra ID
 
@@ -400,7 +412,7 @@ The final PNG **must** be an editable bitmap — a PNG with the full draw.io XML
 ### Primary method: draw.io desktop CLI `--embed-diagram` (preferred — produces valid editable PNGs)
 
 ```bash
-/Applications/draw.io.app/Contents/MacOS/draw.io --export --format png --embed-diagram --scale 2 --output /path/to/output.png /path/to/diagram.drawio
+/Applications/draw.io.app/Contents/MacOS/draw.io --export --format png --embed-diagram --scale 2 --output docs/diagrams/<application-name>.png docs/diagrams/<application-name>.drawio
 ```
 
 This uses draw.io's native export which correctly embeds the XML into the PNG. The `--embed-diagram` flag is the key — it makes the PNG reopenable in draw.io.
@@ -412,12 +424,12 @@ Use this only if the draw.io desktop app is not installed:
 ```bash
 # 1. Render raw PNG
 CLI="/opt/homebrew/bin/cli-anything-drawio"
-$CLI --json --project /path/to/diagram.drawio export render /tmp/diagram-raw.png -f png --crop --overwrite
+$CLI --json --project docs/diagrams/<application-name>.drawio export render /tmp/diagram-raw.png -f png --crop --overwrite
 
 # 2. Embed XML into the PNG
 DRAWIO_SCRIPTS="$HOME/.dotfiles/claude/drawio-scripts"
 ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm install)
-node "$DRAWIO_SCRIPTS/embed_xml.js" /tmp/diagram-raw.png /path/to/diagram.drawio /path/to/output.png
+node "$DRAWIO_SCRIPTS/embed_xml.js" /tmp/diagram-raw.png docs/diagrams/<application-name>.drawio docs/diagrams/<application-name>.png
 ```
 
 ### Last resort: Playwright MCP rendering
@@ -427,7 +439,7 @@ Use this if neither draw.io desktop nor cli-anything-drawio are available:
 ```bash
 DRAWIO_SCRIPTS="$HOME/.dotfiles/claude/drawio-scripts"
 ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm install)
-node "$DRAWIO_SCRIPTS/render_drawio_html.js" /path/to/diagram.drawio /tmp/diagram.html 0
+node "$DRAWIO_SCRIPTS/render_drawio_html.js" docs/diagrams/<application-name>.drawio /tmp/diagram.html 0
 ```
 
 Then use the Playwright MCP server to screenshot the HTML, and run `embed_xml.js` to embed the XML.
@@ -442,7 +454,7 @@ docs/diagrams/<application-name>.png
 
 Create the `docs/diagrams/` directory if it does not exist. Use the application name (lowercase, hyphenated) as the filename. **Do not save a separate `.drawio` file** — the editable PNG contains the full draw.io XML embedded, so it serves as both the image and the editable source. Users can drag the PNG into draw.io to edit.
 
-A temporary `.drawio` file may be created during the build process (e.g., in `/tmp/`) but should not be committed to the repository.
+The `.drawio` file used during the build process (`docs/diagrams/<application-name>.drawio`) should be removed after the PNG is exported — only the editable PNG is committed to the repository.
 
 ## Important Rules
 
@@ -459,6 +471,6 @@ A temporary `.drawio` file may be created during the build process (e.g., in `/t
 11. **Step circles**: use `strokeWidth=3;fontColor=#01426A` style (not strokeWidth=2)
 12. **Editable PNG**: ALWAYS use `draw.io --export --embed-diagram` (preferred) or `embed_xml.js` as fallback — never deliver a plain PNG without embedded XML
 13. **Dark mode**: ALWAYS use dark-mode-safe colors — medium-dark fills with white/light text on all components. Never use light fills (#dae8fc, #f5f5f5) with black text — these break in dark mode. Text readability must depend on contrast with its fill, not the canvas background.
-14. **Azure icons**: Add `mxgraph.azure.*` stencil icons (white, `fillColor=#FFFFFF`) as child cells inside component boxes for visual identification. Use `spacingLeft=40` on the parent box to make room for the icon.
+14. **Azure icons**: Add stencil icons (white, `fillColor=#FFFFFF`) as child cells inside component boxes. Use the correct stencil prefix: `mxgraph.azure.*` for legacy shapes (virtual_machine, cloud, server_rack, load_balancer_generic, virtual_network) and `mxgraph.mscae.cloud.*` for newer shapes (api_management, application_gateway, key_vault, gateway, nsg, vm_scale_set). Wrong prefix = blank icon. Use `spacingLeft=40` on the parent box to make room.
 
 $ARGUMENTS

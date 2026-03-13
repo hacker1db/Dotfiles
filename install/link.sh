@@ -67,6 +67,31 @@ if [ -e "$OPENCODE_SRC" ]; then
   fi
 fi
 
+echo -e "\n\nInstalling Claude Code settings"
+echo "=============================="
+for CLAUDE_FILE in settings.json statusline-command.sh; do
+  CLAUDE_SRC="$DOTFILES/claude/$CLAUDE_FILE"
+  CLAUDE_DEST="$HOME/.claude/$CLAUDE_FILE"
+  mkdir -p "$HOME/.claude"
+  if [ -e "$CLAUDE_SRC" ]; then
+    if [ -L "$CLAUDE_DEST" ]; then
+      CURRENT=$(readlink "$CLAUDE_DEST")
+      if [ "$CURRENT" != "$CLAUDE_SRC" ]; then
+        rm "$CLAUDE_DEST"
+        ln -s "$CLAUDE_SRC" "$CLAUDE_DEST"
+        echo "Updated symlink $CLAUDE_DEST -> $CLAUDE_SRC"
+      else
+        echo "~/.claude/$CLAUDE_FILE already symlinked correctly."
+      fi
+    elif [ ! -e "$CLAUDE_DEST" ]; then
+      ln -s "$CLAUDE_SRC" "$CLAUDE_DEST"
+      echo "Created symlink $CLAUDE_DEST -> $CLAUDE_SRC"
+    else
+      echo "~/.claude/$CLAUDE_FILE exists but is not a symlink; skipping."
+    fi
+  fi
+done
+
 echo -e "\n\nInstalling Claude Code agents and commands"
 echo "=============================="
 for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands"; do
