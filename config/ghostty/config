@@ -14,7 +14,7 @@ bold-is-bright = true
 # Font Settings
 font-family = "JetBrains Mono"
 font-style = "italic"
-font-size = 16
+font-size = 14
 font-feature = +liga
 
 
