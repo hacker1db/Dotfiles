@@ -196,7 +196,7 @@ function brew-cleanup(){
 
 function update-bun-tools(){
 echo "🔍 Getting list of globally installed bun packages..."
-packages=$(bun pm ls -g 2>/dev/null | awk 'NR>1 {print $1}' | sed 's/@[^@]*$//')
+packages=$(bun pm ls -g 2>/dev/null | awk 'NR>1 {print $2}' | sed 's/@[^@]*$//')
 
 if [ -z "$packages" ]; then
   echo "No global packages found."
@@ -208,9 +208,9 @@ echo "$packages"
 
 echo "$packages" | while IFS= read -r pkg; do
   if [ -n "$pkg" ]; then
-    if [ "$pkg" = "copilot" ]; then
+    if [ "$pkg" = "@github/copilot" ]; then
       echo "⬆️ 🤖 updating copilot separately $pkg..."
-      bun add -g "@github/$pkg@latest"
+      bun add -g "$pkg@latest"
       continue
     fi
     echo "⬆️  updating $pkg..."
