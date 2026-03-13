@@ -4,17 +4,36 @@ set -Eeuo pipefail
 trap cleanup SIGINT SIGTERM ERR EXIT
 
 usage() {
-  cat << EOF # remove the space between << and EOF, this is due to web plugin issue
-Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l] [-i] repository
+  cat << EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l <location>] <repository>
+       $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l <location>] --init <name> [--remote <url>] [--branch <name>]
 
-Clone a bare git repo (or init a new one) and set up environment for working comfortably and exclusively from worktrees.
+Set up a bare git repo for working exclusively with worktrees.
+No .git pointer file is created — work from inside worktree subdirs.
+
+Modes:
+  clone (default)   Clone an existing remote repository
+  --init            Initialize a new bare repository from scratch
 
 Available options:
 
--h, --help      Print this help and exit
--v, --verbose   Print script debug info
--l, --location  Location of the bare repo contents (default: .bare)
--i, --init      Initialize a new bare repo instead of cloning an existing one
+-h, --help          Print this help and exit
+-v, --verbose       Print script debug info
+-l, --location      Location of bare repo contents (default: .bare)
+    --init          Initialize a new repo instead of cloning
+    --remote        Remote URL to add when using --init (optional)
+    --branch        Default branch name for --init (default: main)
+
+Result layout:
+  <name>/
+    .bare/          <- git data (no .git pointer file in root)
+    <branch>/       <- initial worktree, start working here
+
+Examples:
+  git-bare-clone git@github.com:user/repo.git
+  git-bare-clone --init my-project
+  git-bare-clone --init my-project --remote git@github.com:user/my-project.git
+  git-bare-clone --init my-project --branch develop
 EOF
   exit
 }
@@ -37,25 +56,35 @@ msg() {
 
 die() {
   local msg=$1
-  local code=${2-1} # default exit status 1
+  local code=${2-1}
   msg "$msg"
   exit "$code"
 }
 
 parse_params() {
   location='.bare'
-  init=0
+  init_mode=0
+  remote_url=''
+  default_branch='main'
 
   while :; do
     case "${1-}" in
     -h | --help) usage ;;
     -v | --verbose) set -x ;;
     --no-color) NO_COLOR=1 ;;
-    -i | --init) init=1 ;;
+    --init) init_mode=1 ;;
     -l | --location)
-        location="${2-}"
-        shift
-        ;;
+      location="${2-}"
+      shift
+      ;;
+    --remote)
+      remote_url="${2-}"
+      shift
+      ;;
+    --branch)
+      default_branch="${2-}"
+      shift
+      ;;
     -?*) die "Unknown option: $1" ;;
     *) break ;;
     esac
@@ -63,9 +92,7 @@ parse_params() {
   done
 
   args=("$@")
-
-  # check required params and arguments
-  [[ ${#args[@]} -eq 0 ]] && die "Missing script arguments"
+  [[ ${#args[@]} -eq 0 ]] && die "Missing required argument (repository URL or project name)"
 
   return 0
 }
@@ -74,49 +101,81 @@ repo_dir_from_arg() {
   local repo_arg=${1%%/}
   local base=${repo_arg##*/}
   base=${base%.git}
-
   [[ -z "$base" ]] && die "Could not determine repo directory name from: $1"
   echo "$base"
+}
+
+do_clone() {
+  local repo_arg="$1"
+  local repo_dir
+  repo_dir=$(repo_dir_from_arg "$repo_arg")
+
+  [[ -e "$repo_dir" ]] && die "Target directory already exists: $repo_dir"
+
+  msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
+  mkdir -p "$repo_dir"
+  pushd "$repo_dir" > /dev/null
+
+  msg "${YELLOW}Cloning bare repository to $location...${NOFORMAT}"
+  git clone --bare "$repo_arg" "$location"
+
+  msg "${YELLOW}Adjusting origin fetch locations...${NOFORMAT}"
+  git -C "$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  git -C "$location" fetch origin
+
+  # Detect default branch from remote HEAD
+  local branch
+  branch=$(git -C "$location" symbolic-ref --short HEAD 2>/dev/null || echo "$default_branch")
+
+  msg "${YELLOW}Creating worktree for '$branch'...${NOFORMAT}"
+  GIT_DIR="$location" git worktree add "$branch" "$branch"
+
+  popd > /dev/null
+  msg "${GREEN}Success. Cloned into $repo_dir/${NOFORMAT}"
+  msg "${CYAN}Next: cd $repo_dir/$branch${NOFORMAT}"
+}
+
+do_init() {
+  local repo_dir="$1"
+
+  [[ -e "$repo_dir" ]] && die "Target directory already exists: $repo_dir"
+
+  msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
+  mkdir -p "$repo_dir"
+  pushd "$repo_dir" > /dev/null
+
+  msg "${YELLOW}Initializing bare repository in $location...${NOFORMAT}"
+  git init --bare --initial-branch="$default_branch" "$location"
+
+  msg "${YELLOW}Creating initial empty commit on '$default_branch'...${NOFORMAT}"
+  local empty_tree initial_commit
+  empty_tree=$(git -C "$location" hash-object -t tree /dev/null)
+  initial_commit=$(git -C "$location" commit-tree "$empty_tree" -m "Initial commit")
+  git -C "$location" update-ref "refs/heads/$default_branch" "$initial_commit"
+
+  if [[ -n "$remote_url" ]]; then
+    msg "${YELLOW}Adding remote origin: $remote_url${NOFORMAT}"
+    git -C "$location" remote add origin "$remote_url"
+    git -C "$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  fi
+
+  msg "${YELLOW}Creating worktree for '$default_branch'...${NOFORMAT}"
+  GIT_DIR="$location" git worktree add "$default_branch" "$default_branch"
+
+  popd > /dev/null
+  msg "${GREEN}Success. Initialized $repo_dir/${NOFORMAT}"
+  if [[ -n "$remote_url" ]]; then
+    msg "${CYAN}Remote set to: $remote_url${NOFORMAT}"
+    msg "${CYAN}Push when ready: cd $repo_dir/$default_branch && git push -u origin $default_branch${NOFORMAT}"
+  fi
+  msg "${CYAN}Next: cd $repo_dir/$default_branch${NOFORMAT}"
 }
 
 parse_params "$@"
 setup_colors
 
-if [[ $init -eq 1 ]]; then
-  repo_dir="${args[0]}"
-
-  if [[ -e "$repo_dir" ]]; then
-    die "Target directory already exists: $repo_dir"
-  fi
-
-  msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
-  mkdir -p "$repo_dir"
-  pushd "$repo_dir" > /dev/null
-  msg "${YELLOW}Initializing bare repository in $location...${NOFORMAT}"
-  git init --bare "$location"
-  msg "${YELLOW}Setting .git file contents...${NOFORMAT}"
-  echo "gitdir: ./$location" > .git
-  popd > /dev/null
-  msg "${GREEN}Success.${NOFORMAT}"
+if [[ $init_mode -eq 1 ]]; then
+  do_init "${args[0]}"
 else
-  repo_arg=${args[0]}
-  repo_dir=$(repo_dir_from_arg "$repo_arg")
-
-  if [[ -e "$repo_dir" ]]; then
-    die "Target directory already exists: $repo_dir"
-  fi
-
-  msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
-  mkdir -p "$repo_dir"
-  pushd "$repo_dir" > /dev/null
-  msg "${YELLOW}Cloning bare repository to $location...${NOFORMAT}"
-  git clone --bare "$repo_arg" "$location"
-  pushd "$location" > /dev/null
-  msg "${YELLOW}Adjusting origin fetch locations...${NOFORMAT}"
-  git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-  popd > /dev/null
-  msg "${YELLOW}Setting .git file contents...${NOFORMAT}"
-  echo "gitdir: ./$location" > .git
-  popd > /dev/null
-  msg "${GREEN}Success.${NOFORMAT}"
+  do_clone "${args[0]}"
 fi
