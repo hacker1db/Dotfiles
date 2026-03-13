@@ -1,0 +1,9 @@
+{
+  "name": "drawio-renderer",
+  "version": "1.0.0",
+  "description": "Renders draw.io XML to editable PNG using mxGraph + Playwright",
+  "dependencies": {
+    "jsdom": "^28.0.0",
+    "mxgraph": "^4.2.2"
+  }
+}
