@@ -327,25 +327,25 @@ style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;strokeColor=#e5ad07;strokeWi
 
 **Comment indicator** (dashed oval-end): `style="endArrow=oval;html=1;rounded=0;dashed=1;strokeColor=#404D2C;strokeWidth=1;endFill=0;endSize=8;"`
 
-## Step 3 — Export to PNG
+## Step 3 — Export to Editable PNG
 
-### Primary method: CLI tool (preferred)
+The final PNG **must** be an editable bitmap — a PNG with the full draw.io XML embedded as a `tEXt` chunk so it can be dragged back into draw.io and edited. This requires two steps: render the PNG, then embed the XML.
 
-The CLI tool exports directly — no temp files, no Playwright needed.
+### 3a. Render the PNG
+
+**Primary method: CLI tool (preferred)**
 
 ```bash
-# Export to PNG from the working project file
-/opt/homebrew/bin/cli-anything-drawio --json --project /path/to/diagram.drawio export render /path/to/output.png -f png --crop --overwrite
+CLI="/opt/homebrew/bin/cli-anything-drawio"
+$CLI --json --project /path/to/diagram.drawio export render /tmp/diagram-raw.png -f png --crop --overwrite
 ```
 
-Save the .drawio file to the user's desired location with `project save` or `cp`, then export the PNG alongside it.
+**Fallback method: Playwright MCP rendering**
 
-### Fallback method: Playwright MCP rendering
-
-Use this only if the CLI export produces unsatisfactory results or if you need the HTML preview rendering with the custom mxGraph parser.
+Use this if the CLI export produces unsatisfactory results or if you need the HTML preview rendering.
 
 ```bash
-# Install deps if needed (jsdom + mxgraph only, NOT playwright)
+# Install deps if needed
 DRAWIO_SCRIPTS="$HOME/.dotfiles/claude/drawio-scripts"
 ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm install)
 
@@ -353,19 +353,33 @@ ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm in
 node "$DRAWIO_SCRIPTS/render_drawio_html.js" /path/to/diagram.drawio /tmp/diagram.html 0
 ```
 
-Then use the Playwright MCP server to screenshot the HTML. If not available, enable it in your tool's settings (Claude Code, OpenCode, or GitHub Copilot CLI).
+Then use the Playwright MCP server to screenshot the HTML (enable it in your tool's settings — Claude Code, OpenCode, or GitHub Copilot CLI — if not available):
 
 1. Navigate to `file:///tmp/diagram.html` using the browser navigate tool
-2. Take a screenshot using the browser screenshot tool
+2. Take a screenshot to `/tmp/diagram-raw.png` using the browser screenshot tool
 
-Optionally embed XML into the PNG for editability:
+### 3b. Embed XML to make the PNG editable (REQUIRED)
+
+This step is **always required** regardless of which render method was used:
+
 ```bash
-node "$DRAWIO_SCRIPTS/embed_xml.js" /tmp/screenshot.png /path/to/diagram.drawio /path/to/output.png
+DRAWIO_SCRIPTS="$HOME/.dotfiles/claude/drawio-scripts"
+ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm install)
+node "$DRAWIO_SCRIPTS/embed_xml.js" /tmp/diagram-raw.png /path/to/diagram.drawio /path/to/output.png
 ```
+
+This embeds the full `.drawio` XML into the PNG's `tEXt` metadata. The resulting file is both a valid PNG image and a reopenable draw.io source file.
 
 ## Step 4 — Present the File
 
-Copy the rendered PNG to the user's desired location or present it directly.
+The final editable PNG and `.drawio` source file must be saved to `docs/diagrams/` in the project repository:
+
+```
+docs/diagrams/<application-name>.drawio
+docs/diagrams/<application-name>.png
+```
+
+Create the `docs/diagrams/` directory if it does not exist. Use the application name (lowercase, hyphenated) as the filename.
 
 ## Important Rules
 
@@ -380,5 +394,6 @@ Copy the rendered PNG to the user's desired location or present it directly.
 9. **Cell IDs**: must be unique strings within a diagram
 10. **No Version field**: The real metadata block does NOT include Version — omit it
 11. **Step circles**: use `strokeWidth=3;fontColor=#01426A` style (not strokeWidth=2)
+12. **Editable PNG**: ALWAYS run `embed_xml.js` after rendering — never deliver a plain PNG without embedded XML
 
 $ARGUMENTS
