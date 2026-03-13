@@ -130,7 +130,7 @@ export PATH="/Users/$Home/.rd/bin:$PATH"
 autoload -Uz compinit && compinit
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="/Users/David.Walters@alaskaair.com/.rd/bin:$PATH"
+export PATH="$HOME/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
 
 # .NET SDK

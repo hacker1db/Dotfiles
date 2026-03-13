@@ -305,7 +305,7 @@ All blog posts are saved to:
 ## Troubleshooting
 
 **Draft not saved**
-→ Check you're in vault directory: `cd /Users/David.Walters@alaskaair.com/notes/SecondBrain`
+→ Check you're in vault directory: `cd $HOME/notes/SecondBrain`
 
 **Note files not found**
 → Use full paths from vault root: `2.Areas/Work Notes/...`

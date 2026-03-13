@@ -291,22 +291,49 @@ Step description text (in legend panel, starting at y=260 from legend border):
 </mxCell>
 ```
 
-### Component Styles (for diagram content area)
+### Component Styles — Dark Mode Safe
 
-**Environment/zone boundary** (green semi-transparent):
+All component styles use **medium-dark fills with white/light text** so diagrams are readable in both draw.io light and dark mode. The key principle: text readability depends on contrast with its fill, not the canvas background.
+
+**Azure internal component** (medium blue fill, white text):
 ```xml
-style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;arcSize=7;opacity=33;verticalAlign=top;"
+style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1565C0;strokeColor=#0D47A1;strokeWidth=2;fontSize=10;verticalAlign=middle;fontColor=#FFFFFF;align=left;spacingLeft=40;"
+```
+
+**3rd-Party/External system** (amber fill, white text, dashed):
+```xml
+style="rounded=1;whiteSpace=wrap;html=1;fontSize=10;strokeColor=#E65100;strokeWidth=2;fillColor=#F57F17;dashed=1;dashPattern=1 1;verticalAlign=middle;fontColor=#FFFFFF;align=left;spacingLeft=38;"
+```
+
+**Connected System** (orange fill, white text):
+```xml
+style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EF6C00;strokeColor=#BF360C;strokeWidth=2;fontSize=10;verticalAlign=middle;fontColor=#FFFFFF;align=left;spacingLeft=38;"
+```
+
+**Public IP / Network utility** (purple fill, white text):
+```xml
+style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6A1B9A;strokeColor=#4A148C;strokeWidth=2;fontSize=9;verticalAlign=middle;fontColor=#FFFFFF;"
+```
+
+**Environment/region boundary** (dark green, semi-transparent, light green text):
+```xml
+style="rounded=1;whiteSpace=wrap;html=1;fontSize=14;arcSize=5;fillColor=#1B5E20;strokeColor=#2E7D32;strokeWidth=2;verticalAlign=top;spacingTop=2;fontColor=#C8E6C9;opacity=30;"
+```
+
+**VNet boundary** (blue outline, blue text, no fill):
+```xml
+style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#42A5F5;fontSize=10;verticalAlign=top;strokeWidth=2;spacingTop=2;fontColor=#64B5F6;"
+```
+
+**Subnet boundary** (dark fill, dashed, light gray text):
+```xml
+style="rounded=1;whiteSpace=wrap;html=1;fillColor=#263238;strokeColor=#455A64;fontSize=9;verticalAlign=middle;dashed=1;fontColor=#B0BEC5;opacity=60;"
 ```
 
 **CDE System boundary** (red crosshatch outline — use same crosshatch technique as legend):
 ```xml
 style="rounded=1;whiteSpace=wrap;html=1;fontSize=12;strokeWidth=2;fillColor=none;"
 <!-- plus two crossing red edge cells like leg-cde-border-1/2 -->
-```
-
-**3rd-Party/External system box** (yellow dotted):
-```xml
-style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;strokeColor=#e5ad07;strokeWidth=1;fillColor=#ffdb67;opacity=75;dashed=1;dashPattern=1 1;verticalAlign=top;"
 ```
 
 **CDE server rack** (pink): `style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=#b85450;fillColor=#f8cecc;shape=mxgraph.azure.server_rack;"`
@@ -317,69 +344,105 @@ style="rounded=0;whiteSpace=wrap;html=1;fontSize=10;strokeColor=#e5ad07;strokeWi
 
 **Actor/User** (match server color): `style="shape=actor;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;"` (change colors for connected=#ffe6cc/#d79b00, oos=#e1d5e7/#9673a6)
 
-### Arrow/Connection Styles
+### Azure Icons
 
-**Encrypted HTTPS (blue open arrow)**: `style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;strokeWidth=2;startArrow=none;startFill=0;"`
+Add Azure stencil icons inside component boxes for visual identification. Place icons as **child cells** of the component box (using `parent="<box-id>"`) so they move with the box. Use `fillColor=#FFFFFF` (white) for the icon — white icons are visible against dark fills in both light and dark mode.
 
-**Encrypted Other traffic (green open arrow)**: `style="endArrow=openThin;html=1;rounded=0;endFill=0;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;"`
+**Pattern** — icon as child of a component box:
+```xml
+<!-- Component box with spacingLeft to make room for icon -->
+<mxCell id="my-component" value="&lt;b&gt;Component Name&lt;/b&gt;&lt;br&gt;..."
+  style="rounded=1;...;align=left;spacingLeft=40;" parent="1" vertex="1">
+  <mxGeometry x="-1200" y="200" width="280" height="65" as="geometry"/>
+</mxCell>
+<!-- Icon as child (coords relative to parent box) -->
+<mxCell id="my-component-icon" value=""
+  style="verticalLabelPosition=middle;html=1;verticalAlign=middle;align=center;strokeColor=none;fillColor=#FFFFFF;shape=mxgraph.azure.xxx;pointerEvents=1;"
+  parent="my-component" vertex="1">
+  <mxGeometry x="8" y="17" width="28" height="28" as="geometry"/>
+</mxCell>
+```
 
-**Unencrypted data** (orange/red dashed): `style="endArrow=classicThin;html=1;rounded=0;endFill=1;strokeWidth=2;fillColor=#f26135;strokeColor=#B82B47;dashed=1;dashPattern=1 2;"`
+**Available Azure stencil shapes** (use `shape=mxgraph.azure.<name>`):
+- `api_management` — API Management
+- `application_gateway` — Application Gateway
+- `load_balancer_generic` — Load Balancer
+- `virtual_machine` — VM / VM Scale Set
+- `key_vault` — Key Vault
+- `cloud` — Cloud / SaaS service
+- `gateway` — NAT Gateway / VPN Gateway
+- `virtual_network` — Virtual Network
+- `server_rack` — Generic server
+- `storage` — Storage Account
+- `sql_database_sql_azure` — SQL Database
+- `active_directory` — Active Directory / Entra ID
 
-**Comment indicator** (dashed oval-end): `style="endArrow=oval;html=1;rounded=0;dashed=1;strokeColor=#404D2C;strokeWidth=1;endFill=0;endSize=8;"`
+### Arrow/Connection Styles — Dark Mode Safe
+
+Use colored strokes and matching `fontColor` with `labelBackgroundColor=none` on all edge labels. These medium-bright colors are visible against both light and dark canvas backgrounds.
+
+**Internal traffic (blue)**: `style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#42A5F5;strokeWidth=2;endArrow=openThin;endFill=0;fontSize=9;fontColor=#42A5F5;labelBackgroundColor=none;"`
+
+**Outbound/encrypted traffic (green)**: `style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#66BB6A;strokeWidth=2;endArrow=openThin;endFill=0;fontSize=9;fontColor=#66BB6A;labelBackgroundColor=none;"`
+
+**Secret/config retrieval (orange dashed)**: `style="endArrow=oval;html=1;rounded=0;endFill=0;strokeWidth=1;strokeColor=#FFA726;dashed=1;fontSize=8;fontColor=#FFA726;labelBackgroundColor=none;"`
+
+**Utility connection (purple)**: `style="endArrow=openThin;html=1;rounded=0;endFill=0;strokeWidth=1;strokeColor=#CE93D8;"`
+
+**Unencrypted data (red dashed)**: `style="endArrow=classicThin;html=1;rounded=0;endFill=1;strokeWidth=2;fillColor=#f26135;strokeColor=#EF5350;dashed=1;dashPattern=1 2;fontSize=9;fontColor=#EF5350;labelBackgroundColor=none;"`
+
+**Comment indicator (dashed oval-end)**: `style="endArrow=oval;html=1;rounded=0;dashed=1;strokeColor=#78909C;strokeWidth=1;endFill=0;endSize=8;"`
 
 ## Step 3 — Export to Editable PNG
 
-The final PNG **must** be an editable bitmap — a PNG with the full draw.io XML embedded as a `tEXt` chunk so it can be dragged back into draw.io and edited. This requires two steps: render the PNG, then embed the XML.
+The final PNG **must** be an editable bitmap — a PNG with the full draw.io XML embedded so it can be dragged back into draw.io and edited.
 
-### 3a. Render the PNG
-
-**Primary method: CLI tool (preferred)**
+### Primary method: draw.io desktop CLI `--embed-diagram` (preferred — produces valid editable PNGs)
 
 ```bash
+/Applications/draw.io.app/Contents/MacOS/draw.io --export --format png --embed-diagram --scale 2 --output /path/to/output.png /path/to/diagram.drawio
+```
+
+This uses draw.io's native export which correctly embeds the XML into the PNG. The `--embed-diagram` flag is the key — it makes the PNG reopenable in draw.io.
+
+### Fallback method: cli-anything-drawio + embed_xml.js
+
+Use this only if the draw.io desktop app is not installed:
+
+```bash
+# 1. Render raw PNG
 CLI="/opt/homebrew/bin/cli-anything-drawio"
 $CLI --json --project /path/to/diagram.drawio export render /tmp/diagram-raw.png -f png --crop --overwrite
-```
 
-**Fallback method: Playwright MCP rendering**
-
-Use this if the CLI export produces unsatisfactory results or if you need the HTML preview rendering.
-
-```bash
-# Install deps if needed
-DRAWIO_SCRIPTS="$HOME/.dotfiles/claude/drawio-scripts"
-ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm install)
-
-# Generate the HTML preview file
-node "$DRAWIO_SCRIPTS/render_drawio_html.js" /path/to/diagram.drawio /tmp/diagram.html 0
-```
-
-Then use the Playwright MCP server to screenshot the HTML (enable it in your tool's settings — Claude Code, OpenCode, or GitHub Copilot CLI — if not available):
-
-1. Navigate to `file:///tmp/diagram.html` using the browser navigate tool
-2. Take a screenshot to `/tmp/diagram-raw.png` using the browser screenshot tool
-
-### 3b. Embed XML to make the PNG editable (REQUIRED)
-
-This step is **always required** regardless of which render method was used:
-
-```bash
+# 2. Embed XML into the PNG
 DRAWIO_SCRIPTS="$HOME/.dotfiles/claude/drawio-scripts"
 ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm install)
 node "$DRAWIO_SCRIPTS/embed_xml.js" /tmp/diagram-raw.png /path/to/diagram.drawio /path/to/output.png
 ```
 
-This embeds the full `.drawio` XML into the PNG's `tEXt` metadata. The resulting file is both a valid PNG image and a reopenable draw.io source file.
+### Last resort: Playwright MCP rendering
+
+Use this if neither draw.io desktop nor cli-anything-drawio are available:
+
+```bash
+DRAWIO_SCRIPTS="$HOME/.dotfiles/claude/drawio-scripts"
+ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm install)
+node "$DRAWIO_SCRIPTS/render_drawio_html.js" /path/to/diagram.drawio /tmp/diagram.html 0
+```
+
+Then use the Playwright MCP server to screenshot the HTML, and run `embed_xml.js` to embed the XML.
 
 ## Step 4 — Present the File
 
-The final editable PNG and `.drawio` source file must be saved to `docs/diagrams/` in the project repository:
+The final editable PNG must be saved to `docs/diagrams/` in the project repository:
 
 ```
-docs/diagrams/<application-name>.drawio
 docs/diagrams/<application-name>.png
 ```
 
-Create the `docs/diagrams/` directory if it does not exist. Use the application name (lowercase, hyphenated) as the filename.
+Create the `docs/diagrams/` directory if it does not exist. Use the application name (lowercase, hyphenated) as the filename. **Do not save a separate `.drawio` file** — the editable PNG contains the full draw.io XML embedded, so it serves as both the image and the editable source. Users can drag the PNG into draw.io to edit.
+
+A temporary `.drawio` file may be created during the build process (e.g., in `/tmp/`) but should not be committed to the repository.
 
 ## Important Rules
 
@@ -394,6 +457,8 @@ Create the `docs/diagrams/` directory if it does not exist. Use the application 
 9. **Cell IDs**: must be unique strings within a diagram
 10. **No Version field**: The real metadata block does NOT include Version — omit it
 11. **Step circles**: use `strokeWidth=3;fontColor=#01426A` style (not strokeWidth=2)
-12. **Editable PNG**: ALWAYS run `embed_xml.js` after rendering — never deliver a plain PNG without embedded XML
+12. **Editable PNG**: ALWAYS use `draw.io --export --embed-diagram` (preferred) or `embed_xml.js` as fallback — never deliver a plain PNG without embedded XML
+13. **Dark mode**: ALWAYS use dark-mode-safe colors — medium-dark fills with white/light text on all components. Never use light fills (#dae8fc, #f5f5f5) with black text — these break in dark mode. Text readability must depend on contrast with its fill, not the canvas background.
+14. **Azure icons**: Add `mxgraph.azure.*` stencil icons (white, `fillColor=#FFFFFF`) as child cells inside component boxes for visual identification. Use `spacingLeft=40` on the parent box to make room for the icon.
 
 $ARGUMENTS

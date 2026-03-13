@@ -211,6 +211,7 @@ Template hooks in `git/templates/hooks/`:
 ### Security
 - **NEVER** commit secrets or API keys
 - **NEVER** log or expose credentials
+- **NEVER** hardcode the username in paths (e.g. `/Users/username/...`) — always use `$HOME` or `~` instead
 - **Git signing**: Configured with 1Password SSH agent
 - **SSH approval caching**: 8 hours (28800s) in 1Password config
 - **compinit security**: Runs daily check, uses `-C` flag for performance

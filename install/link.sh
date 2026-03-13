@@ -4,15 +4,21 @@ DOTFILES=$HOME/.dotfiles
 
 # Ensure clitools repo is present before linking
 CLITOOLS_DIR="$HOME/Developer/clitools"
-CLITOOLS_REPO_URL=${CLITOOLS_REPO_URL:-git@github.com:CyberDSO/clitools.git}
-if [ ! -d "$CLITOOLS_DIR" ]; then
+if [ -z "${CLITOOLS_REPO_URL:-}" ]; then
+    GH_USER=$(gh api user --jq '.login' 2>/dev/null || true)
+    if [ -n "$GH_USER" ]; then
+        CLITOOLS_REPO_URL="git@github.com:${GH_USER}/clitools.git"
+    else
+        echo "Warning: gh CLI not authenticated; skipping clitools clone"
+        CLITOOLS_REPO_URL=""
+    fi
+fi
+if [ -n "$CLITOOLS_REPO_URL" ] && [ ! -d "$CLITOOLS_DIR" ]; then
     echo "Cloning clitools repo to $CLITOOLS_DIR"
     mkdir -p "$(dirname "$CLITOOLS_DIR")"
     git clone "$CLITOOLS_REPO_URL" "$CLITOOLS_DIR" || echo "Failed to clone clitools; continuing without it"
-else
-    if [ -d "$CLITOOLS_DIR/.git" ]; then
-        git -C "$CLITOOLS_DIR" fetch --quiet && git -C "$CLITOOLS_DIR" pull --ff-only --quiet || echo "Could not update clitools; using existing copy"
-    fi
+elif [ -d "$CLITOOLS_DIR/.git" ]; then
+    git -C "$CLITOOLS_DIR" fetch --quiet && git -C "$CLITOOLS_DIR" pull --ff-only --quiet || echo "Could not update clitools; using existing copy"
 fi
 
 

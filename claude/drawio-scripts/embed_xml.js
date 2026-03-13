@@ -50,8 +50,10 @@ while (off < pngBuf.length) {
   const len  = pngBuf.readUInt32BE(off);
   const type = pngBuf.slice(off + 4, off + 8).toString('ascii');
   // Insert tEXt chunk with mxfile XML right before IEND
+  // draw.io expects the XML value to be URI-encoded in the tEXt chunk
   if (type === 'IEND') {
-    parts.push(...makeChunk('tEXt', Buffer.from('mxfile\0' + xml, 'latin1')));
+    const encoded = encodeURIComponent(xml);
+    parts.push(...makeChunk('tEXt', Buffer.from('mxfile\0' + encoded, 'latin1')));
   }
   parts.push(pngBuf.slice(off, off + 12 + len));
   off += 12 + len;
