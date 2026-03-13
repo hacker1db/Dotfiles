@@ -8,7 +8,7 @@ Generate Alaska Air Group-standard draw.io diagrams as **editable PNG files** �
 **CLI tool**: `/opt/homebrew/bin/cli-anything-drawio` — stateful Draw.io CLI for creating diagrams, adding shapes/connectors, and exporting to PNG/PDF/SVG.
 **Scripts location**: `~/.dotfiles/claude/drawio-scripts/`
 **Template location**: `~/.dotfiles/claude/drawio-assets/template/template.drawio`
-**Rendering**: Uses the Playwright MCP server (browser tools) — no local Playwright install needed. If the Playwright MCP tools are not available, enable the Playwright MCP server in Claude Code settings before proceeding.
+**Rendering**: Primary export via CLI tool. Fallback uses the Playwright MCP server (browser tools) — if Playwright MCP tools are not available, enable the Playwright MCP server in your tool's settings (Claude Code, OpenCode, or GitHub Copilot CLI).
 
 ## Workflow
 
@@ -353,9 +353,10 @@ ls "$DRAWIO_SCRIPTS/node_modules" 2>/dev/null || (cd "$DRAWIO_SCRIPTS" && npm in
 node "$DRAWIO_SCRIPTS/render_drawio_html.js" /path/to/diagram.drawio /tmp/diagram.html 0
 ```
 
-Then use the Playwright MCP server (enable it in Claude Code settings if not available):
-1. Call `mcp__playwright__browser_navigate` with url `file:///tmp/diagram.html`
-2. Call `mcp__playwright__browser_take_screenshot` to capture the rendered diagram
+Then use the Playwright MCP server to screenshot the HTML. If not available, enable it in your tool's settings (Claude Code, OpenCode, or GitHub Copilot CLI).
+
+1. Navigate to `file:///tmp/diagram.html` using the browser navigate tool
+2. Take a screenshot using the browser screenshot tool
 
 Optionally embed XML into the PNG for editability:
 ```bash
