@@ -2,7 +2,7 @@
 # Reload tmux config for all sessions and clients
 
 CONFIG="${HOME}/.config/tmux/tmux.conf"
-TPM="${HOME}/.tmux/plugins/tpm/tpm"
+TPM="${HOME}/.config/tmux/plugins/tpm/tpm"
 
 # reload server config
 tmux source-file "$CONFIG"
