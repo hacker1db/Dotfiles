@@ -10,13 +10,21 @@
   "enabledPlugins": {
     "cli-anything@cli-anything": true,
     "typescript-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "oh-my-claudecode@omc": true
   },
   "extraKnownMarketplaces": {
     "cli-anything": {
       "source": {
         "source": "github",
         "repo": "HKUDS/CLI-Anything"
+      }
+    },
+    "omc": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/Yeachan-Heo/oh-my-claudecode.git"
       }
     }
   }

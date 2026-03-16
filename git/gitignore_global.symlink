@@ -34,3 +34,4 @@ tmp
 .Claude
 .vscode
 .sonarlint/
+.omc

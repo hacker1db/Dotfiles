@@ -6,3 +6,7 @@ vault = "Work"
 [[ssh-keys]]
 item = "Github Personal"
 vault = "Private"
+
+[[ssh-keys]]
+item = "ADO"
+vault = "work"
