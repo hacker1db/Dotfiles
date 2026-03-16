@@ -62,6 +62,7 @@ vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""
+vim.opt.fillchars:append("fold: ")
 vim.opt.foldnestmax = 4
 
 -- spell disabled globally — harper-ls handles grammar/spelling for markdown

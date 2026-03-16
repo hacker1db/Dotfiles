@@ -206,6 +206,9 @@ Template hooks in `git/templates/hooks/`:
 - `post-merge` - Track recent merges
 - `pre-commit` - Run jscs/jshint checks
 
+## Hands Off
+- **NEVER** modify the Claude Code status line configuration (`~/.claude/settings.json` `statusLine` block) — the user manages this themselves
+
 ## Security & Best Practices
 
 ### Security

@@ -1,23 +1,23 @@
 # Dotfiles Improvement Plan
 
-## 1. Restore or remove `install/nvm.sh`
+## 1. Restore Or Remove `Install/Nvm.Sh`
 - Add back the missing `install/nvm.sh` script with the expected nvm bootstrap logic, or stop sourcing it from `install.sh:16`.
 - If nvm setup now lives in `install/install_tools.sh`, move the logic there and delete the stale reference so the install script no longer fails.
 
-## 2. Harden `install/install_tools.sh`
+## 2. Harden `Install/Install_Tools.Sh`
 - Fix typos such as `brew instal`, `berw install`, and replace deprecated `brew cask install` with `brew install --cask`.
 - Remove duplicate or invalid cask entries (`darwio`, second `1password-cli`, etc.) and guard each command so the script keeps going when a tool is unavailable.
 - Ensure `nvm` is installed before running `nvm use --lts`; call `nvm install --lts` first or wrap the `use` command in a check.
 
-## 3. Repair macOS defaults script
+## 3. Repair MacOS Defaults Script
 - Delete the stray `link.s` line at `install/osx.sh:11` so the script doesn't terminate early and the remaining defaults commands execute as intended.
 - Consider grouping the defaults writes into logical sections and echoing each action for easier troubleshooting.
 
-## 4. Make shell startup resilient
+## 4. Make Shell Startup Resilient
 - Wrap `source <(kubectl completion zsh)` (and similar blocks) in `command -v` guards so missing commands don't spam errors in new shells.
 - Audit the PATH exports in `zsh/zshrc.symlink` and remove hard-coded usernames or redundant lines to avoid broken paths.
 
-## 5. Fix slow zsh startup (critical performance issues)
+## 5. Fix Slow Zsh Startup (Critical Performance Issues)
 **Major Performance Problems:**
 - **Line 88**: `source <(kubectl completion zsh)` runs UNCONDITIONALLY (even though line 17-19 already does this conditionally!)
   - This is a DUPLICATE that generates completion code every shell start
@@ -37,7 +37,7 @@
 
 **Estimated improvement:** 50-80% faster startup (from ~2-3s to ~500ms)
 
-## 6. Snacks.nvim (UI consolidation) ✅
+## 6. Snacks.Nvim (UI Consolidation) ✅
 
 - Status: Fully consolidated multiple UI plugins into `snacks.nvim`.
 - Now Enabled: notifier, indent, scroll, words, bufdelete, zen, terminal, lazygit, picker, explorer, dashboard, quickfile, image, gitbrowse, statuscolumn.
@@ -59,7 +59,7 @@
   - Decide later on broader use of snacks image/statuscolumn polish if needed
   - Optionally add Undotree (see section 7) after assessing refactor workflow frequency
 
-## 7. Undotree Integration (deferred)
+## 7. Undotree Integration (Deferred)
 - Candidate plugin: `mbbill/undotree`
 - Rationale: Visual exploration of persistent undo history, time-travel diff comparisons
 - Deferred Because: Core workflows currently satisfied; adds another UI panel; evaluate only if complex refactors make deep history inspection frequent
@@ -67,6 +67,6 @@
 
 
 
-## add 
+## Add 
 - dotnet install update using the dotnet-install script 
 - Fix the explore with mini just being really annoying

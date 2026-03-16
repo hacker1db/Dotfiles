@@ -1,7 +1,8 @@
 # Appearance Settings
-background-opacity = 0.95
-# Color Scheme Based on Appearance
-theme = Eldritch
+background-opacity = 0.78
+background-blur = true
+# Color Scheme - linkarzu custom palette
+theme = linkarzu
 link-url = true
 window-decoration = true
 window-padding-balance = true
