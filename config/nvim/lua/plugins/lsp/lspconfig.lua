@@ -281,19 +281,6 @@ return {
                     lspconfig.markdown_oxide.setup({
                         capabilities = oxide_capabilities,
                         root_dir = lspconfig.util.root_pattern(".obsidian", ".moxide.toml", ".git"),
-                        on_attach = function(client, bufnr)
-                            -- refresh codelens on BufEnter and InsertLeave
-                            if client.server_capabilities.codeLensProvider then
-                                vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
-                                    buffer = bufnr,
-                                    callback = function()
-                                        vim.lsp.codelens.refresh({ bufnr = bufnr })
-                                    end,
-                                })
-                                -- initial refresh
-                                vim.lsp.codelens.refresh({ bufnr = bufnr })
-                            end
-                        end,
                     })
                 end,
 

@@ -44,5 +44,38 @@ vim.api.nvim_create_autocmd("FileType", {
     end
     vim.keymap.set({ "n", "v" }, "<leader>ml", function() insert_link(vim.fn.mode()) end, opts)
     vim.keymap.set({ "n", "v" }, "ml", function() insert_link(vim.fn.mode()) end, opts)
+
+    -- Update/insert TOC using markdown-toc
+    vim.keymap.set("n", "<leader>mt", function()
+      local path = vim.fn.expand("%:p")
+      vim.fn.system('markdown-toc --bullets "-" -i ' .. vim.fn.shellescape(path))
+      vim.cmd("edit!")
+      vim.cmd("silent write")
+      vim.notify("TOC updated", vim.log.levels.INFO)
+    end, { buffer = ev.buf, silent = true, desc = "Update markdown TOC" })
   end
+})
+
+-- Codelens auto-refresh for markdown (markdown-oxide reference counts)
+local function codelens_supported(bufnr)
+  for _, c in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+    if c.server_capabilities and c.server_capabilities.codeLensProvider then
+      return true
+    end
+  end
+  return false
+end
+
+local function refresh_markdown_codelens(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then return end
+  if vim.bo[bufnr].buftype ~= "" then return end
+  if vim.bo[bufnr].filetype ~= "markdown" then return end
+  if not codelens_supported(bufnr) then return end
+  vim.lsp.codelens.refresh({ bufnr = bufnr })
+end
+
+vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave", "TextChanged" }, {
+  callback = function(args)
+    refresh_markdown_codelens(args.buf)
+  end,
 })

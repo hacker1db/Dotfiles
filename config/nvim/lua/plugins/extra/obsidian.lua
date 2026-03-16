@@ -37,7 +37,7 @@ return {
             -- Optional, if you keep daily notes in a separate directory.
             folder = "0.Quick Notes 📨/Daily Stuff",
             -- Optional, if you want to automatically insert a template from your template directory like 'daily.md'
-            template = "4.Resources/Templates 🗞/Daily Note Template.md",
+            template = "Daily Note Template.md",
         },
 
         -- Optional, completion of wiki links, local markdown links, and tags using nvim-cmp.
@@ -160,10 +160,9 @@ return {
 
         -- Optional, for templates (see below).
         templates = {
-            subdir = "templates",
+            subdir = "4.Resources/Templates",
             date_format = "%Y-%m-%d",
             time_format = "%H:%M",
-            -- A map for custom variables, the key should be the variable and the value a function
             substitutions = {},
         },
 
