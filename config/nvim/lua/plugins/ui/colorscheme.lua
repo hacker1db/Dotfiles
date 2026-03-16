@@ -57,6 +57,24 @@ return {
                 hl["@markup.strong"] = { fg = "#f94dff", bold = true }
                 hl["@markup.raw.markdown_inline"] = { fg = "#fca6ff" }
 
+                -- Diagnostic colors (harper-ls spelling = Hint = green underline)
+                hl.DiagnosticError = { fg = "#f16c75" }
+                hl.DiagnosticWarn = { fg = "#f1fc79" }
+                hl.DiagnosticInfo = { fg = "#04d1f9" }
+                hl.DiagnosticHint = { fg = "#37f499" }
+                hl.DiagnosticOk = { fg = "#987afb" }
+                hl.DiagnosticUnderlineError = { sp = "#f16c75", undercurl = true }
+                hl.DiagnosticUnderlineWarn = { sp = "#f1fc79", undercurl = true }
+                hl.DiagnosticUnderlineInfo = { sp = "#04d1f9", undercurl = true }
+                hl.DiagnosticUnderlineHint = { sp = "#37f499", undercurl = true }
+                hl.DiagnosticUnderlineOk = { sp = "#987afb", undercurl = true }
+
+                -- Spell underlines
+                hl.SpellBad = { sp = "#f16c75", undercurl = true, bold = true, italic = true }
+                hl.SpellCap = { sp = "#f1fc79", undercurl = true, bold = true, italic = true }
+                hl.SpellLocal = { sp = "#f1fc79", undercurl = true, bold = true, italic = true }
+                hl.SpellRare = { sp = "#987afb", undercurl = true, bold = true, italic = true }
+
                 -- Transparent folded lines
                 hl.Folded = { bg = "NONE" }
             end,

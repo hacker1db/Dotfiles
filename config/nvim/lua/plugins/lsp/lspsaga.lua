@@ -30,7 +30,7 @@ return {
         },
     },
     keys = {
-        { "<leader>ca", "<cmd>Lspsaga code_action<CR>",          mode = { "n", "v" }, desc = "Code action (Lspsaga)" },
+        { "<leader>ca", vim.lsp.buf.code_action,                  mode = { "n", "v" }, desc = "Code action (LSP)" },
         {
             "<leader>cr",
             function()
