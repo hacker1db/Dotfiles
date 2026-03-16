@@ -161,7 +161,10 @@ return {
       { section = "startup" },
     }
     return {
-      notifier = { enabled = true, timeout = 3000, top_down = true, style = { border = "rounded", zindex = 100, ft = "markdown", wo = { winblend = 5, wrap = false, conceallevel = 2, colorcolumn = "" }, bo = { filetype = "snacks_notif" } } },
+      notifier = {
+        enabled = true,
+        top_down = false,
+      },
       indent = { enabled = true, char = "┊" },
       scroll = { enabled = true },
       words = { enabled = true },
@@ -169,7 +172,33 @@ return {
       zen = { enabled = true },
       terminal = { enabled = true },
       lazygit = { enabled = true },
-      picker = { enabled = true, layout = { preset = "telescope", width = 0.95, height = 0.9, preview = 0.75 } },
+      picker = {
+        enabled = true,
+        layout = {
+          preset = "ivy",
+          cycle = false,
+        },
+        formatters = {
+          file = {
+            filename_first = true,
+            truncate = 80,
+          },
+        },
+        matcher = {
+          frecency = true,
+        },
+        win = {
+          input = {
+            keys = {
+              ["<Esc>"] = { "close", mode = { "n", "i" } },
+              ["J"] = { "preview_scroll_down", mode = { "i", "n" } },
+              ["K"] = { "preview_scroll_up", mode = { "i", "n" } },
+              ["H"] = { "preview_scroll_left", mode = { "i", "n" } },
+              ["L"] = { "preview_scroll_right", mode = { "i", "n" } },
+            },
+          },
+        },
+      },
       explorer = { enabled = true, layout = { preset = "left", width = 30 } },
       quickfile = { enabled = true },
       image = { enabled = true },

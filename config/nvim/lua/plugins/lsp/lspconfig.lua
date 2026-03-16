@@ -85,6 +85,8 @@ return {
                 "dockerls",
                 "html",
                 "astro",
+                "markdown_oxide",
+                "harper_ls",
                 -- azure_pipelines_ls is custom; mason won't install it automatically
             },
             automatic_installation = true,
@@ -267,6 +269,46 @@ return {
                         capabilities = capabilities,
                         -- more forgiving root patterns
                         root_dir = lspconfig.util.root_pattern("astro.config.*", "package.json", ".git"),
+                    })
+                end,
+
+                markdown_oxide = function()
+                    local oxide_capabilities = vim.deepcopy(capabilities)
+                    oxide_capabilities.workspace = oxide_capabilities.workspace or {}
+                    oxide_capabilities.workspace.didChangeWatchedFiles = {
+                        dynamicRegistration = true,
+                    }
+                    lspconfig.markdown_oxide.setup({
+                        capabilities = oxide_capabilities,
+                        root_dir = lspconfig.util.root_pattern(".obsidian", ".moxide.toml", ".git"),
+                        on_attach = function(client, bufnr)
+                            -- refresh codelens on BufEnter and InsertLeave
+                            if client.server_capabilities.codeLensProvider then
+                                vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
+                                    buffer = bufnr,
+                                    callback = function()
+                                        vim.lsp.codelens.refresh({ bufnr = bufnr })
+                                    end,
+                                })
+                                -- initial refresh
+                                vim.lsp.codelens.refresh({ bufnr = bufnr })
+                            end
+                        end,
+                    })
+                end,
+
+                harper_ls = function()
+                    lspconfig.harper_ls.setup({
+                        capabilities = capabilities,
+                        filetypes = { "markdown" },
+                        settings = {
+                            ["harper-ls"] = {
+                                linters = {
+                                    linking_verbs = false,
+                                },
+                                ignore_link_title = true,
+                            },
+                        },
                     })
                 end,
 

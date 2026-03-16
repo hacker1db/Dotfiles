@@ -54,48 +54,15 @@ opt.listchars = {
     extends = "❯",
     precedes = "❮",
 }
--- Folding settings
-local M = {}
+-- Folding settings (defaults — per-filetype overrides in autocmds/folds.lua)
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
--- markdown folding
-vim.g.vim_markdown_folding_disabled = 0
-vim.g.vim_markdown_folding_level = 6
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "MarkdownFold()"
--- general folding settings
 vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
 vim.opt.foldenable = true
 vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""
-vim.opt.foldlevel = 99
-vim.opt.foldlevelstart = 1
 vim.opt.foldnestmax = 4
--- powerhsell folding settings
-vim.g.ps1_nofold_blocks = 1
-vim.g.ps1_nofold_sig = 1
-vim.opt.foldmethod = "syntax"
-
-function M.nvim_create_augroups(definitions)
-    for group_name, definition in pairs(definitions) do
-        api.nvim_command('augroup ' .. group_name)
-        api.nvim_command('autocmd!')
-        for _, def in ipairs(definition) do
-            local command = table.concat(vim.tbl_flatten { 'autocmd', def }, ' ')
-            api.nvim_command(command)
-        end
-        api.nvim_command('augroup END')
-    end
-end
-
-local autoCommands = {
-    -- other autocommands
-    open_folds = {
-        { "BufReadPost,FileReadPost", "*", "normal zR" }
-    }
-}
-
-M.nvim_create_augroups(autoCommands)
 
 -- auto set spell
 vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, { command = "setlocal spell spelllang=en_us" })

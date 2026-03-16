@@ -1,6 +1,19 @@
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function(ev)
+    -- Disable inline virtual text for markdownlint (keep gutter signs + underline)
+    vim.api.nvim_create_autocmd("DiagnosticChanged", {
+      buffer = ev.buf,
+      once = true,
+      callback = function()
+        for name, ns_id in pairs(vim.api.nvim_get_namespaces()) do
+          if name:match("lint") then
+            vim.diagnostic.config({ virtual_text = false }, ns_id)
+          end
+        end
+      end,
+    })
+
     local opts = { buffer = ev.buf, silent = true, desc = "Insert markdown link" }
     local function insert_link(mode)
       if mode == "v" then
