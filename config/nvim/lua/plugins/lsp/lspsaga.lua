@@ -30,7 +30,7 @@ return {
         },
     },
     keys = {
-        { "<leader>ca", vim.lsp.buf.code_action,                  mode = { "n", "v" }, desc = "Code action (LSP)" },
+        { "<leader>ca", "<cmd>Lspsaga code_action<CR>",          mode = { "n", "v" }, desc = "Code action (Lspsaga)" },
         {
             "<leader>cr",
             function()
@@ -149,6 +149,11 @@ return {
         { "gp",         "<cmd>Lspsaga peek_definition<CR>",      desc = "Peek definition (Lspsaga)" },
         { "gP",         "<cmd>Lspsaga peek_type_definition<CR>", desc = "Peek type definition (Lspsaga)" },
         { "<leader>cC", vim.lsp.codelens.run,                     desc = "Run codelens (LSP)" },
+        { "<leader>lf", "<cmd>Lspsaga finder<CR>",              desc = "Finder (Lspsaga)" },
         { "<leader>lo", "<cmd>Lspsaga outline<CR>",              desc = "Outline (Lspsaga)" },
+        { "<leader>ci", "<cmd>Lspsaga incoming_calls<CR>",      desc = "Incoming calls (Lspsaga)" },
+        { "<leader>co", "<cmd>Lspsaga outgoing_calls<CR>",      desc = "Outgoing calls (Lspsaga)" },
+        { "[d",         "<cmd>Lspsaga diagnostic_jump_prev<CR>", desc = "Prev diagnostic (Lspsaga)" },
+        { "]d",         "<cmd>Lspsaga diagnostic_jump_next<CR>", desc = "Next diagnostic (Lspsaga)" },
     },
 }

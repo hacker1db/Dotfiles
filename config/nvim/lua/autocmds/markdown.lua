@@ -45,6 +45,8 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set({ "n", "v" }, "<leader>ml", function() insert_link(vim.fn.mode()) end, opts)
     vim.keymap.set({ "n", "v" }, "ml", function() insert_link(vim.fn.mode()) end, opts)
 
+
+
     -- Update/insert TOC using markdown-toc
     vim.keymap.set("n", "<leader>mt", function()
       local path = vim.fn.expand("%:p")

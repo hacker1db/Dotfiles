@@ -64,11 +64,8 @@ vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""
 vim.opt.foldnestmax = 4
 
--- auto set spell
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, { command = "setlocal spell spelllang=en_us" })
-opt.spelllang = "en_us"
-opt.spell = true
-opt.spelloptions = "camel"
+-- spell disabled globally — harper-ls handles grammar/spelling for markdown
+opt.spell = false
 --
 --
 -- Extra vim stuff

@@ -74,14 +74,16 @@ Add a shell alias/function (planned): `theme <name>` delegating to installer.
 ## Neovim Configuration
 
 Location: `config/nvim/` using `lazy.nvim`. Key aspects:
-- Completion: `blink.cmp` (not `nvim-cmp`)
-- File explorer: `mini.files`
-- Fuzzy picking: `mini.pick` for files/buffers (Telescope retained for some git ops)
+- Completion: `blink.cmp` with LuaSnip (markdown templates from SecondBrain vault)
+- File explorer: snacks.nvim explorer
+- Fuzzy picking: snacks.nvim picker (ivy layout, frecency ranking)
 - Formatting: `conform.nvim`
-- Linting: `nvim-lint`
-- Treesitter, LSP via `mason.nvim` + native client
+- Linting: `nvim-lint` (markdownlint virtual text suppressed, gutter signs only)
+- Markdown: `markdown-oxide` (backlinks, references, codelens), `harper-ls` (grammar), `render-markdown.nvim` (linkarzu-style headings/icons)
+- LSP: `mason.nvim` + `lspsaga` (code actions, finder, diagnostics, call hierarchy, outline)
+- Treesitter with per-filetype fold overrides (markdown, PowerShell, JSON)
 - Git integrations: fugitive, gitsigns, neogit, octo
-- UI helpers: snacks.nvim, lualine, etc.
+- UI: snacks.nvim, lualine, noice.nvim (mini notifications), eldritch colorscheme with custom diagnostic/heading highlights
 
 Update / sync plugins headlessly:
 ```bash
@@ -130,7 +132,6 @@ After adding new `*.symlink` file:
 
 ## Roadmap (Planned Improvements)
 - Conditional Git identity includes for specific project directories
-- Dynamic Neovim colorscheme abstraction (remove hard-coded Eldritch usage)
 - Starship palette modularization
 - Brew wrapper with resilience & diff reporting
 - Shell alias for theme switching
