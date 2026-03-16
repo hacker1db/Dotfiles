@@ -76,3 +76,10 @@ cmd([[highlight SpecialKey ctermfg=19 guifg=#333333]])
 cmd([[highlight NonText ctermfg=19 guifg=#333333]])
 
 vim.g.copilot_settings = { selectedCompletionModel = "gpt-4o-copilot" }
+
+-- MDsveX (.svx) files → treat as markdown
+vim.filetype.add({
+    extension = {
+        svx = "markdown",
+    },
+})
