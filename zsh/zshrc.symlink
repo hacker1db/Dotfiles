@@ -11,7 +11,6 @@ autoload -U compinit add-zsh-hook
 compinit -C
 # Reevaluate the prompt string each time it's displaying a prompt
 autoload bashcompinit && bashcompinit
-autoload -Uz compinit
 setopt prompt_subst
 if command -v kubectl &> /dev/null; then
     source <(kubectl completion zsh)
@@ -19,7 +18,7 @@ fi
 if command -v limactl &> /dev/null; then
     source <(limactl completion zsh)
 fi
-if command op &> /dev/null; then
+if command -v op &> /dev/null; then
     eval "$(op completion zsh)"; compdef _op op
 fi
 setopt COMPLETE_ALIASES
@@ -49,7 +48,6 @@ export PATH=$DOTFILES/bin:$PATH
 if [[ -d ~/bin ]]; then
     export PATH=~/bin:$PATH
 fi
-export PATH=$PATH:$HOME.rd/bin/
 
 
 
@@ -68,15 +66,7 @@ if [[ -x "$(command -v fnm)" ]]; then
     eval "$(fnm env --use-on-cd)"
 fi
 
-[[ -e ~/.terminfo ]] && export TERMINFO_DIRS=~/.terminfo:/usr/share/terminfo
-# eport node version manager.
 export NVM_DIR="$HOME/.nvm"
-# export TMUXP_CONFIGDIR=$HOME/.dotfiles/tmux/tmux_setup.yml
-[ -f $HOME/.fzf.zsh ] && source $HOME/.fzf.zsh
-export FZF_DEFAULT_COMMAND='ag -g ""'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-
-
 if [ -f $HOME/.fzf.zsh ]; then
   source $HOME/.fzf.zsh
   export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
@@ -84,8 +74,10 @@ if [ -f $HOME/.fzf.zsh ]; then
   export FZF_DEFAULT_OPTS="--color bg:-1,bg+:-1,fg:-1,fg+:#feffff,hl:#993f84,hl+:#d256b5,info:#676767,prompt:#676767,pointer:#676767"
 fi
 
-alias k=kubectl
-compdef __start_kubectl k
+if command -v kubectl &> /dev/null; then
+    alias k=kubectl
+    compdef __start_kubectl k
+fi
 
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 export PATH="$PATH:$HOME/.dotnet/tools"
@@ -93,16 +85,8 @@ export PATH="$PATH:$HOME/.dotnet/tools"
 
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
-#
-# # matches case insensitive for lowercase
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-#
-# # pasting with tabs doesn't perform completion
 zstyle ':completion:*' insert-tab pending
-#
-# # default to file completion
 zstyle ':completion:*' completer _expand _complete _files _correct _approximate
-#
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*:descriptions' format '%B%d%b'
 zstyle ':completion:*:messages' format '%d'
@@ -123,11 +107,8 @@ if [[ -x "$(command -v eza)" ]]; then
   alias l="eza --icons --git --all --long"
 fi
 
-eval "$(starship init zsh)"
+if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
-
-export PATH="/Users/$Home/.rd/bin:$PATH"
-autoload -Uz compinit && compinit
 
 ### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
 export PATH="$HOME/.rd/bin:$PATH"

@@ -35,6 +35,7 @@ return {
                 "markdown_inline",
                 "go",
                 "dockerfile",
+                "svelte",
             },
             autotag = {
                 enable = true,
