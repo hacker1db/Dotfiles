@@ -45,7 +45,25 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set({ "n", "v" }, "<leader>ml", function() insert_link(vim.fn.mode()) end, opts)
     vim.keymap.set({ "n", "v" }, "ml", function() insert_link(vim.fn.mode()) end, opts)
 
-
+    -- Auto-capitalize markdown heading words on save
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      buffer = ev.buf,
+      callback = function(args)
+        local bufnr = args.buf
+        local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+        for i, line in ipairs(lines) do
+          local hashes, text = line:match("^(#+)%s+(.*)")
+          if hashes and text ~= "" then
+            local capitalized = text:gsub("(%a)([%w']*)", function(first, rest)
+              return first:upper() .. rest
+            end)
+            if capitalized ~= text then
+              vim.api.nvim_buf_set_lines(bufnr, i - 1, i, false, { hashes .. " " .. capitalized })
+            end
+          end
+        end
+      end,
+    })
 
     -- Update/insert TOC using markdown-toc
     vim.keymap.set("n", "<leader>mt", function()
