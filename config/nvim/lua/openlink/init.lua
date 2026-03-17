@@ -1,7 +1,7 @@
 local M = {}
 
 local defaults = {
-    open_cmd = (vim.fn.has("mac") == 1 and "open" or "xdg-open"),
+    open_cmd = "open",
     filetypes = nil,
     notify = true,
     prefer_obsidian = true,
@@ -17,7 +17,7 @@ local function notify(msg, level)
     if not M.opts.notify then return end
     local ok, snacks = pcall(require, "snacks")
     if ok and snacks and snacks.notify then
-        snacks.notify(msg, level or vim.log.levels.INFO)
+        snacks.notify(msg, { level = level or vim.log.levels.INFO })
     else
         vim.notify(msg, level or vim.log.levels.INFO)
     end
@@ -32,6 +32,24 @@ local function open_external(url)
         vim.fn.jobstart(cmd)
     end
     notify("Opened: " .. url)
+end
+
+local function open_spotify(uri)
+    local uri_type = uri:match("^spotify:([a-z]+):")
+    local script
+    if uri_type == "track" or uri_type == "episode" then
+        script = string.format('tell application "Spotify" to play track "%s"', uri)
+    else
+        -- shows, albums, playlists — navigate to the specific page
+        script = string.format('tell application "Spotify" to open location "%s"', uri)
+    end
+    local cmd = { "osascript", "-e", script }
+    if vim.system then
+        vim.system(cmd, { detach = true })
+    else
+        vim.fn.jobstart(cmd)
+    end
+    notify("Spotify: " .. uri)
 end
 
 local function stat(path)
@@ -63,6 +81,17 @@ local function extract_inline_url(line, col)
     end
 end
 
+local function extract_spotify_uri(line, col)
+    local pat = "spotify:[a-z]+:[A-Za-z0-9]+"
+    local i = 1
+    while true do
+        local s, e = line:find(pat, i)
+        if not s then break end
+        if in_range(col, s, e) then return line:sub(s, e) end
+        i = e + 1
+    end
+end
+
 local function extract_wiki_link(line, col)
     local i = 1
     while true do
@@ -76,6 +105,7 @@ end
 local function resolve_file(path)
     if not path then return nil end
     if path:match("^[a-z]+://") then return nil end
+    if path:match("^spotify:") then return nil end
     if path:sub(1, 1) == "~" then path = vim.fn.expand(path) end
     if stat(path) then return path end
     local abs = vim.fn.fnamemodify(path, ":p")
@@ -89,6 +119,7 @@ function M.open()
     local line = vim.api.nvim_get_current_line()
     local col = pos[2] + 1
     local target = extract_markdown_link(line, col)
+    if not target then target = extract_spotify_uri(line, col) end
     if not target then target = extract_inline_url(line, col) end
     if not target then target = extract_wiki_link(line, col) end
     if not target then
@@ -109,6 +140,10 @@ function M.open()
             notify("Obsidian note: " .. target)
             return
         end
+    end
+    if target:match("^spotify:") then
+        open_spotify(target)
+        return
     end
     open_external(target)
 end

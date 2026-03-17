@@ -4,76 +4,61 @@ description: Researches a topic comprehensively using vault notes, Readwise high
 model: claude-opus-4-6
 ---
 
-Research a topic comprehensively and generate a complete blog post draft saved to `2.Areas/Personal Home/Blog Posts 🕸/`.
+Research a topic comprehensively and generate a complete blog post draft. Before writing, read the shared reference at `$HOME/.config/blog/hacker1db-voice.md` for brand voice, security filters, and frontmatter schema.
 
 ## Research Process
 
-### 1. Vault Analysis
-Search the Second Brain for related content in:
-- `2.Areas/Work Notes/DevSecOps Notes/` — work learnings
-- `2.Areas/Work Notes/Ecomm/` — e-commerce security insights
-- `4.Resources/AppSec/` — application security resources
-- `4.Resources/Readwise/` — saved articles and highlights
-- `0.Quick Notes 📨/` — recent captures
-- `2.Areas/Personal Home/Blog Posts 🕸/` — existing posts (avoid duplication)
+### 1. Parallel Research
 
-### 2. Readwise Highlights Integration
-If `READWISE_API_KEY` is set, search highlights tagged with topic keywords, prioritizing recent learning and your annotations.
+Spawn all three research streams simultaneously — don't wait for one to finish before starting the next:
 
-### 3. Online Research
-Research current best practices from:
-- OWASP documentation (if relevant)
-- NIST guidelines (for security topics)
-- Official tool documentation
-- Public CVE data (for vulnerability topics)
+**Stream A — Vault search** via `oh-my-claudecode:explore` (haiku):
+> Search `$HOME/notes/SecondBrain/` for files related to [topic]. Check: work notes, quick notes, existing blog posts (to avoid duplication), AppSec resources. Extract key concepts, code examples, personal experiences, tools used, best practices documented.
+
+**Stream B — Readwise highlights** via `readwise-research` agent:
+> Search Readwise vault for saved articles, books, and podcasts on [topic] and return structured references and key insights.
+
+**Stream C — Online research** via `oh-my-claudecode:document-specialist` (sonnet):
+> Research current best practices for [topic] from: OWASP docs, NIST guidelines, official tool documentation, public CVE data. Focus on 2024+ content. Return concrete techniques, stats, and code patterns.
+
+Synthesize after all three streams complete. If a stream returns nothing, proceed without it — don't block.
+
+### 2. Cover Image
+
+Search Unsplash for a relevant cover image — WebSearch `site:unsplash.com [topic keywords]`, extract the photo ID, construct `https://images.unsplash.com/photo-{id}?w=1200`, note the photographer name. Add it to frontmatter as `thumbnail` and place `<!-- Photo by [Name] on Unsplash -->` on the first line after the closing `---`.
+
+### 3. Apply Security Filters
+
+Apply all filters from the shared reference automatically. When drawing from work notes, genericize all employer-specific details before they enter the draft.
 
 ### 4. Content Synthesis
-Combine all research into a structured blog post:
 
-```markdown
----
-title: "[Topic]: A Practical Guide"
-date: [today]
-author: "David Walters"
-tags: [auto-generated]
-categories: [DevSecOps, Security, relevant-category]
-description: "One-sentence hook from content"
-draft: true
-featured: false
----
+Combine all research into a blog post using the SVX frontmatter schema and content patterns from the shared reference. Ground the post in vault notes and Readwise highlights where available — your own notes and annotations carry the authentic voice. Supplement with online research for current best practices and stats.
 
-# [Title]
+Structure:
+- Opening hook from your experience
+- Understanding/Context section
+- Implementation with "wrong vs. right" code examples
+- Advanced/Edge Cases
+- Tools/Resources
+- Key Takeaways
+- Conclusion with community engagement question
 
-[Opening hook — problem statement]
+### 5. Source Attribution
 
-## [Understanding/Context]
-## [Implementation]
-## [Advanced/Edge Cases]
-## [Tools/Resources]
+Include a research summary in HTML comments at the bottom:
 
-## Key Takeaways
-
-## Conclusion
-[Community engagement question]
+```html
+<!-- Research Sources:
+Vault Notes: [list of files used]
+Readwise Highlights: [list of sources used]
+Online Research: [list of sources used]
+-->
 ```
 
-### 5. Security Filtering
-Automatically remove:
-- "Alaska Airlines" → "a Fortune 500 airline"
-- Colleague names → "security lead", "team member"
-- Internal URLs → "internal systems"
-- Specific infrastructure → "cloud infrastructure"
-- Proprietary tools → "custom tooling" or generic description
+### 6. Save
 
-### 6. Brand Voice Application
-- Practical (real code, real commands)
-- Technical (precise, credible)
-- Educational (break down complexity)
-- Honest (acknowledge trade-offs)
-- Structured (scannable, hierarchical)
+File: `$HOME/notes/SecondBrain/2.Areas/Personal Home/Blog Posts 🕸/[Generated Title].md`
+Status: `draft: true` — change to `false` when ready to publish.
 
-## Output
-
-File Location: `2.Areas/Personal Home/Blog Posts 🕸/[Generated Title].md`
-
-Include a research summary in HTML comments at the bottom listing vault notes, Readwise highlights, and online sources used.
+Then use `/md-to-svx [post name]` to convert and place in the blog repo.

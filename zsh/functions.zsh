@@ -2,6 +2,12 @@
 # functions
 ####################
 
+function daily() {
+    local date="${1:-$(date +%Y-%m-%d)}"
+    local note="$HOME/notes/SecondBrain/0.Quick Notes 📨/Daily Stuff/${date}.md"
+    nvim "$note"
+}
+
 # print available colors and their numbers
 function colours() {
     for i in {0..255}; do

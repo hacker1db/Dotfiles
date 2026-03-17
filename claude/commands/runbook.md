@@ -1,9 +1,9 @@
 ---
-description: Generate a Change Request runbook by analyzing the current repository, then invoke /drawio to generate architecture diagrams
+description: Generate an operational runbook by analyzing the current repository, then invoke /drawio to generate architecture diagrams. Use this skill when the user wants to create a runbook, operational procedure, deployment guide, implementation steps, or step-by-step instructions for executing a change. Triggers on "create runbook", "write a runbook", "generate runbook", "deployment procedure", or "implementation steps".
 ---
-# Change Request Runbook Generator
+# Runbook Generator
 
-Generate a comprehensive Change Request runbook by analyzing the current repository, auto-populating as many fields as possible, and invoking `/drawio` to produce architecture diagrams.
+Generate a comprehensive operational runbook by analyzing the current repository, auto-populating as many fields as possible, and invoking `/drawio` to produce architecture diagrams.
 
 ## Argument Parsing
 

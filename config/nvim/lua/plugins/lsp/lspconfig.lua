@@ -288,6 +288,7 @@ return {
                     lspconfig.harper_ls.setup({
                         capabilities = capabilities,
                         filetypes = { "markdown" },
+                        root_dir = lspconfig.util.root_pattern(".obsidian", ".moxide.toml", ".git"),
                         settings = {
                             ["harper-ls"] = {
                                 linters = {
