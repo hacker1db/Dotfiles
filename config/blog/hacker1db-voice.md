@@ -21,6 +21,7 @@ Shared reference for all blog agents (Claude Code, OpenCode). Read this file whe
 ## Security Filters (Automatic — Always Applied)
 
 ### NEVER include:
+- Swear words, profanity, or crude language of any kind
 - Employer names → "at a Fortune 500 company" or "in the airline industry"
 - Colleague names or internal teams → "security lead", "a team member"
 - Internal URLs, IP addresses, infrastructure details → abstracted

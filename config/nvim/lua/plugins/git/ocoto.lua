@@ -146,6 +146,14 @@ return {
                 purple = "#6f42c1",
             },
             mappings_disable_default = false,
+            mappings = {
+                submit_win = {
+                    approve_review   = { lhs = "<leader>rs", desc = "approve review",        mode = "n" },
+                    comment_review   = { lhs = "<leader>rm", desc = "comment review",         mode = "n" },
+                    request_changes  = { lhs = "<leader>rc", desc = "request changes review", mode = "n" },
+                    close_review_tab = { lhs = "<leader>rq", desc = "close review tab",       mode = "n" },
+                },
+            },
         })
     end,
 }

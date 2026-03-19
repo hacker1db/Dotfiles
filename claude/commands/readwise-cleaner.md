@@ -3,10 +3,24 @@ description: Clean up YouTube content in Readwise Reader by running shorts archi
 ---
 Run both Readwise cleanup scripts in parallel to organize YouTube content.
 
-Launch BOTH tasks simultaneously:
-1. Run `main.py` — finds YouTube Shorts, tags with `youtube-shorts`, and archives them
-2. Run `recategorize.py` — moves YouTube videos from RSS category to video category
+## Script Locations
 
-Both scripts use the Python venv at `$CODE_DIR/clitools/readwiseshortremover/readwise/`.
+Both scripts live at: `$HOME/Developer/clitools/readwiseshortremover/readwise/`
+Python venv: `$HOME/Developer/clitools/readwiseshortremover/readwise/.venv/` (or `venv/`)
 
-Report combined summary when both complete showing: documents scanned, items found, and changes made for each script.
+Activate venv before running:
+```bash
+SCRIPT_DIR="$HOME/Developer/clitools/readwiseshortremover/readwise"
+source "$SCRIPT_DIR/.venv/bin/activate" 2>/dev/null || source "$SCRIPT_DIR/venv/bin/activate"
+```
+
+## Launch BOTH tasks simultaneously:
+
+1. `python "$SCRIPT_DIR/main.py"` — finds YouTube Shorts, tags with `youtube-shorts`, archives them
+2. `python "$SCRIPT_DIR/recategorize.py"` — moves YouTube videos from RSS → video category
+
+## Output
+
+Report combined summary when both complete:
+- Documents scanned, Shorts found/archived, videos recategorized
+- Any errors encountered by either script

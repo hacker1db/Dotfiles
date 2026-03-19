@@ -26,9 +26,16 @@ Before analyzing the repository, fetch the official Change Request template from
    > I need to fetch the Change Request template from the Azure DevOps wiki.
    > Please provide the **organization**, **project**, **wiki name**, and **page path** (or paste the full URL).
 
-2. **Fetch the template** using the Azure DevOps MCP server tool `wiki_get_page_content` (preferred) or fall back to the Azure DevOps CLI:
-   - **MCP (preferred):** Call `mcp__azure-devops__wiki_get_page_content` with the organization, project, wiki, and page path provided by the user.
-   - **CLI fallback:** Run `az devops wiki page show --org <user-provided-org-url> --project <user-provided-project> --wiki <user-provided-wiki> --path '<user-provided-path>' --include-content` and extract the markdown content.
+2. **Fetch the template** using the Azure DevOps CLI:
+   ```bash
+   az devops wiki page show \
+     --org <user-provided-org-url> \
+     --project <user-provided-project> \
+     --wiki <user-provided-wiki> \
+     --path '<user-provided-path>' \
+     --include-content \
+     --query 'content' -o tsv
+   ```
 
 3. **Parse the template** — identify all required sections, fields, tables, and placeholders from the fetched wiki content. Use these as the authoritative structure for the runbook generated in Step 2. Any sections in the wiki template that are not covered by the default output template below must be added. Any default sections not present in the wiki template should be kept as supplementary.
 
@@ -305,13 +312,27 @@ Launch all missing diagram agents in a **single message** so they run in paralle
 
    c. **Add repo link** — ensure the **Repository** field in the header table links to the source repo using the full URL from `git remote get-url origin`.
 
-   d. **Create the wiki page** using the `mcp__azure-devops__wiki_create_or_update_page` tool:
-      - `wikiIdentifier`: from user input
-      - `project`: from user input
-      - `path`: `{parent_path}/CR-{app_name}-{change_date}`
-      - `content`: the wiki-compatible markdown (with adjusted image paths)
+   d. **Create the wiki page** using the Azure DevOps CLI:
+      ```bash
+      az devops wiki page create \
+        --org <org-url> \
+        --project <project> \
+        --wiki <wikiIdentifier> \
+        --path '<parent_path>/CR-{app_name}-{change_date}' \
+        --content @/tmp/runbook-wiki.md \
+        --encoding utf-8
+      ```
 
-   e. If the page creation fails (e.g., page already exists), fetch the existing page's ETag and update it instead.
+   e. If the page already exists (exit code non-zero / "already exists" error), use `update` instead:
+      ```bash
+      az devops wiki page update \
+        --org <org-url> \
+        --project <project> \
+        --wiki <wikiIdentifier> \
+        --path '<parent_path>/CR-{app_name}-{change_date}' \
+        --content @/tmp/runbook-wiki.md \
+        --version <ETag from show command>
+      ```
 
 7. Present a summary to the user:
 

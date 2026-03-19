@@ -32,7 +32,17 @@ Check memory for ADO wiki coordinates (org, project, wiki identifier, template p
 > I need to fetch your Change Request template from Azure DevOps wiki.
 > Please provide the **organization**, **project**, **wiki identifier**, and **template page path**.
 
-Then call `mcp__azure-devops__wiki_get_page_content` with those values. Parse the returned content — identify all required sections, fields, tables, and placeholders. This becomes the authoritative output structure. Keep the default template in Step 3 as a fallback for any sections not covered by the wiki template.
+Then fetch the template via CLI:
+```bash
+az devops wiki page show \
+  --org <org-url> \
+  --project <project> \
+  --wiki <wiki-identifier> \
+  --path '<template-page-path>' \
+  --include-content \
+  --query 'content' -o tsv
+```
+Parse the returned content — identify all required sections, fields, tables, and placeholders. This becomes the authoritative output structure. Keep the default template in Step 3 as a fallback for any sections not covered by the wiki template.
 
 If the fetch fails, warn the user and proceed with the built-in template from Step 3.
 
@@ -291,13 +301,27 @@ The output directory is `~/Downloads/CR-{cr_number}-{app_name}/`. All files go h
 
    > Please provide the **organization**, **project**, **wiki identifier**, and **parent page path** where change requests should be published.
 
-   a. **Create the wiki page** using `mcp__azure-devops__wiki_create_or_update_page`:
-      - `wikiIdentifier`: from memory or user input
-      - `project`: from memory or user input
-      - `path`: `{parent_path}/CR-{cr_number}-{app_name}-{date}`
-      - `content`: the CR markdown content (same as the saved `.md` file)
+   a. **Create the wiki page** using the Azure DevOps CLI:
+      ```bash
+      az devops wiki page create \
+        --org <org-url> \
+        --project <project> \
+        --wiki <wikiIdentifier> \
+        --path '<parent_path>/CR-{cr_number}-{app_name}-{date}' \
+        --content @~/Downloads/CR-{cr_number}-{app_name}/CR-{cr_number}-{app_name}-{date}.md \
+        --encoding utf-8
+      ```
 
-   b. If the page already exists (version conflict), fetch the existing page's ETag and call update instead.
+   b. If the page already exists (non-zero exit / "already exists" error), update it instead:
+      ```bash
+      VERSION=$(az devops wiki page show --org <org-url> --project <project> \
+        --wiki <wikiIdentifier> --path '<path>' --query 'page.etag' -o tsv)
+      az devops wiki page update \
+        --org <org-url> --project <project> --wiki <wikiIdentifier> \
+        --path '<parent_path>/CR-{cr_number}-{app_name}-{date}' \
+        --content @~/Downloads/CR-{cr_number}-{app_name}/CR-{cr_number}-{app_name}-{date}.md \
+        --version "$VERSION"
+      ```
 
    c. Note the published wiki page path in the summary.
 

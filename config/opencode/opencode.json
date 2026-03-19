@@ -34,10 +34,6 @@
     "marksman": {
       "command": ["marksman", "server"],
       "extensions": [".md"]
-    },
-    "custom-lsp": {
-      "command": ["custom-lsp-server", "--stdio"],
-      "extensions": [".custom"]
     }
   }
 }
