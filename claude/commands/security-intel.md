@@ -1,5 +1,5 @@
 ---
-description: Pull this week's security intelligence from CISA KEV, Readwise, and the web, then output it as a quick daily digest or a full brief. Use when you want to catch up on new CVEs, check what's been actively exploited, run a daily security update, generate a weekly threat report, or get a security intelligence brief. Triggers on: "vuln digest", "security brief", "what CVEs came out this week", "threat intel", "check CISA KEV", "security update", "weekly security review".
+description: "Pull this week's security intelligence from CISA KEV, Readwise, and the web, then output it as a quick daily digest or a full brief. Use when you want to catch up on new CVEs, check what's been actively exploited, run a daily security update, generate a weekly threat report, or get a security intelligence brief. Triggers on: \"vuln digest\", \"security brief\", \"what CVEs came out this week\", \"threat intel\", \"check CISA KEV\", \"security update\", \"weekly security review\"."
 ---
 
 Fetch security intelligence from CISA KEV, Readwise Reader, and web sources, then output it as a digest or brief.
