@@ -5,7 +5,7 @@
 function daily() {
     local date="${1:-$(date +%Y-%m-%d)}"
     local note="$HOME/notes/SecondBrain/0.Quick Notes 📨/Daily Stuff/${date}.md"
-    nvim "$note"
+    tmux new-window -n "${date}" "nvim '${note}'" 2>/dev/null || nvim "$note"
 }
 
 # print available colors and their numbers
