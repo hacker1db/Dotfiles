@@ -49,6 +49,16 @@ function g() {
     fi
 }
 
+alias gcc='git-clean-merged'
+
+function git-clean-merged() {
+  git fetch --prune
+  git worktree prune
+  git branch --merged | grep -v '^\*\|main\|master\|develop' | xargs git branch -d
+  git branch -r --merged | grep -v 'origin/main\|origin/master\|origin/develop\|HEAD' \
+    | sed 's/origin\///' | xargs git push origin --delete
+}
+
 function ghi(){
  if [[ $# > 0 ]]; then
     number="#"
