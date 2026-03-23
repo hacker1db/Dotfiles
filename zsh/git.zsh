@@ -51,6 +51,10 @@ function g() {
 
 alias gcc='git-clean-merged'
 
+function cob() {
+  wt switch --create "$@"
+}
+
 function git-clean-merged() {
   git fetch --prune
   git worktree prune

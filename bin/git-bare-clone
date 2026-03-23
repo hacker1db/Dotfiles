@@ -7,13 +7,14 @@ usage() {
   cat << EOF
 Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l <location>] <repository>
        $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l <location>] --init <name> [--remote <url>] [--branch <name>]
+       $(basename "${BASH_SOURCE[0]}") --fix [<path>]
 
 Set up a bare git repo for working exclusively with worktrees.
-No .git pointer file is created — work from inside worktree subdirs.
 
 Modes:
   clone (default)   Clone an existing remote repository
   --init            Initialize a new bare repository from scratch
+  --fix             Fix an existing repo missing the .git pointer or fetch config
 
 Available options:
 
@@ -21,12 +22,14 @@ Available options:
 -v, --verbose       Print script debug info
 -l, --location      Location of bare repo contents (default: .bare)
     --init          Initialize a new repo instead of cloning
+    --fix           Fix an existing bare repo (defaults to current directory)
     --remote        Remote URL to add when using --init (optional)
     --branch        Default branch name for --init (default: main)
 
 Result layout:
   <name>/
-    .bare/          <- git data (no .git pointer file in root)
+    .bare/          <- git data
+    .git            <- gitdir pointer: gitdir: ./.bare
     <branch>/       <- initial worktree, start working here
 
 Examples:
@@ -34,6 +37,8 @@ Examples:
   git-bare-clone --init my-project
   git-bare-clone --init my-project --remote git@github.com:user/my-project.git
   git-bare-clone --init my-project --branch develop
+  git-bare-clone --fix
+  git-bare-clone --fix /path/to/existing/repo
 EOF
   exit
 }
@@ -64,6 +69,7 @@ die() {
 parse_params() {
   location='.bare'
   init_mode=0
+  fix_mode=0
   remote_url=''
   default_branch='main'
 
@@ -73,6 +79,7 @@ parse_params() {
     -v | --verbose) set -x ;;
     --no-color) NO_COLOR=1 ;;
     --init) init_mode=1 ;;
+    --fix) fix_mode=1 ;;
     -l | --location)
       location="${2-}"
       shift
@@ -92,7 +99,7 @@ parse_params() {
   done
 
   args=("$@")
-  [[ ${#args[@]} -eq 0 ]] && die "Missing required argument (repository URL or project name)"
+  [[ $fix_mode -eq 0 && ${#args[@]} -eq 0 ]] && die "Missing required argument (repository URL or project name)"
 
   return 0
 }
@@ -118,6 +125,9 @@ do_clone() {
 
   msg "${YELLOW}Cloning bare repository to $location...${NOFORMAT}"
   git clone --bare "$repo_arg" "$location"
+
+  msg "${YELLOW}Creating .git pointer file...${NOFORMAT}"
+  echo "gitdir: ./.bare" > .git
 
   msg "${YELLOW}Adjusting origin fetch locations...${NOFORMAT}"
   git -C "$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
@@ -147,6 +157,9 @@ do_init() {
   msg "${YELLOW}Initializing bare repository in $location...${NOFORMAT}"
   git init --bare --initial-branch="$default_branch" "$location"
 
+  msg "${YELLOW}Creating .git pointer file...${NOFORMAT}"
+  echo "gitdir: ./.bare" > .git
+
   msg "${YELLOW}Creating initial empty commit on '$default_branch'...${NOFORMAT}"
   local empty_tree initial_commit
   empty_tree=$(git -C "$location" hash-object -t tree /dev/null)
@@ -171,10 +184,59 @@ do_init() {
   msg "${CYAN}Next: cd $repo_dir/$default_branch${NOFORMAT}"
 }
 
+do_fix() {
+  local target="${1:-.}"
+  [[ -d "$target" ]] || die "Directory not found: $target"
+  pushd "$target" > /dev/null
+
+  # Find bare repo — try configured location, then .git dir contents, then a bare repo at root
+  local bare_loc="$location"
+  if [[ ! -d "$bare_loc" ]]; then
+    # Maybe it's a regular clone with a .git directory — check if .git is a bare repo
+    if [[ -d ".git" && -f ".git/config" ]] && grep -q "bare = true" ".git/config" 2>/dev/null; then
+      msg "${YELLOW}Found bare repo inside .git/ — moving to $bare_loc...${NOFORMAT}"
+      mv .git "$bare_loc"
+    else
+      die "No bare repo found at '$bare_loc'. Is this the right directory?"
+    fi
+  fi
+
+  # Write .git pointer if missing or wrong
+  local current_ptr=""
+  [[ -f ".git" ]] && current_ptr=$(cat .git)
+  if [[ "$current_ptr" != "gitdir: ./.bare" ]]; then
+    msg "${YELLOW}Writing .git pointer file...${NOFORMAT}"
+    echo "gitdir: ./.bare" > .git
+    msg "${GREEN}  .git -> gitdir: ./.bare${NOFORMAT}"
+  else
+    msg "${GREEN}  .git pointer already correct, skipping.${NOFORMAT}"
+  fi
+
+  # Fix fetch refspec if missing
+  local fetch_cfg
+  fetch_cfg=$(git -C "$bare_loc" config --get remote.origin.fetch 2>/dev/null || true)
+  if [[ "$fetch_cfg" != "+refs/heads/*:refs/remotes/origin/*" ]]; then
+    msg "${YELLOW}Fixing remote.origin.fetch refspec...${NOFORMAT}"
+    git -C "$bare_loc" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+    msg "${GREEN}  fetch refspec updated.${NOFORMAT}"
+  else
+    msg "${GREEN}  fetch refspec already correct, skipping.${NOFORMAT}"
+  fi
+
+  # Fetch to populate remote tracking refs
+  msg "${YELLOW}Fetching from origin...${NOFORMAT}"
+  git -C "$bare_loc" fetch origin
+
+  popd > /dev/null
+  msg "${GREEN}Done. Repo at '$target' is fixed.${NOFORMAT}"
+}
+
 parse_params "$@"
 setup_colors
 
-if [[ $init_mode -eq 1 ]]; then
+if [[ $fix_mode -eq 1 ]]; then
+  do_fix "${args[0]-}"
+elif [[ $init_mode -eq 1 ]]; then
   do_init "${args[0]}"
 else
   do_clone "${args[0]}"
