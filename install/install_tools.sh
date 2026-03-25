@@ -152,7 +152,6 @@ CASKS=(
   microsoft-teams
   netnewswire
   notion
-  notion-calendar
   notion-mail
   obs
   obsidian

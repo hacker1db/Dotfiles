@@ -274,8 +274,6 @@ cask "miro"
 cask "netnewswire"
 # App to write, plan, collaborate, and get organised
 cask "notion"
-# Calendar for professionals and teams
-cask "notion-calendar"
 # Email client integrated with Notion workspace
 cask "notion-mail"
 # Open-source software for live streaming and screen recording
