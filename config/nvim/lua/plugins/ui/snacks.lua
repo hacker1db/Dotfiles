@@ -198,6 +198,11 @@ return {
             },
           },
         },
+        sources = {
+          explorer = {
+            hidden = true,
+          },
+        },
       },
       explorer = { enabled = true, layout = { preset = "left", width = 30 } },
       quickfile = { enabled = true },

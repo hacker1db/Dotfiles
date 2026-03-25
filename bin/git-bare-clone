@@ -6,7 +6,8 @@ trap cleanup SIGINT SIGTERM ERR EXIT
 usage() {
   cat << EOF
 Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l <location>] <repository>
-       $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l <location>] --init <name> [--remote <url>] [--branch <name>]
+       $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l <location>] --init [<name>] [--remote <url>] [--branch <name>]
+       $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-l <location>] --init [<name>] --create --org <org> [--team <team>] [--branch <name>]
        $(basename "${BASH_SOURCE[0]}") --fix [<path>]
 
 Set up a bare git repo for working exclusively with worktrees.
@@ -25,6 +26,9 @@ Available options:
     --fix           Fix an existing bare repo (defaults to current directory)
     --remote        Remote URL to add when using --init (optional)
     --branch        Default branch name for --init (default: main)
+    --create        Also create the GitHub remote repo (requires --org)
+    --org           GitHub org for --create
+    --team          GitHub team for --create
 
 Result layout:
   <name>/
@@ -37,6 +41,8 @@ Examples:
   git-bare-clone --init my-project
   git-bare-clone --init my-project --remote git@github.com:user/my-project.git
   git-bare-clone --init my-project --branch develop
+  git-bare-clone --init my-project --create --org <org>
+  git-bare-clone --init my-project --create --org <org> --team <team>
   git-bare-clone --fix
   git-bare-clone --fix /path/to/existing/repo
 EOF
@@ -72,6 +78,9 @@ parse_params() {
   fix_mode=0
   remote_url=''
   default_branch='main'
+  github_create=0
+  github_org=''
+  github_team='team-sec-devsecops'
 
   while :; do
     case "${1-}" in
@@ -80,6 +89,7 @@ parse_params() {
     --no-color) NO_COLOR=1 ;;
     --init) init_mode=1 ;;
     --fix) fix_mode=1 ;;
+    --create) github_create=1 ;;
     -l | --location)
       location="${2-}"
       shift
@@ -92,6 +102,14 @@ parse_params() {
       default_branch="${2-}"
       shift
       ;;
+    --org)
+      github_org="${2-}"
+      shift
+      ;;
+    --team)
+      github_team="${2-}"
+      shift
+      ;;
     -?*) die "Unknown option: $1" ;;
     *) break ;;
     esac
@@ -99,7 +117,8 @@ parse_params() {
   done
 
   args=("$@")
-  [[ $fix_mode -eq 0 && ${#args[@]} -eq 0 ]] && die "Missing required argument (repository URL or project name)"
+  [[ $fix_mode -eq 0 && $init_mode -eq 0 && ${#args[@]} -eq 0 ]] && die "Missing required argument (repository URL or project name)"
+  [[ $github_create -eq 1 && -z "$github_org" ]] && die "--create requires --org <org>"
 
   return 0
 }
@@ -147,12 +166,21 @@ do_clone() {
 
 do_init() {
   local repo_dir="$1"
+  local in_place=0
 
-  [[ -e "$repo_dir" ]] && die "Target directory already exists: $repo_dir"
+  if [[ "$repo_dir" == "." ]]; then
+    in_place=1
+  elif [[ -e "$repo_dir" ]]; then
+    die "Target directory already exists: $repo_dir"
+  fi
 
-  msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
-  mkdir -p "$repo_dir"
-  pushd "$repo_dir" > /dev/null
+  [[ -e "$location" ]] && die "Bare repo already exists at: $location"
+
+  if [[ $in_place -eq 0 ]]; then
+    msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
+    mkdir -p "$repo_dir"
+    pushd "$repo_dir" > /dev/null
+  fi
 
   msg "${YELLOW}Initializing bare repository in $location...${NOFORMAT}"
   git init --bare --initial-branch="$default_branch" "$location"
@@ -172,16 +200,64 @@ do_init() {
     git -C "$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
   fi
 
+  # Remove empty worktree dir if it already exists so git worktree add creates it fresh
+  if [[ $in_place -eq 1 && -d "$default_branch" && -z "$(ls -A "$default_branch")" ]]; then
+    msg "${YELLOW}Removing empty $default_branch/ to allow clean worktree setup...${NOFORMAT}"
+    rmdir "$default_branch"
+  fi
+
   msg "${YELLOW}Creating worktree for '$default_branch'...${NOFORMAT}"
   GIT_DIR="$location" git worktree add "$default_branch" "$default_branch"
 
-  popd > /dev/null
-  msg "${GREEN}Success. Initialized $repo_dir/${NOFORMAT}"
+  # When initializing in-place, move pre-existing files into the worktree
+  if [[ $in_place -eq 1 ]]; then
+    local skip_dirs=(".bare" ".git" "$default_branch" ".omc" ".claude" ".DS_Store")
+    local files_to_move=()
+    for item in * .[^.]* ..?*; do
+      [[ -e "$item" || -L "$item" ]] || continue
+      local skip=0
+      for s in "${skip_dirs[@]}"; do [[ "$item" == "$s" ]] && skip=1 && break; done
+      [[ $skip -eq 0 ]] && files_to_move+=("$item")
+    done
+    if [[ ${#files_to_move[@]} -gt 0 ]]; then
+      msg "${YELLOW}Moving ${#files_to_move[@]} item(s) into $default_branch/...${NOFORMAT}"
+      mv "${files_to_move[@]}" "$default_branch/"
+      # If not using --create, commit now; otherwise the PS1 will run git add/commit
+      if [[ $github_create -eq 0 ]]; then
+        msg "${YELLOW}Staging and committing moved files...${NOFORMAT}"
+        git -C "$default_branch" add -A
+        git -C "$default_branch" commit -m "Add initial files"
+      fi
+    fi
+  fi
+
+  if [[ $github_create -eq 1 ]]; then
+    local repo_name
+    if [[ "$repo_dir" == "." ]]; then
+      repo_name=$(basename "$PWD")
+    else
+      repo_name="$repo_dir"
+    fi
+    msg "${YELLOW}Creating GitHub remote repo for '$repo_name' in org '$github_org'...${NOFORMAT}"
+    pushd "$default_branch" > /dev/null
+    pwsh "$HOME/Developer/clitools/initializeGitRepo.ps1" \
+      -GithubOrg "$github_org" \
+      -GithubTeam "$github_team" \
+      -RepoName "$repo_name"
+    popd > /dev/null
+  fi
+
+  if [[ $in_place -eq 0 ]]; then
+    popd > /dev/null
+    msg "${GREEN}Success. Initialized $repo_dir/${NOFORMAT}"
+  else
+    msg "${GREEN}Success. Initialized current directory as bare repo.${NOFORMAT}"
+  fi
   if [[ -n "$remote_url" ]]; then
     msg "${CYAN}Remote set to: $remote_url${NOFORMAT}"
-    msg "${CYAN}Push when ready: cd $repo_dir/$default_branch && git push -u origin $default_branch${NOFORMAT}"
+    msg "${CYAN}Push when ready: cd $default_branch && git push -u origin $default_branch${NOFORMAT}"
   fi
-  msg "${CYAN}Next: cd $repo_dir/$default_branch${NOFORMAT}"
+  msg "${CYAN}Next: cd $default_branch${NOFORMAT}"
 }
 
 do_fix() {
@@ -237,7 +313,7 @@ setup_colors
 if [[ $fix_mode -eq 1 ]]; then
   do_fix "${args[0]-}"
 elif [[ $init_mode -eq 1 ]]; then
-  do_init "${args[0]}"
+  do_init "${args[0]:-.}"
 else
   do_clone "${args[0]}"
 fi

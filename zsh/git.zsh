@@ -58,9 +58,9 @@ function cob() {
 function git-clean-merged() {
   git fetch --prune
   git worktree prune
-  git branch --merged | grep -v '^\*\|main\|master\|develop' | xargs git branch -d
-  git branch -r --merged | grep -v 'origin/main\|origin/master\|origin/develop\|HEAD' \
-    | sed 's/origin\///' | xargs git push origin --delete
+  git branch --merged | grep -vE '^\*|^\+|main|master|develop' | xargs -r git branch -d
+  git branch -r --merged | grep -vE 'origin/main|origin/master|origin/develop|HEAD' \
+    | sed 's/origin\///' | xargs -r git push origin --delete
 }
 
 function ghi(){
