@@ -1,0 +1,28 @@
+#:schema https://github.com/joshmedeski/sesh/raw/main/sesh.schema.json
+
+blacklist = ["scratch"]
+dir_length = 2
+sort_order = ["config", "tmux", "zoxide"]
+
+[default_session]
+startup_command = "nvim"
+preview_command = "eza --all --git --icons --color=always {}"
+
+# Pinned: dotfiles
+[[session]]
+name = "dotfiles"
+path = "~/.dotfiles"
+startup_command = "nvim ."
+
+# Pinned: Second Brain notes
+[[session]]
+name = "notes"
+path = "~/notes/SecondBrain"
+startup_command = "nvim ."
+
+# Wildcard: any project under ~/Developer opens in nvim
+[[wildcard]]
+name = "{}"
+pattern = "~/Developer/*"
+startup_command = "nvim ."
+preview_command = "eza --all --git --icons --color=always {}"

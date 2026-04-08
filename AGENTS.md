@@ -36,10 +36,11 @@ This is a personal dotfiles repository for macOS development environment configu
 ```
 .dotfiles/
 ├── bin/                    # Custom scripts and utilities
-├── config/                 # Application configurations
+├── config/                 # Application configurations (each dir is symlinked to ~/.config/<name>)
 │   ├── 1Password/         # SSH agent config
 │   ├── ghostty/           # Terminal emulator config
 │   ├── nvim/              # Neovim configuration (Lua)
+│   ├── sesh/              # Sesh session manager config (sesh.toml)
 │   ├── starship/          # Shell prompt config
 │   └── tmux/              # Tmux config and themes
 ├── git/                   # Git configuration and templates
@@ -180,6 +181,15 @@ brew bundle --file=~/.dotfiles/install/brewfile
   - `feat(nvim): add mini.pick fuzzy finder`
   - `perf(zsh): remove duplicate compinit calls`
   - `fix(git): correct SSH signing configuration`
+
+## Config Symlinking Convention
+
+All directories under `config/` are symlinked to `~/.config/<name>`. When adding a new app config:
+1. Create the directory at `~/.dotfiles/config/<appname>/`
+2. Remove any existing `~/.config/<appname>` directory
+3. Symlink: `ln -s ~/.dotfiles/config/<appname> ~/.config/<appname>`
+
+**Never create config files directly in `~/.config/`** — always source them from `~/.dotfiles/config/`.
 
 ## Important Files & Patterns
 

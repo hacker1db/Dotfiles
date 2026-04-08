@@ -5,7 +5,7 @@ DOTFILES="$SCRIPT_DIR"
 source "$DOTFILES/install/lib/log.sh"
 
 usage() {
-  echo "Usage: $(basename "$0") {backup|link|git|homebrew|shell|terminfo|macos|extras|nvimtmux|dotnet|theme|all}" >&2
+  echo "Usage: $(basename "$0") {backup|link|git|homebrew|shell|terminfo|macos|extras|bun|nvimtmux|dotnet|theme|all}" >&2
   exit 1
 }
 
@@ -26,6 +26,7 @@ script_for() {
     terminfo) echo "$DOTFILES/install/terminfo.sh" ;;
     macos) echo "$DOTFILES/install/osx.sh" ;;
     extras) echo "$DOTFILES/install/extras.sh" ;;
+    bun) echo "$DOTFILES/install/bun.sh" ;;
     nvimtmux) echo "$DOTFILES/install/nvimtmux.sh" ;;
     dotnet) echo "$DOTFILES/install/dotnet.sh" ;;
     theme) echo "$DOTFILES/install/theme.sh" ;;
@@ -45,7 +46,7 @@ run_script() {
 
 if [ "$cmd" = "all" ]; then
   title "Running full install"
-  for part in backup link terminfo homebrew shell git macos extras nvimtmux dotnet theme; do
+  for part in backup link terminfo homebrew bun shell git macos extras nvimtmux dotnet theme; do
     info "Executing $part"
     run_script "$part"
   done

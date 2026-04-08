@@ -194,8 +194,6 @@ cask "basictex"
 cask "brave-browser"
 # Anthropic's official Claude AI desktop app
 cask "claude"
-# Terminal-based AI coding assistant
-cask "claude-code"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
 # Universal database tool and SQL client
