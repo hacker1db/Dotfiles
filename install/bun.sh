@@ -8,7 +8,6 @@ if ! command -v bun &>/dev/null; then
 fi
 
 packages=(
-  "@anthropic-ai/claude-code"
   "@azure/static-web-apps-cli"
   "@fission-ai/openspec"
   "@github/copilot"

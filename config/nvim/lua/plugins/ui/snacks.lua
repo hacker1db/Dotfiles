@@ -1,7 +1,34 @@
+local uv = vim.uv or vim.loop
+
 return {
   "folke/snacks.nvim",
   lazy = false,
   priority = 1000,
+  init = function()
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "VeryLazy",
+      callback = function()
+        _G.dd = function(...) Snacks.debug.inspect(...) end
+        _G.bt = function() Snacks.debug.backtrace() end
+        if vim.fn.has("nvim-0.11") == 1 then
+          vim._print = function(_, ...) dd(...) end
+        else
+          vim.print = _G.dd
+        end
+        Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
+        Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
+        Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
+        Snacks.toggle.diagnostics():map("<leader>ud")
+        Snacks.toggle.line_number():map("<leader>ul")
+        Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map("<leader>uc")
+        Snacks.toggle.treesitter():map("<leader>uT")
+        Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>ub")
+        Snacks.toggle.inlay_hints():map("<leader>uh")
+        Snacks.toggle.indent():map("<leader>ug")
+        Snacks.toggle.dim():map("<leader>uD")
+      end,
+    })
+  end,
   keys = {
     { "<leader><space>", function() Snacks.picker.smart() end, desc = "Smart Find Files" },
     { "<leader>,", function() Snacks.picker.buffers() end, desc = "Buffers" },
@@ -12,11 +39,11 @@ return {
         local ok, explorer = pcall(require, "snacks.explorer"); if not ok then return end
         for _, win in ipairs(vim.api.nvim_list_wins()) do
           local buf = vim.api.nvim_win_get_buf(win)
-          local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+          local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
             if ft == "snacks_explorer" then pcall(vim.api.nvim_win_close, win, true); return end
         end
         local name = vim.api.nvim_buf_get_name(0)
-        if name ~= "" and vim.loop.fs_stat(name) then explorer.reveal() else explorer.open() end
+        if name ~= "" and uv.fs_stat(name) then explorer.reveal() else explorer.open() end
       end, desc = "File Explorer" },
     { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Buffers" },
     { "<leader>fc", function() Snacks.picker.files({ cwd = vim.fn.stdpath("config") }) end, desc = "Find Config File" },
@@ -106,31 +133,6 @@ return {
         })
       end, desc = "Neovim News" },
   },
-  init = function()
-    vim.api.nvim_create_autocmd("User", {
-      pattern = "VeryLazy",
-      callback = function()
-        _G.dd = function(...) Snacks.debug.inspect(...) end
-        _G.bt = function() Snacks.debug.backtrace() end
-        if vim.fn.has("nvim-0.11") == 1 then
-          vim._print = function(_, ...) dd(...) end
-        else
-          vim.print = _G.dd
-        end
-        Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
-        Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
-        Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
-        Snacks.toggle.diagnostics():map("<leader>ud")
-        Snacks.toggle.line_number():map("<leader>ul")
-        Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map("<leader>uc")
-        Snacks.toggle.treesitter():map("<leader>uT")
-        Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>ub")
-        Snacks.toggle.inlay_hints():map("<leader>uh")
-        Snacks.toggle.indent():map("<leader>ug")
-        Snacks.toggle.dim():map("<leader>uD")
-      end,
-    })
-  end,
   opts = function()
     local dashboard_sections = {
       { section = "header", padding = 1, text = {
@@ -149,7 +151,7 @@ return {
             local ok, ex = pcall(require, "snacks.explorer"); if not ok then return end
             for _, win in ipairs(vim.api.nvim_list_wins()) do
               local buf = vim.api.nvim_win_get_buf(win)
-              local ft = vim.api.nvim_buf_get_option(buf, "filetype")
+              local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
               if ft == "snacks_explorer" then pcall(vim.api.nvim_win_close, win, true); return end
             end
             ex.open()

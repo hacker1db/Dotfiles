@@ -3,7 +3,7 @@ local cmd = vim.cmd
 local api = vim.api
 vim.g.mapleader = ";"
 vim.g.maplocalleader = ";"
-vim.lsp.set_log_level("off") -- set log level to off
+vim.lsp.log.set_level("off") -- set log level to off
 
 opt.syntax = "enable"
 opt.number = true
