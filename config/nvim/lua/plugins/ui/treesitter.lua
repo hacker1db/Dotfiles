@@ -5,11 +5,9 @@ return {
         event = { "BufReadPre", "BufNewFile" },
         build = ":TSUpdate",
         config = function()
-            -- Point v2 at the lazy plugin dir so it finds pre-compiled parsers
-            -- (v2 no longer bundles parsers; master's .so files live here)
-            require("nvim-treesitter").setup({
-                install_dir = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter",
-            })
+            -- lazy.nvim already adds the plugin dir to rtp, so parsers are found
+            -- without setting install_dir (which would prepend the dir and override user queries)
+            require("nvim-treesitter").setup()
         end,
     },
     {
