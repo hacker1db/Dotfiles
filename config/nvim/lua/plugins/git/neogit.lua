@@ -1,5 +1,6 @@
 return {
     "NeogitOrg/neogit",
+    cmd = { "Neogit", "NeogitResetState", "NeogitLogCurrent", "NeogitCommit" },
     dependencies = {
         "nvim-lua/plenary.nvim", -- required
         "sindrets/diffview.nvim", -- optional - Diff integration

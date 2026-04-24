@@ -167,7 +167,15 @@ return {
         enabled = true,
         top_down = false,
       },
-      indent = { enabled = true, char = "┊" },
+      indent = {
+        enabled = true,
+        char = "┊",
+      },
+      scope = {
+        treesitter = {
+          enabled = false,
+        },
+      },
       scroll = { enabled = true },
       words = { enabled = true },
       bufdelete = { enabled = true },

@@ -1,9 +1,16 @@
 return {
-
     "folke/todo-comments.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    cmd = { "TodoQuickFix", "TodoLocList", "TodoTelescope", "TodoFzfLua", "TodoTrouble" },
+    keys = {
+        { "<leader>ft", "<cmd>TodoTelescope<cr>", desc = "Find todos" },
+        { "<leader>xt", "<cmd>TodoTrouble<CR>", desc = "Open todos in trouble" },
+        { "]t", function() require("todo-comments").jump_next() end, desc = "Next todo comment" },
+        { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous todo comment" },
+    },
     dependencies = { "nvim-lua/plenary.nvim" },
-    config = function()
-        require("todo-comments").setup()
+    config = function(_, opts)
+        require("todo-comments").setup(opts)
     end,
     opts = {
         signs = true, -- show icons in the signs column

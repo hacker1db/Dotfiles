@@ -12,7 +12,6 @@ return {
     config = function()
         -- requires
         local lspconfig = require("lspconfig")
-        local mason = require("mason")
         local mason_lspconfig = require("mason-lspconfig")
 
         -- capabilities for blink.cmp
@@ -32,9 +31,6 @@ return {
             underline     = true,
             severity_sort = true,
         })
-        -- init mason first
-        mason.setup()
-
         -- (optional) custom server: azure_pipelines_ls (not in core lspconfig)
         do
             local configs = require("lspconfig.configs")

@@ -2,6 +2,10 @@
 -- folke/gh.nvim has been disabled (see plugins/gh.lua) — it was conflicting with these mappings.
 return {
     "pwntester/octo.nvim",
+    cmd = "Octo",
+    keys = {
+        { "<leader>o", "<cmd>Octo<cr>", desc = "Octo open" },
+    },
     -- lazy.nvim uses `dependencies`, not `requires`
     dependencies = {
         "nvim-lua/plenary.nvim",

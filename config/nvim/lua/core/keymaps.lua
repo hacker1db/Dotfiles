@@ -59,8 +59,6 @@ keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telesc
 keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>", { desc = "Telescope show current commits from file" })
 keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Telescope show branches" })
 keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Telescope show git status" })
--- todo comments (keep TodoTelescope for now)
-keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
 
 -- restart lsp server
 keymap.set("n", "<leader>rs", ":LspRestart<CR>") -- mapping to restart lsp if necessary
@@ -100,14 +98,6 @@ keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev Buffer" })
 keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next Buffer" })
 keymap.set("n", "[B", "<cmd>BufferLineMovePrev<cr>", { desc = "Move buffer prev" })
 keymap.set("n", "]B", "<cmd>BufferLineMoveNext<cr>", { desc = "Move buffer next" })
--- trouble
-keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<cr>", { silent = true, noremap = true })
-keymap.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", { silent = true, noremap = true })
-keymap.set("n", "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", { silent = true, noremap = true })
-keymap.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<cr>", { silent = true, noremap = true })
-keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", { silent = true, noremap = true })
-keymap.set("n", "gR", "<cmd>TroubleToggle lsp_references<cr>", { silent = true, noremap = true })
-keymap.set("n", "<leader>xt", "<cmd>TodoTrouble<CR>", { desc = "Open todos in trouble" })
 
 -- lsp config keymaps
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -133,34 +123,3 @@ vim.api.nvim_create_autocmd("LspAttach", {
         keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
     end,
 })
-
-keymap.set("n", "]t", function()
-    require("todo-comments").jump_next()
-end, { desc = "Next todo comment" })
-keymap.set("n", "[t", function()
-    require("todo-comments").jump_prev()
-end, { desc = "Previous todo comment" })
-keymap.set("n", "<leader>ds", function()
-    require("dap").continue()
-end, { desc = "Debug: Start/Continue" })
-keymap.set("n", "<F1>", function()
-    require("dap").step_into()
-end, { desc = "Debug: Step Into" })
-keymap.set("n", "<F2>", function()
-    require("dap").step_over()
-end, { desc = "Debug: Step Over" })
-keymap.set("n", "<F3>", function()
-    require("dap").step_out()
-end, { desc = "Debug: Step Out" })
-keymap.set("n", "<leader>b", function()
-    require("dap").toggle_breakpoint()
-end, { desc = "Debug: Toggle Breakpoint" })
-keymap.set("n", "<leader>B", function()
-    require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
-end, { desc = "Debug: Set Breakpoint" })
-keymap.set("n", "<F7>", function()
-    require("dapui").toggle()
-end, { desc = "Debug: See last session result." })
-
--- Octo keymaps
-keymap.set("n", "<leader>o", "<cmd>Octo<cr>", { desc = "Octo open" })
