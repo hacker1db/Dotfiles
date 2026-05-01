@@ -4,9 +4,10 @@ return {
         branch = "main",
         event = { "BufReadPre", "BufNewFile" },
         build = ":TSUpdate",
-        config = function()
-            -- lazy.nvim already adds the plugin dir to rtp, so parsers are found
-            -- without setting install_dir (which would prepend the dir and override user queries)
+        config = function(plugin)
+            -- Append runtime/ so queries are found without prepending the plugin root,
+            -- which would override user queries in ~/.config/nvim (e.g. queries/vim/highlights.scm)
+            vim.opt.rtp:append(plugin.dir .. "/runtime")
             require("nvim-treesitter").setup()
         end,
     },

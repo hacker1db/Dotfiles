@@ -90,39 +90,39 @@ Configured LSP servers include:
 
 ### Shell/Dotfiles
 ```bash
-# No automated tests for dotfiles
-# Manual testing: source configuration in new shell
+# No Automated Tests For Dotfiles
+# Manual Testing: Source Configuration In New Shell
 source ~/.zshrc
 
-# Check for zsh syntax errors
+# Check For Zsh Syntax Errors
 zsh -n ~/.dotfiles/zsh/zshrc.symlink
 
-# Verify symlinks are created
+# Verify Symlinks Are Created
 ~/.dotfiles/install/link.sh
 ```
 
 ### Neovim
 ```bash
-# No automated tests for nvim config
-# Manual testing: open Neovim and check for errors
+# No Automated Tests For Nvim Config
+# Manual Testing: Open Neovim And Check For Errors
 nvim +checkhealth
 
-# Check Lua syntax
+# Check Lua Syntax
 luacheck ~/.dotfiles/config/nvim/
 
-# Update and sync plugins
+# Update And Sync Plugins
 nvim --headless "+Lazy! sync" +qa
 ```
 
 ### Installation
 ```bash
-# Install all packages from Brewfile
+# Install All Packages From Brewfile
 brew bundle --file=~/.dotfiles/install/brewfile
 
-# Run full installation script
+# Run Full Installation Script
 ~/.dotfiles/install.sh
 
-# Install tools and create symlinks
+# Install Tools And Create Symlinks
 ~/.dotfiles/install/install_tools.sh
 ~/.dotfiles/install/link.sh
 ```
@@ -250,7 +250,7 @@ Key items:
 2. Consider evaluating Snacks.nvim for plugin consolidation
 3. Continue monitoring shell startup performance
 
-## Working with This Repository
+## Working With This Repository
 
 ### Before Making Changes
 1. Read existing code and follow patterns

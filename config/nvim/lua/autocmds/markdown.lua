@@ -76,7 +76,7 @@ vim.api.nvim_create_autocmd("FileType", {
   end
 })
 
--- Codelens auto-refresh for markdown (markdown-oxide reference counts)
+-- Enable codelens for markdown buffers
 local function codelens_supported(bufnr)
   for _, c in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
     if c.server_capabilities and c.server_capabilities.codeLensProvider then
@@ -86,16 +86,16 @@ local function codelens_supported(bufnr)
   return false
 end
 
-local function refresh_markdown_codelens(bufnr)
+local function enable_markdown_codelens(bufnr)
   if not vim.api.nvim_buf_is_valid(bufnr) then return end
   if vim.bo[bufnr].buftype ~= "" then return end
   if vim.bo[bufnr].filetype ~= "markdown" then return end
   if not codelens_supported(bufnr) then return end
-  vim.lsp.codelens.refresh({ bufnr = bufnr })
+  vim.lsp.codelens.enable(true, { bufnr = bufnr })
 end
 
 vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave", "TextChanged" }, {
   callback = function(args)
-    refresh_markdown_codelens(args.buf)
+    enable_markdown_codelens(args.buf)
   end,
 })

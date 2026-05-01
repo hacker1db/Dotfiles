@@ -34,5 +34,6 @@
         "repo": "anthropics/claude-code"
       }
     }
-  }
+  },
+  "effortLevel": "xhigh"
 }

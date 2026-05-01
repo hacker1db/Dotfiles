@@ -117,6 +117,31 @@ for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands"; do
   fi
 done
 
+echo -e "\n\nInstalling Claude Code skills"
+echo "=============================="
+mkdir -p "$HOME/.claude/skills"
+for SKILL_SRC in "$DOTFILES/claude/skills"/*/; do
+  if [ -f "$SKILL_SRC/SKILL.md" ]; then
+    SKILL_NAME=$(basename "$SKILL_SRC")
+    SKILL_DEST="$HOME/.claude/skills/$SKILL_NAME"
+    if [ -L "$SKILL_DEST" ]; then
+      CURRENT=$(readlink "$SKILL_DEST")
+      if [ "$CURRENT" != "${SKILL_SRC%/}" ]; then
+        rm "$SKILL_DEST"
+        ln -s "${SKILL_SRC%/}" "$SKILL_DEST"
+        echo "Updated symlink $SKILL_DEST -> ${SKILL_SRC%/}"
+      else
+        echo "~/.claude/skills/$SKILL_NAME already symlinked correctly."
+      fi
+    elif [ ! -e "$SKILL_DEST" ]; then
+      ln -s "${SKILL_SRC%/}" "$SKILL_DEST"
+      echo "Created symlink $SKILL_DEST -> ${SKILL_SRC%/}"
+    else
+      echo "~/.claude/skills/$SKILL_NAME exists but is not a symlink; skipping."
+    fi
+  fi
+done
+
 echo -e "\n\nInstalling Claude Code MCP servers"
 echo "=============================="
 MCP_SRC="$DOTFILES/claude/mcp.json"
