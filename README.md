@@ -106,6 +106,7 @@ Config: `config/ghostty/config` — 78% opacity with blur, JetBrains Mono 14pt i
 
 - **19 agents** (oh-my-claudecode orchestration)
 - **15 custom commands**
+- **Shared skills** linked into both `~/.claude/skills/` and `~/.agents/skills/`
 - **MCP server config** (`mcp.json`)
 - **HUD display** and statusline customization
 
@@ -134,6 +135,8 @@ Config: `config/ghostty/config` — 78% opacity with blur, JetBrains Mono 14pt i
 ## Symlink Strategy
 
 All `*.symlink` files are linked into `$HOME` with a leading dot (e.g., `zshrc.symlink` → `~/.zshrc`). Directories under `config/` are linked to `~/.config/<name>/`. Claude Code configs are linked to `~/.claude/`.
+
+Skills live once under `claude/skills/<name>/SKILL.md` and are linked to both `~/.claude/skills/<name>` and `~/.agents/skills/<name>`. Claude Code reads the first path, while GitHub Copilot CLI 1.0.40 no longer loads custom skills from `~/.claude/` and uses the global agents skill path instead. Keeping both links lets one dotfiles source feed both tools.
 
 Re-running `./install.sh link` reconciles all symlinks, including vim compatibility links (`~/.vimrc`, `~/.vim`) and `~/.gitconfig-local`.
 
