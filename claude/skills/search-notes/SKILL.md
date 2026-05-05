@@ -7,6 +7,15 @@ description: "Hybrid semantic search across personal Obsidian vault notes and Re
 
 Search the personal Obsidian vault and Readwise highlights for any query.
 
+## Readwise Plugin
+
+When running on an OpenAI model with the Readwise plugin available, search Readwise through the plugin before reading exported vault files:
+- `_readwise_search_highlights` for highlighted passages and personal notes
+- `_reader_search_documents` for Reader documents by content, title, URL, tags, or summary
+- `_reader_get_document_details` and `_reader_get_document_highlights` when a result needs more context
+
+Use the local vault paths below for Obsidian notes and as a fallback if plugin tools are unavailable.
+
 ## Vault Locations
 
 | Source | Path |
@@ -20,10 +29,11 @@ Search the personal Obsidian vault and Readwise highlights for any query.
 
 ## Search Strategy
 
-1. **Keyword search** — Grep file contents across vault locations
-2. **Filename scan** — `find "$HOME/notes/SecondBrain" -name "*.md" | grep -i "<query>"`
-3. **Highlights scan** — In Readwise files, search the `## Highlights` section; `[n]` annotations = personal notes (especially valuable)
-4. **Synthesize** — combine results, de-duplicate, rank by relevance
+1. **Plugin search** — On OpenAI models, use Readwise plugin search for highlights and Reader documents
+2. **Keyword search** — Grep file contents across vault locations
+3. **Filename scan** — `find "$HOME/notes/SecondBrain" -name "*.md" | grep -i "<query>"`
+4. **Highlights scan fallback** — In exported Readwise files, search the `## Highlights` section; `[n]` annotations = personal notes (especially valuable)
+5. **Synthesize** — combine results, de-duplicate, rank by relevance
 
 Never fabricate file paths or quote content you haven't actually read.
 

@@ -63,7 +63,7 @@
 
 ```xml
 <mxCell id="metadata"
-  value="Team Name: [TEAM]&lt;br&gt;SME: [SME]&lt;br&gt;Copyright: Alaska Air Group, Inc [YEAR]&lt;br&gt;Last Reviewed Date: [YYYY-MM-DD]"
+  value="Team Name: [TEAM]&lt;br&gt;SME: [SME]&lt;br&gt;Copyright: [COMPANY] [YEAR]&lt;br&gt;Last Reviewed Date: [YYYY-MM-DD]"
   style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontColor=#000000;opacity=75;"
   parent="1" vertex="1">
   <mxGeometry x="-192" y="140" width="440" height="80" as="geometry"/>

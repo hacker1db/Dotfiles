@@ -7,6 +7,16 @@ description: "Clean up YouTube content in Readwise Reader by running the shorts 
 
 Run both Readwise cleanup scripts in parallel to organize YouTube content in Readwise Reader.
 
+## Readwise Plugin
+
+When running on an OpenAI model with the Readwise plugin available, use the plugin before local scripts for Reader operations:
+- `_reader_search_documents` or `_reader_list_documents` to find YouTube Shorts and YouTube documents
+- `_reader_add_tags_to_document` to tag Shorts with `youtube-shorts`
+- `_reader_move_documents` to archive Shorts in batches of up to 50
+- `_reader_bulk_edit_document_metadata` for supported metadata changes
+
+Use the scripts below as fallback when the plugin is unavailable or when a workflow needs script-only logic.
+
 ## Script Locations
 
 ```

@@ -2,7 +2,7 @@
 name: drawio
 description: >
   Create, generate, and render draw.io diagram files (.drawio) as editable PNG images using the
-  Alaska Air Group standard template. Use this skill whenever the user asks to create a technical
+  standard template. Use this skill whenever the user asks to create a technical
   diagram, network diagram, architecture diagram, PCI flow diagram, data flow diagram, content
   security policy (CSP) diagram, subresource integrity (SRI) diagram, or any diagram that should
   be editable in draw.io. Always use this skill when diagrams, drawio, or .drawio files are involved.

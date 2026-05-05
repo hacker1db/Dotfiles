@@ -11,6 +11,7 @@ packages=(
   "@azure/static-web-apps-cli"
   "@fission-ai/openspec"
   "@github/copilot"
+  "@readwise/cli"
   "eslint"
   "markdownlint-cli2"
   "md-to-pdf"
@@ -24,5 +25,12 @@ for pkg in "${packages[@]}"; do
   echo "Installing $pkg..."
   bun add -g "$pkg"
 done
+
+# Authenticate Readwise CLI
+# For headless/scripts: readwise login-with-token YOUR_ACCESS_TOKEN (get token at readwise.io/access_token)
+if command -v readwise &>/dev/null; then
+  echo "Logging into Readwise..."
+  readwise login
+fi
 
 echo "Bun global packages setup complete"
