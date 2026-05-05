@@ -117,6 +117,21 @@ for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands"; do
   fi
 done
 
+echo -e "\n\nAdopting any unmanaged Claude skills into dotfiles"
+echo "=============================="
+if [ -d "$HOME/.claude/skills" ]; then
+  for skill_dir in "$HOME/.claude/skills"/*/; do
+    skill_name="$(basename "$skill_dir")"
+    [ -L "${skill_dir%/}" ] && continue
+    [ ! -f "$skill_dir/SKILL.md" ] && continue
+    dotfiles_dest="$DOTFILES/claude/skills/$skill_name"
+    [ -e "$dotfiles_dest" ] && continue
+    echo "Adopting $skill_name into dotfiles..."
+    mv "$skill_dir" "$dotfiles_dest"
+    ln -s "$dotfiles_dest" "${skill_dir%/}"
+  done
+fi
+
 echo -e "\n\nInstalling Claude Code skills"
 echo "=============================="
 link_skill_dir() {
@@ -157,6 +172,14 @@ link_skill_dir "$HOME/.claude/skills" "~/.claude/skills"
 echo -e "\n\nInstalling Copilot CLI skills"
 echo "=============================="
 link_skill_dir "$HOME/.agents/skills" "~/.agents/skills"
+
+echo -e "\n\nInstalling Codex CLI skills"
+echo "=============================="
+link_skill_dir "$HOME/.codex/skills" "~/.codex/skills"
+
+echo -e "\n\nInstalling OpenCode skills"
+echo "=============================="
+link_skill_dir "$HOME/.opencode/skills" "~/.opencode/skills"
 
 echo -e "\n\nInstalling Claude Code MCP servers"
 echo "=============================="
