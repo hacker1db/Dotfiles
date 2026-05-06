@@ -17,28 +17,27 @@ When running on an OpenAI model with the Readwise plugin available, use the plug
 
 Use the scripts below as fallback when the plugin is unavailable or when a workflow needs script-only logic.
 
-## Script Locations
+## Scripts
 
 ```
-$HOME/Developer/clitools/readwiseshortremover/readwise/
+~/.dotfiles/bin/remove-shorts.sh
+~/.dotfiles/bin/recategorize.sh
 ```
-
-Python venv: `.venv/` or `venv/` inside that directory.
 
 ## Steps
 
-1. Activate the venv:
-   ```bash
-   SCRIPT_DIR="$HOME/Developer/clitools/readwiseshortremover/readwise"
-   source "$SCRIPT_DIR/.venv/bin/activate" 2>/dev/null || source "$SCRIPT_DIR/venv/bin/activate"
-   ```
+Launch **both** scripts simultaneously (not sequentially) using two parallel Bash tool calls:
 
-2. Launch **both** scripts simultaneously (not sequentially):
-   - `python "$SCRIPT_DIR/main.py"` — finds YouTube Shorts, tags with `youtube-shorts`, archives them
-   - `python "$SCRIPT_DIR/recategorize.py"` — moves YouTube videos from RSS → video category
+- `~/.dotfiles/bin/remove-shorts.sh` — finds YouTube Shorts, tags with `youtube-shorts`, archives them
+- `~/.dotfiles/bin/recategorize.sh` — moves YouTube videos from RSS → video category
 
-3. Report combined summary when both complete:
-   - Documents scanned
-   - Shorts found and archived
-   - Videos recategorized
-   - Any errors from either script
+Report combined summary when both complete:
+- Documents scanned
+- Shorts found and archived
+- Videos recategorized
+- Any errors from either script
+
+## Prerequisites
+
+- `readwise` CLI installed and authenticated (`readwise login`)
+- `jq` installed

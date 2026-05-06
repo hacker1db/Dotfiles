@@ -1,21 +1,24 @@
 ---
 name: readwise-cleaner
-description: Orchestrates parallel cleanup of YouTube content in Readwise Reader by launching shorts-remover and recategorizer subagents simultaneously
+description: Orchestrates parallel cleanup of YouTube content in Readwise Reader by running the shorts remover and recategorizer scripts simultaneously
 ---
 
 Orchestrates parallel cleanup of YouTube content in Readwise Reader.
 
 ## Execution
 
-Launch BOTH subagents in PARALLEL using the Task tool in a single message:
+Run both scripts in parallel using two simultaneous Bash tool calls:
 
-1. Task with `readwise-shorts-remover` subagent — Archives YouTube Shorts
-2. Task with `readwise-recategorizer` subagent — Recategorizes YouTube videos from RSS to video
+1. `~/.dotfiles/bin/remove-shorts.sh` — finds YouTube Shorts, tags with `youtube-shorts`, archives them
+2. `~/.dotfiles/bin/recategorize.sh` — moves YouTube videos from RSS → video category
 
-Report combined summary when both complete.
+Report combined summary when both complete:
+- Documents scanned
+- Shorts found and archived
+- Videos recategorized
+- Any errors from either script
 
 ## Prerequisites
 
-- `$CODE_DIR` environment variable must be set
-- 1Password CLI (`op`) installed and authenticated
-- Readwise Reader API key stored in 1Password
+- `readwise` CLI installed and authenticated (`readwise login`)
+- `jq` installed
