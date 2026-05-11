@@ -35,5 +35,7 @@
       }
     }
   },
-  "effortLevel": "xhigh"
+  "effortLevel": "xhigh",
+  "theme": "dark-daltonized",
+  "editorMode": "vim"
 }
