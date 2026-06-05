@@ -20,6 +20,8 @@ alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias cat='bat'
 alias tf="terraform"
+alias pn="pnpm"
+alias pna="pnpm audit"
 alias l="ls -lah ${colorflag}"
 alias la="ls -AF ${colorflag}"
 if [[ -x "$(command -v eza)" ]]; then

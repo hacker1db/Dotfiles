@@ -21,7 +21,6 @@ tap "jesseduffield/lazygit"
 tap "majd/repo"
 tap "mondoohq/mondoo"
 tap "noahgorstein/tap"
-tap "oven-sh/bun"
 tap "planetscale/tap"
 tap "rcmdnk/file"
 tap "robscott/tap"
@@ -36,6 +35,8 @@ brew "act"
 brew "amass"
 # Open-source, cross-platform JavaScript runtime environment
 brew "node"
+# Fast, disk space efficient package manager
+brew "pnpm"
 # CLI tool for Angular
 brew "angular-cli"
 # Microsoft Azure CLI 2.0
@@ -174,8 +175,6 @@ brew "zsh"
 brew "zsh-autosuggestions"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
-# Incredibly fast JavaScript runtime, bundler, transpiler and package manager - all in one.
-brew "oven-sh/bun/bun"
 # A CLI tool to start Linux KVM or macOS Hypervisor framework virtual machines using the libkrun platform.
 brew "slp/krunkit/krunkit"
 # Password manager that keeps all passwords secure behind one password

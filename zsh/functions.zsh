@@ -217,31 +217,19 @@ function brew-cleanup(){
  brew bundle dump --mas --tap --cask --brews --describe -v  --file="$HOME/.dotfiles/install/brewfile" -f  && brew cleanup && brew doctor
 }
 
-function update-bun-tools(){
-echo "🔍 Getting list of globally installed bun packages..."
-packages=$(bun pm ls -g 2>/dev/null | awk 'NR>1 {print $2}' | sed 's/@[^@]*$//')
-
-if [ -z "$packages" ]; then
-  echo "No global packages found."
-  return 0
+function update-node-tools(){
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found."
+  return 1
 fi
 
-echo "📦 Updating the following packages:"
-echo "$packages"
+export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+mkdir -p "$PNPM_HOME"
+export PATH="$PNPM_HOME:$PATH"
 
-echo "$packages" | while IFS= read -r pkg; do
-  if [ -n "$pkg" ]; then
-    if [ "$pkg" = "@github/copilot" ]; then
-      echo "⬆️ 🤖 updating copilot separately $pkg..."
-      bun add -g "$pkg@latest"
-      continue
-    fi
-    echo "⬆️  updating $pkg..."
-    bun add -g "$pkg@latest"
-  fi
-done
-
-echo "✅ All global bun packages updated!"
+echo "Updating global pnpm packages..."
+pnpm update --global --latest
+echo "All global pnpm packages updated!"
 }
 
 function get-azsubcount(){

@@ -32,7 +32,6 @@ TAPS=(
   majd/repo
   mondoohq/mondoo
   noahgorstein/tap
-  oven-sh/bun
   planetscale/tap
   rcmdnk/file
   robscott/tap
@@ -98,7 +97,7 @@ FORMULAS=(
   zsh
   zsh-autosuggestions
   zsh-syntax-highlighting
-  oven-sh/bun/bun
+  pnpm
 )
 
 for f in "${FORMULAS[@]}"; do
@@ -196,11 +195,14 @@ if command -v nvm >/dev/null 2>&1; then
   nvm use --lts || true
 fi
 
-if command -v bun >/dev/null 2>&1; then
+if command -v pnpm >/dev/null 2>&1; then
+  export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+  mkdir -p "$PNPM_HOME"
+  export PATH="$PNPM_HOME:$PATH"
   npm install --global yarn || true
   yarn global add expo-cli || true
-  bun i -g vercel || true
-  bun install -g typescript typescript-language-server eslint prettier @fission-ai/openspec@latest @github/copilot || true
+  pnpm add --global vercel || true
+  pnpm add --global typescript typescript-language-server eslint prettier @fission-ai/openspec@latest @github/copilot || true
 fi
 
 # Wordlists

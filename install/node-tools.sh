@@ -1,13 +1,17 @@
 #!/usr/bin/env bash
 
-echo "Setting up bun global packages"
+echo "Setting up Node global tools"
 
-if ! command -v bun &>/dev/null; then
-  echo "bun not found, skipping"
+if ! command -v pnpm &>/dev/null; then
+  echo "pnpm not found, skipping Node global tools"
   exit 0
 fi
 
-packages=(
+export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+mkdir -p "$PNPM_HOME"
+export PATH="$PNPM_HOME:$PATH"
+
+tools=(
   "@azure/static-web-apps-cli"
   "@fission-ai/openspec"
   "@github/copilot"
@@ -21,9 +25,9 @@ packages=(
   "vercel"
 )
 
-for pkg in "${packages[@]}"; do
-  echo "Installing $pkg..."
-  bun add -g "$pkg"
+for tool in "${tools[@]}"; do
+  echo "Installing $tool..."
+  pnpm add --global "$tool"
 done
 
 # Authenticate Readwise CLI
@@ -33,4 +37,4 @@ if command -v readwise &>/dev/null; then
   readwise login
 fi
 
-echo "Bun global packages setup complete"
+echo "Node global tools setup complete"

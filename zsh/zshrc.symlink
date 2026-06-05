@@ -97,8 +97,9 @@ if [[ -x "$(command -v zoxide)" ]]; then
     eval "$(zoxide init zsh --hook pwd --cmd cd)"
 fi
 
-if [[ -x "$(command -v bun)" ]]; then
-    export PATH="$PATH:$HOME/.bun/bin"
+if [[ -x "$(command -v pnpm)" ]]; then
+    export PNPM_HOME="$HOME/Library/pnpm"
+    export PATH="$PNPM_HOME:$PATH"
 fi
 
 export PYENV_ROOT="$HOME/.pyenv"
