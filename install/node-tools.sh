@@ -9,7 +9,7 @@ fi
 
 export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
 mkdir -p "$PNPM_HOME"
-export PATH="$PNPM_HOME:$PATH"
+export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 
 tools=(
   "@azure/static-web-apps-cli"
@@ -23,6 +23,7 @@ tools=(
   "typescript"
   "typescript-language-server"
   "vercel"
+  "@anthropic-ai/claude-code"
 )
 
 for tool in "${tools[@]}"; do

@@ -225,7 +225,19 @@ fi
 
 export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
 mkdir -p "$PNPM_HOME"
-export PATH="$PNPM_HOME:$PATH"
+export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
+
+if ! pnpm list --global --depth -1 2>/dev/null | grep -Eq '^[├└]── '; then
+  echo "No global pnpm packages found."
+  if command -v npm >/dev/null 2>&1; then
+    local npm_global_count
+    npm_global_count="$(npm list -g --depth=0 2>/dev/null | grep -Ec '^[├└]── ' || true)"
+    if [[ "${npm_global_count:-0}" -gt 0 ]]; then
+      echo "Found ${npm_global_count} npm global package(s). Run: npm update -g"
+    fi
+  fi
+  return 0
+fi
 
 echo "Updating global pnpm packages..."
 pnpm update --global --latest

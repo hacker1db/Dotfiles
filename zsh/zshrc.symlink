@@ -99,7 +99,7 @@ fi
 
 if [[ -x "$(command -v pnpm)" ]]; then
     export PNPM_HOME="$HOME/Library/pnpm"
-    export PATH="$PNPM_HOME:$PATH"
+    export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 fi
 
 export PYENV_ROOT="$HOME/.pyenv"
@@ -123,3 +123,6 @@ export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH"
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
+# Added by sonarqube-cli installer
+export PATH="$HOME/.local/share/sonarqube-cli/bin:$PATH"

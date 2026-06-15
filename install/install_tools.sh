@@ -198,7 +198,7 @@ fi
 if command -v pnpm >/dev/null 2>&1; then
   export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
   mkdir -p "$PNPM_HOME"
-  export PATH="$PNPM_HOME:$PATH"
+  export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
   npm install --global yarn || true
   yarn global add expo-cli || true
   pnpm add --global vercel || true
