@@ -1,0 +1,5 @@
+{
+  "env": {
+    "CLAUDE_CODE_USE_FOUNDRY": "0"
+  }
+}

@@ -69,7 +69,7 @@ fi
 
 echo -e "\n\nInstalling Claude Code settings"
 echo "=============================="
-for CLAUDE_FILE in settings.json statusline-command.sh; do
+for CLAUDE_FILE in statusline-command.sh; do
   CLAUDE_SRC="$DOTFILES/claude/$CLAUDE_FILE"
   CLAUDE_DEST="$HOME/.claude/$CLAUDE_FILE"
   mkdir -p "$HOME/.claude"

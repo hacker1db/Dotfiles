@@ -19,3 +19,4 @@ config/nvim/plugin/
 Brewfile.lock.json
 config/tmux/plugins/
 node_modules/
+claude/.local/

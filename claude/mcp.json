@@ -8,11 +8,6 @@
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@playwright/mcp"]
-    },
-    "app-modernization": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@microsoft/github-copilot-app-modernization-mcp-server@latest"]
     }
   }
 }
