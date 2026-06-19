@@ -25,6 +25,11 @@ DEST="$HOME/.claude/settings.json"
 MARKER="${CLAUDE_CODE_BACKEND_MARKER:-$HOME/.config/claude-code/backend}"
 
 resolve_backend() {
+  local arg="${1:-}"
+  if [ -n "$arg" ]; then
+    echo "$arg"
+    return
+  fi
   if [ -n "${CLAUDE_CODE_BACKEND:-}" ]; then
     echo "$CLAUDE_CODE_BACKEND"
     return
@@ -36,7 +41,7 @@ resolve_backend() {
   echo "anthropic"
 }
 
-backend="$(resolve_backend)"
+backend="$(resolve_backend "${2:-}")"
 case "$backend" in
   foundry | anthropic) ;;
   *)
@@ -54,6 +59,15 @@ command -v jq >/dev/null 2>&1 || { error "jq is required but not installed"; exi
 mkdir -p "$GEN_DIR" "$HOME/.claude"
 
 # Deep-merge: keys in the fragment win, env objects are merged key by key.
+# Local autoMode.environment file — not committed to git, shared across backends.
+# Falls back to the legacy foundry-automode.json name for backward compatibility.
+_automode_default="$HOME/.config/claude-code/automode.json"
+_automode_legacy="$HOME/.config/claude-code/foundry-automode.json"
+if [ -z "${CLAUDE_AUTOMODE_ENV_FILE:-}" ] && [ ! -f "$_automode_default" ] && [ -f "$_automode_legacy" ]; then
+  _automode_default="$_automode_legacy"
+fi
+LOCAL_AUTOMODE="${CLAUDE_AUTOMODE_ENV_FILE:-$_automode_default}"
+
 if [ "$backend" = "foundry" ]; then
   # Resource name comes from $ANTHROPIC_FOUNDRY_RESOURCE; if empty, discover it
   # via the Azure CLI (requires `az login`).
@@ -69,11 +83,21 @@ if [ "$backend" = "foundry" ]; then
     error "Could not resolve a Foundry resource name. Run 'az login' or set ANTHROPIC_FOUNDRY_RESOURCE."
     exit 1
   fi
-  jq -s --arg res "$resource" '.[0] * .[1] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$FRAGMENT" > "$GEN"
-  info "Resolved Claude backend: foundry (resource: $resource)"
+  if [ -f "$LOCAL_AUTOMODE" ]; then
+    jq -s --arg res "$resource" '.[0] * .[1] * .[2] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$GEN"
+    info "Resolved Claude backend: foundry (resource: $resource, autoMode: $LOCAL_AUTOMODE)"
+  else
+    jq -s --arg res "$resource" '.[0] * .[1] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$FRAGMENT" > "$GEN"
+    info "Resolved Claude backend: foundry (resource: $resource)"
+  fi
 else
-  jq -s '.[0] * .[1]' "$BASE" "$FRAGMENT" > "$GEN"
-  info "Resolved Claude backend: $backend"
+  if [ -f "$LOCAL_AUTOMODE" ]; then
+    jq -s '.[0] * .[1] * .[2]' "$BASE" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$GEN"
+    info "Resolved Claude backend: $backend (autoMode: $LOCAL_AUTOMODE)"
+  else
+    jq -s '.[0] * .[1]' "$BASE" "$FRAGMENT" > "$GEN"
+    info "Resolved Claude backend: $backend"
+  fi
 fi
 
 link() {

@@ -63,5 +63,18 @@
   "effortLevel": "high",
   "theme": "dark-daltonized",
   "editorMode": "vim",
-  "model": "claude-fable-5[1m]"
+  "model": "claude-fable-5[1m]",
+  "permissions": {
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(su *)",
+      "Bash(shred *)",
+      "Bash(dd *)",
+      "Bash(mkfs*)",
+      "Bash(fdisk*)",
+      "Bash(diskutil erase*)",
+      "Bash(diskutil unmount*)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  }
 }

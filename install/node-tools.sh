@@ -23,7 +23,6 @@ tools=(
   "typescript"
   "typescript-language-server"
   "vercel"
-  "@anthropic-ai/claude-code"
 )
 
 for tool in "${tools[@]}"; do
