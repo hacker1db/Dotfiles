@@ -7,7 +7,7 @@ You are generating a beautiful standalone HTML page showing what the user is cur
 
 ## Readwise Access
 
-Use the `readwise` CLI for all Readwise operations (see the `readwise-cli` skill for the full command reference). Pass this preference to any subagents. The instructions below reference MCP tool names — translate to CLI equivalents as needed (e.g. `mcp__readwise__reader_list_documents` → `readwise reader-list-documents`). If the Readwise MCP server is available in this session, you may use MCP tools directly as an alternative.
+Follow `../readwise-cli/references/access-patterns.md` and pass that preference to any subagents.
 
 ## Process
 

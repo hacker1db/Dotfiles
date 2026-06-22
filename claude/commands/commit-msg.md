@@ -1,8 +1,9 @@
 ---
-description: Generate conventional commit message from staged changes
+description: Generate a conventional commit message from staged changes.
 ---
-Analyze staged changes (files, additions, deletions, scope hints from paths, branch name via !`git rev-parse --abbrev-ref HEAD`).
-Infer type (feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert) and scope.
-Return the with body variant: subject + detailed body (what & why, not how, with bullet points for key changes) + issue refs (if pattern #\d in branch or diff).
-Subject: imperative, lowercase, no trailing period, <=50 chars.
-Body: wrap ~72 chars, include breaking change note if detected.
+
+# Commit Message
+
+Use the `commit-msg` skill with `$ARGUMENTS`.
+
+Analyze staged changes and return a conventional commit subject plus body when useful. Do not create the commit.

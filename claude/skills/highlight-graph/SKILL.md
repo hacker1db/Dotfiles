@@ -11,7 +11,7 @@ You are building an interactive 2D force-graph visualization of the user's Readw
 
 ## Readwise Access
 
-Use the `readwise` CLI for all Readwise operations (see the `readwise-cli` skill for the full command reference). The instructions below reference MCP tool names — translate to CLI equivalents as needed (e.g. `mcp__readwise__readwise_list_highlights` → `readwise readwise-list-highlights`). If the Readwise MCP server is available in this session, you may use MCP tools directly as an alternative.
+Follow `../readwise-cli/references/access-patterns.md`.
 
 ## Build Script
 

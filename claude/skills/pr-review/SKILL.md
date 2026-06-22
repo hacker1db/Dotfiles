@@ -1,6 +1,6 @@
 ---
 name: pr-review
-description: "Comprehensive pull request review of the current branch vs main, covering changes, risk, test coverage, and architectural impact. Use this skill when the user wants a PR review, wants to review their branch before opening a pull request, wants to understand what changed, or needs deployment notes. Triggers on 'review my PR', 'review this branch', 'pr review', 'what changed in this branch', 'is this ready to merge', 'review before I open a PR'."
+description: "Review the current branch vs main for changes, risk, tests, and deployment notes. Triggers: PR review, review this branch, what changed, ready to merge."
 ---
 
 # Pull Request Reviewer

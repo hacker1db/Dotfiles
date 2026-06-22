@@ -1,6 +1,6 @@
 ---
 name: schedule
-description: "Create a scheduled task that can be run on demand or automatically on an interval. Use this skill when the user wants to automate a recurring workflow, set a reminder, schedule a one-time future action, or turn any current session's work into a repeatable task. Trigger on phrases like 'schedule this', 'run this every day', 'remind me', 'automate this', or 'save this as a task'."
+description: "Create a scheduled or repeatable task. Triggers: schedule this, run every day, remind me, automate this, save as task."
 ---
 
 # Schedule Skill

@@ -1,6 +1,6 @@
 ---
 name: runbook
-description: "Generate a comprehensive operational runbook by analyzing the current repository, with architecture diagrams via draw.io. Use this skill when the user wants to create a runbook, operational procedure, deployment guide, implementation steps, or step-by-step instructions for a change. Triggers on 'create runbook', 'write a runbook', 'generate runbook', 'deployment procedure', 'implementation steps', 'operational guide', 'I need a runbook'."
+description: "Generate an operational runbook from repo analysis with optional draw.io diagrams. Triggers: create runbook, deployment procedure, implementation steps, operational guide."
 ---
 
 # Runbook Generator

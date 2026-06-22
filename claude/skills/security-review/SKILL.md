@@ -1,6 +1,6 @@
 ---
 name: security-review
-description: "Security-focused scan of staged git changes for injection, auth issues, secrets, and vulnerable dependencies. Use this skill when the user asks to check staged changes for security issues, scan for secrets or API keys, audit dependencies, review for OWASP vulnerabilities, or before committing sensitive code. Triggers on 'security scan', 'check for secrets', 'audit this', 'owasp check', 'scan staged changes', 'security review', 'check for api keys', 'scan for vulnerabilities'."
+description: "Review staged changes for security issues. Triggers: security review, scan staged changes, check secrets, OWASP check, audit this."
 ---
 
 # Security Reviewer

@@ -1,6 +1,6 @@
 ---
 name: todoist-operations
-description: "Manage the user's Todoist tasks through the Todoist REST and Sync APIs. Use when creating tasks, processing or triaging Todoist, reading task comments, moving/completing tasks, or when the user says 'my tasks', 'todoist', 'task management', 'process my tasks', or 'help with my Todoist'."
+description: "Manage Todoist tasks through the API. Triggers: Todoist, my tasks, task management, process my tasks."
 ---
 
 # Todoist Operations

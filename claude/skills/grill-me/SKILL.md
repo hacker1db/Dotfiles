@@ -1,6 +1,6 @@
 ---
 name: grill-me
-description: Interview the user relentlessly about a plan, idea, or project until a shared understanding is reached. Walks down each branch of the design tree, resolving dependencies between decisions one-by-one. Use whenever the user says "grill me", "interview me about", "challenge my plan", "help me think through", "poke holes in this", "play devil's advocate", or wants rigorous thinking before starting something new — even if they don't explicitly ask to be grilled.
+description: "Deep interview for plans and ideas. Triggers: grill me, challenge my plan, help me think through, poke holes, devil's advocate."
 argument-hint: [topic, plan, or project to explore]
 ---
 

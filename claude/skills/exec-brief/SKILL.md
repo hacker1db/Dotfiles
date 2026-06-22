@@ -1,6 +1,6 @@
 ---
 name: exec-brief
-description: Produce a concise, high-level leadership write-up in fixed Executive Summary / What Happened / Impact / Action / Ask format. Use when the user needs to brief leadership on an incident, escalation, risk, outage, or project situation. Triggers on "exec brief", "leadership brief", "brief leadership", "write up for leadership", "leadership writeup", "I need a brief", "brief the team", "draft a brief", "write this up for leadership".
+description: "Write a leadership brief in the standard Exec Summary format. Triggers: exec brief, leadership brief, brief the team, draft a brief."
 argument-hint: [situation, incident, or topic to write up]
 ---
 

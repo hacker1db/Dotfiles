@@ -1,11 +1,6 @@
 ---
 name: drawio
-description: >
-  Create, generate, and render draw.io diagram files (.drawio) as editable PNG images using the
-  standard template. Use this skill whenever the user asks to create a technical
-  diagram, network diagram, architecture diagram, PCI flow diagram, data flow diagram, content
-  security policy (CSP) diagram, subresource integrity (SRI) diagram, or any diagram that should
-  be editable in draw.io. Always use this skill when diagrams, drawio, or .drawio files are involved.
+description: "Create editable draw.io diagrams and PNG exports. Triggers: drawio, .drawio, architecture diagram, network diagram, data flow diagram."
 ---
 
 # Draw.Io Skill

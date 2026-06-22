@@ -1,6 +1,6 @@
 ---
 name: change-request
-description: "Generate a formal Change Request (CR) document by analyzing the current repository and publishing to Azure DevOps wiki. Use this skill whenever the user wants to create a change request, CR document, change management doc, or deployment approval. Triggers on 'create CR', 'write a change request', 'generate CR', 'I need a CR for this change', 'change management doc'."
+description: "Generate a formal Change Request document from repo analysis. Triggers: create CR, write change request, generate CR, deployment approval."
 ---
 
 # Change Request Generator

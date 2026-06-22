@@ -1,20 +1,15 @@
 ---
 name: search-notes
-description: "Hybrid semantic search across personal Obsidian vault notes and Readwise highlights with source citations. Use this skill when the user wants to search their notes, find something in their vault, look up Readwise highlights, recall what they have read on a topic, or search their second brain. Triggers on 'search my notes', 'find in vault', 'what do my notes say about', 'look up in obsidian', 'search readwise', 'recall what I read about', 'find in my second brain'."
+description: "Search Obsidian notes and Readwise highlights with citations. Triggers: search my notes, find in vault, search Readwise, recall what I read."
 ---
 
 # Notes Searcher
 
 Search the personal Obsidian vault and Readwise highlights for any query.
 
-## Readwise Plugin
+## Readwise Access
 
-When running on an OpenAI model with the Readwise plugin available, search Readwise through the plugin before reading exported vault files:
-- `_readwise_search_highlights` for highlighted passages and personal notes
-- `_reader_search_documents` for Reader documents by content, title, URL, tags, or summary
-- `_reader_get_document_details` and `_reader_get_document_highlights` when a result needs more context
-
-Use the local vault paths below for Obsidian notes and as a fallback if plugin tools are unavailable.
+Follow `../readwise-cli/references/access-patterns.md`; prefer plugin search when available, then local vault files as fallback.
 
 ## Vault Locations
 

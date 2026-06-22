@@ -1,6 +1,6 @@
 ---
 name: readwise-mcp
-description: How to use the Readwise MCP tools — access highlights, documents, and your entire reading library via MCP (alternative to CLI)
+description: "Reference for Readwise MCP tools when the active client exposes them instead of the CLI."
 ---
 
 # Readwise MCP

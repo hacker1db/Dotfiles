@@ -1,21 +1,15 @@
 ---
 name: security-intel
-description: "Pull security intelligence from CISA KEV, Readwise, and the web, then output as a quick digest or full brief. Use when you want to catch up on new CVEs, check actively exploited vulnerabilities, run a daily security update, generate a weekly threat report, or get a security intelligence brief. Triggers on 'vuln digest', 'security brief', 'what CVEs came out this week', 'threat intel', 'check CISA KEV', 'security update', 'weekly security review', 'security intel'."
+description: "Build a CISA/Readwise/web security digest or brief. Triggers: vuln digest, security brief, threat intel, check CISA KEV, weekly security review."
 ---
 
 # Security Intelligence
 
 Fetch security intelligence and output as a digest (quick, default) or brief (comprehensive).
 
-## Readwise Plugin
+## Readwise Access
 
-When running on an OpenAI model with the Readwise plugin available, use it for all Readwise/Reader work instead of fetching a token or calling the Readwise HTTP API:
-- `_reader_list_documents` for recent Reader articles, filtered by `location=new`, `category=article`, and `updated_after` when useful
-- `_reader_search_documents` for security-themed Reader content
-- `_readwise_search_highlights` for prior saved highlights related to CISA themes
-- `_reader_get_document_details` and `_reader_get_document_highlights` when a document needs more context
-
-Only use the token/API workflow below when plugin tools are unavailable.
+Follow `../readwise-cli/references/access-patterns.md`.
 
 ## Modes
 

@@ -1,6 +1,6 @@
 ---
 name: readwise-cli
-description: How to use the Readwise CLI — access highlights, documents, and your entire reading library from the command line
+description: "Reference for the Readwise CLI when another skill needs exact Reader or highlight commands."
 ---
 
 # Readwise CLI

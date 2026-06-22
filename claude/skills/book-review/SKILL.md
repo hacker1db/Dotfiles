@@ -11,7 +11,7 @@ where the original ideas come from connecting the book to everything else the us
 
 ## Readwise Access
 
-Use the `readwise` CLI for all Readwise operations (see the `readwise-cli` skill for the full command reference). The instructions below reference MCP tool names — translate to CLI equivalents as needed (e.g. `mcp__readwise__reader_search_documents` → `readwise reader-search-documents`). If the Readwise MCP server is available in this session, you may use MCP tools directly as an alternative.
+Follow `../readwise-cli/references/access-patterns.md`.
 
 ## Setup
 

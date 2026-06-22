@@ -1,6 +1,6 @@
 ---
 name: md-to-svx
-description: "Convert Obsidian markdown blog posts to .svx files for the hacker1db.dev SvelteKit blog. Use this skill when the user wants to convert markdown to svx, publish a blog post from Obsidian, move content from the vault to the blog, or convert .md to .svx. Triggers on 'publish post', 'convert post', 'svx', 'push to blog', 'convert to svx', 'publish to blog'."
+description: "Convert Obsidian blog markdown to hacker1db.dev .svx. Triggers: md to svx, publish post, convert post, push to blog."
 ---
 
 # Markdown to SVX Converter

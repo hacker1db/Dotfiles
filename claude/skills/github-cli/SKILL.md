@@ -1,6 +1,6 @@
 ---
 name: github-cli
-description: "Comprehensive reference for the GitHub CLI (gh). Use this skill whenever the user wants to work with GitHub via the command line — PRs, issues, repos, Actions, search, REST API calls. Triggers on 'gh pr', 'gh issue', 'create a PR', 'github cli', 'list my PRs', 'gh repo', 'run gh command', 'use gh to', or any GitHub workflow task."
+description: "Reference for GitHub CLI workflows. Triggers: gh pr, gh issue, create PR, GitHub CLI, gh repo, gh api."
 ---
 
 # GitHub CLI Reference

@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: "Propose safe, incremental refactoring with diff snippets, test impact analysis, and rollback plan. Use this skill when the user wants to clean up code, reduce duplication, simplify logic, extract functions, improve naming, or restructure without changing behavior. Triggers on 'refactor this', 'clean up', 'simplify', 'extract function', 'reduce duplication', 'improve this code', 'restructure', 'this code is messy'."
+description: "Plan safe behavior-preserving refactors. Triggers: refactor this, clean up, simplify, extract function, reduce duplication."
 ---
 
 # Refactor Advisor

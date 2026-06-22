@@ -1,6 +1,6 @@
 ---
 name: review
-description: "Structured code review of staged git changes across correctness, security, performance, clarity, maintainability, and style. Use this skill when the user asks to review staged changes, do a code review before committing, check their diff, or look at what is about to be committed. Triggers on 'review my changes', 'review staged', 'check my diff', 'code review', 'look at what I changed', 'review before commit'."
+description: "Review staged git changes for correctness and maintainability. Triggers: review staged, check my diff, code review, review before commit."
 ---
 
 # Staged Changes Reviewer

@@ -1,6 +1,6 @@
 ---
 name: readwise-cleaner
-description: "Clean up YouTube content in Readwise Reader by running the shorts archiver and video recategorizer in parallel. Use this skill when the user wants to clean up Readwise, archive YouTube Shorts, recategorize YouTube videos, organize their reading queue, or run the Readwise cleanup scripts. Triggers on 'clean readwise', 'archive shorts', 'readwise cleanup', 'organize readwise', 'run readwise scripts', 'remove shorts'."
+description: "Clean YouTube content in Readwise Reader. Triggers: clean Readwise, archive shorts, YouTube Shorts, recategorize videos."
 ---
 
 # Readwise Cleaner

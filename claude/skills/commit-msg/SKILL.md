@@ -1,6 +1,6 @@
 ---
 name: commit-msg
-description: "Generate a conventional commit message by analyzing staged changes. Use this skill when the user wants to write a commit message, format a commit, create a git commit, or needs help naming a commit. Triggers on 'write a commit message', 'generate commit', 'commit message for my changes', 'what should I name this commit', 'help me commit'."
+description: "Generate a conventional commit message from staged changes. Triggers: commit message, generate commit, name this commit, help me commit."
 ---
 
 # Commit Message Generator

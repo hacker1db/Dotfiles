@@ -1,6 +1,6 @@
 ---
 name: azure-devops-cli
-description: "Comprehensive reference for the Azure DevOps CLI (az devops). Use this skill whenever the user wants to interact with Azure DevOps — wikis, work items, boards, pipelines, repos, PRs, or projects. Triggers on 'az devops', 'ADO cli', 'azure devops wiki', 'work item', 'ado pipeline', 'devops board', 'create wiki page', 'ado pr'."
+description: "Reference for Azure DevOps CLI workflows. Triggers: az devops, ADO CLI, wiki page, work item, pipeline, repo, PR."
 ---
 
 # Azure DevOps CLI Reference

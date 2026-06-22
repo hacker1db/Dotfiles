@@ -1,6 +1,6 @@
 ---
 name: summarize
-description: "Multi-layer documentation summary with TL;DR, section map, key concepts, and follow-up questions. Use this skill when the user wants to summarize a file, understand a document quickly, get a TL;DR, summarize a directory, or summarize content from a URL. Triggers on 'summarize', 'tl;dr', 'explain this file', 'give me an overview', 'what does this do', 'summarize this repo', 'what is in this directory', 'summarize this url'."
+description: "Summarize files, directories, repos, or URLs into TL;DR, map, concepts, and questions. Triggers: summarize, tl;dr, explain this, overview."
 ---
 
 # Summarizer

@@ -1,6 +1,6 @@
 ---
 name: md2html
-description: Convert long-form Markdown into a single self-contained HTML page. Use when the user asks for /md2html, wants a .md file turned into .html, or asks to render a plan, spec, RFC, runbook, postmortem, brainstorm, or notes document as HTML.
+description: "Convert Markdown into a self-contained HTML page. Triggers: md2html, render markdown, plan to HTML, notes to HTML."
 argument-hint: <file.md> [--out output.html]
 allowed-tools: [Read, Write, Glob, Bash]
 ---
