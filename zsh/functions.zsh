@@ -257,3 +257,11 @@ function docker_set_host_to_podman_socket()
     echo "Setting DOCKER_HOST=$unix_domain_socket"
     export DOCKER_HOST="$unix_domain_socket"
 }
+
+function drawio-open() {
+    local root="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+    local -a files
+    files=("${(@f)$(find "$root" \( -name "*.drawio.png" -o -name "*.drawio" \) 2>/dev/null)}")
+    (( ${#files} )) || { echo "No draw.io diagrams found in $root"; return 1; }
+    open -a draw.io "${files[@]}"
+}
