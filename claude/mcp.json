@@ -1,10 +1,6 @@
 {
   "mcpServers": {
-    "postman": {
-      "type": "http",
-      "url": "https://mcp.postman.com/mcp"
-    },
-    "playwright": {
+"playwright": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@playwright/mcp"]
@@ -13,6 +9,7 @@
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/",
       "headers": {
+        "Authorization": "Bearer ${GITHUB_TOKEN_MCP}",
         "X-MCP-Toolsets": "default,copilot_spaces"
       }
     }

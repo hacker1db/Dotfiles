@@ -165,6 +165,12 @@ link_skill_dir() {
       fi
     fi
   done
+  for link in "$dest_dir"/*; do
+    if [ -L "$link" ] && [ ! -e "$link" ]; then
+      rm "$link"
+      echo "Removed broken symlink: $display_dir/$(basename "$link")"
+    fi
+  done
 }
 
 link_skill_dir "$HOME/.claude/skills" "~/.claude/skills"
