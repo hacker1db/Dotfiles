@@ -24,6 +24,7 @@ Read each source file fully, then write one self-contained `.html` file per sour
 - Embed a clean light stylesheet inline (`<style>`) — no external dependencies.
 - Preserve headings, code blocks, tables, fenced diagrams, and relative links.
 - Output: `<stem>.html` next to the source unless `--out` overrides.
+- After writing, always open the file in the default browser: `open <output.html>` (macOS).
 
 ### PDF (`--to pdf`)
 Run `md-to-pdf` via CLI:

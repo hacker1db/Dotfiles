@@ -128,7 +128,7 @@
     whitespace = nowarn
 [core]
     excludesfile = ~/.gitignore_global
-    pager = delta
+	pager = hunk pager
     editor = vim
     whitespace = cr-at-eol
 	autocrlf = input
