@@ -265,3 +265,13 @@ function drawio-open() {
     (( ${#files} )) || { echo "No draw.io diagrams found in $root"; return 1; }
     open -a draw.io "${files[@]}"
 }
+
+# Scaffold BMAD-METHOD into the current project (Claude Code + Codex).
+# Extra args pass through, e.g. `bmad-init --directory .`.
+# Set GITHUB_TOKEN first to avoid the 60/hr anonymous GitHub API rate limit
+# when the external modules (bmb, cis) resolve their release tags.
+function bmad-init() {
+  bmad-method install --yes \
+    --modules bmm,bmb,cis \
+    --tools claude-code,codex "$@"
+}

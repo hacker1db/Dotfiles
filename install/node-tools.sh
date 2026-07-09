@@ -16,6 +16,7 @@ tools=(
   "@fission-ai/openspec"
   "@github/copilot"
   "@readwise/cli"
+  "bmad-method"
   "eslint"
   "markdownlint-cli2"
   "md-to-pdf"
