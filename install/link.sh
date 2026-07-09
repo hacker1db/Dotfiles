@@ -94,7 +94,7 @@ done
 
 echo -e "\n\nInstalling Claude Code agents and commands"
 echo "=============================="
-for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands"; do
+for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands" "$DOTFILES/claude/output-styles"; do
   DIR_NAME=$(basename "$CLAUDE_SRC")
   CLAUDE_DEST="$HOME/.claude/$DIR_NAME"
   mkdir -p "$HOME/.claude"

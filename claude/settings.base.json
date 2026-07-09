@@ -73,6 +73,7 @@
   "effortLevel": "high",
   "theme": "dark-daltonized",
   "editorMode": "vim",
+  "outputStyle": "Plan Browser",
   "model": "claude-fable-5[1m]",
   "permissions": {
     "deny": [
