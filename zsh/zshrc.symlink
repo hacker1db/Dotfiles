@@ -118,9 +118,14 @@ export STARSHIP_CONFIG=~/.config/starship/starship.toml
 export PATH="$HOME/.rd/bin:$PATH"
 ### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
 
-# .NET SDK
-export DOTNET_ROOT="$HOME/.dotnet"
-export PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH"
+if [[ -d /opt/homebrew/opt/dotnet/libexec ]]; then
+    export DOTNET_ROOT="/opt/homebrew/opt/dotnet/libexec"
+elif [[ -d /usr/local/opt/dotnet/libexec ]]; then
+    export DOTNET_ROOT="/usr/local/opt/dotnet/libexec"
+elif [[ -d "$HOME/.dotnet" ]]; then
+    export DOTNET_ROOT="$HOME/.dotnet"
+fi
+[[ -n "${DOTNET_ROOT:-}" ]] && export PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:$PATH"
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
 

@@ -1,0 +1,39 @@
+{
+  "skill_name": "review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review my staged changes before I commit. I want correctness, maintainability, performance, and style risks called out with file:line references.",
+      "expected_output": "A staged-diff code review report that starts from `git diff --cached`, prioritizes findings, and includes a concise summary.",
+      "files": [],
+      "assertions": [
+        "The response checks whether staged changes exist before reviewing.",
+        "The response includes findings with severity, category, location, issue, why it matters, and recommendation fields when issues are found.",
+        "The response includes top risks before commit.",
+        "The response explicitly says no staged changes are present if the staged diff is empty."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Can you check my diff? Focus on bugs and regressions, not formatting nitpicks.",
+      "expected_output": "A review of staged changes that prioritizes behavioral risks over cosmetic observations.",
+      "files": [],
+      "assertions": [
+        "The response reviews `git diff --cached` rather than unstaged or branch-wide changes.",
+        "The response prioritizes correctness and maintainability findings.",
+        "The response avoids overemphasizing style-only comments unless they create real risk."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Do a pre-commit review and tell me if anything looks unsafe or likely to break.",
+      "expected_output": "A concise staged-change review with severity counts and actionable recommendations.",
+      "files": [],
+      "assertions": [
+        "The response includes an overall assessment with severity counts.",
+        "The response prominently flags secrets, credentials, or unsafe patterns if present.",
+        "The response includes good practices only after findings or after confirming no findings."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "skill_name": "search-notes",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Search my notes and Readwise highlights for what I have saved about spaced repetition. Include citations.",
+      "expected_output": "A cited synthesis from Obsidian notes and Readwise highlights.",
+      "files": [],
+      "assertions": [
+        "The response searches both Obsidian vault locations and Readwise highlights or documents when available.",
+        "The response includes quoted snippets with source paths and line numbers for local files.",
+        "The response does not fabricate file paths or quotes.",
+        "The response ends with suggested next queries."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Find anything in my vault about appsec risk acceptance and summarize the strongest references.",
+      "expected_output": "A ranked, cited note search result focused on relevant vault content.",
+      "files": [],
+      "assertions": [
+        "The response scans filenames and file contents under `$HOME/notes/SecondBrain/`.",
+        "The response ranks results by relevance rather than listing raw grep output.",
+        "The response includes related topics and additional sources."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "What have I read about incident retrospectives? Search Readwise and my notes.",
+      "expected_output": "A combined search result that synthesizes Readwise and vault matches with citations.",
+      "files": [],
+      "assertions": [
+        "The response uses the Readwise access pattern before falling back to local exported files.",
+        "The response de-duplicates overlapping results.",
+        "The response separates summary, key findings, related topics, additional sources, and follow-up queries."
+      ]
+    }
+  ]
+}

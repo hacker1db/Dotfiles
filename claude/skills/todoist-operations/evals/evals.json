@@ -1,0 +1,39 @@
+{
+  "skill_name": "todoist-operations",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Show me my Todoist tasks for today and help me triage them.",
+      "expected_output": "A Todoist task triage flow that fetches relevant tasks and comments before recommending actions.",
+      "files": [],
+      "assertions": [
+        "The response retrieves the Todoist token through 1Password item `Todoist api` or uses an existing `TODOIST_API_TOKEN`.",
+        "The response fetches task comments before acting on tasks.",
+        "The response presents the full numbered task set before batch processing.",
+        "The response does not modify tasks until the user asks for a change."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Move all delegated Todoist tasks out of my focus list, but do not close anything assigned to someone else.",
+      "expected_output": "A Todoist batch operation plan that treats delegated tasks conservatively.",
+      "files": [],
+      "assertions": [
+        "The response treats tasks assigned to someone else as delegated.",
+        "The response avoids completing delegated tasks.",
+        "The response confirms the full batch before making changes."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Complete the Todoist task once you move the linked note into the vault.",
+      "expected_output": "A workflow that comments with the destination link before completing the Todoist task.",
+      "files": [],
+      "assertions": [
+        "The response fetches comments before acting.",
+        "The response adds a Todoist comment with the destination link before completion.",
+        "The response never asks the user to paste or persist the Todoist API token."
+      ]
+    }
+  ]
+}

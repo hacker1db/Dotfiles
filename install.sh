@@ -5,7 +5,7 @@ DOTFILES="$SCRIPT_DIR"
 source "$DOTFILES/install/lib/log.sh"
 
 usage() {
-  echo "Usage: $(basename "$0") {backup|link|claude|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|theme|all}" >&2
+  echo "Usage: $(basename "$0") {backup|link|claude|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
   exit 1
 }
 
@@ -30,6 +30,7 @@ script_for() {
     node-tools) echo "$DOTFILES/install/node-tools.sh" ;;
     nvimtmux) echo "$DOTFILES/install/nvimtmux.sh" ;;
     dotnet) echo "$DOTFILES/install/dotnet.sh" ;;
+    dotnet-tools) echo "$DOTFILES/install/dotnet-tools.sh" ;;
     theme) echo "$DOTFILES/install/theme.sh" ;;
     *) return 1 ;;
   esac
@@ -47,7 +48,7 @@ run_script() {
 
 if [ "$cmd" = "all" ]; then
   title "Running full install"
-  for part in backup link claude terminfo homebrew node-tools shell git macos extras nvimtmux dotnet theme; do
+  for part in backup link claude terminfo homebrew node-tools shell git macos extras nvimtmux dotnet dotnet-tools theme; do
     info "Executing $part"
     run_script "$part"
   done

@@ -7,7 +7,7 @@ description: "Manage Obsidian notes with wikilinks and indexes. Triggers: create
 
 ## Vault location
 
-`~/notes/SecondBrian/`
+`~/notes/SecondBrain/`
 
 Mostly flat at root level — no folder hierarchy for organization.
 
@@ -31,10 +31,10 @@ Use Glob/Grep tools directly on the vault path:
 
 ```bash
 # Search by filename
-find ~/notes/SecondBrian/ -name "*.md" | grep -i "keyword"
+find ~/notes/SecondBrain/ -name "*.md" | grep -i "keyword"
 
 # Search by content
-grep -rl "keyword" ~/notes/SecondBrian/ --include="*.md"
+grep -rl "keyword" ~/notes/SecondBrain/ --include="*.md"
 ```
 
 ### Create a new note
@@ -49,11 +49,11 @@ grep -rl "keyword" ~/notes/SecondBrian/ --include="*.md"
 Search for all notes that reference a given note:
 
 ```bash
-grep -rl "\[\[Note Title\]\]" ~/notes/SecondBrian/
+grep -rl "\[\[Note Title\]\]" ~/notes/SecondBrain/
 ```
 
 ### Find index notes
 
 ```bash
-find ~/notes/SecondBrian/ -name "*Index*"
+find ~/notes/SecondBrain/ -name "*Index*"
 ```

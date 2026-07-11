@@ -11,8 +11,9 @@ Generates standard diagrams as **editable PNG files** — PNGs with embedded XML
 
 1. Identify: diagram type, systems, metadata (team, SME, year), and GitHub source path
 2. Generate `.drawio` XML — see `references/component-styles.md` for all element styles
-3. Install deps if needed: `cd scripts && npm install`
-4. Render: `node scripts/render_drawio.js /tmp/diagram.drawio /tmp/diagram.png 0`
+3. Install deps if needed: `cd $HOME/.dotfiles/claude/drawio-scripts && npm install`
+4. Render preview HTML: `node $HOME/.dotfiles/claude/drawio-scripts/render_drawio_html.js /tmp/diagram.drawio /tmp/diagram.html 0`
+5. If a PNG screenshot is produced from the HTML preview, embed source XML with: `node $HOME/.dotfiles/claude/drawio-scripts/embed_xml.js /tmp/diagram.png /tmp/diagram.drawio /tmp/diagram.editable.png`
 
 ## Coordinate System
 

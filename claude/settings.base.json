@@ -74,7 +74,9 @@
   "theme": "dark-daltonized",
   "editorMode": "vim",
   "outputStyle": "Plan Browser",
+  "tui": "fullscreen",
   "model": "claude-fable-5[1m]",
+  "skillListingBudgetFraction": 0.02,
   "permissions": {
     "deny": [
       "Bash(sudo *)",

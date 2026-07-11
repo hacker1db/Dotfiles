@@ -92,6 +92,12 @@ for CLAUDE_FILE in statusline-command.sh; do
   fi
 done
 
+if [ -x "$DOTFILES/install/claude-backend.sh" ]; then
+  "$DOTFILES/install/claude-backend.sh" || echo "Warning: Claude Code settings backend link failed; continuing."
+else
+  echo "Warning: $DOTFILES/install/claude-backend.sh is not executable; skipping Claude Code settings backend link."
+fi
+
 echo -e "\n\nInstalling Claude Code agents and commands"
 echo "=============================="
 for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands" "$DOTFILES/claude/output-styles"; do

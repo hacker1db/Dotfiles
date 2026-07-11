@@ -3,18 +3,15 @@ return {
     { -- Linting
         "mfussenegger/nvim-lint",
         event = { "BufReadPre", "BufNewFile" },
-        opts = {
-            linters = {
-                -- https://github.com/LazyVim/LazyVim/discussions/4094#discussioncomment-10178217
-                ["markdownlint-cli2"] = {
-                    args = { "--config", os.getenv("HOME") .. "/.dotfiles/.markdownlint.yaml", "--" },
-                },
-            },
-        },
         config = function()
             local lint = require("lint")
+            lint.linters["markdownlint-cli2"].args = {
+                "-",
+                "--config",
+                os.getenv("HOME") .. "/.dotfiles/.markdownlint.yaml",
+            }
             lint.linters_by_ft = {
-                markdown = { "markdownlint", "markdownlint-cli2" },
+                markdown = { "markdownlint-cli2" },
                 lua = { "luacheck" },
                 python = { "flake8" },
                 sh = { "shellcheck" },

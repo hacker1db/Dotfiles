@@ -5,10 +5,11 @@ return {
         event = { "BufReadPre", "BufNewFile" },
         build = ":TSUpdate",
         config = function(plugin)
+            require("nvim-treesitter").setup()
+            vim.opt.rtp:remove(plugin.dir)
             -- Append runtime/ so queries are found without prepending the plugin root,
             -- which would override user queries in ~/.config/nvim (e.g. queries/vim/highlights.scm)
             vim.opt.rtp:append(plugin.dir .. "/runtime")
-            require("nvim-treesitter").setup()
         end,
     },
     {

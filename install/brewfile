@@ -35,6 +35,8 @@ brew "act"
 brew "amass"
 # Open-source, cross-platform JavaScript runtime environment
 brew "node"
+# Developer platform
+brew "dotnet"
 # Fast, disk space efficient package manager
 brew "pnpm"
 # CLI tool for Angular

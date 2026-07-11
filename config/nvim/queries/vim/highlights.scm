@@ -127,7 +127,6 @@
   "eval"
   "sign"
   "abort"
-  "substitute"
 ] @keyword
 
 (map_statement
@@ -253,9 +252,6 @@
 (heredoc
   (parameter) @keyword)
 
-(script
-  (parameter) @keyword)
-
 [
   (marker_definition)
   (endmarker)
@@ -316,9 +312,6 @@
 
 (binary_operation
   "." @operator)
-
-(lua_statement
-  "=" @keyword)
 
 ; Punctuation
 [

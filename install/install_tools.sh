@@ -51,6 +51,7 @@ FORMULAS=(
   azure-cli
   bat
   bat-extras
+  dotnet
   eza
   fd
   fnm

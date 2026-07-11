@@ -1,0 +1,39 @@
+{
+  "skill_name": "commit-msg",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a commit message for my staged changes.",
+      "expected_output": "A conventional commit message inferred from `git diff --cached`.",
+      "files": [],
+      "assertions": [
+        "The response reads staged changes with `git diff --cached` or equivalent.",
+        "The subject line uses conventional commit format with type and optional scope.",
+        "The subject line is imperative, has no trailing period, and is no longer than 50 characters.",
+        "The body explains what changed and why when the change is not self-evident."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Name this commit. The branch mentions issue 248.",
+      "expected_output": "A conventional commit message that includes an issue reference if it can be inferred.",
+      "files": [],
+      "assertions": [
+        "The response includes an issue reference footer when one is detectable.",
+        "The response wraps body lines at approximately 72 characters.",
+        "The response chooses a conventional type from the configured list."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Help me commit these staged dotfiles changes.",
+      "expected_output": "A dotfiles-appropriate conventional commit message with an inferred scope such as nvim, zsh, tmux, git, install, or skills.",
+      "files": [],
+      "assertions": [
+        "The response infers a scope from the staged paths when useful.",
+        "The response does not actually create a commit.",
+        "The response provides only the proposed commit message or clearly separates it from any explanation."
+      ]
+    }
+  ]
+}
