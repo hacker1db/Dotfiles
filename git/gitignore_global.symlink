@@ -37,3 +37,4 @@ tmp
 .omc
 
 **/.claude/settings.local.json
+.opencode/package-lock.json
