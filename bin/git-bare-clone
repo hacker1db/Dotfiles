@@ -81,8 +81,10 @@ parse_params() {
   github_create=0
   github_org=''
   github_team='team-sec-devsecops'
+  github_team_explicit=0
+  args=()
 
-  while :; do
+  while [[ $# -gt 0 ]]; do
     case "${1-}" in
     -h | --help) usage ;;
     -v | --verbose) set -x ;;
@@ -91,36 +93,77 @@ parse_params() {
     --fix) fix_mode=1 ;;
     --create) github_create=1 ;;
     -l | --location)
+      [[ $# -ge 2 ]] || die "$1 requires a value"
       location="${2-}"
-      shift
+      shift 2
+      continue
       ;;
     --remote)
+      [[ $# -ge 2 ]] || die "$1 requires a value"
       remote_url="${2-}"
-      shift
+      shift 2
+      continue
       ;;
     --branch)
+      [[ $# -ge 2 ]] || die "$1 requires a value"
       default_branch="${2-}"
-      shift
+      shift 2
+      continue
       ;;
     --org)
+      [[ $# -ge 2 ]] || die "$1 requires a value"
       github_org="${2-}"
-      shift
+      shift 2
+      continue
       ;;
     --team)
+      [[ $# -ge 2 ]] || die "$1 requires a value"
       github_team="${2-}"
+      github_team_explicit=1
+      shift 2
+      continue
+      ;;
+    --)
       shift
+      args+=("$@")
+      break
       ;;
     -?*) die "Unknown option: $1" ;;
-    *) break ;;
+    *) args+=("$1") ;;
     esac
     shift
   done
 
-  args=("$@")
-  [[ $fix_mode -eq 0 && $init_mode -eq 0 && ${#args[@]} -eq 0 ]] && die "Missing required argument (repository URL or project name)"
+  [[ $fix_mode -eq 1 && $init_mode -eq 1 ]] && die "--fix and --init cannot be used together"
+  [[ $github_create -eq 1 && $init_mode -eq 0 ]] && die "--create requires --init"
   [[ $github_create -eq 1 && -z "$github_org" ]] && die "--create requires --org <org>"
+  [[ $github_create -eq 1 && -n "$remote_url" ]] && die "--create and --remote cannot be used together"
+  [[ $init_mode -eq 0 && $fix_mode -eq 0 && ${#args[@]} -ne 1 ]] && die "Clone mode requires exactly one repository URL"
+  [[ $init_mode -eq 1 && ${#args[@]} -gt 1 ]] && die "Init mode accepts at most one project name"
+  [[ $fix_mode -eq 1 && ${#args[@]} -gt 1 ]] && die "Fix mode accepts at most one path"
+  [[ -z "$location" ]] && die "--location cannot be empty"
+  git check-ref-format --branch "$default_branch" > /dev/null 2>&1 || die "Invalid branch name: $default_branch"
+
+  if [[ $github_create -eq 1 ]]; then
+    case "$github_org" in
+    ecomm) github_org='Alaska-ECommerce' ;;
+    its) github_org='Alaska-ITS' ;;
+    shared)
+      github_org='Alaska-Airlines-Shared'
+      [[ $github_team_explicit -eq 0 ]] && github_team='DevSecOps'
+      ;;
+    esac
+  fi
 
   return 0
+}
+
+gitdir_pointer() {
+  if [[ "$location" == /* ]]; then
+    printf 'gitdir: %s\n' "$location"
+  else
+    printf 'gitdir: ./%s\n' "${location#./}"
+  fi
 }
 
 repo_dir_from_arg() {
@@ -146,15 +189,15 @@ do_clone() {
   git clone --bare "$repo_arg" "$location"
 
   msg "${YELLOW}Creating .git pointer file...${NOFORMAT}"
-  echo "gitdir: ./.bare" > .git
+  gitdir_pointer > .git
 
   msg "${YELLOW}Adjusting origin fetch locations...${NOFORMAT}"
-  git -C "$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-  git -C "$location" fetch origin
+  git --git-dir="$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+  git --git-dir="$location" fetch origin
 
   # Detect default branch from remote HEAD
   local branch
-  branch=$(git -C "$location" symbolic-ref --short HEAD 2>/dev/null || echo "$default_branch")
+  branch=$(git --git-dir="$location" symbolic-ref --short HEAD 2>/dev/null || echo "$default_branch")
 
   msg "${YELLOW}Creating worktree for '$branch'...${NOFORMAT}"
   GIT_DIR="$location" git worktree add "$branch" "$branch"
@@ -167,6 +210,7 @@ do_clone() {
 do_init() {
   local repo_dir="$1"
   local in_place=0
+  local next_path="$default_branch"
 
   if [[ "$repo_dir" == "." ]]; then
     in_place=1
@@ -174,30 +218,35 @@ do_init() {
     die "Target directory already exists: $repo_dir"
   fi
 
-  [[ -e "$location" ]] && die "Bare repo already exists at: $location"
+  if [[ $github_create -eq 1 ]]; then
+    command -v gh > /dev/null 2>&1 || die "--create requires the GitHub CLI (gh)"
+  fi
 
   if [[ $in_place -eq 0 ]]; then
     msg "${YELLOW}Creating repo directory $repo_dir...${NOFORMAT}"
     mkdir -p "$repo_dir"
     pushd "$repo_dir" > /dev/null
+    next_path="$repo_dir/$default_branch"
   fi
+
+  [[ -e "$location" ]] && die "Bare repo already exists at: $location"
 
   msg "${YELLOW}Initializing bare repository in $location...${NOFORMAT}"
   git init --bare --initial-branch="$default_branch" "$location"
 
   msg "${YELLOW}Creating .git pointer file...${NOFORMAT}"
-  echo "gitdir: ./.bare" > .git
+  gitdir_pointer > .git
 
   msg "${YELLOW}Creating initial empty commit on '$default_branch'...${NOFORMAT}"
   local empty_tree initial_commit
-  empty_tree=$(git -C "$location" hash-object -t tree /dev/null)
-  initial_commit=$(git -C "$location" commit-tree "$empty_tree" -m "Initial commit")
-  git -C "$location" update-ref "refs/heads/$default_branch" "$initial_commit"
+  empty_tree=$(git --git-dir="$location" hash-object -t tree /dev/null)
+  initial_commit=$(git --git-dir="$location" commit-tree "$empty_tree" -m "Initial commit")
+  git --git-dir="$location" update-ref "refs/heads/$default_branch" "$initial_commit"
 
   if [[ -n "$remote_url" ]]; then
     msg "${YELLOW}Adding remote origin: $remote_url${NOFORMAT}"
-    git -C "$location" remote add origin "$remote_url"
-    git -C "$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+    git --git-dir="$location" remote add origin "$remote_url"
+    git --git-dir="$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
   fi
 
   # Remove empty worktree dir if it already exists so git worktree add creates it fresh
@@ -211,7 +260,12 @@ do_init() {
 
   # When initializing in-place, move pre-existing files into the worktree
   if [[ $in_place -eq 1 ]]; then
-    local skip_dirs=(".bare" ".git" "$default_branch" ".omc" ".claude" ".DS_Store")
+    local bare_root=''
+    if [[ "$location" != /* ]]; then
+      bare_root=${location#./}
+      bare_root=${bare_root%%/*}
+    fi
+    local skip_dirs=("$bare_root" ".git" "$default_branch" ".omc" ".claude" ".DS_Store")
     local files_to_move=()
     for item in * .[^.]* ..?*; do
       [[ -e "$item" || -L "$item" ]] || continue
@@ -222,29 +276,22 @@ do_init() {
     if [[ ${#files_to_move[@]} -gt 0 ]]; then
       msg "${YELLOW}Moving ${#files_to_move[@]} item(s) into $default_branch/...${NOFORMAT}"
       mv "${files_to_move[@]}" "$default_branch/"
-      # If not using --create, commit now; otherwise the PS1 will run git add/commit
-      if [[ $github_create -eq 0 ]]; then
-        msg "${YELLOW}Staging and committing moved files...${NOFORMAT}"
-        git -C "$default_branch" add -A
-        git -C "$default_branch" commit -m "Add initial files"
-      fi
+      msg "${YELLOW}Staging and committing moved files...${NOFORMAT}"
+      git -C "$default_branch" add -A
+      git -C "$default_branch" commit -m "Add initial files"
     fi
   fi
 
   if [[ $github_create -eq 1 ]]; then
     local repo_name
-    if [[ "$repo_dir" == "." ]]; then
-      repo_name=$(basename "$PWD")
-    else
-      repo_name="$repo_dir"
-    fi
+    repo_name=$(basename "$PWD")
     msg "${YELLOW}Creating GitHub remote repo for '$repo_name' in org '$github_org'...${NOFORMAT}"
-    pushd "$default_branch" > /dev/null
-    pwsh "$HOME/Developer/clitools/initializeGitRepo.ps1" \
-      -GithubOrg "$github_org" \
-      -GithubTeam "$github_team" \
-      -RepoName "$repo_name"
-    popd > /dev/null
+    gh repo create "$github_org/$repo_name" \
+      --team "$github_team" \
+      --internal \
+      --source "$default_branch" \
+      --remote origin \
+      --push
   fi
 
   if [[ $in_place -eq 0 ]]; then
@@ -255,9 +302,11 @@ do_init() {
   fi
   if [[ -n "$remote_url" ]]; then
     msg "${CYAN}Remote set to: $remote_url${NOFORMAT}"
-    msg "${CYAN}Push when ready: cd $default_branch && git push -u origin $default_branch${NOFORMAT}"
+    msg "${CYAN}Push when ready: cd $next_path && git push -u origin $default_branch${NOFORMAT}"
+  elif [[ $github_create -eq 1 ]]; then
+    msg "${CYAN}Remote created: $github_org/$repo_name${NOFORMAT}"
   fi
-  msg "${CYAN}Next: cd $default_branch${NOFORMAT}"
+  msg "${CYAN}Next: cd $next_path${NOFORMAT}"
 }
 
 do_fix() {
@@ -278,22 +327,23 @@ do_fix() {
   fi
 
   # Write .git pointer if missing or wrong
-  local current_ptr=""
+  local current_ptr="" expected_ptr
+  expected_ptr=$(gitdir_pointer)
   [[ -f ".git" ]] && current_ptr=$(cat .git)
-  if [[ "$current_ptr" != "gitdir: ./.bare" ]]; then
+  if [[ "$current_ptr" != "$expected_ptr" ]]; then
     msg "${YELLOW}Writing .git pointer file...${NOFORMAT}"
-    echo "gitdir: ./.bare" > .git
-    msg "${GREEN}  .git -> gitdir: ./.bare${NOFORMAT}"
+    gitdir_pointer > .git
+    msg "${GREEN}  .git -> ${expected_ptr#gitdir: }${NOFORMAT}"
   else
     msg "${GREEN}  .git pointer already correct, skipping.${NOFORMAT}"
   fi
 
   # Fix fetch refspec if missing
   local fetch_cfg
-  fetch_cfg=$(git -C "$bare_loc" config --get remote.origin.fetch 2>/dev/null || true)
+  fetch_cfg=$(git --git-dir="$bare_loc" config --get remote.origin.fetch 2>/dev/null || true)
   if [[ "$fetch_cfg" != "+refs/heads/*:refs/remotes/origin/*" ]]; then
     msg "${YELLOW}Fixing remote.origin.fetch refspec...${NOFORMAT}"
-    git -C "$bare_loc" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+    git --git-dir="$bare_loc" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
     msg "${GREEN}  fetch refspec updated.${NOFORMAT}"
   else
     msg "${GREEN}  fetch refspec already correct, skipping.${NOFORMAT}"
@@ -301,7 +351,7 @@ do_fix() {
 
   # Fetch to populate remote tracking refs
   msg "${YELLOW}Fetching from origin...${NOFORMAT}"
-  git -C "$bare_loc" fetch origin
+  git --git-dir="$bare_loc" fetch origin
 
   popd > /dev/null
   msg "${GREEN}Done. Repo at '$target' is fixed.${NOFORMAT}"
