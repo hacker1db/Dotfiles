@@ -38,3 +38,5 @@ tmp
 
 **/.claude/settings.local.json
 .opencode/package-lock.json
+_bmad/
+.agents/
