@@ -15,9 +15,10 @@ accent = "#987afb"
 panel = "#0D1116"
 noteBorder = "#fca6ff"
 
-[custom_theme.syntax]
-keyword  = "#987afb"
-string   = "#37f499"
-comment  = "#b7bfce"
-operator = "#04d1f9"
-variable = "#fca6ff"
+[custom_theme.syntax_scopes]
+"keyword" = "#987afb"
+"string" = "#37f499"
+"comment" = "#b7bfce"
+"punctuation.definition.comment" = "#b7bfce"
+"keyword.operator" = "#04d1f9"
+"variable" = "#fca6ff"
