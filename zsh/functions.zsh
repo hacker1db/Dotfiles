@@ -214,7 +214,46 @@ function gha(){
        gh project item-add 16 --owner Alaska-ITS --url "$@"
 }
 function brew-cleanup(){
- brew bundle dump --mas --tap --cask --brews --describe -v  --file="$HOME/.dotfiles/install/brewfile" -f  && brew cleanup && brew doctor
+    local brewfile="${DOTFILES:-$HOME/.dotfiles}/install/brewfile"
+    local snapshot
+    local formula
+    local -a missing_formulae
+
+    if [[ ! -f "$brewfile" ]]; then
+        echo "Brewfile not found: $brewfile"
+        return 1
+    fi
+
+    snapshot="$(mktemp "${TMPDIR:-/tmp}/brewfile.XXXXXX")" || return 1
+    command brew bundle dump --mas --tap --cask --brews --file="$snapshot" --force || {
+        rm -f "$snapshot"
+        return 1
+    }
+
+    for formula in ${(f)"$(command brew leaves)"}; do
+        if ! awk -v target="$formula" '
+            /^brew "/ {
+                name = $0
+                sub(/^brew "/, "", name)
+                sub(/".*/, "", name)
+                count = split(name, parts, "/")
+                if (parts[count] == target) found = 1
+            }
+            END { exit(found ? 0 : 1) }
+        ' "$snapshot"; then
+            missing_formulae+=("$formula")
+        fi
+    done
+
+    if (( ${#missing_formulae[@]} )); then
+        echo "Brewfile was not updated; the dump omitted installed formulae: ${missing_formulae[*]}"
+        rm -f "$snapshot"
+        return 1
+    fi
+
+    mv "$snapshot" "$brewfile"
+    command brew cleanup || return 1
+    command brew doctor
 }
 
 function update-node-tools(){

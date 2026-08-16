@@ -1,4 +1,3 @@
-export HOMEBREW_BREWFILE=~/.dotfiles/install/Brewfile
 eval $(/opt/homebrew/bin/brew shellenv)
 # source z.sh if it exists
 zpath="$(brew --prefix)/etc/profile.d/z.sh"
