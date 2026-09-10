@@ -21,7 +21,10 @@ Parse `$ARGUMENTS`:
 
 ### HTML (`--to html`)
 Read each source file fully, then write one self-contained `.html` file per source.
-- Embed a clean light stylesheet inline (`<style>`) — no external dependencies.
+- Embed a clean **dark-mode** stylesheet inline (`<style>`) — no external dependencies. Always render dark, regardless of the OS/browser color-scheme preference (do not rely on `prefers-color-scheme`).
+  - Use a dark background (e.g. `#0d1117`), light body text (e.g. `#e6edf3`), a muted secondary color for de-emphasized text, and a slightly lighter panel background (e.g. `#161b22`) for code blocks, tables, and cards.
+  - Ensure sufficient contrast (WCAG AA) and pick a readable accent color for links (e.g. `#58a6ff`).
+  - Set `color-scheme: dark` on `:root` so form controls and scrollbars match.
 - Preserve headings, code blocks, tables, fenced diagrams, and relative links.
 - Output: `<stem>.html` next to the source unless `--out` overrides.
 - After writing, always open the file in the default browser: `open <output.html>` (macOS).
