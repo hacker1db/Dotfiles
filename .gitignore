@@ -20,3 +20,4 @@ Brewfile.lock.json
 config/tmux/plugins/
 node_modules/
 claude/.local/
+codex/.local/

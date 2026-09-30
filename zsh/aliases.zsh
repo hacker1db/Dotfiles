@@ -105,6 +105,7 @@ alias httpgui="open\ /Applications/HTTPie.app"
 alias azlocations='az account list-locations -o table'
 alias azlogin='az login'
 alias azlogout='az logout'
+alias az-openai-token='azure-openai-token'
 alias customrole="az role definition list --custom-role-only true --output json --query '[].{roleName:roleName, roleType:roleType, id:id}'"
 
 ## AI Tools and alias

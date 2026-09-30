@@ -283,15 +283,26 @@ do_init() {
   fi
 
   if [[ $github_create -eq 1 ]]; then
-    local repo_name
+    local repo_name repo_url
     repo_name=$(basename "$PWD")
     msg "${YELLOW}Creating GitHub remote repo for '$repo_name' in org '$github_org'...${NOFORMAT}"
+    # Create the empty remote only. We wire up 'origin' and push ourselves below,
+    # because 'gh repo create --source' does not reliably configure the remote in a
+    # bare-repo/worktree layout (the worktree's .git is a gitdir pointer, not a dir).
     gh repo create "$github_org/$repo_name" \
       --team "$github_team" \
-      --internal \
-      --source "$default_branch" \
-      --remote origin \
-      --push
+      --internal
+
+    msg "${YELLOW}Resolving remote URL...${NOFORMAT}"
+    repo_url=$(gh repo view "$github_org/$repo_name" --json sshUrl --jq .sshUrl)
+    [[ -n "$repo_url" ]] || die "Could not resolve remote URL for $github_org/$repo_name"
+
+    msg "${YELLOW}Adding remote origin: $repo_url${NOFORMAT}"
+    git --git-dir="$location" remote add origin "$repo_url"
+    git --git-dir="$location" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
+    msg "${YELLOW}Pushing '$default_branch' to origin...${NOFORMAT}"
+    git -C "$default_branch" push -u origin "$default_branch"
   fi
 
   if [[ $in_place -eq 0 ]]; then

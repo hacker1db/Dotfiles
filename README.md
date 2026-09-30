@@ -110,6 +110,24 @@ Config: `config/ghostty/config` — 78% opacity with blur, JetBrains Mono 14pt i
 - **MCP server config** (`mcp.json`)
 - **HUD display** and statusline customization
 
+### Microsoft Foundry OpenAI
+
+Configure a separate Codex home with Azure CLI token authentication:
+
+```bash
+az login
+./install.sh codex-foundry \
+  --resource YOUR_FOUNDRY_OPENAI_RESOURCE \
+  --model YOUR_OPENAI_DEPLOYMENT_NAME
+```
+
+The generated `~/.codex_foundry/config.toml` uses `bin/azure-openai-token`
+as Codex's command-backed auth provider. It obtains short-lived Entra tokens
+from the active Azure CLI session and does not configure an API key.
+
+In T3 Code, add a second Codex provider with `CODEX_HOME` set to
+`~/.codex_foundry` and the binary path set to `/opt/homebrew/bin/codex`.
+
 ### Custom Scripts (`Bin/`)
 
 | Script | Purpose |
@@ -123,6 +141,16 @@ Config: `config/ghostty/config` — 78% opacity with blur, JetBrains Mono 14pt i
 | `gbrt` | Git bare repo tool |
 | `tmux-reload-all` | Reload all tmux sessions |
 | `dotnet-install.sh` | .NET SDK installer |
+| `install-caido-skills` | Install official Caido skills and dependencies into one project |
+
+Install Caido skills only in projects that need them:
+
+```bash
+install-caido-skills /path/to/project
+```
+
+The command installs `caido/skills` under the project's `.agents/skills/`
+directory and does not run as part of the default dotfiles installation.
 
 ### MacOS Defaults
 

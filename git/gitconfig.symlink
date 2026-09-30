@@ -132,7 +132,7 @@
     editor = vim
     whitespace = cr-at-eol
 	autocrlf = input
-	hooksPath = ~/.dotfiles/git/templates/hooks
+	hooksPath = ~/.sonar/sonarqube-cli/hooks
 
 [interactive]
     diffFilter = delta --color-only
@@ -177,8 +177,7 @@
 [url "ssh://git@github.com/"]
     insteadOf = https://github.com/
 [credential "https://github.com"]
-	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential

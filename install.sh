@@ -5,7 +5,7 @@ DOTFILES="$SCRIPT_DIR"
 source "$DOTFILES/install/lib/log.sh"
 
 usage() {
-  echo "Usage: $(basename "$0") {backup|link|claude|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
+  echo "Usage: $(basename "$0") {backup|link|claude|codex-foundry|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
   exit 1
 }
 
@@ -21,6 +21,7 @@ script_for() {
     backup) echo "$DOTFILES/install/backup.sh" ;;
     link) echo "$DOTFILES/install/link.sh" ;;
     claude) echo "$DOTFILES/install/claude-backend.sh" ;;
+    codex-foundry) echo "$DOTFILES/install/codex-foundry.sh" ;;
     git) echo "$DOTFILES/install/git.sh" ;;
     homebrew) echo "$DOTFILES/install/install_tools.sh" ;;
     shell) echo "$DOTFILES/install/shell.sh" ;;
