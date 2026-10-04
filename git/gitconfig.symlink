@@ -181,3 +181,5 @@
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential
+[url "git@github-hacker1db:hacker1db/"]
+	insteadOf = git@github.com:hacker1db/
