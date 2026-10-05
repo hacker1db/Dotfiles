@@ -15,6 +15,7 @@ tools=(
   "@azure/static-web-apps-cli"
   "@fission-ai/openspec"
   "@github/copilot"
+  "@openai/codex-security"
   "@readwise/cli"
   "bmad-method"
   "eslint"
@@ -36,6 +37,17 @@ done
 if command -v readwise &>/dev/null; then
   echo "Logging into Readwise..."
   readwise login
+fi
+
+# Authenticate Codex Security (ChatGPT sign-in). Skips if already logged in.
+# See https://github.com/openai/codex-security
+if command -v codex-security &>/dev/null; then
+  if codex-security login status &>/dev/null; then
+    echo "Codex Security already logged in"
+  else
+    echo "Logging into Codex Security..."
+    codex-security login
+  fi
 fi
 
 echo "Node global tools setup complete"
