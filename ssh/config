@@ -1,0 +1,19 @@
+# --- GitHub account: hacker1db (personal) ---
+Host hb1 github-hacker1db
+	HostName github.com
+	User git
+	IdentitiesOnly yes
+	IdentityFile ~/.ssh/id_hacker1db.pub
+	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+
+# --- GitHub account: CyberDSO (work) ---
+Host github-cyberdso
+	HostName github.com
+	User git
+	IdentitiesOnly yes
+	IdentityFile ~/.ssh/id_cyberdso.pub
+	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+
+Host *
+	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+

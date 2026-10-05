@@ -215,6 +215,31 @@ if [ -e "$MCP_SRC" ]; then
   fi
 fi
 
+echo -e "\n\nInstalling SSH config"
+echo "=============================="
+SSH_SRC="$DOTFILES/ssh/config"
+SSH_DEST="$HOME/.ssh/config"
+if [ -e "$SSH_SRC" ]; then
+  mkdir -p "$HOME/.ssh"
+  chmod 700 "$HOME/.ssh"
+  chmod 600 "$SSH_SRC"
+  if [ -L "$SSH_DEST" ]; then
+    CURRENT=$(readlink "$SSH_DEST")
+    if [ "$CURRENT" != "$SSH_SRC" ]; then
+      rm "$SSH_DEST"
+      ln -s "$SSH_SRC" "$SSH_DEST"
+      echo "Updated symlink $SSH_DEST -> $SSH_SRC"
+    else
+      echo "~/.ssh/config already symlinked correctly."
+    fi
+  elif [ ! -e "$SSH_DEST" ]; then
+    ln -s "$SSH_SRC" "$SSH_DEST"
+    echo "Created symlink $SSH_DEST -> $SSH_SRC"
+  else
+    echo "~/.ssh/config exists but is not a symlink; skipping."
+  fi
+fi
+
 echo -e "\n\nCreating vim symlinks"
 echo "=============================="
 VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim" "$HOME/.vimrc:$DOTFILES/vim/.vimrc")
