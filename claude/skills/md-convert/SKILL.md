@@ -9,6 +9,12 @@ allowed-tools: [Read, Write, Glob, Bash]
 
 Convert one or more Markdown files to HTML, PDF, or Word (docx).
 
+Plan Manager is the canonical durable record for user-facing, implementation,
+project, investigation, PR, and team plans. Do not create conversion artifacts
+automatically while planning. When the user explicitly invokes `md-convert` or
+asks to export or render a plan, convert the requested canonical plan to the
+requested format, including HTML.
+
 ## Arguments
 
 Parse `$ARGUMENTS`:

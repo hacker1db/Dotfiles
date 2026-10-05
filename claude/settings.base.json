@@ -73,7 +73,7 @@
   "effortLevel": "high",
   "theme": "dark-daltonized",
   "editorMode": "vim",
-  "outputStyle": "Plan Browser",
+  "outputStyle": "Plan Manager",
   "tui": "fullscreen",
   "model": "claude-fable-5[1m]",
   "skillListingBudgetFraction": 0.02,
