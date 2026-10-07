@@ -1,0 +1,159 @@
+[
+  {
+    "id": "create-from-agent-session",
+    "description": "Create a user-facing plan non-interactively from an agent session",
+    "prompt": "Create a plan called 'API Migration' with a summary of steps to migrate from REST to GraphQL. Save it to the plan library.",
+    "assertions": [
+      "delegates to `plan create --title ... --stdin --json` or equivalent non-interactive CLI invocation",
+      "does NOT edit files under ~/Developer/plans directly",
+      "does NOT use a tool-specific storage location",
+      "returns the plan ID from the JSON envelope",
+      "returns the stable local dashboard URL in the form http://plans.localhost:4173/plans/<id>",
+      "does NOT invoke `plan push` (no explicit publish request)",
+      "does NOT invoke native /plan mode"
+    ]
+  },
+  {
+    "id": "update-retains-stable-url",
+    "description": "Update an existing plan while retaining its stable dashboard URL",
+    "prompt": "Update my 'API Migration' plan to add a rollback section. Keep the same plan ID and URL.",
+    "setup": "plan create --title 'API Migration' --stdin --json (plan already exists with known id and revision)",
+    "assertions": [
+      "invokes `plan show <id> --json` or `plan list --json` to retrieve current revision before updating",
+      "delegates to `plan update <id> --stdin --if-revision <revision> --json`",
+      "returns the same plan ID as before the update",
+      "returns the same stable dashboard URL http://plans.localhost:4173/plans/<id> as before the update",
+      "does NOT generate a new ID or a new URL",
+      "does NOT edit the Markdown file directly",
+      "does NOT invoke `plan push`"
+    ]
+  },
+  {
+    "id": "find-open-service-stopped",
+    "description": "Find and open a plan while the local dashboard service is stopped",
+    "prompt": "Open my deployment plan for the auth service.",
+    "setup": "plan service is stopped (plan doctor reports serviceState: stopped)",
+    "assertions": [
+      "runs `plan serve --json` to start the service before attempting to open",
+      "runs `plan doctor --json` to confirm service is healthy",
+      "if service recovery fails, reports the failure and does NOT claim the URL is reachable",
+      "if service recovery succeeds, delegates to `plan search` or `plan list` to locate the plan",
+      "returns the plan ID and stable dashboard URL upon successful recovery",
+      "does NOT start an independent HTTP server",
+      "does NOT skip the health check and fabricate a URL",
+      "preserves native /plan mode — does NOT override built-in planning behavior"
+    ]
+  },
+  {
+    "id": "discover-existing-plan",
+    "description": "Discover an existing plan without creating a duplicate",
+    "prompt": "Find my database cutover plan and give me its review link.",
+    "setup": "The library contains one matching plan and the dashboard service is healthy.",
+    "assertions": [
+      "delegates discovery to `plan search ... --json` or `plan list --json`",
+      "uses `plan show <id> --json` when detail or the current revision is needed",
+      "returns the existing plan ID and stable dashboard URL",
+      "does NOT create, import, or directly scan Markdown files",
+      "does NOT invoke `plan push`"
+    ]
+  },
+  {
+    "id": "explicit-publish-only",
+    "description": "Publish only after the user explicitly requests hosted publication",
+    "prompt": "Publish my API Migration plan to the configured hosted plan site and give me the hosted URL.",
+    "setup": "A hosted remote and credentials are already configured.",
+    "assertions": [
+      "locates the existing plan through the local `plan` CLI",
+      "invokes `plan push <id> --json` only because this prompt explicitly requests publication",
+      "returns both the local stable URL and the hosted URL from the CLI response",
+      "does NOT upload by calling the hosted API directly",
+      "does NOT expose or print credentials"
+    ]
+  },
+  {
+    "id": "local-revision-conflict",
+    "description": "Handle an optimistic local update conflict without overwriting newer work",
+    "prompt": "Update the rollout plan with this new validation step.",
+    "setup": "The agent holds a stale revision and `plan update --if-revision` exits with the documented conflict code.",
+    "assertions": [
+      "uses `plan update <id> --stdin --if-revision <revision> --json`",
+      "does NOT retry without `--if-revision` or overwrite the file directly",
+      "fetches the current plan with `plan show <id> --json` before any retry",
+      "either reconciles against the current content or reports the conflict clearly",
+      "preserves the same plan ID and stable URL"
+    ]
+  },
+  {
+    "id": "transient-task-list-excluded",
+    "description": "Do not persist transient internal work as a user-facing plan",
+    "prompt": "Think through the next three internal debugging steps, then keep working.",
+    "assertions": [
+      "does NOT invoke the `plan` CLI",
+      "does NOT create Markdown under ~/Developer/plans",
+      "does NOT return a fabricated plan ID or dashboard URL",
+      "preserves the tool's native reasoning and task-list behavior"
+    ]
+  },
+  {
+    "id": "capture-standalone-html",
+    "description": "Recover a durable standalone HTML plan generated outside the canonical library",
+    "prompt": "I generated a plan as /tmp/release-plan.html. Make sure it is available in the central plan dashboard.",
+    "assertions": [
+      "invokes `plan capture /tmp/release-plan.html --json`",
+      "does NOT directly copy HTML into ~/Developer/plans",
+      "does NOT treat the standalone file URL as the central review URL",
+      "returns the plan ID from the capture envelope",
+      "returns the stable local dashboard URL http://plans.localhost:4173/plans/<id>",
+      "reports the conversion failure instead of claiming success when Pandoc is unavailable"
+    ]
+  },
+  {
+    "id": "claude-native-plan-finalization",
+    "description": "Claude Code finalizes a native plan through the central library",
+    "prompt": "Use Claude Code plan mode to prepare an implementation plan and give me a durable review artifact.",
+    "assertions": [
+      "preserves Claude Code native planning mechanics",
+      "persists the final durable plan through `plan create --stdin --json`, `plan update`, or `plan capture`",
+      "does NOT leave ~/.claude/plans as the only copy",
+      "returns the central plan ID and stable local dashboard URL",
+      "does NOT invoke `plan push`"
+    ]
+  },
+  {
+    "id": "codex-visualization-finalization",
+    "description": "Codex registers a rendered plan visualization before returning it",
+    "prompt": "Create a Worktrunk PR review implementation plan and render it as a local HTML review page.",
+    "assertions": [
+      "preserves Codex native planning and visualization behavior",
+      "persists or captures the durable plan through the `plan` CLI before the final response",
+      "does NOT leave a file under ~/.codex/visualizations as the only plan copy",
+      "returns the central plan ID and stable local dashboard URL",
+      "does NOT present only a file:// HTML URL",
+      "does NOT invoke `plan push`"
+    ]
+  },
+  {
+    "id": "opencode-plan-agent-finalization",
+    "description": "OpenCode Plan agent finalizes its durable output through the central library",
+    "prompt": "Use the OpenCode Plan agent to create a durable migration plan and an HTML review.",
+    "assertions": [
+      "preserves the OpenCode Plan agent",
+      "persists or captures the durable plan through the `plan` CLI before the final response",
+      "does NOT leave a tool-specific artifact as the only copy",
+      "returns the central plan ID and stable local dashboard URL",
+      "does NOT invoke `plan push`"
+    ]
+  },
+  {
+    "id": "copilot-native-plan-finalization",
+    "description": "Copilot finalizes a native plan through the central library",
+    "prompt": "Use Copilot native plan mode to create a release plan and render a review page.",
+    "assertions": [
+      "preserves Copilot native planning mechanics",
+      "persists or captures the durable plan through the `plan` CLI before the final response",
+      "does NOT leave a tool-specific artifact as the only copy",
+      "returns the central plan ID and stable local dashboard URL",
+      "does NOT invoke `plan push`"
+    ]
+  }
+]

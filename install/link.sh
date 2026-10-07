@@ -21,6 +21,21 @@ elif [ -d "$CLITOOLS_DIR/.git" ]; then
     git -C "$CLITOOLS_DIR" fetch --quiet && git -C "$CLITOOLS_DIR" pull --ff-only --quiet || echo "Could not update clitools; using existing copy"
 fi
 
+PLAN_MANAGER_READY=0
+PLAN_MANAGER_FAILURE=0
+if [ -r "$DOTFILES/install/plan-manager-bootstrap.sh" ]; then
+  source "$DOTFILES/install/plan-manager-bootstrap.sh"
+  if bootstrap_plan_repo && install_plan_cli; then
+    PLAN_MANAGER_READY=1
+  else
+    PLAN_MANAGER_FAILURE=1
+    warning "Plan-manager bootstrap did not complete; continuing other dotfiles links."
+  fi
+else
+  PLAN_MANAGER_FAILURE=1
+  echo "Warning: plan-manager bootstrap helper is missing."
+fi
+
 
 echo -e "\nCreating symlinks"
 echo "=============================="
@@ -58,12 +73,13 @@ if [ -e "$OPENCODE_SRC" ]; then
   if [ -L "$OPENCODE_DEST" ]; then
     CURRENT=$(readlink "$OPENCODE_DEST")
     if [ "$CURRENT" != "$OPENCODE_SRC" ]; then
-      rm "$OPENCODE_DEST"
+      OPENCODE_BACKUP="${OPENCODE_DEST}.backup-$(date +%Y%m%d%H%M%S)"
+      mv "$OPENCODE_DEST" "$OPENCODE_BACKUP"
       ln -s "$OPENCODE_SRC" "$OPENCODE_DEST"
+      echo "Backed up the previous OpenCode link to $OPENCODE_BACKUP"
     fi
-  else
-    rm -rf "$OPENCODE_DEST"
-    ln -s "$OPENCODE_SRC" "$OPENCODE_DEST"
+  elif [ -d "$OPENCODE_DEST" ]; then
+    echo "$OPENCODE_DEST is an unmanaged directory; preserving it and linking only managed plan surfaces."
   fi
 fi
 
@@ -305,4 +321,19 @@ else
   else
     echo "$LOCAL_FILE exists (no clitools source found); leaving as-is."
   fi
+fi
+
+if [ "$PLAN_MANAGER_READY" -eq 1 ]; then
+  if ! install_plan_instruction_links ||
+     ! reconcile_codex_config ||
+     ! initialize_plan_library ||
+     ! install_plan_launch_agent ||
+     ! check_plan_manager; then
+    PLAN_MANAGER_FAILURE=1
+  fi
+fi
+
+if [ "$PLAN_MANAGER_FAILURE" -ne 0 ]; then
+  echo "Dotfiles installation needs attention; see the diagnostics above."
+  exit 1
 fi

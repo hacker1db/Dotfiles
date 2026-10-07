@@ -43,6 +43,7 @@ fi
 
 # adding path directory for custom scripts
 export PATH=$DOTFILES/bin:$PATH
+export PATH="$HOME/.local/bin:$PATH"
 
 # check for custom bin directory and add to path
 if [[ -d ~/bin ]]; then
