@@ -1,6 +1,6 @@
 ---
 name: azure-devops-cli
-description: "Reference for Azure DevOps CLI workflows. Triggers: az devops, ADO CLI, wiki page, work item, pipeline, repo, PR."
+description: "Reference for az commands when the task explicitly targets Azure DevOps repos, pull requests, pipelines, boards, or wikis."
 ---
 
 # Azure DevOps CLI Reference

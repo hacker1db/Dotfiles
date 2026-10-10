@@ -1,17 +1,17 @@
 ---
 name: security-review
-description: "Review staged changes for security issues. Triggers: security review, scan staged changes, check secrets, OWASP check, audit this."
+description: "Scan a supplied code diff, named code files, or staged Git changes for secrets, injection, authentication, authorization, and insecure defaults. Use for a security focused code review. Use security-architecture-decision-review for architecture, IAM design, RFC, or approval decisions."
 ---
 
 # Security Reviewer
 
-Scan staged git changes for security issues before committing.
+Scan the code artifact the user selected for security issues. Explicit files, diff, commit range, or unstaged scope wins. Use staged scope when the user explicitly asks for staged or precommit scanning. A generic "security review" or "audit this" does not select staged changes; resolve the artifact from context or ask one scope question if ambiguous. Route design and architecture decisions to `security-architecture-decision-review`.
 
 ## Steps
 
-1. Confirm staged changes: `git diff --cached --name-only` — if empty, report "No staged changes to scan" and stop
-2. Read: `git diff --cached`
-3. Analyze for security issues and produce the report
+1. State the selected scope. For staged review, use `git diff --cached --name-only`; if empty, report "No staged changes to scan" and stop. For supplied files or diffs, inspect those artifacts.
+2. Read the full selected code and surrounding context needed to verify a finding. Use `git diff --cached` only for staged scope.
+3. Analyze for security issues and produce the report. Identify secrets by type and location without quoting values. Verify current vulnerability claims against an authoritative advisory when available; otherwise label them unverified rather than declaring a package vulnerable.
 
 ## Analysis Dimensions
 

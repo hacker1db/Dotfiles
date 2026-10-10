@@ -1,4 +1,4 @@
-# Draw.io — Component Styles & XML Reference
+# Draw.io; Component Styles & XML Reference
 
 ## Outer Wrapper (Required)
 
@@ -138,7 +138,18 @@
 </mxCell>
 ```
 
-> See full legend XML (CDE swatch, Connected System, OOS System, comment indicator) in `assets/template/template.drawio`.
+The remaining legend cells use the component colors and comment style defined below. All required legend XML is included in this reference.
+
+```xml
+<mxCell id="leg-cde-swatch" value="" style="rounded=0;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1"><mxGeometry x="-192" y="340" width="40" height="10" as="geometry"/></mxCell>
+<mxCell id="leg-cde-label" value="CDE" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#4D6366;" parent="1" vertex="1"><mxGeometry x="-142" y="335" width="232" height="20" as="geometry"/></mxCell>
+<mxCell id="leg-connected-swatch" value="" style="rounded=0;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1"><mxGeometry x="-192" y="370" width="40" height="10" as="geometry"/></mxCell>
+<mxCell id="leg-connected-label" value="Connected System" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#4D6366;" parent="1" vertex="1"><mxGeometry x="-142" y="365" width="232" height="20" as="geometry"/></mxCell>
+<mxCell id="leg-oos-swatch" value="" style="rounded=0;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1"><mxGeometry x="-192" y="400" width="40" height="10" as="geometry"/></mxCell>
+<mxCell id="leg-oos-label" value="Out of Scope System" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#4D6366;" parent="1" vertex="1"><mxGeometry x="-142" y="395" width="232" height="20" as="geometry"/></mxCell>
+<mxCell id="leg-comment-arrow" value="" style="endArrow=oval;dashed=1;strokeColor=#404D2C;strokeWidth=1;endFill=0;endSize=8;" parent="1" edge="1"><mxGeometry relative="1" as="geometry"><mxPoint x="-192" y="435" as="sourcePoint"/><mxPoint x="-152" y="435" as="targetPoint"/></mxGeometry></mxCell>
+<mxCell id="leg-comment-label" value="Comment indicator" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=10;fontColor=#4D6366;" parent="1" vertex="1"><mxGeometry x="-142" y="425" width="232" height="20" as="geometry"/></mxCell>
+```
 
 ---
 

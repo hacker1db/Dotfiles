@@ -1,6 +1,6 @@
 ---
 name: obsidian-vault
-description: "Manage Obsidian notes with wikilinks and indexes. Triggers: create note, update vault, organize notes, build index note."
+description: "Use as supporting guidance when creating, editing, organizing, inspecting backlinks, or linking Obsidian vault notes and indexes."
 ---
 
 # Obsidian Vault
@@ -9,13 +9,13 @@ description: "Manage Obsidian notes with wikilinks and indexes. Triggers: create
 
 `~/notes/SecondBrain/`
 
-Mostly flat at root level — no folder hierarchy for organization.
+Read the vault instructions and nearby notes to determine the destination. This vault uses numbered folders as well as root notes; preserve its existing organization.
 
 ## Naming conventions
 
 - **Index notes**: aggregate related topics (e.g., `Ralph Wiggum Index.md`, `Skills Index.md`, `RAG Index.md`)
 - **Title Case** for all note names
-- No folders for organization — use links and index notes instead
+- Use the existing destination for the note type and wikilinks for connections. Follow a specialized writing skill for its content contract and use this skill for vault conventions.
 
 ## Linking
 
@@ -27,14 +27,14 @@ Mostly flat at root level — no folder hierarchy for organization.
 
 ### Search for notes
 
-Use Glob/Grep tools directly on the vault path:
+Use the available file search tools on the vault path. Prefer `rg --files` for filenames and `rg` for text when installed:
 
 ```bash
 # Search by filename
-find ~/notes/SecondBrain/ -name "*.md" | grep -i "keyword"
+rg --files ~/notes/SecondBrain/ -g "*.md" | rg -i "keyword"
 
 # Search by content
-grep -rl "keyword" ~/notes/SecondBrain/ --include="*.md"
+rg -l "keyword" ~/notes/SecondBrain/ -g "*.md"
 ```
 
 ### Create a new note

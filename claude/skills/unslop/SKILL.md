@@ -1,6 +1,6 @@
 ---
 name: unslop
-description: Edit supplied prose to cut common AI writing tells while preserving meaning, facts, tone, quotations, code, and formatting. Use when asked to unslop, de-slop, humanize, de-AI, tighten, or polish writing.
+description: "Edit supplied prose while preserving facts and format when the user explicitly invokes /unslop or asks to use the unslop skill."
 disable-model-invocation: true
 ---
 

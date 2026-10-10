@@ -1,8 +1,7 @@
 ---
 name: md-convert
-description: "Convert Markdown files to HTML, PDF, or Word (docx). Triggers: md2pdf, md2html, md2docx, convert to pdf, convert to word, export markdown, render markdown, plan to HTML, notes to HTML."
+description: "Convert specified Markdown files to HTML, PDF, or Word DOCX, including an explicit export of a saved plan or note. Use for md2pdf, md2html, md2docx, or a Markdown file conversion request. General writing, planning, document analysis, or conversion of non-Markdown input is outside this workflow."
 argument-hint: <file.md|glob> [--to html|pdf|docx] [--out <path>] [--stylesheet <css>]
-allowed-tools: [Read, Write, Glob, Bash]
 ---
 
 # md-convert
@@ -17,7 +16,7 @@ requested format, including HTML.
 
 ## Arguments
 
-Parse `$ARGUMENTS`:
+Resolve inputs from the user request or `$ARGUMENTS`:
 - `<file.md>` or glob (e.g. `docs/runbooks/*.md`) — source(s) to convert; ask if not provided
 - `--to html|pdf|docx` — output format; ask if not provided (accept `word` as alias for `docx`)
 - `--out <path>` — output file or directory; defaults to same directory as source with matching stem
@@ -33,20 +32,20 @@ Read each source file fully, then write one self-contained `.html` file per sour
   - Set `color-scheme: dark` on `:root` so form controls and scrollbars match.
 - Preserve headings, code blocks, tables, fenced diagrams, and relative links.
 - Output: `<stem>.html` next to the source unless `--out` overrides.
-- After writing, always open the file in the default browser: `open <output.html>` (macOS).
+- Offer or use a supported in-app preview when useful, or open a browser only when requested. Discover the available preview capability; do not assume macOS or run `open` unconditionally.
 
 ### PDF (`--to pdf`)
-Run `md-to-pdf` via CLI:
+Check whether `md-to-pdf` and the requested stylesheet exist before invoking them. If unavailable, use an installed supported Markdown or HTML to PDF converter with comparable output, or report the missing dependency. Do not install software automatically. Preferred CLI:
 ```
 md-to-pdf <file> --stylesheet <css>
 ```
 - Default stylesheet: `~/.dotfiles/claude/md-to-pdf.css`
 - Custom stylesheet: use `--stylesheet` argument.
-- Glob input: shell expands to multiple files; pass all to one `md-to-pdf` invocation.
-- Output: `<stem>.pdf` next to each source (md-to-pdf default behavior).
+- Resolve glob input to explicit files and pass each path as a safely quoted argument, one file per conversion. Do not execute user text as shell syntax.
+- Honor `--out`. When the CLI writes next to the source, move only the newly generated PDF to the requested destination after success. Detect existing outputs before conversion so they are not silently overwritten.
 
 ### DOCX (`--to docx` or `--to word`)
-Run pandoc:
+Check for an available pandoc installation or supported document conversion capability. Preferred CLI:
 ```
 pandoc <file> -o <stem>.docx
 ```
@@ -55,9 +54,9 @@ pandoc <file> -o <stem>.docx
 
 ## Execution Rules
 
-1. Resolve the glob (via Glob tool or shell) to a concrete file list before converting.
+1. Resolve the glob with an available file search capability to a concrete list. Validate sources, output paths, and converter availability. Quote paths safely, including spaces and shell metacharacters. Preserve source files. Respect requested overwrite behavior; ask before replacing an existing output when intent is unclear.
 2. For each file, confirm the planned output path in a pre-run summary if converting more than one file.
-3. Run conversions; stop and display the error if any command exits non-zero.
+3. Run conversions and verify outputs exist and are readable in the requested format. For PDF and DOCX, use available inspection or rendering tools to check representative layout. Stop and report failures with the successful and failed files identified. A missing stylesheet requires an explicit fallback disclosure, not a false claim that it was applied.
 4. After all conversions, print a result table:
 
    | Source | Output | Status |

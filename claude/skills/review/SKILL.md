@@ -1,17 +1,17 @@
 ---
 name: review
-description: "Review staged git changes for correctness and maintainability. Triggers: review staged, check my diff, code review, review before commit."
+description: "Review a staged Git diff before commit, or a supplied code diff for correctness, maintainability, performance, and style. Use for staged review, precommit review, or checking a specific diff. Use pr-review for a branch or pull request and security-review for a security focused code scan."
 ---
 
-# Staged Changes Reviewer
+# Code Diff Reviewer
 
-Review staged git changes before a commit. If nothing is staged, stop immediately.
+Review the artifact the user selected. Explicit scope wins, including an attached diff, named files, unstaged changes, or a commit range. A generic request such as "check my diff" does not select the index. Use context to resolve it; if staged and unstaged changes both exist and scope remains unclear, ask which to review before making findings. Route branch or pull request reviews to `pr-review` and security only scans to `security-review`.
 
 ## Steps
 
-1. Check: `git diff --cached --stat` — if empty, report "No staged changes to review" and stop
-2. Analyze: `git diff --cached` across all six dimensions below
-3. Produce the report
+1. Resolve and state the review scope. For explicit staged or precommit review, check `git diff --cached --stat`; if empty, report "No staged changes to review" and stop. For other scopes, inspect the selected artifact and identify its boundaries.
+2. Read the full selected diff and enough surrounding code to validate findings. Use `git diff --cached` only for staged scope. Analyze all six dimensions below unless the user narrowed the focus.
+3. Produce the report. Cite verified locations and distinguish observed defects from unverified risks. Never reproduce secret values; identify their location and type.
 
 ## Report Format
 

@@ -1,6 +1,6 @@
 ---
 name: md-to-svx
-description: "Convert Obsidian blog markdown to hacker1db.dev .svx. Triggers: md to svx, publish post, convert post, push to blog."
+description: "Convert a vault blog draft to a local hacker1db.dev mdsvex file when the user requests .svx conversion or preparation for that blog."
 ---
 
 # Markdown to SVX Converter
@@ -27,6 +27,6 @@ Before converting, read `$HOME/.config/blog/hacker1db-voice.md` for the SVX fron
 7. Write `.svx` file; show transformation summary
 8. Post-conversion checklist (images to copy, stripped embeds, draft status)
 
-Add `--publish` flag to set `draft: false` and show `git diff --stat`.
+The existing `--publish` flag prepares the local file by setting `draft: false`; it does not deploy or publish the site. Set this flag only when requested or already authorized, and report the local readiness state accurately. A live publishing request also needs the repository deployment workflow and its authorization. Do not claim that conversion alone made the post live.
 
 See `references/conversion-guide.md` for frontmatter mapping and syntax conversion rules.

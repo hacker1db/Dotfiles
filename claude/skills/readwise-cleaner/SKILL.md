@@ -1,43 +1,14 @@
 ---
 name: readwise-cleaner
-description: "Clean YouTube content in Readwise Reader. Triggers: clean Readwise, archive shorts, YouTube Shorts, recategorize videos."
+description: "Clean YouTube items in Readwise Reader by archiving Shorts and correcting video categories, or perform either requested cleanup. Use for Reader cleanup, not general inbox triage or YouTube recommendations."
 ---
 
 # Readwise Cleaner
 
-Run both Readwise cleanup scripts in parallel to organize YouTube content in Readwise Reader.
+Clean only the requested operations. General YouTube cleanup includes Shorts archival and RSS video recategorization. Read `references/cleanup.md` before execution and follow `../readwise-cli/references/access-patterns.md`.
 
-## Readwise Plugin
+Choose one route per operation before mutation. A supported authenticated connector is preferred; a local script is a fallback only for that operation. Do not run a script after the connector has already completed its work. After partial or unknown outcomes, inspect current state and resume only unresolved IDs through a route supporting that scope.
 
-When running on an OpenAI model with the Readwise plugin available, use the plugin before local scripts for Reader operations:
-- `_reader_search_documents` or `_reader_list_documents` to find YouTube Shorts and YouTube documents
-- `_reader_add_tags_to_document` to tag Shorts with `youtube-shorts`
-- `_reader_move_documents` to archive Shorts in batches of up to 50
-- `_reader_bulk_edit_document_metadata` for supported metadata changes
+Process Shorts before recategorization because both operations can touch RSS documents. Preserve unrelated tags and metadata. Read all pages before claiming complete coverage.
 
-Use the scripts below as fallback when the plugin is unavailable or when a workflow needs script-only logic.
-
-## Scripts
-
-```
-~/.dotfiles/bin/remove-shorts.sh
-~/.dotfiles/bin/recategorize.sh
-```
-
-## Steps
-
-Launch **both** scripts simultaneously (not sequentially) using two parallel Bash tool calls:
-
-- `~/.dotfiles/bin/remove-shorts.sh` — finds YouTube Shorts, tags with `youtube-shorts`, archives them
-- `~/.dotfiles/bin/recategorize.sh` — moves YouTube videos from RSS → video category
-
-Report combined summary when both complete:
-- Documents scanned
-- Shorts found and archived
-- Videos recategorized
-- Any errors from either script
-
-## Prerequisites
-
-- `readwise` CLI installed and authenticated (`readwise login`)
-- `jq` installed
+Report documents scanned, Shorts found and confirmed archived, videos confirmed recategorized, errors, and uncertain outcomes. The bundled wrappers can return success after failed fetches; an exit code alone does not establish complete coverage.

@@ -2,20 +2,7 @@
 
 ## Daily Note Path
 
-```bash
-VAULT="$HOME/notes/SecondBrain"
-DAILY_NOTE="$VAULT/0.Quick Notes 📨/Daily Stuff/$TODAY.md"
-[ ! -f "$DAILY_NOTE" ] && printf "# %s\n\n" "$TODAY" > "$DAILY_NOTE"
-```
-
-Check for duplicate before appending:
-```bash
-grep -q "Security Intel — $TODAY" "$DAILY_NOTE" && echo "⚠️ Already appended today — skipping" && unset READWISE_TOKEN && exit 0
-```
-
-Append with `printf '%s\n' "$DIGEST_CONTENT" >> "$DAILY_NOTE"` (not heredoc — `$HOME` won't expand inside quoted heredoc delimiters).
-
----
+Resolve the configured vault, then use `0.Quick Notes 📨/Daily Stuff/YYYY-MM-DD.md` in the user's timezone. Read the existing note before inserting content. Match its template and section placement. If missing, use the established daily note template rather than a bare title. Check for an existing Security Intel entry for the same day before adding one; report duplicates or update only within the requested scope.
 
 ## DIGEST MODE Template
 

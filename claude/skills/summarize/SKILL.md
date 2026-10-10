@@ -1,6 +1,6 @@
 ---
 name: summarize
-description: "Summarize files, directories, repos, or URLs into TL;DR, map, concepts, and questions. Triggers: summarize, tl;dr, explain this, overview."
+description: "Produce a structured overview of supplied files, a repository, a directory, or a URL when the user asks to summarize that source."
 ---
 
 # Summarizer
@@ -9,7 +9,7 @@ Summarize any file, directory, or URL into a structured multi-layer overview.
 
 ## Arguments
 
-`$ARGUMENTS` — the target file path, directory path, or URL. If empty, summarize the current working directory.
+Use the source named or supplied by the user. Resolve a clear reference from conversation context; ask for the target if none is identifiable. Do not default an unrelated explanation request to the current repository.
 
 ## Output Structure
 

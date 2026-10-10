@@ -1,16 +1,13 @@
-# Readwise Access Patterns
+# Shared Readwise access router
 
-Use the lightest available access path:
+Select by available capabilities and authentication, independent of model brand.
 
-1. Prefer installed Readwise plugin/MCP tools when they are available in the active client.
-2. Otherwise use the `readwise` CLI.
-3. Use direct HTTP API calls only when the CLI/plugin path cannot perform the needed operation.
+1. Prefer an authenticated plugin or MCP connection that supports the required operation. Discover its actual tool name and schema; namespaces differ by host.
+2. Otherwise use an authenticated `readwise` CLI. Read `commands.md` and verify command help. For authentication, use interactive `readwise login`; do not request raw tokens in chat.
+3. Use direct HTTP only when the other paths cannot perform the operation and an approved local integration supports secure credential injection. Inspect that integration before use. Keep credentials inside its process; never print, log, persist, or pass tokens in command arguments. If no secure integration is available, report the missing capability.
 
-When instructions mention MCP tool names, translate them to the equivalent CLI command if using the CLI. Example: `mcp__readwise__reader_list_documents` maps to `readwise reader-list-documents`.
+Select a route for each operation before mutating data. Do not repeat a successful operation through another route. After a timeout or partial failure, re-read current state, identify confirmed and unresolved IDs, and retry only unresolved work. If state cannot be established, report uncertainty and stop that operation.
 
-Token handling:
-- Never display, echo, log, or persist Readwise tokens.
-- Prefer existing authenticated CLI/plugin sessions.
-- If a direct API token is needed, retrieve it from 1Password only when the workflow explicitly calls for it, then unset it before finishing.
+Use Reader for saving sources unless the user asks for Highlights. Mutations require user authorization from the current task; read requests alone do not authorize moves, tags, or deletions. Paginate, preserve metadata, and distinguish confirmed success, failure, and unknown outcomes.
 
-For full CLI command syntax, read `../SKILL.md`. For MCP tool syntax, read `../../readwise-mcp/SKILL.md`.
+CLI syntax: `commands.md`. MCP syntax: `../../readwise-mcp/references/tools.md`. Active schemas take precedence over illustrative examples.

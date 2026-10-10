@@ -1,4 +1,4 @@
-# Change Request — Repository Analysis Guide
+# Change Request; Repository Analysis Guide
 
 ## What to Scan
 
@@ -39,4 +39,4 @@ Convert SSH to HTTPS:
 - CI/CD stages and deployment method
 - Observability tools (Application Insights, Datadog, Prometheus, etc.)
 
-Skip missing files silently — never error on absent sources.
+Skip missing files silently; never error on absent sources.

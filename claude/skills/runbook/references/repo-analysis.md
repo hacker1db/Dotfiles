@@ -1,4 +1,4 @@
-# Runbook — Repository Analysis Guide
+# Runbook; Repository Analysis Guide
 
 ## What to Scan
 
@@ -46,4 +46,4 @@ SSH to HTTPS conversion:
 - CI/CD stages and deployment method
 - Observability tools (Application Insights, Datadog, Prometheus)
 
-Skip missing files silently — never error on absent sources.
+Skip missing files silently; never error on absent sources.

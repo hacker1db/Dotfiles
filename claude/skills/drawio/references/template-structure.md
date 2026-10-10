@@ -1,4 +1,4 @@
-# Draw.Io — Template Structure Reference
+# Draw.Io; Template Structure Reference
 
 ## Diagram Types (4 Pages In AAG Standard Template)
 
@@ -21,10 +21,10 @@
 ## Required Metadata Fields
 
 All diagrams must include in the metadata cell:
-- **Team Name** — your team's name
-- **SME** — Subject Matter Expert's full name
-- **Copyright** — `<CompanyName>, Inc YEAR`
-- **Last Reviewed Date** — `yyyy-mm-dd` (full ISO, never shorten)
+- **Team Name**; your team's name
+- **SME**; Subject Matter Expert's full name
+- **Copyright**; `<CompanyName>, Inc YEAR`
+- **Last Reviewed Date**; `yyyy-mm-dd` (full ISO, never shorten)
 
 ## Color Legend
 

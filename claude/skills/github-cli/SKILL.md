@@ -1,6 +1,6 @@
 ---
 name: github-cli
-description: "Reference for GitHub CLI workflows. Triggers: gh pr, gh issue, create PR, GitHub CLI, gh repo, gh api."
+description: "Reference for gh commands when the task targets GitHub pull requests, issues, repositories, Actions, or its API."
 ---
 
 # GitHub CLI Reference

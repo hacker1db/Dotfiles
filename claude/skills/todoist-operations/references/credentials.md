@@ -48,4 +48,6 @@ def get_todoist_token():
 
 ## MCP, Agent, and External Tool Workflows
 
-When a tool cannot directly invoke `op`, wrap the tool invocation from the shell with `TODOIST_API_TOKEN` set using the Shell Tools pattern. If a spawned agent needs Todoist access, explicitly instruct it to retrieve the token from 1Password item `Todoist api` through `op` and to avoid printing or storing the token.
+Use an already authenticated connector through its normal tools. A shell environment variable cannot authenticate an independently hosted MCP connection. If it lacks authentication, use the host's connection flow. For a separately authorized direct API fallback, keep token retrieval and the HTTP request in the same process using the patterns above.
+
+Agents using a direct API must retrieve credentials themselves through this secure local workflow. Do not pass token values in agent messages. Disable shell tracing and never print captured item data, authorization headers, or environment dumps. Report authentication failures without raw credential material.

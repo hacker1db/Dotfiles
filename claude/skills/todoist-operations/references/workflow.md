@@ -19,10 +19,14 @@
 
 ## Content Destinations
 
-- Articles/References -> `3-Resources/Articles/` in Obsidian
-- Ideas -> `3-Resources/Raw Ideas/` with full context
-- Journal/Reflections -> `2-Areas/Journal/`
-- Grouped tasks -> create Obsidian project and Todoist project
+Resolve the active vault and inspect its existing folders before filing. For David's SecondBrain vault, verified destinations are:
+
+1. General references: `4.Resources/` or an existing relevant subfolder. Reader synced articles live at `4.Resources/Readwise/Articles/`; use Reader save workflows for that managed collection.
+2. Ideas: `0.Quick Notes 📨/` unless a more specific existing project destination is established. There is no verified `Raw Ideas` folder; do not invent one from the former path.
+3. Journal and reflections: `2.Areas/Personal Home/Journal/`.
+4. Grouped tasks: resolve the existing project structure before creating an Obsidian or Todoist project within the authorized task.
+
+Verify the destination note was saved successfully before commenting with its link or completing the source task. Preserve Obsidian metadata and links. Recheck folders on other machines rather than assuming this vault layout.
 
 ## Processing Output Format
 

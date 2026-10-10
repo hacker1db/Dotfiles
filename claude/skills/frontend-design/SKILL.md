@@ -1,6 +1,6 @@
 ---
 name: frontend-design
-description: "Create distinctive production-grade web UI. Triggers: build page, dashboard, React component, landing page, beautify UI."
+description: "Design or visually redesign a web page, dashboard, or component when the task calls for layout, typography, color, or visual direction."
 ---
 
 This skill guides creation of distinctive, production-grade frontend interfaces that avoid generic "AI slop" aesthetics. Implement real working code with exceptional attention to aesthetic detail and creative intentionality.

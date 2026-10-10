@@ -1,6 +1,6 @@
 ---
 name: feed-catchup
-description: Catch up on your RSS feed — highlights up top, full browse below
+description: "Browse unseen Readwise Reader RSS feed items with personalized picks and batches of twenty. Use for feed catchup and explicit feed item actions. Recent reading recaps, inbox triage, and changing RSS subscriptions are separate tasks. Browsing does not mark items seen."
 ---
 
 You are helping the user catch up on their Readwise Reader RSS feed. Follow this process carefully.
@@ -11,14 +11,13 @@ Follow `../readwise-cli/references/access-patterns.md`.
 
 ## Setup
 
-**IMPORTANT — do this in a single parallel turn before anything else:**
-Read `reader_persona.md` AND run `readwise reader-list-documents --location feed --limit 20 --response-fields title,author,category,word_count,reading_time,summary,url,site_name,published_date,saved_at,first_opened_at` at the same time as parallel operations. Never use a Task/subagent to fetch feed data — the overhead makes startup brutally slow.
+Read the optional `reader_persona.md` and fetch the feed through the authenticated capability selected by the access router. These reads may run concurrently when supported; sequential reads work too.
 
-1. **Check for persona file.** (Done in parallel above.) Use it throughout the session to personalize commentary and picks. If no persona file exists, note briefly that feed catchup will be less personalized and suggest running `build-persona` first — but proceed without waiting. If you show this message, add `· · ·` after it.
+1. **Check for persona file.** Use it to personalize commentary and picks. If unavailable, proceed with general relevance criteria.
 
-2. **Fetch feed documents.** Run `readwise reader-list-documents --location feed --limit 20 --response-fields title,author,category,word_count,reading_time,summary,url,site_name,published_date,saved_at,first_opened_at`. Documents come back most-recently-saved first. Filter to items where `first_opened_at` is null (unseen). If you have fewer than 20 unseen items and there are more pages, paginate until you have 20 unseen items OR pages run out. Hold all unseen items in memory. (Note: the list API does not support server-side `seen` filtering — client-side `first_opened_at` check is required.)
+2. **Fetch feed documents.** Request batches of twenty, with IDs, title, author, category, reading time, summary, original URL, site name, saved time, and seen state where supported. Use the selected connector's documented schema or CLI reference rather than assuming a fixed tool name. Filter unseen items using the supported seen field; when only `first_opened_at` is exposed, treat null as the documented proxy and say so if it affects certainty. Follow pagination until twenty unseen items are collected or the feed is exhausted. Keep a session cursor and displayed IDs so browsing forward does not repeat items or require changing their metadata.
 
-3. **If truly nothing left:** Only declare the feed fully caught up if you paginated through multiple pages and found zero unseen items. In that case, say so briefly and end.
+3. **If truly nothing left:** Only declare the feed fully caught up after exhausting all available pages and finding zero unseen items, including a genuinely empty single page. In that case, say so briefly and end.
 
 4. **Pick the top 5.** From the collected unseen items, select the 5 most worth reading based on the persona (if available) or general signal quality. Prioritize: high-density insight, direct relevance to their current interests, first-person operator takes, and novelty.
 
@@ -28,7 +27,7 @@ Render the overview exactly like this:
 
 **📡 Reader Feed**
 
-{1-2 sentences explaining what you looked at and what stood out — e.g. "Scanned the last 20 unseen items. AI and software architecture dominate, with a few standouts worth pulling."}
+{1-2 sentences explaining what you looked at and what stood out; e.g. "Scanned the last 20 unseen items. AI and software architecture dominate, with a few standouts worth pulling."}
 
 **Today's picks** *(spanning {human-readable time range, e.g. "the last 8 hours" or "Feb 24–26"})*:
 
@@ -37,16 +36,16 @@ Render the overview exactly like this:
 | 1 | [Title](url) | site_name | reading_time | One-line reason this made the cut |
 | 2 | ... | ... | ... | ... |
 
-{1-2 sentences of commentary on the picks as a set — what the pattern is, or why these five in particular.}
+{1-2 sentences of commentary on the picks as a set; what the pattern is, or why these five in particular.}
 
 · · ·
 
 Want to act on any of these, or browse everything?
 
-- **Later N** / **Inbox N** / **Shortlist N** / **Archive N** — move a pick
-- **Show N** — get a deeper summary
-- **Read N** — open in Reader
-- **Browse all** — go through all unseen items in batches of 20
+- **Later N** / **Inbox N** / **Shortlist N** / **Archive N**; move a pick
+- **Show N**; get a deeper summary
+- **Read N**; open in Reader
+- **Browse all**; go through all unseen items in batches of 20
 
 ## Browse Loop
 
@@ -54,33 +53,35 @@ If the user says "browse all" (or similar), enter the batch-by-batch loop. Prese
 
 ### The Table
 
-Before the table, add a single line with the time range covered by the batch, e.g. *"Feb 26, 3:00–11:00 PM"* or *"last 4 hours"* — derived from the `saved_at` values of the items in that batch.
+Before the table, add a single line with the time range covered by the batch, e.g. *"Feb 26, 3:00–11:00 PM"* or *"last 4 hours"*; derived from the `saved_at` values of the items in that batch.
 
 | # | Title | Source | Time | Summary |
 |---|-------|--------|------|---------|
-| 1 | [Title](url) | site_name | reading_time | Brief summary from metadata — one line, truncated if needed |
+| 1 | [Title](url) | site_name | reading_time | Brief summary from metadata; one line, truncated if needed |
 | 2 | ... | ... | ... | ... |
 
-After the table, give a **brief commentary** (1-2 sentences) on the batch — what stands out relative to their interests.
+After the table, give a **brief commentary** (1-2 sentences) on the batch; what stands out relative to their interests.
 
 ### Options
 
-- **Mark all seen** — mark the batch as seen and load the next 10
-- **Later N** — move to Later (you can also move to Inbox/Shortlist/Archive)
-- **Show N** — get a deeper summary (or the full content if short)
-- **Read N** — open in Reader
+- **Next**; show the next twenty without changing seen state
+- **Mark all seen**; mark the displayed batch as seen and load the next twenty
+- **Later N**; move to Later (you can also move to Inbox/Shortlist/Archive)
+- **Show N**; get a deeper summary (or the full content if short)
+- **Read N**; open in Reader
 
 *(You can act on multiple items at once, e.g. "later 2, 5, 8")*
 
 ### Handling Responses
 
-- **"Mark all seen"** / **"next"** / **"seen"** — Run `readwise reader-bulk-edit-document-metadata --documents '[{"document_id": "<id>", "seen": true}, ...]'` for every document in the current batch in a single call. Do not move or archive them. Then display the next batch of 20.
-- **"Later N"** — Move that document to `later` location. Confirm briefly, then continue.
-- **"Later N, N, N"** — Move multiple documents to `later`. Confirm briefly.
-- **"Inbox N"** / **"Shortlist N"** / **"Archive N"** — Move to the specified location (`new`, `shortlist`, or `archive`). Confirm briefly.
-- **"Show N"** — Fetch full content using `readwise reader-get-document-details --document-id <id>`. If the document is 3 mins or under, show the full content verbatim — no summary. If over 3 mins, give a richer summary with why-read/why-skip reasoning. Then re-present the options.
-- **"Read N"** — Provide the Reader link (`https://read.readwise.io/read/{id}`) so they can open it directly.
-- **"Stop"** / **"done"** — End the session with a brief summary of what was processed (how many seen, how many pulled).
+- **"Next"** / **"more"**; Advance the session cursor and display the next batch of twenty. Make no metadata changes unless the user has explicitly established that navigation should mark items seen for this session.
+- **"Mark all seen"** / **"seen"**; When used as the displayed action, mark only the current batch's IDs as seen through the selected capability, then display the next batch of twenty. Explicit session authorization is sufficient; do not ask again. Do not move or archive these items. Verify the mutation result; on partial failure report affected items accurately.
+- **"Later N"**; Move that document to `later` location. Confirm briefly, then continue.
+- **"Later N, N, N"**; Move multiple documents to `later`. Confirm briefly.
+- **"Inbox N"** / **"Shortlist N"** / **"Archive N"**; Move to the specified location (`new`, `shortlist`, or `archive`). Confirm briefly.
+- **"Show N"**; Fetch the selected document through the active capability. Provide a richer summary with reasons to read or skip it, using brief attributed quotations within applicable quotation limits. Then re-present the options.
+- **"Read N"**; Provide the Reader link (`https://read.readwise.io/read/{id}`) so they can open it directly.
+- **"Stop"** / **"done"**; End with accurate counts of items displayed, marked seen, and moved. Browsed items do not count as marked seen.
 
 ### Transitions
 

@@ -1,27 +1,20 @@
 ---
 name: change-request
-description: "Generate a formal Change Request document from repo analysis. Triggers: create CR, write change request, generate CR, deployment approval."
+description: "Draft a formal deployment Change Request from repository evidence, including risk, validation, and rollback. Use for creating or revising CR documents. Publish to an Azure DevOps wiki only when requested; deployment execution and general code review are separate tasks."
 ---
 
 # Change Request Generator
 
-Analyze the current repo and produce a complete CR document with risk assessment, rollback plan, and ADO wiki publish.
+Produce a complete local Change Request using `references/template.md` and repository evidence. Read the template before drafting and `references/repo-analysis.md` when inspecting the repository.
 
-## Arguments
+## Inputs and workflow
 
-Parse `$ARGUMENTS` for flags: `--cr <NUMBER>`, `--date <YYYY-MM-DD>`, `--window <HH:MM-HH:MM TZ>`, `--type <standard|emergency|normal>`, `--risk <low|medium|high|critical>`, `--env <ENV>`, `--runbook <PATH>`.
+1. Use the requested change, repository, and destination from the conversation. Accept free text or `--cr <NUMBER>`, `--date <YYYY-MM-DD>`, `--window <HH:MM-HH:MM TZ>`, `--type <standard|emergency|normal>`, `--risk <low|medium|high|critical>`, `--env <ENV>`, and `--runbook <PATH>`.
+2. Fetch an existing wiki template if its location and authenticated access are available. Otherwise use the bundled template. Ask only for details necessary to resolve the change scope; mark other missing fields `[PLACEHOLDER - description]`.
+3. Inspect application identity, infrastructure, pipelines, dependencies, configuration, and source structure. Assess blast radius, data impact, failure modes, and rollback complexity. Distinguish repository facts from proposed steps.
+4. Save all ten sections as Markdown in the requested destination or the project's documentation folder. Generate a PDF only when requested, using an available document conversion capability.
+5. Check completeness, paths, and consistency before delivering the local draft. Drafting procedures does not authorize executing them.
 
-## Workflow
+## Publication
 
-1. **Fetch template** — pull the CR template from the ADO wiki (ask user for org/project/wiki/path)
-2. **Analyze repo** — scan for app identity, infra, CI/CD, dependencies, config, source structure
-3. **Assess risk** — blast radius, data impact, rollback complexity, failure modes
-4. **Generate document** — all 10 sections (description, risk, prerequisites, implementation steps, validation, rollback, systems, comms, diagrams, close checklist)
-5. **Save & publish** — write to `~/Downloads/CR-{cr_number}-{app_name}/`, generate PDF via `npx md-to-pdf --stylesheet ~/.dotfiles/claude/md-to-pdf.css`, publish to ADO wiki
-
-Use `[PLACEHOLDER - description]` for fields that cannot be auto-detected from the repo.
-
-## References
-
-- `references/template.md` — full 10-section CR output template and section details
-- `references/repo-analysis.md` — what to scan and how to populate fields
+A draft request authorizes the local document. Publish only when the user has authorized publication to the destination in this conversation. Honor prior authorization without asking again. If it is absent, deliver the complete draft before requesting a publishing decision. Resolve missing destination details only when publication is needed. Verify the remote result before reporting success; preserve the local draft if publication fails.
