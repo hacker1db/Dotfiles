@@ -110,6 +110,12 @@ Config: `config/ghostty/config` — 78% opacity with blur, JetBrains Mono 14pt i
 - **MCP server config** (`mcp.json`)
 - **HUD display** and statusline customization
 
+### Ponytail plugin
+
+`claude/settings.base.json` declares the Ponytail marketplace and enables the plugin for both Claude backends. Run `./install.sh ponytail` to install Ponytail for Claude Code and Codex; `./install.sh all` also runs this step after installing the CLIs. The installer skips plugins that are already installed and checks that an existing Ponytail marketplace uses `DietrichGebert/ponytail`.
+
+After installing in Codex, open `/hooks`, review Ponytail's two lifecycle hooks, and start a new chat. Restart the Codex desktop app to load the plugin.
+
 ### Microsoft Foundry OpenAI
 
 Configure a separate Codex home with Azure CLI token authentication:

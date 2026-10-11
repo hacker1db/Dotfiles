@@ -48,13 +48,20 @@
     "gopls-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "oh-my-claudecode@omc": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "ponytail@ponytail": true
   },
   "extraKnownMarketplaces": {
     "cli-anything": {
       "source": {
         "source": "github",
         "repo": "HKUDS/CLI-Anything"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
       }
     },
     "omc": {

@@ -64,6 +64,7 @@ FORMULAS=(
   httpie
   hub
   hugo
+  jq
   kubectx
   lazydocker
   lazygit
@@ -114,6 +115,7 @@ CASKS=(
   basictex
   burp-suite-professional
   claude-code
+  codex
   cursor
   dbeaver-community
   devtoys
