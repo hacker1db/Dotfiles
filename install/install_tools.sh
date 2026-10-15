@@ -205,7 +205,7 @@ if command -v pnpm >/dev/null 2>&1; then
   npm install --global yarn || true
   yarn global add expo-cli || true
   pnpm add --global vercel || true
-  pnpm add --global typescript typescript-language-server eslint prettier @fission-ai/openspec@latest @github/copilot || true
+  pnpm add --global typescript typescript-language-server eslint prettier @github/copilot || true
 fi
 
 # Wordlists

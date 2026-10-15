@@ -13,7 +13,6 @@ export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 
 tools=(
   "@azure/static-web-apps-cli"
-  "@fission-ai/openspec"
   "@github/copilot"
   "@openai/codex-security"
   "@readwise/cli"
