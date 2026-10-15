@@ -260,9 +260,7 @@ Key items:
 3. Test startup time with `time zsh -i -c exit`
 4. Source changes before committing: `source ~/.zshrc`
 
-### Commit Checklist
-- Never Commit anything let me manage the git lifecycle.
 ## Getting Help
 
-- Issues/Feedback: https://github.com/sst/opencode/issues
+- Issues/Feedback: https://github.com/hacker1db/dotfiles/issues
 - This is a personal dotfiles repo - adapt patterns to your own use case

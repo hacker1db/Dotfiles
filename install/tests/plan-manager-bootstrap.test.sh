@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
-PLAN_REPOSITORY="${PLAN_MANAGER_TEST_REPO_DIR:-$(dirname "$ROOT")/Developer/sites/plan-manager}"
+PLAN_REPOSITORY="${PLAN_MANAGER_TEST_REPO_DIR:-$HOME/Developer/plan-manager}"
 FIXTURE="$(mktemp -d /tmp/plan-manager-installer-test.XXXXXX)"
 trap 'rm -rf "$FIXTURE"' EXIT
 

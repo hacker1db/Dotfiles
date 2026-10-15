@@ -63,8 +63,17 @@ typeset -A plugins
 
 zfetch Aloxaf/fzf-tab
 
-if [[ -x "$(command -v fnm)" ]]; then
-    eval "$(fnm env --use-on-cd)"
+if command -v fnm &> /dev/null; then
+    _fnm_env="$(fnm env --shell zsh)" && eval "$_fnm_env"
+    unset _fnm_env
+    _fnm_autoload_hook() {
+        [[ -r . && -x . ]] && /bin/pwd -P >/dev/null 2>&1 || return
+        if [[ -f .node-version || -f .nvmrc || -f package.json ]]; then
+            fnm use --silent-if-unchanged
+        fi
+    }
+    add-zsh-hook -D chpwd _fnm_autoload_hook
+    [[ -n $FNM_MULTISHELL_PATH ]] && add-zsh-hook chpwd _fnm_autoload_hook
 fi
 
 export NVM_DIR="$HOME/.nvm"

@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 DOTFILES="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 source "$DOTFILES/install/lib/log.sh"
 
-PLAN_REPO_DIR="${PLAN_MANAGER_REPO_DIR:-$HOME/Developer/sites/plan-manager}"
+PLAN_REPO_DIR="${PLAN_MANAGER_REPO_DIR:-$HOME/Developer/plan-manager}"
 LOCAL_BIN="$HOME/.local/bin"
 PLAN_LINK="$LOCAL_BIN/plan"
 PLAN_ROOT="${PLAN_HOME:-$HOME/Developer/plans}"

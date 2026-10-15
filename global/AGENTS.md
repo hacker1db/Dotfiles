@@ -26,6 +26,10 @@ For every in-scope plan:
 
 Use the tool's plan adapter: Codex uses `$plans`; OpenCode and Copilot use `/plans`. Delegate operations to the `plan` CLI rather than reimplementing its storage or service behavior.
 
+## Plan-manager source code
+
+Keep the plan-manager repository in `~/Developer/plan-manager`, alongside other code repositories. For the bare-repository layout, use its `main/` worktree. The plan library remains `~/Developer/plans`.
+
 ## Workspace access
 
 The plan library at `~/Developer/plans` is configured as a writable root in `~/.codex/config.toml`. If a managed application or organization policy prevents access, request approval when prompted and do not attempt to bypass the sandbox.

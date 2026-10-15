@@ -6,7 +6,7 @@ A tool-neutral local plan library backed by `~/Developer/plans`, served at `http
 
 The plan-manager application — CLI, local server, dashboard, hosted Next.js app, migrations, and tests — lives in a dedicated Git repository separate from dotfiles:
 
-- Default location: `~/Developer/sites/plan-manager`
+- Default location: `~/Developer/plan-manager`
 - Override: set `PLAN_MANAGER_REPO_DIR` before running `install/link.sh`
 
 Dotfiles owns only the bootstrap configuration, CLI symlink, LaunchAgent template, skill, global instructions, and command adapters. Application code is never copied into dotfiles.
@@ -17,8 +17,8 @@ Dotfiles owns only the bootstrap configuration, CLI symlink, LaunchAgent templat
 
 | Layout | Description | Resolved worktree |
 |---|---|---|
-| Normal clone | Standard `git clone` | `~/Developer/sites/plan-manager` |
-| Bare + linked worktree | `.bare` dir + `main/` linked worktree | `~/Developer/sites/plan-manager/main` |
+| Normal clone | Standard `git clone` | `~/Developer/plan-manager` |
+| Bare + linked worktree | `.bare` dir + `main/` linked worktree | `~/Developer/plan-manager/main` |
 | Explicit override | `PLAN_MANAGER_WORKTREE` set | Value of that variable |
 
 The current machine uses the **bare + linked worktree** layout. Fresh machines receive a normal clone.
@@ -36,7 +36,7 @@ Before cross-machine bootstrap can work, the repository needs a reachable origin
 
 ```bash
 # Add the remote (inside the application worktree)
-cd ~/Developer/sites/plan-manager/main
+cd ~/Developer/plan-manager/main
 git remote add origin git@github.com:<your-user>/plan-manager.git
 git push -u origin main
 ```
@@ -271,7 +271,7 @@ mv ~/.codex/AGENTS.md.backup-<timestamp> ~/.codex/AGENTS.md
 plan auth logout --remote default
 ```
 
-Removing the `~/.local/bin/plan` symlink does not delete `~/Developer/sites/plan-manager` or its worktrees. Markdown files under `~/Developer/plans` are user data and are never deleted by rollback or uninstall.
+Removing the `~/.local/bin/plan` symlink does not delete `~/Developer/plan-manager` or its worktrees. Markdown files under `~/Developer/plans` are user data and are never deleted by rollback or uninstall.
 
 ## Installer verification
 

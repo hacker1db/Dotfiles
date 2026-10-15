@@ -32,11 +32,15 @@ if command -v skillctl &> /dev/null; then
 fi
 
 # Moved auto help load stuff for me
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-bindkey '^w' autosuggest-execute
-bindkey '^e' autosuggest-accept
-bindkey '^u' autosuggest-toggle
+if [[ -n $HOMEBREW_PREFIX && -r "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    bindkey '^w' autosuggest-execute
+    bindkey '^e' autosuggest-accept
+    bindkey '^u' autosuggest-toggle
+fi
+if [[ -n $HOMEBREW_PREFIX && -r "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+fi
 bindkey '^L' vi-forward-word
 bindkey '^k' up-line-or-search
 bindkey '^j' down-line-or-search
