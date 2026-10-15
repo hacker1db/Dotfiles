@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+
+key=$("$(dirname "$0")/git-agent-key")
+printf 'key::%s\n' "$key"

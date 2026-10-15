@@ -1,0 +1,24 @@
+#!/bin/sh
+set -u
+
+host=
+for arg in "$@"; do
+    case "$arg" in
+        -*) ;;
+        *@*) host=${arg#*@}; break ;;
+    esac
+done
+
+[ -n "$host" ] || exec ssh "$@"
+title=$(git config --get "agentkey.$host.title" || true)
+[ -n "$title" ] || [ "$host" = github.com ] || exec ssh "$@"
+
+key=$("$(dirname "$0")/git-agent-key" ${title:+"$title"}) || exec ssh "$@"
+
+dir=$(mktemp -d "${TMPDIR:-/tmp}/git-agent-ssh.XXXXXX") || exit 1
+trap 'rm -rf "$dir"' EXIT
+trap 'exit 130' INT TERM HUP
+printf '%s\n' "$key" > "$dir/id.pub"
+
+SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" \
+    ssh -o IdentitiesOnly=yes -o IdentityAgent=SSH_AUTH_SOCK -i "$dir/id.pub" "$@"

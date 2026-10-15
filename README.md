@@ -42,7 +42,7 @@ DOTFILES_NONINTERACTIVE=1 ./install.sh git
 - **Listing:** eza with icons and git status (`ll`, `l`)
 - **FZF:** fd-backed file finder with custom color scheme
 - **119 aliases** across navigation, git, docker, azure, AI tools, and more
-- **30+ functions** including `extract`, `ghmerge`, `gitsign`, `jwt` decode, tmux helpers
+- **30+ functions** including `extract`, `ghmerge`, `jwt` decode, tmux helpers
 - **Local overrides:** `~/.localrc` sourced if present
 
 ### Neovim
@@ -86,11 +86,11 @@ Config: `config/ghostty/config` — 78% opacity with blur, JetBrains Mono 14pt i
 
 ### Git
 
-- **Global config:** `git/gitconfig.symlink` with SSH commit signing via 1Password (`gpg.format=ssh`)
+- **Global config:** `git/gitconfig.symlink` — generic, no accounts or signing required
 - **Local overrides:** `~/.gitconfig-local` auto-linked from `~/Developer/clitools/` if present, otherwise stub created
 - **Global ignore:** `git/gitignore_global.symlink`
 - **Hooks:** pre-commit (jscs, jshint), post-merge templates
-- **Multi-account:** interactive work/personal switching in `install/git.sh`
+- **Account profiles (optional):** `git/profiles/<name>/` holds multi-account settings — host aliases, per-remote identities, and SSH auth/commit signing with keys served by the 1Password agent (looked up by item title via `agentkey.*` config, no key files on disk). Enable one with `DOTFILES_GIT_PROFILE=<name> ./install.sh git`; it links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`. Without a profile, Git and SSH use plain defaults.
 
 ### Homebrew
 

@@ -132,7 +132,6 @@
     editor = vim
     whitespace = cr-at-eol
 	autocrlf = input
-	hooksPath = ~/.sonar/sonarqube-cli/hooks
 
 [interactive]
     diffFilter = delta --color-only
@@ -163,26 +162,7 @@
 	instructionFormat = "[%an - %ar] %s"
 [pull]
 	ff = only
-# Add signing 
-[gpg]
-  format = ssh
 
-[gpg "ssh"]
-  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-  allowedSignersFile = ~/.ssh/allowed_signers
-
-[commit]
-    gpgsign = true
-
-[url "ssh://git@github.com/"]
-    insteadOf = https://github.com/
-[credential "https://github.com"]
-	helper = !gh auth git-credential
-[credential "https://gist.github.com"]
-	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
-[url "git@github-hacker1db:hacker1db/"]
-	insteadOf = git@github.com:hacker1db/
-[url "git@hb1:zerobitconsulting/"]
-	insteadOf = git@github.com:zerobitconsulting/
-	insteadOf = https://github.com/zerobitconsulting/
+[include]
+    # Optional account profile linked by install/git.sh; ignored when missing
+    path = ~/.gitconfig-accounts
