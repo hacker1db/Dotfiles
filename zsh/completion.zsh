@@ -25,6 +25,12 @@ zstyle ':fzf-tab:*' switch-group '<' '>'
 # sesh completion
 eval "$(sesh completion zsh)"
 
+# skillctl completion (the launcher reuses the last build for completion requests)
+if command -v skillctl &> /dev/null; then
+    _skillctl_completion="$(skillctl completion zsh 2>/dev/null)" && [[ -n $_skillctl_completion ]] && eval "$_skillctl_completion"
+    unset _skillctl_completion
+fi
+
 # Moved auto help load stuff for me
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

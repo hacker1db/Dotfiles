@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -12,6 +12,14 @@ function read(path) {
 }
 
 const stableUrl = 'http://plans.localhost:4173/plans/<id>'
+for (const path of [
+  'codex/AGENTS.md',
+  'config/opencode/AGENTS.md',
+  'config/copilot/copilot-instructions.md',
+  'copilot/copilot-instructions.md',
+]) {
+  assert.equal(realpathSync(join(root, path)), join(root, 'global/AGENTS.md'))
+}
 const sharedContract = read('claude/skills/plans/SKILL.md')
 assert.match(sharedContract, /plan capture <artifact> --json/)
 assert.match(sharedContract, /regardless of where the harness wrote it/)
@@ -32,31 +40,32 @@ const harnesses = [
   },
   {
     name: 'Codex desktop/CLI',
-    policy: ['codex/AGENTS.md'],
+    policy: ['global/AGENTS.md'],
     evalId: 'codex-visualization-finalization',
     mockAdapter(artifact) {
-      assert.match(read('codex/AGENTS.md'), /\$plans/)
+      assert.match(read('global/AGENTS.md'), /Codex uses `\$plans`/)
       return ['capture', artifact, '--json']
     },
   },
   {
     name: 'OpenCode',
     policy: [
-      'config/opencode/AGENTS.md',
+      'global/AGENTS.md',
       'config/opencode/command/plans.md',
     ],
     evalId: 'opencode-plan-agent-finalization',
     mockAdapter(artifact) {
       assert.match(read('config/opencode/command/plans.md'), /Delegate to the `plan` CLI/)
+      assert.match(read('global/AGENTS.md'), /OpenCode and Copilot use `\/plans`/)
       return ['capture', artifact, '--json']
     },
   },
   {
     name: 'Copilot',
-    policy: ['copilot/copilot-instructions.md'],
+    policy: ['global/AGENTS.md'],
     evalId: 'copilot-native-plan-finalization',
     mockAdapter(artifact) {
-      assert.match(read('copilot/copilot-instructions.md'), /Use the `\/plans` command/)
+      assert.match(read('global/AGENTS.md'), /OpenCode and Copilot use `\/plans`/)
       return ['capture', artifact, '--json']
     },
   },
@@ -97,16 +106,7 @@ for (const target of [
 ]) {
   assert.ok(bootstrap.includes(target), `installer does not manage ${target}`)
 }
-
-const linker = read('install/link.sh')
-for (const target of [
-  '$HOME/.claude/skills',
-  '$HOME/.agents/skills',
-  '$HOME/.codex/skills',
-  '$HOME/.opencode/skills',
-]) {
-  assert.ok(linker.includes(target), `shared skill is not linked into ${target}`)
-}
+assert.equal((bootstrap.match(/"\$DOTFILES\/global\/AGENTS\.md"/g) || []).length, 3)
 
 const planBin = process.env.PLAN_MANAGER_TEST_BIN
 if (planBin) {

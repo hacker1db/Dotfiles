@@ -69,19 +69,26 @@ done
 
 OPENCODE_SRC="$DOTFILES/config/opencode"
 OPENCODE_DEST="$HOME/.config/opencode"
-if [ -e "$OPENCODE_SRC" ]; then
-  if [ -L "$OPENCODE_DEST" ]; then
-    CURRENT=$(readlink "$OPENCODE_DEST")
-    if [ "$CURRENT" != "$OPENCODE_SRC" ]; then
-      OPENCODE_BACKUP="${OPENCODE_DEST}.backup-$(date +%Y%m%d%H%M%S)"
-      mv "$OPENCODE_DEST" "$OPENCODE_BACKUP"
-      ln -s "$OPENCODE_SRC" "$OPENCODE_DEST"
-      echo "Backed up the previous OpenCode link to $OPENCODE_BACKUP"
+if [[ -d "$OPENCODE_SRC" && ! "$OPENCODE_SRC" -ef "$OPENCODE_DEST" ]]; then
+    if [[ -d "$OPENCODE_DEST" && ! -L "$OPENCODE_DEST" ]]; then
+        echo "$OPENCODE_DEST is an unmanaged directory; preserving it and linking only managed files."
+    else
+        if [[ -e "$OPENCODE_DEST" || -L "$OPENCODE_DEST" ]]; then
+            OPENCODE_BACKUP_BASE="$OPENCODE_DEST.backup.$(date +%Y%m%d%H%M%S)"
+            OPENCODE_BACKUP=$OPENCODE_BACKUP_BASE
+            OPENCODE_BACKUP_SUFFIX=0
+            while [[ -e "$OPENCODE_BACKUP" || -L "$OPENCODE_BACKUP" ]]; do
+                OPENCODE_BACKUP_SUFFIX=$((OPENCODE_BACKUP_SUFFIX + 1))
+                OPENCODE_BACKUP="$OPENCODE_BACKUP_BASE.$OPENCODE_BACKUP_SUFFIX"
+            done
+            mv "$OPENCODE_DEST" "$OPENCODE_BACKUP" || exit 1
+            echo "Preserved existing OpenCode config: $OPENCODE_BACKUP"
+        fi
+        ln -s "$OPENCODE_SRC" "$OPENCODE_DEST" || exit 1
     fi
-  elif [ -d "$OPENCODE_DEST" ]; then
-    echo "$OPENCODE_DEST is an unmanaged directory; preserving it and linking only managed plan surfaces."
-  fi
 fi
+
+bash "$DOTFILES/install/agent-instructions.sh" || exit 1
 
 echo -e "\n\nInstalling Claude Code settings"
 echo "=============================="
@@ -140,76 +147,6 @@ for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands" "$DOTFIL
     fi
   fi
 done
-
-echo -e "\n\nAdopting any unmanaged Claude skills into dotfiles"
-echo "=============================="
-if [ -d "$HOME/.claude/skills" ]; then
-  for skill_dir in "$HOME/.claude/skills"/*/; do
-    skill_name="$(basename "$skill_dir")"
-    [ -L "${skill_dir%/}" ] && continue
-    [ ! -f "$skill_dir/SKILL.md" ] && continue
-    dotfiles_dest="$DOTFILES/claude/skills/$skill_name"
-    [ -e "$dotfiles_dest" ] && continue
-    echo "Adopting $skill_name into dotfiles..."
-    mv "$skill_dir" "$dotfiles_dest"
-    ln -s "$dotfiles_dest" "${skill_dir%/}"
-  done
-fi
-
-echo -e "\n\nInstalling Claude Code skills"
-echo "=============================="
-link_skill_dir() {
-  local dest_dir="$1"
-  local display_dir="$2"
-  if ! mkdir -p "$dest_dir"; then
-    echo "Could not create $display_dir; skipping."
-    return
-  fi
-  for SKILL_SRC in "$DOTFILES/claude/skills"/*/; do
-    if [ -f "$SKILL_SRC/SKILL.md" ]; then
-      SKILL_NAME=$(basename "$SKILL_SRC")
-      SKILL_DEST="$dest_dir/$SKILL_NAME"
-      if [ -L "$SKILL_DEST" ]; then
-        CURRENT=$(readlink "$SKILL_DEST")
-        if [ "$CURRENT" != "${SKILL_SRC%/}" ]; then
-          rm "$SKILL_DEST"
-          ln -s "${SKILL_SRC%/}" "$SKILL_DEST"
-          echo "Updated symlink $SKILL_DEST -> ${SKILL_SRC%/}"
-        else
-          echo "$display_dir/$SKILL_NAME already symlinked correctly."
-        fi
-      elif [ ! -e "$SKILL_DEST" ]; then
-        if ln -s "${SKILL_SRC%/}" "$SKILL_DEST"; then
-          echo "Created symlink $SKILL_DEST -> ${SKILL_SRC%/}"
-        else
-          echo "Could not create symlink $SKILL_DEST -> ${SKILL_SRC%/}"
-        fi
-      else
-        echo "$display_dir/$SKILL_NAME exists but is not a symlink; skipping."
-      fi
-    fi
-  done
-  for link in "$dest_dir"/*; do
-    if [ -L "$link" ] && [ ! -e "$link" ]; then
-      rm "$link"
-      echo "Removed broken symlink: $display_dir/$(basename "$link")"
-    fi
-  done
-}
-
-link_skill_dir "$HOME/.claude/skills" "~/.claude/skills"
-
-echo -e "\n\nInstalling Copilot CLI skills"
-echo "=============================="
-link_skill_dir "$HOME/.agents/skills" "~/.agents/skills"
-
-echo -e "\n\nInstalling Codex CLI skills"
-echo "=============================="
-link_skill_dir "$HOME/.codex/skills" "~/.codex/skills"
-
-echo -e "\n\nInstalling OpenCode skills"
-echo "=============================="
-link_skill_dir "$HOME/.opencode/skills" "~/.opencode/skills"
 
 echo -e "\n\nInstalling Claude Code MCP servers"
 echo "=============================="

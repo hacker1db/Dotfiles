@@ -195,6 +195,18 @@ link_managed_file "$managed_source" "$managed_dest" "test instructions" >/dev/nu
 [ "$(find "$HOME/.codex" -name 'AGENTS.md.backup-*' | wc -l | tr -d ' ')" = "1" ] ||
     fail "idempotent instruction linking created another backup"
 
+instruction_home="$FIXTURE/instruction-home"
+bash "$ROOT/install/agent-instructions.sh" "$instruction_home" >/dev/null
+original_home="$HOME"
+HOME="$instruction_home"
+install_plan_instruction_links >/dev/null
+bash "$ROOT/install/agent-instructions.sh" "$HOME" >/dev/null
+[ "$HOME/.copilot/copilot-instructions.md" -ef "$ROOT/global/AGENTS.md" ] ||
+    fail "Copilot installers selected different instructions"
+[ "$(find "$HOME/.copilot" -name 'copilot-instructions.md.backup.*' | wc -l | tr -d ' ')" = "0" ] ||
+    fail "Copilot installers replaced each other's links"
+HOME="$original_home"
+
 mkdir -p "$HOME/.claude" "$HOME/.config/opencode/command"
 ln -s "$ROOT/claude/commands" "$HOME/.claude/commands"
 printf 'preserve\n' > "$HOME/.config/opencode/custom-state"

@@ -172,6 +172,14 @@ All directories under `config/` are symlinked to `~/.config/<name>`. When adding
 
 **Never create config files directly in `~/.config/`** — always source them from `~/.dotfiles/config/`.
 
+## Agent Skills
+
+- The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out at `$HOME/Developer/skills/main` by default.
+- That repository provides `skillctl`, the skill manager for Codex, Claude Code, and GitHub Copilot CLI. Read its README before changing skill sources, selections, or installation behavior.
+- `claude/skills/` in this repository contains legacy copies during migration. Do not create or update personal skills here, and do not move installed skills back into this repository.
+- Existing global skill links may still point to `claude/skills/` until the migration is complete. Keep those links intact during dotfiles installation; use `skillctl` for the eventual migration.
+- The project-scoped Caido installer and the OpenCode skill under `config/opencode/skills/` are separate from the current `skillctl` global adapters.
+
 ## Important Files & Patterns
 
 ### Neovim Keymaps

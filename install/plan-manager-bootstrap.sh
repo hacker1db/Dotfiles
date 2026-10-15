@@ -358,11 +358,11 @@ link_managed_file() {
 install_plan_instruction_links() {
     title "Installing plan-manager global instructions"
     link_managed_file \
-        "$DOTFILES/copilot/copilot-instructions.md" \
+        "$DOTFILES/global/AGENTS.md" \
         "$HOME/.copilot/copilot-instructions.md" \
         "Copilot global instructions" || return 1
     link_managed_file \
-        "$DOTFILES/codex/AGENTS.md" \
+        "$DOTFILES/global/AGENTS.md" \
         "$HOME/.codex/AGENTS.md" \
         "Codex global instructions" || return 1
     link_managed_file \
@@ -370,7 +370,7 @@ install_plan_instruction_links() {
         "$HOME/.claude/commands/plans.md" \
         "Claude plans command" || return 1
     link_managed_file \
-        "$DOTFILES/config/opencode/AGENTS.md" \
+        "$DOTFILES/global/AGENTS.md" \
         "$HOME/.config/opencode/AGENTS.md" \
         "OpenCode global instructions" || return 1
     link_managed_file \

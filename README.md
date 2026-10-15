@@ -32,6 +32,21 @@ DOTFILES_NONINTERACTIVE=1 ./install.sh git
 
 ## What's Included
 
+### Global AI instructions
+
+Edit root `AGENTS.md` for dotfiles repository guidance. Edit `global/AGENTS.md` for shared global policy; the Codex, OpenCode, and Copilot source paths below link to it.
+
+| Tool | Dotfiles source | Installed location |
+|------|-----------------|--------------------|
+| Claude Code | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
+| Codex | `codex/AGENTS.md` | `~/.codex/AGENTS.md` |
+| OpenCode | `config/opencode/AGENTS.md` | `~/.config/opencode/AGENTS.md` |
+| GitHub Copilot CLI | `config/copilot/copilot-instructions.md` | `~/.copilot/copilot-instructions.md` |
+
+Run `bash install/agent-instructions.sh` to install just these links, or `./install.sh link` during normal setup. Existing files and differing symlinks are backed up before replacement. Re-running keeps correct links intact. Edits to a source file reach its installed location immediately; start a new tool session to reload instructions.
+
+VS Code Copilot Agent Host uses the Copilot instruction file. For VS Code's Local agent, enable `chat.useClaudeMdFile` in user settings to load the Claude instructions. This is enabled on the current machine in both VS Code and VS Code Insiders; new machines need the setting enabled too. GitHub.com personal instructions are separate website settings and do not read local files.
+
 ### Shell (Zsh)
 
 - **Prompt:** Starship with custom config (`config/starship/starship.toml`)
@@ -106,7 +121,7 @@ Config: `config/ghostty/config` — 78% opacity with blur, JetBrains Mono 14pt i
 
 - **19 agents** (oh-my-claudecode orchestration)
 - **15 custom commands**
-- **Shared skills** linked into both `~/.claude/skills/` and `~/.agents/skills/`
+- **Shared skills** moving to the separate skills repository and its `skillctl` manager
 - **MCP server config** (`mcp.json`)
 - **HUD display** and statusline customization
 
@@ -170,9 +185,11 @@ directory and does not run as part of the default dotfiles installation.
 
 All `*.symlink` files are linked into `$HOME` with a leading dot (e.g., `zshrc.symlink` → `~/.zshrc`). Directories under `config/` are linked to `~/.config/<name>/`. Claude Code configs are linked to `~/.claude/`.
 
-Skills live once under `claude/skills/<name>/SKILL.md` and are linked to both `~/.claude/skills/<name>` and `~/.agents/skills/<name>`. Claude Code reads the first path, while GitHub Copilot CLI 1.0.40 no longer loads custom skills from `~/.claude/` and uses the global agents skill path instead. Keeping both links lets one dotfiles source feed both tools.
+The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out locally at `~/Developer/skills/main`. Its `skillctl` CLI manages skill selection and installation for Codex, Claude Code, and GitHub Copilot CLI. The `bin/skillctl` launcher in this repo rebuilds the CLI from that checkout on every invocation, then runs it. Completion requests (`skillctl __complete …`, `skillctl completion …`) reuse the last build so Tab stays fast, and `zsh/completion.zsh` loads `skillctl completion zsh`. Go must be installed. Set `SKILLCTL_REPO_DIR` to use another checkout.
 
-Re-running `./install.sh link` reconciles all symlinks, including vim compatibility links (`~/.vimrc`, `~/.vim`) and `~/.gitconfig-local`.
+The `claude/skills/` tree in this repo is legacy content awaiting migration. The dotfiles linker no longer adopts skills into that tree or installs them from it. Existing global links remain in place until they are migrated through `skillctl`. A fresh dotfiles installation leaves skill setup to the skills repository. Its catalog needs to be ready before switching the global links; follow its README for CLI usage.
+
+Re-running `./install.sh link` reconciles dotfiles symlinks, including vim compatibility links (`~/.vimrc`, `~/.vim`) and `~/.gitconfig-local`.
 
 ## Theme Manager
 
