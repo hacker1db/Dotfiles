@@ -84,18 +84,18 @@ if [ "$backend" = "foundry" ]; then
     exit 1
   fi
   if [ -f "$LOCAL_AUTOMODE" ]; then
-    jq -s --arg res "$resource" '.[0] * .[1] * .[2] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$GEN"
+    jq -s --arg res "$resource" '.[0] * .[1] * .[2] * .[3] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$GEN"
     info "Resolved Claude backend: foundry (resource: $resource, autoMode: $LOCAL_AUTOMODE)"
   else
-    jq -s --arg res "$resource" '.[0] * .[1] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$FRAGMENT" > "$GEN"
+    jq -s --arg res "$resource" '.[0] * .[1] * .[2] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" > "$GEN"
     info "Resolved Claude backend: foundry (resource: $resource)"
   fi
 else
   if [ -f "$LOCAL_AUTOMODE" ]; then
-    jq -s '.[0] * .[1] * .[2]' "$BASE" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$GEN"
+    jq -s '.[0] * .[1] * .[2] * .[3]' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$GEN"
     info "Resolved Claude backend: $backend (autoMode: $LOCAL_AUTOMODE)"
   else
-    jq -s '.[0] * .[1]' "$BASE" "$FRAGMENT" > "$GEN"
+    jq -s '.[0] * .[1] * .[2]' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" > "$GEN"
     info "Resolved Claude backend: $backend"
   fi
 fi

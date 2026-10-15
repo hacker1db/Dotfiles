@@ -43,7 +43,7 @@ for key in "${keys[@]}"; do
 done
 settings_dir="$(mktemp -d "${TMPDIR:-/tmp}/claude-session.XXXXXXXX")"
 trap 'rm -rf "$settings_dir"' EXIT
-files=("$root/claude/settings.$backend.json")
+files=("$root/claude/settings.work.json" "$root/claude/settings.$backend.json")
 automode="${CLAUDE_AUTOMODE_ENV_FILE:-$HOME/.config/claude-code/automode.json}"
 if [[ -z "${CLAUDE_AUTOMODE_ENV_FILE:-}" && ! -f "$automode" && -f "$HOME/.config/claude-code/foundry-automode.json" ]]; then
     automode="$HOME/.config/claude-code/foundry-automode.json"

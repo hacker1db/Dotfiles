@@ -114,6 +114,8 @@ else
   echo "Warning: $DOTFILES/install/claude-backend.sh is not executable; skipping Claude Code settings backend link."
 fi
 
+python3 "$DOTFILES/install/claude-profiles.py" || echo "Warning: Claude profile setup incomplete; see the reported local prerequisites."
+
 echo -e "\n\nInstalling Claude Code agents and commands"
 echo "=============================="
 for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands" "$DOTFILES/claude/output-styles"; do

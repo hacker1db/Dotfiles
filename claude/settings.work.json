@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash(git commit*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.dotfiles/claude/hooks/pre-commit-security.sh",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
