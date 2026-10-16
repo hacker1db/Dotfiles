@@ -1,5 +1,5 @@
 if [[ -x /opt/homebrew/bin/brew ]]; then
-    _brew_env="$(cd -q / && /opt/homebrew/bin/brew shellenv zsh)" && eval "$_brew_env"
+    _brew_env="$(builtin cd -q / && /opt/homebrew/bin/brew shellenv zsh)" && eval "$_brew_env"
     unset _brew_env
 fi
 [[ -n $HOMEBREW_PREFIX ]] || return
