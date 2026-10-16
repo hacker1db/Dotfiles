@@ -9,19 +9,19 @@ The plan-manager application — CLI, local server, dashboard, hosted Next.js ap
 - Default location: `~/Developer/plan-manager`
 - Override: set `PLAN_MANAGER_REPO_DIR` before running `install/link.sh`
 
-Dotfiles owns only the bootstrap configuration, CLI symlink, LaunchAgent template, skill, global instructions, and command adapters. Application code is never copied into dotfiles.
+Dotfiles owns the bootstrap configuration, CLI symlink, LaunchAgent template, global instructions, and command adapters. The shared `plans` skill is managed separately through the skills repository; legacy copies in `claude/skills/` are not installed by the linker. Application code is never copied into dotfiles.
 
 ### Repository layouts
 
 `install/link.sh` supports three checkout layouts at the target root:
 
 | Layout | Description | Resolved worktree |
-|---|---|---|
+| --- | --- | --- |
 | Normal clone | Standard `git clone` | `~/Developer/plan-manager` |
 | Bare + linked worktree | `.bare` dir + `main/` linked worktree | `~/Developer/plan-manager/main` |
 | Explicit override | `PLAN_MANAGER_WORKTREE` set | Value of that variable |
 
-The current machine uses the **bare + linked worktree** layout. Fresh machines receive a normal clone.
+Fresh clones created by the bootstrap use a normal clone. Existing bare repositories with a `main/` worktree are supported.
 
 The following overrides are supported:
 
@@ -65,15 +65,15 @@ install/link.sh
 The installer:
 
 1. Resolves or clones the plan-manager repository.
-2. Installs locked application dependencies (`pnpm install --frozen-lockfile`).
+2. Installs locked application dependencies (`pnpm install --frozen-lockfile`) and runs `pnpm build`.
 3. Validates `bin/plan` and links it to `~/.local/bin/plan`.
-4. Links the shared skill, global instructions, and command adapters.
+4. Links global instructions and command adapters. Install the `plans` skill separately through skillctl.
 5. Merges `~/Developer/plans` into the Codex writable-root config.
-6. Installs the LaunchAgent and loads it with `launchctl`.
-7. Initializes `~/Developer/plans` and its `archive/` subdirectory.
-8. Runs `plan doctor` to confirm everything is healthy.
+6. Initializes `~/Developer/plans` and its `archive/` subdirectory.
+7. Installs the LaunchAgent and loads it with `launchctl`.
+8. Runs `plan serve --json` and `plan doctor --json`, reporting failures.
 
-`install/link.sh` is idempotent: a second run with unchanged sources leaves all links, tool state, plan data, and service state unchanged.
+The bootstrap preserves correct managed links and backs up replaced files. Rerunning can fetch and fast-forward the application checkout, reinstall dependencies, rebuild the CLI, and check/start the service. It is not a no-op verification command. A plan-manager failure is reported after other dotfiles links have been attempted and makes the linker exit nonzero.
 
 The Codex reconciler creates `~/.codex/config.toml` when absent. Before changing
 an existing file it writes a timestamped same-directory backup, then atomically
@@ -90,7 +90,15 @@ array without setting a sandbox mode or approval policy.
 
 ## CLI usage
 
-The `plan` executable is on `PATH` at `~/.local/bin/plan` after installation.
+The `plan` executable is linked at `~/.local/bin/plan` after installation. Dotfiles Zsh startup adds that directory to `PATH`.
+
+The bootstrap and LaunchAgent explicitly pass `PLAN_HOME=~/Developer/plans`. The application can have a different default, and the symlink does not set environment variables. For terminal invocations, set the canonical root in `~/.localrc` and reload the shell:
+
+```sh
+export PLAN_HOME="$HOME/Developer/plans"
+```
+
+Confirm the effective root with `plan doctor --json` before creating or importing plans. Agent operations use non-interactive JSON mode; opening/reviewing requires `plan serve` and `plan doctor --json` first.
 
 ### Common operations
 
@@ -99,7 +107,7 @@ The `plan` executable is on `PATH` at `~/.local/bin/plan` after installation.
 plan new "My Project Plan"
 
 # Create non-interactively (agent/script use)
-echo "# My Plan\n\nSteps here." | plan create --title "My Plan" --stdin --json
+printf '# My Plan\n\nSteps here.\n' | plan create --title "My Plan" --stdin --json
 
 # Capture a Markdown or standalone HTML plan created by a harness
 plan capture /path/to/plan.html --json
@@ -132,17 +140,17 @@ plan open <id-or-slug>
 plan doctor --json
 ```
 
-See `claude/skills/plans/references/cli.md` for the full command reference, JSON envelope schema, and exit codes.
+Use `plan --help` and the application repository README for the installed CLI contract. The legacy skill references in dotfiles may describe an older application release.
 
 ## Stable local dashboard URL
 
-```
+```text
 http://plans.localhost:4173/
 ```
 
 Each plan has a stable ID-based route:
 
-```
+```text
 http://plans.localhost:4173/plans/<id>
 ```
 
@@ -151,7 +159,7 @@ The ID is immutable across title changes, renames, status changes, and archive m
 ## Per-tool invocation
 
 | Tool | Command | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Claude Code | `/plans` | Delegates to the `plans` skill |
 | OpenCode | `/plans` | Delegates to the `plans` skill |
 | Copilot CLI | `/plans` | Delegates to the `plans` skill |
@@ -163,7 +171,7 @@ The ID is immutable across title changes, renames, status changes, and archive m
 
 After `install/link.sh` completes:
 
-- **Claude Code, OpenCode, Copilot**: instructions load per-session; start a new session to pick up the updated skill and command adapter.
+- **Claude Code, OpenCode, Copilot**: start a new session to pick up updated instructions and command adapters; ensure the shared skill is installed separately.
 - **Codex desktop**: global guidance loads once at the beginning of a run; start a new desktop task after linking.
 - **Codex CLI**: start a new CLI session after linking.
 
@@ -201,23 +209,15 @@ HTML capture uses Pandoc to create canonical GitHub-flavored Markdown. External 
 
 ## Hosted publishing (optional)
 
-Hosted publishing is opt-in. Local Markdown remains authoritative. It is a planned follow-on capability and is not enabled in the local-only v0.2 release; the remote commands currently fail closed with the documented dependency-unavailable exit code.
+Hosted publishing is opt-in and must be explicitly requested. Local Markdown remains authoritative. The application now supports a single hosted site, configured through `PLAN_MANAGER_URL`; the earlier named-remote commands are not the current workflow.
 
-```bash
-# Add a hosted service
-plan remote add default https://<your-hosted-app>.vercel.app
-
-# Authenticate
-plan auth login --remote default
-
-# Publish a plan explicitly
-plan push <id> --remote default --json
-
-# Check remote status
-plan remote status <id> --json
+```sh
+plan auth login
+plan auth status
+plan push <id> --json
 ```
 
-See `claude/skills/plans/references/remote.md` for the full publishing workflow.
+Use the application repository's README and `docs/hosting.md` for authentication, revision conflicts, and deployment setup. This dotfiles bootstrap does not deploy the hosted service or authenticate an account. It does not publish plans during installation.
 
 ## Troubleshooting
 
@@ -228,6 +228,7 @@ plan doctor --json
 ```
 
 Common causes:
+
 - Service not started: `plan serve` to start it.
 - Port 4173 occupied: `plan doctor` reports the owning process. Resolve the collision, then `plan serve`.
 - LaunchAgent not loaded: `launchctl list | grep plan-manager` to check; rerun `install/link.sh` to reinstall.
@@ -240,7 +241,7 @@ Common causes:
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Then reload: `source ~/.zshrc`. Or rerun `install/link.sh` which ensures `~/.local/bin` is on PATH.
+Then reload: `source ~/.zshrc`. Rerun `install/link.sh` only if the CLI symlink needs repair; its environment changes do not modify the parent shell.
 
 ### Codex cannot write to `~/Developer/plans`
 
@@ -267,8 +268,8 @@ rm ~/.local/bin/plan
 # Restore a backed-up instruction file (example)
 mv ~/.codex/AGENTS.md.backup-<timestamp> ~/.codex/AGENTS.md
 
-# Remove a hosted remote without affecting local plans
-plan auth logout --remote default
+# Clear hosted authentication without deleting local plans
+plan auth logout
 ```
 
 Removing the `~/.local/bin/plan` symlink does not delete `~/Developer/plan-manager` or its worktrees. Markdown files under `~/Developer/plans` are user data and are never deleted by rollback or uninstall.
@@ -287,8 +288,4 @@ validation, missing and conflicting targets, frozen dependency invocation, CLI
 link repair, instruction backups, atomic Codex config reconciliation, and
 idempotent LaunchAgent rendering under a temporary `HOME`.
 
-To revert the plan-browser output style to the previous behavior, restore `claude/output-styles/plan-browser.md` from git history:
-
-```bash
-git -C ~/.dotfiles checkout HEAD~1 -- claude/output-styles/plan-browser.md
-```
+To undo an output-style change, inspect its Git history and restore the intended revision of `claude/output-styles/plan-browser.md`; do not assume the previous commit contains the desired version.

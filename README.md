@@ -1,211 +1,167 @@
 # Dotfiles
 
-macOS development environment — modular installer, theme manager, 40+ Neovim plugins, and per-repo Git identity overrides.
+Personal macOS development configuration for Zsh, Neovim, tmux, Ghostty, Git, and AI coding tools. Installation is split into scripts under `install/`; application settings live under `config/`.
 
-## Quick Start
+## Installation
 
-```bash
+```sh
 git clone https://github.com/hacker1db/Dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ./install.sh all
 ```
 
-Re-run individual steps safely (idempotent):
+Review the scripts before running a full installation: they install packages, change macOS preferences, configure applications, and may prompt for authentication. `all` runs `link` before `homebrew`; plan-manager bootstrap in the link step already requires Node.js 20+, pnpm, and Pandoc. On a fresh machine, install those prerequisites and authenticate `gh` (or set `PLAN_MANAGER_REPO_URL`) first.
 
-```bash
-./install.sh backup      # backup existing dotfiles
-./install.sh link        # create/update all symlinks
-./install.sh terminfo    # install terminfo entries
-./install.sh homebrew    # Homebrew + Brewfile packages
-./install.sh shell       # zsh setup
-./install.sh git         # git auth & credential helpers
-./install.sh macos       # macOS defaults
-./install.sh extras      # extra tools/scripts
-./install.sh theme       # theme manager (list/apply/sync)
+| Command | Purpose |
+| --- | --- |
+| `./install.sh backup` | Copy selected existing dotfiles into `~/dotfiles-backup` |
+| `./install.sh link` | Link configuration, generate Claude settings/profiles, and bootstrap plan-manager |
+| `./install.sh claude anthropic` / `./install.sh claude foundry` | Select the legacy global Claude backend |
+| `./install.sh terminfo` | Install terminal capability entries |
+| `./install.sh homebrew` | Run the explicit package lists and tool setup in `install/install_tools.sh` |
+| `./install.sh node-tools` | Install pnpm global tools; run Readwise and Codex Security login setup |
+| `./install.sh shell` | Configure Zsh |
+| `./install.sh git` | Configure Git identity and optional account profiles |
+| `./install.sh macos` | Apply macOS preferences |
+| `./install.sh extras` | Install extra tools |
+| `./install.sh nvimtmux` | Create NvimTmux.app and register file associations with `duti` |
+| `./install.sh dotnet` / `./install.sh dotnet-tools` | Install .NET and global tools |
+| `./install.sh theme list` | List theme candidates |
+| `./install.sh ponytail` | Install Ponytail for Claude Code and Codex |
+| `./install.sh codex-foundry --resource NAME --model DEPLOYMENT` | Configure a separate Codex home for Foundry |
+
+`all` runs backup, link, claude, terminfo, homebrew, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, theme, and ponytail, in that order. Codex Foundry setup is explicit. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+
+`DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; that catalog and the explicit lists in `install/install_tools.sh` are separate sources.
+
+## Shell and terminal workflow
+
+- Zsh loads `zsh/**/*.zsh`, autoloads `zsh/functions/`, and reads `~/.localrc` for local overrides.
+- Starship supplies the prompt; zoxide provides `cd`; eza provides `l` and `ll`.
+- fzf-tab uses zfetch; completion includes kubectl, limactl, 1Password, sesh, and skillctl. fnm selects Node versions when entering directories with Node project markers.
+- `daily` opens a dated SecondBrain note, `yy` changes directory through Yazi, `ts` and Alt+s select sesh sessions, and `gh-rate-limit` inspects GitHub limits.
+- Ghostty uses `config/ghostty/config`: JetBrains Mono italic at 14pt, 78% opacity, blur, linkarzu colors, and clipboard copy-on-select. The old WezTerm configuration has been removed.
+- tmux lives in `config/tmux/tmux.conf`, uses Ctrl+a as its prefix, and includes vi copy mode, mouse support, undercurl colors, session persistence through resurrect/continuum, and Neovim pane navigation. Prefix+o opens sesh; prefix+g opens lazygit; prefix+G opens gh-dash; prefix+O opens OpenCode; prefix+u uses the fzf URL picker.
+
+### Worktrunk and Git worktrees
+
+`wt` shell integration is loaded from Zsh. User settings are in [config/worktrunk/config.toml](config/worktrunk/config.toml), linked at `~/.config/worktrunk/config.toml`. Worktrees use sibling directories named after sanitized branches; switching in tmux renames the window. Commit generation calls the configured `ocr` command, which must be available separately.
+
+```sh
+wt switch --create feature/my-change
+wt pull-all
 ```
 
-`./install.sh all` runs them in order. Non-interactive mode for CI:
+`wt pull-all` fetches every remote with pruning, then runs `git pull --ff-only --no-autostash` in each worktree **of the current repository** using that branch's configured upstream. Worktrees without a resolvable upstream, including detached worktrees, are skipped. A failed initial fetch stops the operation; individual pull failures are reported while remaining worktrees continue. Diverged branches require manual resolution. Local edits are not stashed; Git refuses updates that would overwrite them. This does not discover unrelated repositories or change remote URLs.
 
-```bash
-DOTFILES_NONINTERACTIVE=1 ./install.sh git
+The `wt-pull-all` function in `zsh/functions.zsh` delegates to the same alias. Reload it with `source ~/.dotfiles/zsh/functions.zsh`. `cob` wraps `wt switch --create`; `git-bare-clone` supports cloning, `--init`, and `--fix` for a `.bare` repository with linked worktrees. Run `git-bare-clone --help` for its arguments. `gcc` invokes `git-clean-merged`, which can delete merged local **and remote** branches.
+
+## Neovim
+
+Configuration: `config/nvim/`. lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories.
+
+| Area | Current configuration |
+| --- | --- |
+| Completion | blink.cmp, LuaSnip, Copilot completion integration |
+| LSP | mason.nvim, lspconfig, lspsaga; TypeScript tools, gopls, Lua, Python, Terraform, Docker, YAML, JSON, markdown-oxide, and harper-ls |
+| Formatting/linting | conform.nvim and nvim-lint |
+| Navigation/UI | Snacks explorer, picker, dashboard, notifier, indent, terminal, and zen; lualine, noice, which-key, trouble |
+| Git | Fugitive, Gitsigns, Neogit, Octo; Telescope Git pickers and Snacks Git views |
+| Editing | mini.ai, mini.comment, mini.icons, mini.pairs, mini.surround; Treesitter context, textobjects, and autotag |
+| Markdown | Obsidian integration, render-markdown, heading capitalization, filetype-specific folds, `.svx` Markdown detection, and vault-backed LuaSnip templates |
+| AI/testing/debugging | Copilot, CopilotChat, vim-test, and DAP configuration |
+| Colors | Eldritch and custom diagnostic/heading highlights |
+
+Space is the leader. Use `<leader>e` for the explorer, `<leader>ff` for files, `<leader>fr` for recent files, `<leader>/` for grep, `<leader>,` for buffers, and `<leader>sh` for help. `gd`/`gr` navigate LSP definitions/references. See `lua/core/keymaps.lua` and plugin `keys` tables for the complete mappings; some Git mappings are defined in both places.
+
+The former nvim-cmp and nvim-tree configurations are removed. mini.files, mini.pick, and Avante are not configured. [Mini plugin notes](config/nvim/lua/plugins/mini/mini.md) describe the active modules. Standalone specs for mini.bracketed, mini.diff, and undotree remain directly under `lua/plugins/`, outside the imported directories; their presence and related keymaps do not establish that they load.
+
+```sh
+nvim +checkhealth
+nvim --headless "+Lazy! sync" +qa
 ```
 
-## What's Included
+Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not a read-only check. Obsidian and snippet configuration assumes a personal SecondBrain vault; adjust those paths for another machine. Legacy UltiSnips files remain under `vim/`.
 
-### Global AI instructions
+## Git identities and hooks
 
-Edit root `AGENTS.md` for dotfiles repository guidance. Edit `global/AGENTS.md` for shared global policy; the Codex, OpenCode, and Copilot source paths below link to it.
+`git/gitconfig.symlink` provides account-neutral defaults, `~/.gitconfig-local` overrides, `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls. `ssh/config` includes local and optional account configuration.
 
-| Tool | Dotfiles source | Installed location |
-|------|-----------------|--------------------|
+```sh
+DOTFILES_GIT_PROFILE=hacker1db ./install.sh git
+```
+
+The optional profile links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`. It supplies remote-specific identities, SSH host aliases, and 1Password agent-backed authentication/signing through `bin/git-agent-key`, `bin/git-agent-ssh`, and `bin/git-agent-signing-key`. Keys are selected by configured agent item titles; private key files are not installed. Profile setup removes a local `user.signingkey` override. Review profile-specific account mappings before enabling it.
+
+New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and Sonar pre-commit/pre-push adapters. Sonar adapters skip when `sonar` is absent. These Git hooks are separate from Claude's work-profile GitGuardian hook.
+
+## AI tools and shared instructions
+
+| Tool | Source | Installed instruction file |
+| --- | --- | --- |
 | Claude Code | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
-| Codex | `codex/AGENTS.md` | `~/.codex/AGENTS.md` |
-| OpenCode | `config/opencode/AGENTS.md` | `~/.config/opencode/AGENTS.md` |
-| GitHub Copilot CLI | `config/copilot/copilot-instructions.md` | `~/.copilot/copilot-instructions.md` |
+| Codex | `codex/AGENTS.md` → `global/AGENTS.md` | `~/.codex/AGENTS.md` |
+| OpenCode | `config/opencode/AGENTS.md` → `global/AGENTS.md` | `~/.config/opencode/AGENTS.md` |
+| Copilot CLI | `config/copilot/copilot-instructions.md` → `global/AGENTS.md` | `~/.copilot/copilot-instructions.md` |
 
-Run `bash install/agent-instructions.sh` to install just these links, or `./install.sh link` during normal setup. Existing files and differing symlinks are backed up before replacement. Re-running keeps correct links intact. Edits to a source file reach its installed location immediately; start a new tool session to reload instructions.
+Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for shared policy. `bash install/agent-instructions.sh` installs just the instruction links with backups. Start a new tool session to reload them.
 
-VS Code Copilot Agent Host uses the Copilot instruction file. For VS Code's Local agent, enable `chat.useClaudeMdFile` in user settings to load the Claude instructions. This is enabled on the current machine in both VS Code and VS Code Insiders; new machines need the setting enabled too. GitHub.com personal instructions are separate website settings and do not read local files.
+Claude installation links individual files/directories for instructions, agents, commands, output styles, and the statusline script; it does not replace the entire `~/.claude` directory. MCP configuration is linked to `~/.mcp.json`. Backend settings are generated from base, provider, work-hook, and optional local fragments.
 
-### Shell (Zsh)
+- [Native Claude profiles](claude/PROFILES.md): separate subscription, personal, and Foundry configuration directories, private generated settings, and scoped work hooks. Foundry requires an explicit local endpoint configuration; account logins are separate onboarding steps.
+- [Per-session Claude providers](docs/claude-sessions.md): `claude-subscription` and `claude-foundry` select a provider for one invocation without switching the global backend.
+- Claude agents and commands cover reviews, GitHub/Azure DevOps, security, notes, reading, and writing workflows. Work profiles register a GitGuardian commit hook; personal profiles omit that registration. Sonar remains separate in Git hooks.
+- OpenCode includes agent/command definitions, TUI settings, and a Supacode presence plugin that emits activity only inside Supacode surfaces.
+- `./install.sh ponytail` installs the declared Ponytail plugin for Claude Code and Codex. In Codex, review its hooks through `/hooks` and restart the session/app.
 
-- **Prompt:** Starship with custom config (`config/starship/starship.toml`)
-- **Plugins:** fzf-tab (via zfetch plugin manager)
-- **Completions:** kubectl, limactl, 1Password CLI — all behind `command -v` guards
-- **Node management:** fnm with auto-switch on `cd`
-- **Navigation:** zoxide (aliased to `cd`)
-- **Listing:** eza with icons and git status (`ll`, `l`)
-- **FZF:** fd-backed file finder with custom color scheme
-- **119 aliases** across navigation, git, docker, azure, AI tools, and more
-- **30+ functions** including `extract`, `ghmerge`, `jwt` decode, tmux helpers
-- **Local overrides:** `~/.localrc` sourced if present
+### Personal skills
 
-### Neovim
+Personal skill sources live in [hacker1db/skills](https://github.com/hacker1db/skills). `bin/skillctl` resolves a normal checkout at `~/Developer/skills` or its `main/` worktree, rebuilds the Go CLI for normal invocations, and reuses the last build for completion. Set `SKILLCTL_REPO_DIR` for another checkout. Follow that repository's README for selections and installation.
 
-Location: `config/nvim/` — lazy.nvim plugin manager, organized by category.
+`claude/skills/` contains legacy reading, research, writing, diagrams, review, security, and planning skills. Dotfiles preserves existing installed links but no longer installs or migrates this tree. New global skill setup belongs to skillctl. The OpenCode Supacode skill and project-only `bin/install-caido-skills` remain separate.
 
-| Category | Plugins |
-|----------|---------|
-| **Completion** | blink.cmp, LuaSnip (markdown templates from SecondBrain vault) |
-| **LSP** | mason.nvim, lspsaga (finder, diagnostics, calls, outline), lspconfig |
-| **Languages** | TypeScript tools, gopher.nvim (Go), markdown-oxide, harper-ls (grammar) |
-| **Formatting** | conform.nvim |
-| **Linting** | nvim-lint (markdownlint gutter-only, no virtual text) |
-| **Git** | fugitive, gitsigns, neogit, octo (GitHub PRs/issues) |
-| **UI** | snacks.nvim (explorer, picker, dashboard, notifier, indent, zen, terminal, lazygit), lualine, noice.nvim, which-key, trouble.nvim |
-| **Treesitter** | Full parsing with per-filetype fold overrides (markdown, PowerShell, JSON) |
-| **Telescope** | Git-specific pickers and extensions |
-| **Mini** | ai, comment, icons, pairs, surround, bracketed, diff |
-| **Extras** | Copilot, obsidian.nvim, render-markdown, colorizer, rainbow delimiters, todo-comments, undotree, maximizer |
-| **Debug** | DAP configuration |
-| **Theme** | Eldritch with custom diagnostic/heading highlights |
-
-**Snippets:** UltiSnips templates for markdown, TypeScript, HTML, JavaScript, gitcommit, vim, textile.
-
-```bash
-nvim --headless "+Lazy! sync" +qa   # headless plugin sync
-nvim +checkhealth                    # verify setup
-```
-
-### Tmux
-
-Config: `config/tmux/tmux.conf` — transparent status bar, vi-mode, mouse support.
-
-**Plugins (TPM):** sensible, resurrect, continuum (auto-save/restore), yank, battery, cpu, fzf-url, vim-tmux-navigator, nerd-font-window-name.
-
-**Features:** seamless Neovim/tmux navigation (hjkl), lazygit popup, gitmux status integration.
-
-### Ghostly Terminal
-
-Config: `config/ghostty/config` — 78% opacity with blur, JetBrains Mono 14pt italic with ligatures, linkarzu color theme, URL detection.
-
-### Git
-
-- **Global config:** `git/gitconfig.symlink` — generic, no accounts or signing required
-- **Local overrides:** `~/.gitconfig-local` auto-linked from `~/Developer/clitools/` if present, otherwise stub created
-- **Global ignore:** `git/gitignore_global.symlink`
-- **Hooks:** pre-commit (jscs, jshint), post-merge templates
-- **Account profiles (optional):** `git/profiles/<name>/` holds multi-account settings — host aliases, per-remote identities, and SSH auth/commit signing with keys served by the 1Password agent (looked up by item title via `agentkey.*` config, no key files on disk). Enable one with `DOTFILES_GIT_PROFILE=<name> ./install.sh git`; it links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`. Without a profile, Git and SSH use plain defaults.
-
-### Homebrew
-
-`install/install_tools.sh` manages:
-
-- **100+ formulas:** git, gh, neovim, go, rust, node, fzf, ripgrep, bat, eza, fd, starship, zoxide, tmux, lazygit, kubectl, k9s, helm, terraform, azure-cli, trivy, grype, trufflehog, pandoc, hugo, and more
-- **70+ casks:** Ghostty, Claude, 1Password, Obsidian, Docker Desktop, Cursor, Figma, Discord, Postman, Azure Data Studio, OBS, and more
-- **30+ taps:** 1password, azure, docker, hashicorp, oven-sh (bun), and more
-
-### Claude Code
-
-`claude/` directory symlinked to `~/.claude/` during install:
-
-- **19 agents** (oh-my-claudecode orchestration)
-- **15 custom commands**
-- **Shared skills** moving to the separate skills repository and its `skillctl` manager
-- **MCP server config** (`mcp.json`)
-- **HUD display** and statusline customization
-
-### Ponytail plugin
-
-`claude/settings.base.json` declares the Ponytail marketplace and enables the plugin for both Claude backends. Run `./install.sh ponytail` to install Ponytail for Claude Code and Codex; `./install.sh all` also runs this step after installing the CLIs. The installer skips plugins that are already installed and checks that an existing Ponytail marketplace uses `DietrichGebert/ponytail`.
-
-After installing in Codex, open `/hooks`, review Ponytail's two lifecycle hooks, and start a new chat. Restart the Codex desktop app to load the plugin.
-
-### Microsoft Foundry OpenAI
-
-Configure a separate Codex home with Azure CLI token authentication:
-
-```bash
-az login
-./install.sh codex-foundry \
-  --resource YOUR_FOUNDRY_OPENAI_RESOURCE \
-  --model YOUR_OPENAI_DEPLOYMENT_NAME
-```
-
-The generated `~/.codex_foundry/config.toml` uses `bin/azure-openai-token`
-as Codex's command-backed auth provider. It obtains short-lived Entra tokens
-from the active Azure CLI session and does not configure an API key.
-
-In T3 Code, add a second Codex provider with `CODEX_HOME` set to
-`~/.codex_foundry` and the binary path set to `/opt/homebrew/bin/codex`.
-
-### Custom Scripts (`Bin/`)
-
-| Script | Purpose |
-|--------|---------|
-| `e` | Editor shortcut |
-| `tm` | Tmux session manager |
-| `jwt` | JWT token decoder |
-| `git-bare-clone` | Enhanced bare repo cloning |
-| `git-kill` | Branch cleanup |
-| `git-recent` | Recent commit viewer |
-| `gbrt` | Git bare repo tool |
-| `tmux-reload-all` | Reload all tmux sessions |
-| `dotnet-install.sh` | .NET SDK installer |
-| `install-caido-skills` | Install official Caido skills and dependencies into one project |
-
-Install Caido skills only in projects that need them:
-
-```bash
+```sh
 install-caido-skills /path/to/project
 ```
 
-The command installs `caido/skills` under the project's `.agents/skills/`
-directory and does not run as part of the default dotfiles installation.
+### Plan-manager integration
 
-### MacOS Defaults
+[Plan-manager setup and troubleshooting](docs/plan-manager.md) documents the separate application checkout, `~/.local/bin/plan`, LaunchAgent, and Codex writable-root reconciliation. Dotfiles policy uses `~/Developer/plans` as the canonical library and `http://plans.localhost:4173/` as its local dashboard. The linker builds the application and checks its service; application source and plan data are not stored here. Publishing requires an explicit request.
 
-`install/osx.sh` sets: Finder preferences, Dock behavior, keyboard repeat rates, terminal encoding, and UI tweaks.
+### Codex with Microsoft Foundry
 
-### NvimTmux.App
-
-`install/nvimtmux.sh` creates a custom macOS app that opens files in Neovim inside tmux. Registers file associations via `duti` for 20+ file types.
-
-## Symlink Strategy
-
-All `*.symlink` files are linked into `$HOME` with a leading dot (e.g., `zshrc.symlink` → `~/.zshrc`). Directories under `config/` are linked to `~/.config/<name>/`. Claude Code configs are linked to `~/.claude/`.
-
-The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out locally at `~/Developer/skills/main`. Its `skillctl` CLI manages skill selection and installation for Codex, Claude Code, and GitHub Copilot CLI. The `bin/skillctl` launcher in this repo rebuilds the CLI from that checkout on every invocation, then runs it. Completion requests (`skillctl __complete …`, `skillctl completion …`) reuse the last build so Tab stays fast, and `zsh/completion.zsh` loads `skillctl completion zsh`. Go must be installed. Set `SKILLCTL_REPO_DIR` to use another checkout.
-
-The `claude/skills/` tree in this repo is legacy content awaiting migration. The dotfiles linker no longer adopts skills into that tree or installs them from it. Existing global links remain in place until they are migrated through `skillctl`. A fresh dotfiles installation leaves skill setup to the skills repository. Its catalog needs to be ready before switching the global links; follow its README for CLI usage.
-
-Re-running `./install.sh link` reconciles dotfiles symlinks, including vim compatibility links (`~/.vimrc`, `~/.vim`) and `~/.gitconfig-local`.
-
-## Theme Manager
-
-```bash
-./install.sh theme list           # list available themes
-./install.sh theme apply Eldritch # apply named theme
-./install.sh theme current        # show current theme
-./install.sh theme sync           # re-write integrations
+```sh
+az login
+./install.sh codex-foundry --resource YOUR_RESOURCE --model YOUR_DEPLOYMENT
 ```
 
-Applies across: Neovim colorscheme, Starship palette, Ghostty color scheme, tmux theme.
+This creates `~/.codex_foundry/config.toml`, using `bin/azure-openai-token` to obtain short-lived Entra tokens from Azure CLI. Start Codex with `CODEX_HOME="$HOME/.codex_foundry"`. A T3 Code provider can use the same environment and the installed Codex binary. Resource access and model deployments must already exist.
 
-## Safety
+## Symlinks and themes
 
-No secrets stored in repo. 1Password SSH agent handles commit signing and authentication.
+`*.symlink` sources map into `$HOME` with a leading dot; `config/*` maps into `~/.config/`. The general loops skip existing targets. Managed instruction links and selected integrations have their own replacement/backup behavior. In particular, a discovered clitools Git config replaces `~/.gitconfig-local`; preserve local edits before relinking. `link` may clone/update clitools and plan-manager, build dependencies, and start the dashboard service.
 
----
+```sh
+./install.sh theme list
+./install.sh theme apply eldritch
+./install.sh theme current
+./install.sh theme sync
+```
 
-Feel free to fork and adapt.
+The theme script writes Neovim, Starship, Ghostty, and tmux settings. Candidate names come from the terminal/tmux theme files; a listed name does not guarantee a matching theme for every application. These operations can modify tracked configuration.
+
+## Validation
+
+The installer fixture tests use temporary homes/repositories rather than changing live profiles or loading a LaunchAgent:
+
+```sh
+python3 install/tests/claude-profiles.test.py
+bash install/tests/claude-session.test.sh
+bash install/tests/plan-manager-bootstrap.test.sh
+node install/tests/plan-manager-harness-contracts.test.mjs
+zsh -n zsh/zshrc.symlink
+zsh -n zsh/functions.zsh
+git diff --check
+```
+
+These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers.

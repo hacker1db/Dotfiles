@@ -1,5 +1,7 @@
 # Native Claude Code profiles
 
+Profiles separate account configuration and history. For provider selection within the existing configuration directory, see [per-session launchers](../docs/claude-sessions.md).
+
 Run the installer from the dotfiles root:
 
 ```sh

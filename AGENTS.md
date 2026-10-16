@@ -14,7 +14,7 @@ This is a personal dotfiles repository for macOS development environment configu
 
 ## Project Structure
 
-```
+```text
 .dotfiles/
 ├── bin/                    # Custom scripts and utilities
 ├── config/                 # Application configurations (each dir is symlinked to ~/.config/<name>)
@@ -27,12 +27,13 @@ This is a personal dotfiles repository for macOS development environment configu
 ├── git/                   # Git configuration and templates
 ├── install/               # Installation scripts and Brewfile
 ├── zsh/                   # Zsh configuration files
-└── RECOMMENDED_CHANGES.md # Known issues and improvement suggestions
+└── docs/                  # Integration setup and troubleshooting
 ```
 
 ## Key Technologies & Tools
 
 ### Development Tools
+
 - **Editor**: Neovim (lazy.nvim plugin manager)
 - **Shell**: Zsh with custom completions
 - **Terminal**: Ghostty
@@ -43,12 +44,13 @@ This is a personal dotfiles repository for macOS development environment configu
 - **Prompt**: Starship
 
 ### Neovim Stack
+
 - **Plugin Manager**: lazy.nvim
 - **Completion**: blink.cmp (NOT nvim-cmp)
 - **LSP**: Native LSP with mason.nvim for server management
-- **File Explorer**: mini.files (replaced nvim-tree)
-- **Fuzzy Finder**: mini.pick (replaced telescope for files/buffers)
-- **AI Assistants**: avante.nvim (Claude/GPT), Copilot
+- **File Explorer**: Snacks explorer (replaced nvim-tree)
+- **Fuzzy Finder**: Snacks picker for files/buffers/help; Telescope remains for Git pickers
+- **AI Assistants**: Copilot and CopilotChat
 - **Git**: fugitive, gitsigns, neogit, octo.nvim
 - **Formatting**: conform.nvim
 - **Linting**: nvim-lint
@@ -57,7 +59,8 @@ This is a personal dotfiles repository for macOS development environment configu
 
 ### Languages & LSPs
 Configured LSP servers include:
-- TypeScript/JavaScript (ts_ls, eslint)
+
+- TypeScript/JavaScript (typescript-tools, eslint)
 - Go (gopls)
 - Lua (lua_ls)
 - Python (pyright)
@@ -65,24 +68,31 @@ Configured LSP servers include:
 - Docker (dockerls)
 - YAML (yamlls)
 - JSON (jsonls)
-- Markdown (marksman)
+- Markdown (markdown_oxide, harper_ls)
 
 ## Build, Test & Lint Commands
 
 ### Shell/Dotfiles
+
 ```bash
-# No Automated Tests For Dotfiles
+# Isolated installer checks
+python3 install/tests/claude-profiles.test.py
+bash install/tests/claude-session.test.sh
+bash install/tests/plan-manager-bootstrap.test.sh
+node install/tests/plan-manager-harness-contracts.test.mjs
+
 # Manual Testing: Source Configuration In New Shell
 source ~/.zshrc
 
 # Check For Zsh Syntax Errors
 zsh -n ~/.dotfiles/zsh/zshrc.symlink
 
-# Verify Symlinks Are Created
+# Install links and integrations (changes configuration and starts services)
 ~/.dotfiles/install/link.sh
 ```
 
 ### Neovim
+
 ```bash
 # No Automated Tests For Nvim Config
 # Manual Testing: Open Neovim And Check For Errors
@@ -96,12 +106,13 @@ nvim --headless "+Lazy! sync" +qa
 ```
 
 ### Installation
+
 ```bash
 # Install All Packages From Brewfile
 brew bundle --file=~/.dotfiles/install/brewfile
 
 # Run Full Installation Script
-~/.dotfiles/install.sh
+~/.dotfiles/install.sh all
 
 # Install Tools And Create Symlinks
 ~/.dotfiles/install/install_tools.sh
@@ -111,12 +122,14 @@ brew bundle --file=~/.dotfiles/install/brewfile
 ## Code Style & Conventions
 
 ### General
+
 - **NO COMMENTS** unless explicitly requested
 - Follow existing patterns in the codebase
 - Use existing libraries and utilities already installed
 - Check Brewfile before assuming a tool is available
 
 ### Neovim Lua
+
 - **Indentation**: 2 spaces
 - **Quotes**: Double quotes for strings
 - **Plugin structure**: Separate files per plugin in organized directories
@@ -127,6 +140,7 @@ brew bundle --file=~/.dotfiles/install/brewfile
   - `lua/plugins/extra/` - Miscellaneous plugins
 - **Keymaps**: Define in `lua/core/keymaps.lua` or plugin files
 - **Plugin format**: Return lazy.nvim spec table
+
   ```lua
   return {
     "author/plugin-name",
@@ -138,36 +152,42 @@ brew bundle --file=~/.dotfiles/install/brewfile
     end,
   }
   ```
+
 - **DO NOT** use nvim-cmp (replaced with blink.cmp)
-- **DO NOT** use nvim-tree (replaced with mini.files)
-- **Fuzzy finding**: Use mini.pick for files/buffers, telescope for git operations
+- **DO NOT** use nvim-tree (replaced with Snacks explorer)
+- **Fuzzy finding**: Use Snacks picker for files/buffers; preserve existing Telescope Git operations
 
 ### Shell Scripts (Zsh)
+
 - **Indentation**: 4 spaces
 - **Conditionals**: Use `[[ ]]` for tests
 - **Functions**: Define in `zsh/functions/` or `zsh/functions.zsh`
 - **Performance**: Always guard expensive commands (completions, evals) with existence checks
+
   ```zsh
   if command -v kubectl &> /dev/null; then
       source <(kubectl completion zsh)
   fi
   ```
+
 - **Avoid duplicates**: Check for existing functionality before adding
 
 ### Git Commits
+
 - **Format**: `type(scope): description`
 - **Types**: feat, fix, perf, refactor, docs, style, test, chore
 - **Scope**: nvim, zsh, tmux, git, install, etc.
 - **Examples**:
-  - `feat(nvim): add mini.pick fuzzy finder`
+  - `feat(nvim): configure Snacks picker`
   - `perf(zsh): remove duplicate compinit calls`
   - `fix(git): correct SSH signing configuration`
 
 ## Config Symlinking Convention
 
 All directories under `config/` are symlinked to `~/.config/<name>`. When adding a new app config:
+
 1. Create the directory at `~/.dotfiles/config/<appname>/`
-2. Remove any existing `~/.config/<appname>` directory
+2. Preserve or back up existing configuration before replacing its path
 3. Symlink: `ln -s ~/.dotfiles/config/<appname> ~/.config/<appname>`
 
 **Never create config files directly in `~/.config/`** — always source them from `~/.dotfiles/config/`.
@@ -183,17 +203,20 @@ All directories under `config/` are symlinked to `~/.config/<name>`. When adding
 ## Important Files & Patterns
 
 ### Neovim Keymaps
+
 - **Leader key**: Space
 - **Local leader**: `\`
-- **File operations**: `;e` (mini.files), `;f` (mini.pick files), `;fr` (recent)
-- **Search**: `;/` (grep), `;;` (help tags)
-- **Buffers**: `;bl` (buffer list)
+- **File operations**: `<leader>e` (Snacks explorer), `<leader>ff` (files), `<leader>fr` (recent)
+- **Search**: `<leader>/` (grep), `<leader>sh` (help)
+- **Buffers**: `<leader>,` (Snacks buffer picker)
 - **Git**: `<leader>gc` (commits), `<leader>gb` (branches)
 - **LSP**: `gd` (definition), `gr` (references), `K` (hover)
-- **AI**: `<leader>aa` (avante chat), `<leader>ae` (edit), `<leader>ar` (refresh)
+- **AI**: `:CopilotChat` and `:Copilot`; see `lua/plugins/extra/ai.lua`
 
 ### Zsh Functions
-Custom functions in `zsh/functions/`:
+Custom functions in `zsh/functions/`, `zsh/functions.zsh`, and `zsh/git.zsh`:
+
+- `wt-pull-all` - Delegate to the Worktrunk `pull-all` alias for this repository
 - `c` - Quick directory navigation
 - `h` - Command history search
 - `yy` - Yazi file manager with directory change
@@ -201,60 +224,67 @@ Custom functions in `zsh/functions/`:
 
 ### Git Hooks
 Template hooks in `git/templates/hooks/`:
+
 - `post-checkout` - Track recent branches
 - `post-merge` - Track recent merges
-- `pre-commit` - Run jscs/jshint checks
+- `pre-commit` - Dispatch JSCS/JSHint and optional Sonar checks
+- `pre-push` - Dispatch optional Sonar checks
 
 ## Hands Off
+
 - **NEVER** modify the Claude Code status line configuration (`~/.claude/settings.json` `statusLine` block) — the user manages this themselves
 
 ## Security & Best Practices
 
 ### Security
+
 - **NEVER** commit secrets or API keys
 - **NEVER** log or expose credentials
 - **NEVER** hardcode the username in paths (e.g. `/Users/username/...`) — always use `$HOME` or `~` instead
-- **Git signing**: Configured with 1Password SSH agent
-- **SSH approval caching**: 8 hours (28800s) in 1Password config
-- **compinit security**: Runs daily check, uses `-C` flag for performance
+- **Git signing**: Optional account profiles configure 1Password SSH agent signing
+- **SSH agent**: Configuration lives in `config/1Password/ssh/agent.toml`
+- **compinit**: Startup uses `-C`; do not assume it performs a daily security check
 
 ### Performance
-- **Shell startup**: Optimized to ~500ms (removed duplicates)
+
+- **Shell startup**: Measure locally; avoid unverified timing claims
 - **Lazy loading**: Plugins load on events, not at startup
-- **Completions**: Guarded behind command existence checks
+- **Completions**: Guard new external command invocations behind existence checks
 - **Caching**: Use caching where possible (compinit, plugin managers)
 
 ### Compatibility
+
 - **Platform**: macOS (darwin)
-- **Shell**: Zsh (not bash)
+- **Shell**: Zsh interactively; installer scripts use Bash
 - **Terminal**: Ghostty
 - **Package manager**: Homebrew
 
-## Known Issues & TODOs
+## Configuration boundaries
 
-See `RECOMMENDED_CHANGES.md` for detailed list of known issues and improvement suggestions.
-
-Key items:
-1. Install script has NVM check issue (needs `nvm install --lts` before `nvm use`)
-2. Consider evaluating Snacks.nvim for plugin consolidation
-3. Continue monitoring shell startup performance
+- The general linker skips existing configuration paths; selected managed integrations reconcile their own links.
+- Personal skills are maintained outside dotfiles; do not update the legacy `claude/skills/` tree.
+- lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories. Specs directly under `lua/plugins/` are not imported by this setup.
+- Use [README.md](README.md), [Claude profiles](claude/PROFILES.md), [session launchers](docs/claude-sessions.md), and [plan-manager integration](docs/plan-manager.md) for current setup details.
 
 ## Working With This Repository
 
 ### Before Making Changes
+
 1. Read existing code and follow patterns
 2. Check if tools/libraries are already installed (see Brewfile)
-3. Review `RECOMMENDED_CHANGES.md` for known issues
+3. Review the relevant README and integration guide under `docs/`
 4. Test changes in a new shell/nvim instance before committing
 
 ### Adding Neovim Plugins
+
 1. Check if functionality already exists
 2. Prefer mini.nvim ecosystem when possible
 3. Create new file in appropriate `lua/plugins/` subdirectory
 4. Update `lazy-lock.json` by syncing in nvim
-5. Document in `lua/plugins/mini/README.md` if using mini plugin
+5. Document in `lua/plugins/mini/mini.md` if using mini plugin
 
 ### Modifying Shell Config
+
 1. Guard expensive operations with command checks
 2. Avoid duplicating existing functionality
 3. Test startup time with `time zsh -i -c exit`

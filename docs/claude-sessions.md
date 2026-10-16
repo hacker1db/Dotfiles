@@ -1,5 +1,7 @@
 # Claude Code sessions
 
+These launchers select a provider for one invocation while using the existing Claude configuration directory. For separate account configuration and history, use [native profiles](../claude/PROFILES.md).
+
 Run these in separate terminal tabs or tmux panes:
 
 ```sh
