@@ -4,7 +4,8 @@ echo "Setting up Node global tools"
 
 if ! command -v pnpm &>/dev/null; then
   echo "pnpm not found, skipping Node global tools"
-  exit 0
+  # install.sh sources this script; return so later phases still run.
+  return 0 2>/dev/null || exit 0
 fi
 
 export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"

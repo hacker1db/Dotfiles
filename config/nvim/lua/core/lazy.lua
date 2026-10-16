@@ -13,6 +13,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+    -- top-level specs (undotree, mini-diff, mini-bracketed); subdirectories have no init.lua
+    { import = "plugins" },
     { import = "plugins.extra" },
     { import = "plugins.git" },
     { import = "plugins.ui" },

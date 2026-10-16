@@ -4,7 +4,7 @@ set -euo pipefail
 
 if ! command -v brew >/dev/null 2>&1; then
   echo Installing Homebrew
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  /bin/bash -c "$(curl --proto "=https" --tlsv1.2 -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 
 # Backup installation for when brew bundle is unreliable
@@ -202,7 +202,7 @@ if command -v pnpm >/dev/null 2>&1; then
   export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
   mkdir -p "$PNPM_HOME"
   export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
-  npm install --global yarn || true
+  npm install --global --ignore-scripts yarn || true
   yarn global add expo-cli || true
   pnpm add --global vercel || true
   pnpm add --global typescript typescript-language-server eslint prettier @github/copilot || true

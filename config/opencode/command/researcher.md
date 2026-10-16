@@ -42,7 +42,8 @@ Query Readwise for articles from the **last 7 days** about security vulnerabilit
 
 ```bash
 # Search for recent security articles (silent mode - no verbose output)
-curl -s -H "Authorization: Token $READWISE_TOKEN" \
+# Pass the token via a header file descriptor so it never appears in curl's argv.
+curl -s -H @<(printf 'Authorization: Token %s\n' "$READWISE_TOKEN") \
      "https://readwise.io/api/v3/list/?location=new&category=article&query=vulnerability CVE security" | \
      jq '.results[] | select(.created_at > (now - 604800)) | {title, url, author, created_at, id, reader_url}'
 
@@ -68,7 +69,7 @@ For articles with highlights, retrieve them to add context:
 
 ```bash
 # Get highlights for a specific document
-curl -s -H "Authorization: Token $READWISE_TOKEN" \
+curl -s -H @<(printf 'Authorization: Token %s\n' "$READWISE_TOKEN") \
      "https://readwise.io/api/v3/highlights/?document_id=DOCUMENT_ID" | \
      jq '.results[] | {text, highlighted_at, url}'
 ```

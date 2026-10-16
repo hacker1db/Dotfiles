@@ -248,7 +248,15 @@ if [ -n "$SOURCE_CANDIDATE" ]; then
     fi
   else
     if [ -e "$LOCAL_FILE" ]; then
-      rm -rf "$LOCAL_FILE"
+      LOCAL_BACKUP_BASE="$LOCAL_FILE.backup.$(date +%Y%m%d%H%M%S)"
+      LOCAL_BACKUP=$LOCAL_BACKUP_BASE
+      LOCAL_BACKUP_SUFFIX=0
+      while [[ -e "$LOCAL_BACKUP" || -L "$LOCAL_BACKUP" ]]; do
+        LOCAL_BACKUP_SUFFIX=$((LOCAL_BACKUP_SUFFIX + 1))
+        LOCAL_BACKUP="$LOCAL_BACKUP_BASE.$LOCAL_BACKUP_SUFFIX"
+      done
+      mv "$LOCAL_FILE" "$LOCAL_BACKUP" || exit 1
+      echo "Preserved existing $LOCAL_FILE: $LOCAL_BACKUP"
     fi
     ln -s "$SOURCE_CANDIDATE" "$LOCAL_FILE"
     echo "Linked $LOCAL_FILE -> $SOURCE_CANDIDATE"

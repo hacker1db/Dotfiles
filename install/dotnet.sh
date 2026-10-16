@@ -27,7 +27,7 @@ elif command -v dotnet-install.sh >/dev/null 2>&1; then
 else
     INSTALL_SCRIPT=$(mktemp)
     echo "Downloading Microsoft dotnet-install.sh..."
-    curl -fsSL "https://dot.net/v1/dotnet-install.sh" -o "$INSTALL_SCRIPT"
+    curl --proto "=https" --tlsv1.2 -fsSL "https://dot.net/v1/dotnet-install.sh" -o "$INSTALL_SCRIPT"
     chmod +x "$INSTALL_SCRIPT"
     DOWNLOADED=true
 fi

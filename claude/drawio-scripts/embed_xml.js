@@ -7,10 +7,21 @@
 'use strict';
 
 const fs = require('fs');
+const { inputPath, outputPath } = require('./safe_path');
 
-const [,,pngPath, drawioPath, outPath] = process.argv;
-if (!pngPath || !drawioPath || !outPath) {
+const [,,pngArg, drawioArg, outArg] = process.argv;
+if (!pngArg || !drawioArg || !outArg) {
   process.stderr.write('Usage: node embed_xml.js <input.png> <input.drawio> <output.png>\n');
+  process.exit(1);
+}
+
+let pngPath, drawioPath, outPath;
+try {
+  pngPath    = inputPath(pngArg, ['.png']);
+  drawioPath = inputPath(drawioArg, ['.drawio', '.xml']);
+  outPath    = outputPath(outArg, ['.png']);
+} catch (e) {
+  console.error(e.message);
   process.exit(1);
 }
 
@@ -61,4 +72,4 @@ while (off < pngBuf.length) {
 
 fs.writeFileSync(outPath, Buffer.concat(parts));
 const stat = fs.statSync(outPath);
-console.log(`Editable PNG saved: ${outPath} (${(stat.size/1024).toFixed(1)} KB)`);
+console.log(`Editable PNG saved: ${outArg} (${(stat.size/1024).toFixed(1)} KB)`);

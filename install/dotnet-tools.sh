@@ -12,7 +12,8 @@ fi
 
 if ! command -v dotnet >/dev/null 2>&1; then
     echo "dotnet not found, skipping .NET global tools"
-    exit 0
+    # install.sh sources this script; return so later phases still run.
+    return 0 2>/dev/null || exit 0
 fi
 
 export PATH="${DOTNET_ROOT:-}:$HOME/.dotnet/tools:$PATH"

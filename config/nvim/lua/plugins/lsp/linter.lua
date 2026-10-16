@@ -21,14 +21,14 @@ return {
                 javascript = { "eslint" },
                 json = { "jsonlint" },
                 go = {},
-                svelete = { "svelte-check" },
+                -- svelte: diagnostics come from the svelte language server (no nvim-lint adapter)
                 terraform = { "tflint" },
                 dockerfile = { "hadolint" },
                 codespell = { "codespell" },
-                primisma = { "prisma-lint" },
+                prisma = { "prisma-lint" },
                 ruby = { "rubocop" },
-                rust = { "cargo" },
-                ansible = { "ansible-lint" },
+                rust = { "clippy" },
+                ansible = { "ansible_lint" },
                 zsh = { "shellcheck", "zsh" },
             }
 

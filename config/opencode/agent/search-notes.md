@@ -145,8 +145,9 @@ Example inbound policy:
 # Build FAISS index from scratch
 opencode index build --source ~/notes/SecondBrain
 
-# Import Readwise highlights
-opencode index import --readwise --token $READWISE_TOKEN
+# Import Readwise highlights (token is read from $READWISE_TOKEN in the environment;
+# never pass it as a command-line argument, where process listings can capture it)
+opencode index import --readwise
 ```
 
 ### Incremental Updates

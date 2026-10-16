@@ -71,7 +71,8 @@ Retrieve token via: `op item get 37nc3retjhuxh6qafon4b65i6q --reveal --fields ap
 Use cascading tier search:
 ```bash
 # Fetch all recent articles
-curl -s -H "Authorization: Token $READWISE_TOKEN" \
+# Pass the token via a header file descriptor so it never appears in curl's argv.
+curl -s -H @<(printf 'Authorization: Token %s\n' "$READWISE_TOKEN") \
   "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=$PERIOD_START"
 
 # Apply tier filters using jq

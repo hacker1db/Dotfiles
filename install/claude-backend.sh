@@ -56,7 +56,15 @@ command -v jq >/dev/null 2>&1 || { error "jq is required but not installed"; exi
 [ -f "$BASE" ] || { error "Missing base settings: $BASE"; exit 1; }
 [ -f "$FRAGMENT" ] || { error "Missing fragment: $FRAGMENT"; exit 1; }
 
+# The generated file can carry credentials from the autoMode input, so keep it
+# private to the current user (mktemp creates files with mode 0600).
 mkdir -p "$GEN_DIR" "$HOME/.claude"
+chmod 700 "$GEN_DIR"
+
+# Merge into a temporary file and move it into place only on success, so a
+# failed merge never truncates the settings file already linked into ~/.claude.
+TMP_GEN="$(mktemp "$GEN_DIR/settings.generated.XXXXXX")"
+trap 'rm -f "$TMP_GEN"' EXIT
 
 # Deep-merge: keys in the fragment win, env objects are merged key by key.
 # Local autoMode.environment file — not committed to git, shared across backends.
@@ -84,21 +92,46 @@ if [ "$backend" = "foundry" ]; then
     exit 1
   fi
   if [ -f "$LOCAL_AUTOMODE" ]; then
-    jq -s --arg res "$resource" '.[0] * .[1] * .[2] * .[3] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$GEN"
+    jq -s --arg res "$resource" '.[0] * .[1] * .[2] * .[3] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$TMP_GEN"
     info "Resolved Claude backend: foundry (resource: $resource, autoMode: $LOCAL_AUTOMODE)"
   else
-    jq -s --arg res "$resource" '.[0] * .[1] * .[2] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" > "$GEN"
+    jq -s --arg res "$resource" '.[0] * .[1] * .[2] | .env.ANTHROPIC_FOUNDRY_RESOURCE = $res' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" > "$TMP_GEN"
     info "Resolved Claude backend: foundry (resource: $resource)"
   fi
 else
   if [ -f "$LOCAL_AUTOMODE" ]; then
-    jq -s '.[0] * .[1] * .[2] * .[3]' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$GEN"
+    jq -s '.[0] * .[1] * .[2] * .[3]' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" "$LOCAL_AUTOMODE" > "$TMP_GEN"
     info "Resolved Claude backend: $backend (autoMode: $LOCAL_AUTOMODE)"
   else
-    jq -s '.[0] * .[1] * .[2]' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" > "$GEN"
+    jq -s '.[0] * .[1] * .[2]' "$BASE" "$CLAUDE_DIR/settings.work.json" "$FRAGMENT" > "$TMP_GEN"
     info "Resolved Claude backend: $backend"
   fi
 fi
+
+# Preserve user-owned settings from the current ~/.claude/settings.json: a
+# custom statusLine and any hook registrations that do not run a managed
+# command. Managed hooks always come from the repository fragments.
+if [ -f "$DEST" ] && jq -e 'type == "object"' "$DEST" >/dev/null 2>&1; then
+  TMP_MERGED="$(mktemp "$GEN_DIR/settings.merged.XXXXXX")"
+  trap 'rm -f "$TMP_GEN" "$TMP_MERGED"' EXIT
+  jq -s '
+    .[0] as $gen | .[1] as $old
+    | [($gen.hooks // {})[][] | .hooks[]? | .command] as $managed
+    | $gen
+    | if $old.statusLine then .statusLine = $old.statusLine else . end
+    | reduce (($old.hooks // {}) | to_entries[]) as $e (.;
+        reduce ($e.value[]
+                | select([.hooks[]?.command] | all(. as $c | $managed | index([$c]) | not))) as $r (.;
+          if ((.hooks[$e.key] // []) | index([$r])) then .
+          else .hooks[$e.key] = ((.hooks[$e.key] // []) + [$r]) end))
+  ' "$TMP_GEN" "$DEST" > "$TMP_MERGED"
+  mv -f "$TMP_MERGED" "$TMP_GEN"
+fi
+
+chmod 600 "$TMP_GEN"
+mv -f "$TMP_GEN" "$GEN"
+# install.sh sources this script; do not leave the cleanup trap behind.
+trap - EXIT
 
 link() {
   rm -f "$DEST"

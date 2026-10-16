@@ -31,7 +31,8 @@ curl -s "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerab
 
 **4. Readwise articles (one call, client-side filtering):**
 ```bash
-curl -s -H "Authorization: Token $READWISE_TOKEN" \
+# Pass the token via a header file descriptor so it never appears in curl's argv.
+curl -s -H @<(printf 'Authorization: Token %s\n' "$READWISE_TOKEN") \
   "https://readwise.io/api/v3/list/?location=new&category=article&paginate_by=50" | \
   jq --arg c "$CUTOFF" '[.results[] | select(.created_at >= $c) | {title,url,author,created_at,id}]'
 ```

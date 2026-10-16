@@ -10,6 +10,7 @@
 const fs   = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
+const { inputPath, outputPath } = require('./safe_path');
 const MXGRAPH_JS = path.resolve(__dirname, 'node_modules/mxgraph/javascript/mxClient.js');
 
 // ─── 1. Parse drawio XML → cell list ──────────────────────────────────────
@@ -110,6 +111,36 @@ function parseStyle(s) {
     if (i > 0) r[p.slice(0,i).trim()] = p.slice(i+1).trim();
   });
   return r;
+}
+
+// Diagram content is untrusted: escape every value at its HTML/SVG sink.
+function esc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Accept only plain colour tokens (#hex or a CSS keyword) from diagram styles.
+function safeColor(v, fallback) {
+  return (typeof v === 'string' && /^(#[0-9a-fA-F]{3,8}|[a-zA-Z]+)$/.test(v)) ? v : fallback;
+}
+
+function safeNum(v, fallback) {
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+// Hex digits only: the value is reused inside a marker id and url(#...).
+function safeHexToken(v, fallback) {
+  const h = (v || '').replace('#','').toLowerCase();
+  return /^[0-9a-f]{3,8}$/.test(h) ? h : fallback;
+}
+
+function safeHttpUrl(v) {
+  try {
+    const u = new URL(v);
+    return (u.protocol === 'https:' || u.protocol === 'http:') ? u.href : '';
+  } catch { return ''; }
 }
 
 function classify(c) {
@@ -232,26 +263,26 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
   const titleCell= cells.find(c => classify(c) === 'title');
   const metaCell = cells.find(c => classify(c) === 'metadata');
   const srcCell  = cells.find(c => c.link && c.link.includes('github'));
-  const githubUrl = srcCell ? srcCell.link : '';
+  const githubUrl = srcCell ? safeHttpUrl(srcCell.link) : '';
 
-  const titleText = titleCell ? titleCell.label : diagramName;
+  const titleText = esc(titleCell ? titleCell.label : diagramName);
   const metaLines = metaCell
     ? metaCell.label.split(/\n|<br>/).map(l => {
         const i = l.indexOf(':');
-        return i>0 ? `<b>${l.slice(0,i+1)}</b>${l.slice(i+1)}` : l;
+        return i>0 ? `<b>${esc(l.slice(0,i+1))}</b>${esc(l.slice(i+1))}` : esc(l);
       }).join('<br>')
     : '';
 
   let svgZones = '';
   zones.forEach(z => {
     const st = parseStyle(z.style);
-    const fill   = st.fillColor  || '#f5f5f5';
-    const stroke = st.strokeColor|| '#999';
+    const fill   = safeColor(st.fillColor, '#f5f5f5');
+    const stroke = safeColor(st.strokeColor, '#999');
     const isDash = z.style.includes('dashed=1');
-    const opacity= Math.min(parseFloat(st.opacity||'100')/100, 0.28);
+    const opacity= Math.min(safeNum(st.opacity, 100)/100, 0.28);
     const rgb    = hexToRgb(fill);
     const fillCss= rgb ? `rgba(${rgb.r},${rgb.g},${rgb.b},${opacity})` : fill;
-    const arcSize= parseFloat(st.arcSize||'7')/100;
+    const arcSize= safeNum(st.arcSize, 7)/100;
     const rx     = Math.round(arcSize * Math.min(tw(z.w), th(z.h)) / 2 * 2);
     const dashAttr= isDash ? 'stroke-dasharray="7,4"' : '';
     const sw     = isDash ? '1.5' : '2';
@@ -261,12 +292,12 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
             rx="${rx}" fill="${fillCss}" stroke="${stroke}" stroke-width="${sw}" ${dashAttr}/>
       ${labelClean ? `<text x="${tx(z.ax)+14}" y="${ty(z.ay)+18}"
             font-family="'Segoe UI',Arial,sans-serif" font-size="12.5" font-weight="700"
-            fill="${stroke}">${labelClean.replace(/</g,'&lt;').slice(0,60)}</text>` : ''}`;
+            fill="${stroke}">${esc(labelClean.slice(0,60))}</text>` : ''}`;
   });
 
   const arrowColors = new Set(['5b8ec2','82b366','b85450','9673a6','888888','6c8ebf']);
   edges.forEach(e => {
-    const sc = (parseStyle(e.style).strokeColor || '#6c8ebf').replace('#','').toLowerCase();
+    const sc = safeHexToken(parseStyle(e.style).strokeColor, '6c8ebf');
     arrowColors.add(sc);
   });
   let defs = '<defs>';
@@ -286,8 +317,8 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
     const cx2 = tx(tgt.ax + tgt.w/2);
     const cy2 = ty(tgt.ay + tgt.h/2);
     const st   = parseStyle(e.style);
-    const sc   = (st.strokeColor || '#6c8ebf').replace('#','').toLowerCase();
-    const sw   = st.strokeWidth || '2.2';
+    const sc   = safeHexToken(st.strokeColor, '6c8ebf');
+    const sw   = safeNum(st.strokeWidth, 2.2);
     const dash = e.style.includes('dashed=1') ? 'stroke-dasharray="6,4"' : '';
     const marker = `marker-end="url(#ah-${sc})"`;
     const mx = (cx1 + cx2) / 2;
@@ -298,8 +329,8 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
   let iconHtml = '';
   icons.forEach(ic => {
     const st     = parseStyle(ic.style);
-    const fill   = st.fillColor  || '#e3f2fd';
-    const stroke = st.strokeColor|| '#1565c0';
+    const fill   = safeColor(st.fillColor, '#e3f2fd');
+    const stroke = safeColor(st.strokeColor, '#1565c0');
     const shape  = st.shape      || '';
     const grad   = `linear-gradient(145deg,${lightenHex(fill,35)},${fill})`;
     const SIZE   = 62;
@@ -314,15 +345,15 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
         ${iconSvg(shape, fill, stroke)}
       </div>
       ${ic.label ? `<div style="font-size:11px;font-weight:700;color:#111;max-width:106px;
-                                line-height:1.3;font-family:'Segoe UI',Arial,sans-serif;">${ic.label}</div>` : ''}
+                                line-height:1.3;font-family:'Segoe UI',Arial,sans-serif;">${esc(ic.label)}</div>` : ''}
     </div>`;
   });
 
   let actorHtml = '';
   actors.forEach(a => {
     const st     = parseStyle(a.style);
-    const fill   = st.fillColor  || '#f8cecc';
-    const stroke = st.strokeColor|| '#b85450';
+    const fill   = safeColor(st.fillColor, '#f8cecc');
+    const stroke = safeColor(st.strokeColor, '#b85450');
     const grad   = `linear-gradient(145deg,${lightenHex(fill,30)},${fill})`;
     const SIZE   = 52;
     const cx     = tx(a.ax + a.w/2) - SIZE/2;
@@ -339,7 +370,7 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
         </svg>
       </div>
       ${a.label ? `<div style="font-size:10.5px;font-weight:700;color:${stroke};max-width:92px;
-                               line-height:1.3;font-family:'Segoe UI',Arial,sans-serif;">${a.label}</div>` : ''}
+                               line-height:1.3;font-family:'Segoe UI',Arial,sans-serif;">${esc(a.label)}</div>` : ''}
     </div>`;
   });
 
@@ -353,7 +384,7 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
                 font-size:10.5px;font-weight:800;color:#01426A;
                 font-family:'Segoe UI',Arial,sans-serif;
                 box-shadow:0 1px 5px rgba(0,200,240,0.35);z-index:20;">
-      ${b.label}
+      ${esc(b.label)}
     </div>`;
   });
 
@@ -362,7 +393,7 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
       <div style="width:22px;height:22px;border-radius:50%;background:#c0f7ff;border:2.5px solid #00cff0;
            display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;
            color:#01426A;flex-shrink:0;font-family:'Segoe UI',Arial,sans-serif;">${i+1}</div>
-      <div style="font-size:10.5px;color:#01426A;line-height:1.5;font-family:'Segoe UI',Arial,sans-serif;">${s.label}</div>
+      <div style="font-size:10.5px;color:#01426A;line-height:1.5;font-family:'Segoe UI',Arial,sans-serif;">${esc(s.label)}</div>
     </div>`).join('');
 
   const SH = `font-size:9px;font-weight:800;color:#bbb;text-transform:uppercase;letter-spacing:1.3px;
@@ -475,7 +506,7 @@ ${panel}
 </div>
 <div style="position:absolute;bottom:9px;left:${PAD}px;font-size:9px;color:#bbb;
      font-family:'Segoe UI',Arial,sans-serif;">
-  ${githubUrl ? `Source: ${githubUrl}` : ''}
+  ${githubUrl ? `Source: ${esc(githubUrl)}` : ''}
 </div>
 
 </div></body></html>`, totalW, totalH };
@@ -483,8 +514,9 @@ ${panel}
 
 // ─── 6. Main ──────────────────────────────────────────────────────────────
 
-async function main(inputFile, outputFile, pageIndex) {
-  if (!fs.existsSync(inputFile)) throw new Error(`Not found: ${inputFile}`);
+async function main(inputArg, outputArg, pageIndex) {
+  const inputFile  = inputPath(inputArg, ['.drawio', '.xml']);
+  const outputFile = outputPath(outputArg, ['.html', '.htm']);
   const xml = fs.readFileSync(inputFile, 'utf8');
   console.log(`Parsing: ${path.basename(inputFile)}`);
 
@@ -494,10 +526,10 @@ async function main(inputFile, outputFile, pageIndex) {
   const { html, totalW, totalH } = buildHtml(parsed);
 
   fs.writeFileSync(outputFile, html, 'utf8');
-  console.log(`  HTML saved: ${outputFile} (${totalW}x${totalH}px)`);
+  console.log(`  HTML saved: ${outputArg} (${totalW}x${totalH}px)`);
   console.log(JSON.stringify({ width: totalW, height: totalH }));
 }
 
 const [,,inp,out,pg] = process.argv;
 if (!inp || !out) { process.stderr.write('Usage: node render_drawio_html.js <in.drawio> <out.html> [page]\n'); process.exit(1); }
-main(inp, out, parseInt(pg||'0',10)).catch(e=>{ console.error(e.message); process.exit(1); });
+main(inp, out, Math.max(0, parseInt(pg||'0',10) || 0)).catch(e=>{ console.error(e.message); process.exit(1); });

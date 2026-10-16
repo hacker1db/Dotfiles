@@ -13,7 +13,7 @@ local formatters = {
     go              = { "goimports", "gofmt" },
     lua             = { "stylua" },
     python          = { "isort", "black" },
-    csharp          = { "csharpier" }, -- or { "dotnet_format" }
+    cs              = { "csharpier" }, -- or { "dotnet_format" }
 }
 
 return {

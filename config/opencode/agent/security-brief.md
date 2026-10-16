@@ -24,7 +24,8 @@ Instead of searching for exact keywords in titles, use this cascading search:
 
 ```bash
 # Step 1: Get ALL recent unread articles (location=new)
-curl -s -H "Authorization: Token $READWISE_TOKEN" \
+# Pass the token via a header file descriptor so it never appears in curl's argv.
+curl -s -H @<(printf 'Authorization: Token %s\n' "$READWISE_TOKEN") \
      "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=YYYY-MM-DD" \
      | jq '.results[]'
 
@@ -75,7 +76,7 @@ READWISE_TOKEN=$(op item get YOUR_ITEM_ID --reveal --fields apikey 2>/dev/null)
 SEVEN_DAYS_AGO=$(date -v-7d +%Y-%m-%dT%H:%M:%S)
 
 # Fetch all recent articles
-ARTICLES=$(curl -s -H "Authorization: Token $READWISE_TOKEN" \
+ARTICLES=$(curl -s -H @<(printf 'Authorization: Token %s\n' "$READWISE_TOKEN") \
   "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=$SEVEN_DAYS_AGO")
 
 # Tier 1: Direct security matches (title, author, source)
@@ -130,7 +131,7 @@ YOUR_SECURITY_FEEDS=(
 # Build query for only those feeds
 FEED_FILTER=$(printf "rssSource:%s OR " "${YOUR_SECURITY_FEEDS[@]}" | sed 's/ OR $//')
 
-curl -s -H "Authorization: Token $READWISE_TOKEN" \
+curl -s -H @<(printf 'Authorization: Token %s\n' "$READWISE_TOKEN") \
   "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=$SEVEN_DAYS_AGO" \
   | jq --arg feeds "$FEED_FILTER" '
     .results[] | 
@@ -283,7 +284,7 @@ Run this to test the new criteria:
 READWISE_TOKEN=$(op item get 37nc3retjhuxh6qafon4b65i6q --reveal --fields apikey 2>/dev/null)
 SEVEN_DAYS_AGO=$(date -v-7d +%Y-%m-%dT%H:%M:%S)
 
-curl -s -H "Authorization: Token $READWISE_TOKEN" \
+curl -s -H @<(printf 'Authorization: Token %s\n' "$READWISE_TOKEN") \
   "https://readwise.io/api/v3/list/?location=new&category=article&updatedAfter=$SEVEN_DAYS_AGO" \
   | jq -r '
     .results[] | 

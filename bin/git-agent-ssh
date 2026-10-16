@@ -13,7 +13,15 @@ done
 title=$(git config --get "agentkey.$host.title" || true)
 [ -n "$title" ] || [ "$host" = github.com ] || exec ssh "$@"
 
-key=$("$(dirname "$0")/git-agent-key" ${title:+"$title"}) || exec ssh "$@"
+if ! key=$("$(dirname "$0")/git-agent-key" ${title:+"$title"}); then
+    # A managed account must never fall back to unrestricted key selection,
+    # or SSH may authenticate as a different GitHub account.
+    if [ -n "$title" ]; then
+        echo "git-agent-ssh: could not select agent key \"$title\" for $host" >&2
+        exit 1
+    fi
+    exec ssh "$@"
+fi
 
 dir=$(mktemp -d "${TMPDIR:-/tmp}/git-agent-ssh.XXXXXX") || exit 1
 trap 'rm -rf "$dir"' EXIT

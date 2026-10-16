@@ -25,7 +25,7 @@ class SonarQubeWorkflowTest(unittest.TestCase):
     def test_scan_uses_cloud_project_settings(self):
         self.assertRegex(WORKFLOW, r'(?m)^permissions:\n  contents: read$')
         self.assertIn('fetch-depth: 0', WORKFLOW)
-        self.assertRegex(WORKFLOW, r'SonarSource/sonarqube-scan-action@v\d+\.\d+\.\d+')
+        self.assertRegex(WORKFLOW, r'SonarSource/sonarqube-scan-action@[0-9a-f]{40} # v\d+\.\d+\.\d+')
         self.assertIn('SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}', WORKFLOW)
         self.assertIn('-Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}', WORKFLOW)
         self.assertIn('-Dsonar.projectKey=hacker1db_Dotfiles', WORKFLOW)
@@ -36,7 +36,12 @@ class SonarQubeWorkflowTest(unittest.TestCase):
     def test_lint_checks_shell_zsh_and_lua(self):
         self.assertIn("'*.sh' '*.bash' ':(exclude)bin/dotnet-install.sh' | xargs -0 shellcheck -S error", WORKFLOW)
         self.assertIn('zsh -n "$file"', WORKFLOW)
-        self.assertIn('lunarmodules/luacheck@v1.2.0', WORKFLOW)
+        self.assertRegex(WORKFLOW, r'lunarmodules/luacheck@[0-9a-f]{40} # v1\.2\.0')
+
+    def test_actions_are_pinned_to_commit_shas(self):
+        import re
+        for ref in re.findall(r'uses: (\S+)', WORKFLOW):
+            self.assertRegex(ref, r'@[0-9a-f]{40}$')
 
 
 if __name__ == '__main__':

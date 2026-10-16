@@ -7,7 +7,7 @@ vim.api.nvim_create_autocmd("FileType", {
     pattern = "markdown",
     callback = function(ev)
         vim.wo.foldmethod = "expr"
-        vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
+        vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
         vim.wo.foldlevel = 99
 
         -- Auto-close folds after a short delay, but skip daily notes
