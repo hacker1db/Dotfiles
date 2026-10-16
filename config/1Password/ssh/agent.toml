@@ -9,3 +9,7 @@ vault = "Private"
 [[ssh-keys]]
 item = "d6gsj3axc6v54vnlg5imtb6nqy"
 vault = "Work"
+
+[[ssh-keys]]
+item = "gzuythinigjqx5oowxyyrhqdai"
+vault = "automation"
