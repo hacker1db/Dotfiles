@@ -1,0 +1,55 @@
+[core]
+    sshCommand = ~/.dotfiles/bin/git-agent-ssh
+    hooksPath = ~/.sonar/sonarqube-cli/hooks
+[gpg]
+    format = ssh
+[gpg "ssh"]
+    program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+    defaultKeyCommand = sh -c ~/.dotfiles/bin/git-agent-signing-key
+    allowedSignersFile = ~/.ssh/allowed_signers
+[commit]
+    gpgsign = true
+
+[url "ssh://git@github.com/"]
+    insteadOf = https://github.com/
+[credential "https://github.com"]
+    helper =
+    helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+    helper =
+    helper = !/opt/homebrew/bin/gh auth git-credential
+[url "git@github-hacker1db:hacker1db/"]
+    insteadOf = git@github.com:hacker1db/
+[url "git@hb1:zerobitconsulting/"]
+    insteadOf = git@github.com:zerobitconsulting/
+    insteadOf = https://github.com/zerobitconsulting/
+
+[agentkey "hb1"]
+    title = Github personal
+[agentkey "github-hacker1db"]
+    title = Github personal
+[agentkey "github-cyberdso"]
+    title = Github Work
+[agentkey "6212228+hacker1db@users.noreply.github.com"]
+    title = Github personal
+[agentkey "hacker1db@hacker1db.dev"]
+    title = Github personal
+[agentkey "177144687+CyberDSO@users.noreply.github.com"]
+    title = Github Work
+
+[includeIf "hasconfig:remote.*.url:git@github-hacker1db:*/**"]
+    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+[includeIf "hasconfig:remote.*.url:git@hb1:*/**"]
+    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+[includeIf "hasconfig:remote.*.url:git@github.com:hacker1db/**"]
+    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+[includeIf "hasconfig:remote.*.url:https://github.com/hacker1db/**"]
+    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/hacker1db/**"]
+    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+[includeIf "hasconfig:remote.*.url:git@github.com:zerobitconsulting/**"]
+    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+[includeIf "hasconfig:remote.*.url:https://github.com/zerobitconsulting/**"]
+    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+[includeIf "hasconfig:remote.*.url:git@github-cyberdso:*/**"]
+    path = ~/.dotfiles/git/profiles/hacker1db/identities/cyberdso.gitconfig

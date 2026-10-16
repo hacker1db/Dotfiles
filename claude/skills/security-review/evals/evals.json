@@ -1,0 +1,39 @@
+{
+  "skill_name": "security-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run a security review on my staged changes. Look for secrets, injection risks, auth mistakes, and unsafe defaults.",
+      "expected_output": "A security-focused staged-diff review with risk level, findings, dependency concerns, and remediation priorities.",
+      "files": [],
+      "assertions": [
+        "The response checks staged changes with `git diff --cached --name-only` or equivalent before scanning.",
+        "The response analyzes injection, authentication, sensitive data exposure, dependencies, input validation, and security misconfiguration.",
+        "The response includes a risk level and finding counts by severity.",
+        "The response says no issues were found explicitly when the scan is clean."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Audit this before I commit. I added a config file and a new package.",
+      "expected_output": "A staged security audit that pays attention to configuration defaults and new dependencies.",
+      "files": [],
+      "assertions": [
+        "The response identifies new dependencies as a dedicated dependency concern area.",
+        "The response checks for hardcoded hosts, debug flags, credentials, and unsafe defaults.",
+        "The response orders remediation priorities by severity."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Please check whether this staged diff leaks keys or introduces command injection.",
+      "expected_output": "A targeted security review that prominently reports any leaked secrets or command injection concerns.",
+      "files": [],
+      "assertions": [
+        "The response treats secrets and command injection as high-priority checks.",
+        "The response includes file:line locations for any findings.",
+        "The response includes actionable recommendations and a diff patch when the fix is clear."
+      ]
+    }
+  ]
+}

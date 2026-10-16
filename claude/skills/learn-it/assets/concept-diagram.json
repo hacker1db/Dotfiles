@@ -1,0 +1,259 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "learn-it-skill",
+  "elements": [
+    {
+      "type": "ellipse",
+      "id": "topicNode",
+      "x": 340,
+      "y": 180,
+      "width": 220,
+      "height": 80,
+      "strokeColor": "#1971c2",
+      "backgroundColor": "#4dabf7",
+      "fillStyle": "solid",
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "topicLabel"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "topicLabel",
+      "x": 355,
+      "y": 206,
+      "width": 190,
+      "height": 28,
+      "text": "[TOPIC]",
+      "fontSize": 18,
+      "textAlign": "center",
+      "containerId": "topicNode"
+    },
+    {
+      "type": "rectangle",
+      "id": "step1",
+      "x": 60,
+      "y": 340,
+      "width": 180,
+      "height": 60,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "step1Label"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "step1Label",
+      "x": 70,
+      "y": 358,
+      "width": 160,
+      "height": 24,
+      "text": "[Step 1 name]",
+      "fontSize": 14,
+      "textAlign": "center",
+      "containerId": "step1"
+    },
+    {
+      "type": "rectangle",
+      "id": "step2",
+      "x": 310,
+      "y": 340,
+      "width": 180,
+      "height": 60,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "step2Label"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "step2Label",
+      "x": 320,
+      "y": 358,
+      "width": 160,
+      "height": 24,
+      "text": "[Step 2 name]",
+      "fontSize": 14,
+      "textAlign": "center",
+      "containerId": "step2"
+    },
+    {
+      "type": "rectangle",
+      "id": "step3",
+      "x": 560,
+      "y": 340,
+      "width": 180,
+      "height": 60,
+      "strokeColor": "#2f9e44",
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "step3Label"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "step3Label",
+      "x": 570,
+      "y": 358,
+      "width": 160,
+      "height": 24,
+      "text": "[Step 3 name]",
+      "fontSize": 14,
+      "textAlign": "center",
+      "containerId": "step3"
+    },
+    {
+      "type": "rectangle",
+      "id": "ahaNode",
+      "x": 290,
+      "y": 480,
+      "width": 220,
+      "height": 70,
+      "strokeColor": "#e67700",
+      "backgroundColor": "#ffd43b",
+      "fillStyle": "solid",
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "ahaLabel"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "ahaLabel",
+      "x": 300,
+      "y": 502,
+      "width": 200,
+      "height": 26,
+      "text": "\ud83d\udca1 [Aha insight label]",
+      "fontSize": 14,
+      "textAlign": "center",
+      "containerId": "ahaNode"
+    },
+    {
+      "type": "arrow",
+      "id": "a1",
+      "x": 400,
+      "y": 260,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          -220,
+          80
+        ]
+      ],
+      "startBinding": {
+        "elementId": "topicNode",
+        "gap": 5,
+        "focus": -0.5
+      },
+      "endBinding": {
+        "elementId": "step1",
+        "gap": 5,
+        "focus": 0
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a2",
+      "x": 450,
+      "y": 260,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          80
+        ]
+      ],
+      "startBinding": {
+        "elementId": "topicNode",
+        "gap": 5,
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "step2",
+        "gap": 5,
+        "focus": 0
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a3",
+      "x": 500,
+      "y": 260,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          220,
+          80
+        ]
+      ],
+      "startBinding": {
+        "elementId": "topicNode",
+        "gap": 5,
+        "focus": 0.5
+      },
+      "endBinding": {
+        "elementId": "step3",
+        "gap": 5,
+        "focus": 0
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "a4",
+      "x": 400,
+      "y": 400,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          80
+        ]
+      ],
+      "startBinding": {
+        "elementId": "step2",
+        "gap": 5,
+        "focus": 0
+      },
+      "endBinding": {
+        "elementId": "ahaNode",
+        "gap": 5,
+        "focus": 0
+      }
+    }
+  ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff"
+  }
+}

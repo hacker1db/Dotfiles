@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+AZURE_CLI="${AZURE_CLI_PATH:-}"
+if [ -z "$AZURE_CLI" ]; then
+  AZURE_CLI="$(command -v az || true)"
+fi
+if [ -z "$AZURE_CLI" ] && [ -x "/opt/homebrew/bin/az" ]; then
+  AZURE_CLI="/opt/homebrew/bin/az"
+fi
+if [ -z "$AZURE_CLI" ] && [ -x "/usr/local/bin/az" ]; then
+  AZURE_CLI="/usr/local/bin/az"
+fi
+
+if [ -z "$AZURE_CLI" ] || [ ! -x "$AZURE_CLI" ]; then
+  printf '%s\n' "Azure CLI (az) is required to obtain an Azure OpenAI token." >&2
+  exit 1
+fi
+
+exec "$AZURE_CLI" account get-access-token \
+  --scope "https://cognitiveservices.azure.com/.default" \
+  --query accessToken \
+  --output tsv

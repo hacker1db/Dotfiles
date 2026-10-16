@@ -1,0 +1,54 @@
+# Filename: ~/github/dotfiles-latest/.markdownlint.yaml
+# Markdownlint configuration
+# Reference: https://github.com/DavidAnson/markdownlint
+
+# Usage:
+# - New: Use with mfussenegger/nvim-lint and point to this file.
+# - Old: Copy this file into each working directory (e.g., obsidian_main, linkarzu.github.io).
+#   Note: Copying to ~/github alone may not apply settings—check with `:pwd`.
+
+# Rule configurations:
+
+# MD004 - Unordered list style
+# Disabled due to TOC warnings for using symbols other than '-'
+MD004: false
+
+# MD007 - Unordered list indentation
+# Disabled for compatibility with Confluence (uses 4-space indents)
+MD007: false
+
+# MD010 - Hard tabs
+# Allow hard tabs in code blocks
+MD010:
+    code_blocks: false
+
+# MD012 - Multiple consecutive blank lines
+# Increased max to avoid false positives at EOF
+MD012:
+    maximum: 2
+
+# MD013 - Line length
+# Disabled due to autoformatting and long markdown links
+MD013: false
+
+# MD030 - Spaces after list markers
+# Disabled for Confluence compatibility
+MD030: false
+
+# MD033 - Inline HTML
+# Disabled to allow HTML in markdown (e.g., GitHub READMEs)
+MD033: false
+# allowed_elements: ["a", "img", "div"]  # Optional customization
+
+# MD025 - Multiple top-level headings
+MD025: false
+
+# MD026 - Trailing punctuation in headings
+MD026: false
+# punctuation: ".,;:!。，；：！"  # Optional customization
+
+# MD022 - Headings should be surrounded by blank lines
+MD022: false
+
+# MD034 - Disallow bare URLs
+MD034: false

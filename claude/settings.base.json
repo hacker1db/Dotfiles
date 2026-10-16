@@ -1,0 +1,65 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "cli-anything@cli-anything": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "oh-my-claudecode@omc": true,
+    "frontend-design@claude-plugins-official": true,
+    "ponytail@ponytail": true
+  },
+  "extraKnownMarketplaces": {
+    "cli-anything": {
+      "source": {
+        "source": "github",
+        "repo": "HKUDS/CLI-Anything"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
+    "omc": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/Yeachan-Heo/oh-my-claudecode.git"
+      }
+    },
+    "claude-code-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code"
+      }
+    }
+  },
+  "plansDirectory": "~/Developer/plans",
+  "effortLevel": "high",
+  "theme": "dark-daltonized",
+  "editorMode": "vim",
+  "outputStyle": "Plan Manager",
+  "tui": "fullscreen",
+  "model": "claude-fable-5[1m]",
+  "skillListingBudgetFraction": 0.02,
+  "permissions": {
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(su *)",
+      "Bash(shred *)",
+      "Bash(dd *)",
+      "Bash(mkfs*)",
+      "Bash(fdisk*)",
+      "Bash(diskutil erase*)",
+      "Bash(diskutil unmount*)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  }
+}

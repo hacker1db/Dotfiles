@@ -2,6 +2,16 @@
 # functions
 ####################
 
+function wt-pull-all() {
+    wt pull-all
+}
+
+function daily() {
+    local date="${1:-$(date +%Y-%m-%d)}"
+    local note="$HOME/notes/SecondBrain/0.Quick Notes 📨/Daily Stuff/${date}.md"
+    tmux new-window -n "${date}" "nvim '${note}'" 2>/dev/null || nvim "$note"
+}
+
 # print available colors and their numbers
 function colours() {
     for i in {0..255}; do
@@ -13,11 +23,33 @@ function colours() {
         fi
     done
 }
-function gitsign(){
-    git config --system user.signingkey "$(op item get "$@" --fields="public key")"
+
+function ghmerge(){
+gh pr view "$1" --json state -q '.state' -q '.state' | grep -q "OPEN" && gh pr diff "$1" && printf "Approve and merge PR #$1? [y/N] " && read ans && { [[ $ans =~ ^[Yy]$ ]] && gh pr review "$1" --approve && gh pr merge "$1" --rebase || echo "Canceled."; }
 }
 
+function ts(){
+  sesh connect "$(sesh list -i | gum filter --limit 1 --placeholder 'Pick a sesh' --prompt='⚡')"
+}
 
+function sesh-sessions() {
+  {
+    exec </dev/tty
+    exec <&1
+    local session
+    session=$(sesh list -t -c | fzf --height 40% --reverse --border-label ' sesh ' --border --prompt '⚡  ')
+    zle reset-prompt > /dev/null 2>&1 || true
+    [[ -z "$session" ]] && return
+    sesh connect $session
+  }
+}
+
+zle     -N             sesh-sessions
+bindkey -M emacs '\es' sesh-sessions
+bindkey -M vicmd '\es' sesh-sessions
+bindkey -M viins '\es' sesh-sessions
+
+function cx() { cd "$@" && l; }
 # Create a new directory and enter it
 function md() {
     mkdir -p "$@" && cd "$@"
@@ -31,9 +63,8 @@ function db() {
     echo "Building $DOCKERFILE with $IMAGENAME"
 
     docker build -f "$DOCKERFILE" -t $IMAGENAME:tempbuild$RANDOM --build-arg PAT=$PATTOKEN .
-
-
 }
+
 function clitools(){
 if [[ -d $CODE_DIR/clitools ]]; then
      cd $CODE_DIR/clitools
@@ -41,6 +72,16 @@ else
 gh repo clone hacker1db/clitools $CODE_DIR/clitools
 fi
 
+}
+
+# Create a new secure code review worktree
+# Usage: newreview <name> [-i <issue-number>] [-p]
+function newreview(){
+  if [[ ! -d $CODE_DIR/clitools ]]; then
+    echo "clitools not found. Cloning..."
+    gh repo clone hacker1db/clitools $CODE_DIR/clitools
+  fi
+  $CODE_DIR/clitools/new-secure-review.sh "$@"
 }
 
 alias bathelp='bat --plain --language=help'
@@ -154,12 +195,118 @@ function mds(){
     glow -p "$@" -s dark | less -r
 }
 
-function docker-init(){
-    limactl start template://docker
-    export DOCKER_HOST=$(limactl list docker --format 'unix://{{.Dir}}/sock/docker.sock')
-}
 function cytj(){
     yq -Poy "$@"
 }
 
+function azdlogin(){
+        if [ -z "$1" ]; then
+            echo "Usage: dlogin <registry>"
+            return 1
+       fi
+    az acr login -n "$@" --expose-token --query 'accessToken' -o tsv | podman login -u 00000000-0000-0000-0000-000000000000 --password-stdin "$@.azurecr.io"
+}
+function gha(){
+       gh project item-add 16 --owner Alaska-ITS --url "$@"
+}
+function brew-cleanup(){
+    local brewfile="${DOTFILES:-$HOME/.dotfiles}/install/brewfile"
+    local snapshot
+    local formula
+    local -a missing_formulae
 
+    if [[ ! -f "$brewfile" ]]; then
+        echo "Brewfile not found: $brewfile"
+        return 1
+    fi
+
+    snapshot="$(mktemp "${TMPDIR:-/tmp}/brewfile.XXXXXX")" || return 1
+    command brew bundle dump --mas --tap --cask --brews --file="$snapshot" --force || {
+        rm -f "$snapshot"
+        return 1
+    }
+
+    for formula in ${(f)"$(command brew leaves)"}; do
+        if ! awk -v target="$formula" '
+            /^brew "/ {
+                name = $0
+                sub(/^brew "/, "", name)
+                sub(/".*/, "", name)
+                count = split(name, parts, "/")
+                if (parts[count] == target) found = 1
+            }
+            END { exit(found ? 0 : 1) }
+        ' "$snapshot"; then
+            missing_formulae+=("$formula")
+        fi
+    done
+
+    if (( ${#missing_formulae[@]} )); then
+        echo "Brewfile was not updated; the dump omitted installed formulae: ${missing_formulae[*]}"
+        rm -f "$snapshot"
+        return 1
+    fi
+
+    mv "$snapshot" "$brewfile"
+    command brew cleanup || return 1
+    command brew doctor
+}
+
+function update-node-tools(){
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found."
+  return 1
+fi
+
+export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+mkdir -p "$PNPM_HOME"
+export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
+
+if ! pnpm list --global --depth -1 2>/dev/null | grep -Eq '^[├└]── '; then
+  echo "No global pnpm packages found."
+  if command -v npm >/dev/null 2>&1; then
+    local npm_global_count
+    npm_global_count="$(npm list -g --depth=0 2>/dev/null | grep -Ec '^[├└]── ' || true)"
+    if [[ "${npm_global_count:-0}" -gt 0 ]]; then
+      echo "Found ${npm_global_count} npm global package(s). Run: npm update -g"
+    fi
+  fi
+  return 0
+fi
+
+echo "Updating global pnpm packages..."
+pnpm update --global --latest
+echo "All global pnpm packages updated!"
+}
+
+function get-azsubcount(){
+
+    count=$(az account list --all | jq '.[].name' | wc | awk '{print $1}')
+    echo "You have $count Azure subscriptions"
+}
+## Set DOCKER_HOST to point to Podman socket
+function docker_set_host_to_podman_socket()
+{
+    local socket_path="$(podman machine inspect --format '{{.ConnectionInfo.PodmanSocket.Path}}')"
+    local unix_domain_socket="unix://$socket_path"
+    echo "Setting DOCKER_HOST=$unix_domain_socket"
+    export DOCKER_HOST="$unix_domain_socket"
+}
+
+function drawio-open() {
+    local root="${1:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
+    local -a files
+    files=("${(@f)$(find "$root" \( -name "*.drawio.png" -o -name "*.drawio" \) 2>/dev/null)}")
+    (( ${#files} )) || { echo "No draw.io diagrams found in $root"; return 1; }
+    open -a draw.io "${files[@]}"
+}
+
+# Scaffold BMAD-METHOD into the current project (Claude Code + Codex).
+# Extra args pass through, e.g. `bmad-init --directory .`.
+# Set GITHUB_TOKEN first to avoid the 60/hr anonymous GitHub API rate limit
+# when the external modules (bmb, cis) resolve their release tags.
+function bmad-init() {
+  bmad-method install --yes \
+    --modules bmm,bmb,cis \
+    --tools claude-code,codex "$@"
+}

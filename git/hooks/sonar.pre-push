@@ -1,0 +1,9 @@
+#!/bin/sh
+
+SONAR_BIN=$(command -v sonar 2>/dev/null || :)
+[ -z "$SONAR_BIN" ] && {
+	echo "sonarqube-cli not found, skipping secrets scan"
+	exit 0
+}
+
+exec "$SONAR_BIN" hook git-pre-push

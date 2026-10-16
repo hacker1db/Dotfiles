@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.plan-manager.serve</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>@@PLAN@@</string>
+    <string>serve</string>
+    <string>--foreground</string>
+  </array>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>HOME</key>
+    <string>@@HOME@@</string>
+    <key>PLAN_HOME</key>
+    <string>@@PLAN_ROOT@@</string>
+    <key>PATH</key>
+    <string>@@PATH@@</string>
+  </dict>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string>@@HOME@@/Library/Logs/plan-manager/serve.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>@@HOME@@/Library/Logs/plan-manager/serve.error.log</string>
+
+  <key>WorkingDirectory</key>
+  <string>@@WORKTREE@@</string>
+
+  <key>ThrottleInterval</key>
+  <integer>10</integer>
+</dict>
+</plist>

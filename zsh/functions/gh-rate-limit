@@ -1,0 +1,30 @@
+local response resource used limit remaining reset readable
+setopt local_options pipe_fail
+response=$(gh api /rate_limit) || return
+
+{
+    printf '%s\n' 'GitHub API rate limits (Pacific Time)'
+    printf '%s\n\n' '======================================'
+    printf 'Resource\tUsed\tLimit\tRemaining\tReset (PT)\n'
+    printf '--------\t----\t-----\t---------\t---------\n'
+    printf '%s\n' "$response" | jq -r '
+      def format_resource:
+        if . == "core" then "REST API"
+        elif . == "graphql" then "GraphQL"
+        else
+          gsub("_"; " ")
+          | split(" ")
+          | map((.[0:1] | ascii_upcase) + .[1:])
+          | join(" ")
+        end;
+      .resources
+      | to_entries
+      | sort_by(if .key == "core" then 0 elif .key == "graphql" then 1 else 2 end)
+      | .[]
+      | [(.key | format_resource), .value.used, .value.limit, .value.remaining, .value.reset]
+      | @tsv
+    ' | while IFS=$'\t' read -r resource used limit remaining reset; do
+        readable=$(TZ=America/Los_Angeles date -r "$reset" '+%b %-d, %Y %-I:%M:%S %p %Z') || return 1
+        printf '%s\t%s\t%s\t%s\t%s\n' "$resource" "$used" "$limit" "$remaining" "$readable"
+    done
+} | column -t -s $'\t'

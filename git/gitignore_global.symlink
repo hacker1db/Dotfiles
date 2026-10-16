@@ -8,7 +8,6 @@ Thumbs.db
 Icon
 .ssh 
 *.ini
-*.csv
 *.pyc
 .zsh_histroy
 # Thumbnails
@@ -32,4 +31,12 @@ tmp
 
 .terraform
 .terraform.lock
+.Claude
+.vscode
+.sonarlint/
+.omc
 
+**/.claude/settings.local.json
+.opencode/package-lock.json
+_bmad/
+.agents/

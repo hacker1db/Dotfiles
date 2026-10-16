@@ -3,7 +3,7 @@ alias ga='git add'
 alias gb='git branch'
 alias gl='git pull'
 alias gp='git push'
-alias gd='git diff --name-only --relative --diff-filter=d | xargs bat --diff'
+alias gd='hunk diff'
 alias gdc='git diff --cached --name-only --relative --diff-filter=d | xargs bat --diff'
 alias gs='git s'
 alias gss='git stash save'
@@ -14,13 +14,16 @@ alias grn='git-rename'
 alias glog="git l"
 alias gcm="git commit -am"
 alias gcs="git commit -S -am"
-alias gds="git diff --name-only --relative --diff-filter=d --staged | xargs bat --diff"
+# alias gds="git diff --name-only --relative --diff-filter=d --staged | xargs bat --diff"
+alias gds='hunk diff --staged'
 
 # alias git-amend='git commit --amend -C HEAD'
 alias git-undo='git reset --soft HEAD~1'
 alias git-count='git shortlog -sn'
 alias git-undopush="git push -f origin HEAD^:master"
 alias cpbr="git rev-parse --abbrev-ref HEAD | pbcopy"
+alias gcb="git rev-parse --abbrev-ref HEAD | pbcopy"
+alias sch="git rev-parse HEAD | pbcopy"
 # git root
 alias gr='[ ! -z `git rev-parse --show-cdup` ] && cd `git rev-parse --show-cdup || pwd`'
 
@@ -47,6 +50,20 @@ function g() {
     fi
 }
 
+alias gcc='git-clean-merged'
+
+function cob() {
+  wt switch --create "$@"
+}
+
+function git-clean-merged() {
+  git fetch --prune
+  git worktree prune
+  git branch --merged | grep -vE '^\*|^\+|main|master|develop' | xargs -r git branch -d
+  git branch -r --merged | grep -vE 'origin/main|origin/master|origin/develop|HEAD' \
+    | sed 's/origin\///' | xargs -r git push origin --delete
+}
+
 function ghi(){
  if [[ $# > 0 ]]; then
     number="#"
@@ -55,8 +72,9 @@ function ghi(){
         gh issue list 
     fi
 }
-
-
+function gitinit(){
+ pwsh -f "~/Developer/clitools/initializeGitRepo.ps1 -GithubOrg $1"
+}
 
 
 # TODO: FIX the follow GitHub issue script
@@ -88,3 +106,7 @@ function ghi(){
 #   commandline -f execute
 #
 # }
+# Run for me in the background  
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+
+

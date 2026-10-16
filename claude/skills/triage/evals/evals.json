@@ -1,0 +1,39 @@
+{
+  "skill_name": "triage",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Triage my Reader inbox one item at a time and help me decide what to read, save for later, or archive.",
+      "expected_output": "A personalized Readwise Reader inbox triage flow that fetches inbox documents and presents one document at a time.",
+      "files": [],
+      "assertions": [
+        "The response checks for `reader_persona.md` before presenting inbox items.",
+        "The response fetches Reader inbox documents from location `new` with a limit of 10.",
+        "The response presents one document at a time rather than dumping the full batch.",
+        "The response includes Read, Later, Archive, and Something else options."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Help me clear my Readwise inbox. If I say later, move it to later; if I say archive, archive it.",
+      "expected_output": "An interactive triage loop that maps user responses to Reader move operations.",
+      "files": [],
+      "assertions": [
+        "The response maps `Later` to `readwise reader-move-documents --location later`.",
+        "The response maps archive or skip responses to archive movement.",
+        "The response uses a visual separator before moving to the next document."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Show me the first thing in my Reader inbox and pitch whether I should read it.",
+      "expected_output": "A single Reader document card with a concise pitch and honest skip reason.",
+      "files": [],
+      "assertions": [
+        "The response includes an ASCII document card.",
+        "The response includes both `Why read` and `Why skip` sections.",
+        "The response fetches full document details only when the user asks for more detail."
+      ]
+    }
+  ]
+}
