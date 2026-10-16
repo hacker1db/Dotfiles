@@ -1,0 +1,57 @@
+name: Tests and SonarQube Cloud
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: python3 install/tests/claude-profiles.test.py
+      - run: bash install/tests/claude-session.test.sh
+      - run: node install/tests/plan-manager-harness-contracts.test.mjs
+      - run: python3 install/tests/sonarqube-workflow.test.py
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck zsh
+      - run: git ls-files -z -- '*.sh' '*.bash' ':(exclude)bin/dotnet-install.sh' | xargs -0 shellcheck -S error
+      - run: for file in zsh/*.zsh zsh/*.symlink zsh/functions/*; do zsh -n "$file" || exit; done
+      - uses: lunarmodules/luacheck@v1.2.0
+        with:
+          args: config/nvim --no-color --codes --globals vim M Snacks dd --no-max-line-length --no-unused
+
+  sonarqube:
+    needs: [test, lint]
+    if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check SonarQube settings
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+        run: |
+          test -n "$SONAR_TOKEN" || { echo 'Missing SONAR_TOKEN secret' >&2; exit 1; }
+          test -n "$SONAR_ORGANIZATION" || { echo 'Missing SONAR_ORGANIZATION variable' >&2; exit 1; }
+      - uses: SonarSource/sonarqube-scan-action@v8.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+            -Dsonar.projectKey=hacker1db_Dotfiles
