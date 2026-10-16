@@ -180,6 +180,8 @@ brew "mcp-publisher"
 brew "mysql-client"
 # Incremental parsing library
 brew "tree-sitter"
+# CLI used by nvim-treesitter to build parsers
+brew "tree-sitter-cli"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # Web server scanner

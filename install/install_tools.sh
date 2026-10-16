@@ -74,6 +74,7 @@ FORMULAS=(
   mas
   mysql-client
   tree-sitter
+  tree-sitter-cli
   neovim
   nmap
   opencode
