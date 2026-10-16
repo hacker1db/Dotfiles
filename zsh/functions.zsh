@@ -2,6 +2,10 @@
 # functions
 ####################
 
+function wt-pull-all() {
+    wt pull-all
+}
+
 function daily() {
     local date="${1:-$(date +%Y-%m-%d)}"
     local note="$HOME/notes/SecondBrain/0.Quick Notes 📨/Daily Stuff/${date}.md"
