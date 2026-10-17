@@ -6,6 +6,11 @@ APP_SOURCE="$CLITOOLS/NvimTmux.app"
 APP_DEST="$HOME/Applications/NvimTmux.app"
 BUNDLE_ID="dev.hacker1db.nvimtmux"
 
+if [ "$(uname -s)" != "Darwin" ]; then
+    echo "Skipping NvimTmux: macOS only"
+    exit 0
+fi
+
 echo "Setting up NvimTmux..."
 
 # Install app to ~/Applications
@@ -19,8 +24,8 @@ if [ -d "$APP_SOURCE" ]; then
     /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/LaunchServices.framework/Versions/A/Support/lsregister -f "$APP_DEST"
     echo "Registered with LaunchServices"
 else
-    echo "Warning: NvimTmux.app not found at $APP_SOURCE"
-    exit 1
+    echo "Warning: NvimTmux.app not found at $APP_SOURCE, skipping"
+    exit 0
 fi
 
 # Set default editor associations with duti

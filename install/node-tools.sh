@@ -35,8 +35,12 @@ done
 # Authenticate Readwise CLI
 # For headless/scripts: readwise login-with-token YOUR_ACCESS_TOKEN (get token at readwise.io/access_token)
 if command -v readwise &>/dev/null; then
-  echo "Logging into Readwise..."
-  readwise login
+  if [ -t 0 ]; then
+    echo "Logging into Readwise..."
+    readwise login || echo "Warning: Readwise login failed; run 'readwise login' manually"
+  else
+    echo "Skipping Readwise login: no TTY. Run 'readwise login' manually"
+  fi
 fi
 
 # Authenticate Codex Security (ChatGPT sign-in). Skips if already logged in.
@@ -44,9 +48,11 @@ fi
 if command -v codex-security &>/dev/null; then
   if codex-security login status &>/dev/null; then
     echo "Codex Security already logged in"
-  else
+  elif [ -t 0 ]; then
     echo "Logging into Codex Security..."
-    codex-security login
+    codex-security login || echo "Warning: Codex Security login failed; run 'codex-security login' manually"
+  else
+    echo "Skipping Codex Security login: no TTY. Run 'codex-security login' manually"
   fi
 fi
 

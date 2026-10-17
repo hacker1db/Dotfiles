@@ -1,24 +1,28 @@
 #!/usr/bin/env bash
  
 DOTFILES=$HOME/.dotfiles
+source "$DOTFILES/install/lib/log.sh"
+source "$DOTFILES/install/lib/env.sh"
+
+github_ssh_preflight >&2 || true
 
 # Ensure clitools repo is present before linking
 CLITOOLS_DIR="$HOME/Developer/clitools"
 if [ -z "${CLITOOLS_REPO_URL:-}" ]; then
-    GH_USER=$(gh api user --jq '.login' 2>/dev/null || true)
+    GH_USER=$(github_owner || true)
     if [ -n "$GH_USER" ]; then
-        CLITOOLS_REPO_URL="git@github.com:${GH_USER}/clitools.git"
+        CLITOOLS_REPO_URL="$(github_repo_url "${GH_USER}/clitools")"
     else
-        echo "Warning: gh CLI not authenticated; skipping clitools clone"
+        echo "Warning: GitHub owner could not be determined (set DOTFILES_GITHUB_OWNER); skipping clitools clone"
         CLITOOLS_REPO_URL=""
     fi
 fi
 if [ -n "$CLITOOLS_REPO_URL" ] && [ ! -d "$CLITOOLS_DIR" ]; then
     echo "Cloning clitools repo to $CLITOOLS_DIR"
     mkdir -p "$(dirname "$CLITOOLS_DIR")"
-    git clone "$CLITOOLS_REPO_URL" "$CLITOOLS_DIR" || echo "Failed to clone clitools; continuing without it"
+    github_clone "$CLITOOLS_REPO_URL" "$CLITOOLS_DIR" || echo "Failed to clone clitools; continuing without it"
 elif [ -d "$CLITOOLS_DIR/.git" ]; then
-    git -C "$CLITOOLS_DIR" fetch --quiet && git -C "$CLITOOLS_DIR" pull --ff-only --quiet || echo "Could not update clitools; using existing copy"
+    github_git -C "$CLITOOLS_DIR" fetch --quiet && github_git -C "$CLITOOLS_DIR" pull --ff-only --quiet || echo "Could not update clitools; using existing copy"
 fi
 
 PLAN_MANAGER_READY=0

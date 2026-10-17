@@ -3,6 +3,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOTFILES="$SCRIPT_DIR"
 source "$DOTFILES/install/lib/log.sh"
+source "$DOTFILES/install/lib/env.sh"
 
 usage() {
   echo "Usage: $(basename "$0") {backup|link|claude|codex-foundry|ponytail|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
@@ -45,16 +46,34 @@ run_script() {
     error "Script missing: $sc"
     exit 1
   fi
-  source "$sc" "$@"
+  load_brew_env || true
+  case "$1" in
+    link) github_ssh_preflight || true ;;
+  esac
+  bash "$sc" "$@"
+  local status=$?
+  case "$1" in
+    link|git) unset GITHUB_SSH_OK ;;
+  esac
+  load_brew_env || true
+  return "$status"
 }
 
 if [ "$cmd" = "all" ]; then
   title "Running full install"
-  for part in backup link claude terminfo homebrew node-tools shell git macos extras nvimtmux dotnet dotnet-tools theme ponytail; do
+  failed=()
+  for part in backup homebrew link claude terminfo node-tools shell git macos extras nvimtmux dotnet dotnet-tools ponytail; do
     info "Executing $part"
-    run_script "$part"
+    if ! run_script "$part"; then
+      error "$part failed; continuing"
+      failed+=("$part")
+    fi
   done
   echo
+  if [ "${#failed[@]}" -gt 0 ]; then
+    error "Finished with failures: ${failed[*]}"
+    exit 1
+  fi
   success "All tasks complete"
   exit 0
 fi

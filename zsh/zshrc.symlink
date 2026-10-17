@@ -117,7 +117,7 @@ export PATH="/opt/homebrew/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh --no-rehash)"
+command -v pyenv &>/dev/null && eval "$(pyenv init - zsh --no-rehash)"
 
 if [[ -x "$(command -v eza)" ]]; then
   alias ll="eza --icons --git --long"
