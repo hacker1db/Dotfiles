@@ -180,7 +180,7 @@ for c in "${CASKS[@]}"; do
 done
 
 # Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
-[ -x "$HOME/.local/bin/claude" ] || curl -fsSL https://claude.ai/install.sh | bash || true
+[ -x "$HOME/.local/bin/claude" ] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
 
 # Fonts via tap already handled; ensure nerd fonts present
 brew tap homebrew/cask-fonts || true

@@ -101,7 +101,7 @@ function commaFollows(lines, valueLine, valueEnd, endLine, endColumn) {
 }
 
 function reconcile(original) {
-  const lines = original.length > 0 ? original.match(/[^\n]*\n|[^\n]+$/g) ?? [] : []
+  const lines = original.length > 0 ? original.match(/(?:[^\n]*\n)|(?:[^\n]+$)/g) ?? [] : []
   const sectionIndexes = []
 
   for (let index = 0; index < lines.length; index++) {

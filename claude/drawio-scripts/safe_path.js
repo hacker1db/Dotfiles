@@ -15,8 +15,7 @@ function allowedBase() {
 }
 
 function assertInside(base, target, original) {
-  const rel = path.relative(base, target);
-  if (rel === '' || rel.startsWith('..') || path.isAbsolute(rel)) {
+  if (!path.normalize(target).startsWith(base + path.sep)) {
     throw new Error(`Refusing path outside ${base}: ${original}`);
   }
 }
@@ -32,6 +31,7 @@ function inputPath(p, exts) {
   checkExt(p, exts);
   const base = allowedBase();
   const resolved = path.resolve(base, p);
+  assertInside(base, resolved, p);
   if (!fs.existsSync(resolved)) throw new Error(`Not found: ${p}`);
   const real = fs.realpathSync(resolved);
   assertInside(base, real, p);
@@ -45,6 +45,7 @@ function outputPath(p, exts) {
   checkExt(p, exts);
   const base = allowedBase();
   const resolved = path.resolve(base, p);
+  assertInside(base, resolved, p);
   const dir = fs.realpathSync(path.dirname(resolved));
   const target = path.join(dir, path.basename(resolved));
   assertInside(base, target, p);
