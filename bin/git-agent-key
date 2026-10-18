@@ -13,11 +13,7 @@ fi
     echo 'No agentkey title configured for this Git identity.' >&2
     exit 1
 }
-socket="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-[ -S "$socket" ] || {
-    echo 'The 1Password agent socket is unavailable.' >&2
-    exit 1
-}
+socket=$("$(dirname "$0")/git-agent-socket") || exit 1
 keys=$(SSH_AUTH_SOCK="$socket" /usr/bin/ssh-add -L) || exit 1
 printf '%s\n' "$keys" | awk -v title="$title" '
     NF >= 3 {
