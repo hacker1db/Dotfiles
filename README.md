@@ -110,7 +110,7 @@ The scan fails with a named missing-setting error if any value is absent. The wo
 
 | Tool | Source | Installed instruction file |
 | --- | --- | --- |
-| Claude Code | `claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
+| Claude Code | `claude/CLAUDE.md` | `~/.claude-{personal,subscription,foundry}/CLAUDE.md` |
 | Codex | `codex/AGENTS.md` → `global/AGENTS.md` | `~/.codex/AGENTS.md` |
 | OpenCode | `config/opencode/AGENTS.md` → `global/AGENTS.md` | `~/.config/opencode/AGENTS.md` |
 | Copilot CLI | `config/copilot/copilot-instructions.md` → `global/AGENTS.md` | `~/.copilot/copilot-instructions.md` |

@@ -100,7 +100,6 @@ const bootstrap = read('install/plan-manager-bootstrap.sh')
 for (const target of [
   '$HOME/.copilot/copilot-instructions.md',
   '$HOME/.codex/AGENTS.md',
-  '$HOME/.claude/commands/plans.md',
   '$HOME/.config/opencode/AGENTS.md',
   '$HOME/.config/opencode/command/plans.md',
 ]) {

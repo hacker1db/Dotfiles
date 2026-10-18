@@ -366,10 +366,6 @@ install_plan_instruction_links() {
         "$HOME/.codex/AGENTS.md" \
         "Codex global instructions" || return 1
     link_managed_file \
-        "$DOTFILES/claude/commands/plans.md" \
-        "$HOME/.claude/commands/plans.md" \
-        "Claude plans command" || return 1
-    link_managed_file \
         "$DOTFILES/global/AGENTS.md" \
         "$HOME/.config/opencode/AGENTS.md" \
         "OpenCode global instructions" || return 1

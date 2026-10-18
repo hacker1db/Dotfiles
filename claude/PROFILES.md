@@ -43,7 +43,7 @@ There are two ways for a tool to select a profile:
 
 The Foundry profile also needs a working `az login`. Its resource and model come from its settings file, not from the environment.
 
-`~/.claude` is the legacy config dir, and the profile installer no longer writes there. `install/agent-instructions.sh` (`CLAUDE.md`) and `install/plan-manager-bootstrap.sh` (`commands/plans.md`) still link into it. Remove those links before deleting `~/.claude`.
+`~/.claude` is the legacy config dir. Dotfiles no longer links anything into it. The only managed links left there are skillctl's in `~/.claude/skills`, which skillctl keeps and never relinks.
 
 ## Install
 

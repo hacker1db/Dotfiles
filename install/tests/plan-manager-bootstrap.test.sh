@@ -207,14 +207,10 @@ bash "$ROOT/install/agent-instructions.sh" "$HOME" >/dev/null
     fail "Copilot installers replaced each other's links"
 HOME="$original_home"
 
-mkdir -p "$HOME/.claude" "$HOME/.config/opencode/command"
-ln -s "$ROOT/claude/commands" "$HOME/.claude/commands"
+mkdir -p "$HOME/.config/opencode/command"
 printf 'preserve\n' > "$HOME/.config/opencode/custom-state"
 install_plan_instruction_links >/dev/null
 [ -f "$HOME/.config/opencode/custom-state" ] || fail "unmanaged OpenCode state was removed"
-[ -f "$ROOT/claude/commands/plans.md" ] || fail "Claude source was moved through a parent symlink"
-[ "$ROOT/claude/commands/plans.md" -ef "$HOME/.claude/commands/plans.md" ] ||
-    fail "Claude plans command does not resolve to the managed source"
 [ -L "$HOME/.config/opencode/AGENTS.md" ] || fail "OpenCode global instructions were not linked"
 [ -L "$HOME/.config/opencode/command/plans.md" ] || fail "OpenCode plans command was not linked"
 [ -L "$HOME/.copilot/copilot-instructions.md" ] || fail "Copilot global instructions were not linked"

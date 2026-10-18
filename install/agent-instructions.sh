@@ -5,13 +5,11 @@ set -euo pipefail
 DOTFILES=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)
 TARGET_HOME=${1:-$HOME}
 SOURCES=(
-    "$DOTFILES/claude/CLAUDE.md"
     "$DOTFILES/global/AGENTS.md"
     "$DOTFILES/global/AGENTS.md"
     "$DOTFILES/global/AGENTS.md"
 )
 DESTINATIONS=(
-    "$TARGET_HOME/.claude/CLAUDE.md"
     "$TARGET_HOME/.codex/AGENTS.md"
     "$TARGET_HOME/.copilot/copilot-instructions.md"
     "$TARGET_HOME/.config/opencode/AGENTS.md"
