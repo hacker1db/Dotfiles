@@ -93,21 +93,6 @@ if [[ "$LINK_PHASE" != integrations ]]; then
       fi
     fi
 
-    echo -e "\n\nCreating vim symlinks"
-    echo "=============================="
-    VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim" "$HOME/.vimrc:$DOTFILES/vim/.vimrc")
-    for file in "${VIMFILES[@]}"; do
-        KEY=${file%%:*}
-        VALUE=${file#*:}
-        [ -L "$KEY" ] && [ ! -e "$KEY" ] && rm "$KEY"
-        if [ -e "$KEY" ]; then
-            echo "${KEY} already exists... skipping."
-        else
-            echo "Creating symlink for $KEY"
-            ln -s "$VALUE" "$KEY"
-        fi
-    done
-
     echo -e "\n\nCreating zshrc symlinks"
     echo "=============================="
     ZSHRC=("$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")

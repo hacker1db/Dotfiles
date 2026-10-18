@@ -91,7 +91,7 @@ nvim +checkhealth
 nvim --headless "+Lazy! sync" +qa
 ```
 
-Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not a read-only check. Obsidian and snippet configuration assumes a personal SecondBrain vault; adjust those paths for another machine. Legacy UltiSnips files remain under `vim/`.
+Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not a read-only check. Obsidian and snippet configuration assumes a personal SecondBrain vault; adjust those paths for another machine.
 
 ## Git identities and hooks
 
