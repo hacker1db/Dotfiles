@@ -6,7 +6,7 @@ source "$DOTFILES/install/lib/log.sh"
 source "$DOTFILES/install/lib/env.sh"
 
 usage() {
-  echo "Usage: $(basename "$0") {backup|link|codex-foundry|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
+  echo "Usage: $(basename "$0") {backup|link|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
   exit 1
 }
 
@@ -21,7 +21,6 @@ script_for() {
   case "$1" in
     backup) echo "$DOTFILES/install/backup.sh" ;;
     link) echo "$DOTFILES/install/link.sh" ;;
-    codex-foundry) echo "$DOTFILES/install/codex-foundry.sh" ;;
     git) echo "$DOTFILES/install/git.sh" ;;
     homebrew) echo "$DOTFILES/install/install_tools.sh" ;;
     shell) echo "$DOTFILES/install/shell.sh" ;;

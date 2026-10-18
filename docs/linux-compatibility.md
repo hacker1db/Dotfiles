@@ -46,7 +46,6 @@ Detect the platform with `[[ "$(uname -s)" == Darwin ]]` in installer scripts an
 | `config/tmux/themes/tmuxlayout.conf:21` | `osascript` "now playing" segment | Show it only on macOS. |
 | `config/ghostty/config:9` | `macos-titlebar-style` | Ghostty ignores it on Linux, so no change is needed. |
 | `install/extras.sh:9-11` | Rancher Desktop path under `~/Library/Application Support` | Already guarded by `[ -d ]`, so no change is needed. |
-| `bin/azure-openai-token:8-12` | Only checks the macOS `az` paths | Fall back to `command -v az` first. |
 | `bin/login-shell` | Uses `reattach-to-user-namespace`, but falls back to `exec "$shell" -l` | Works on Linux with this branch's fix. |
 | `config/opencode/package-lock.json` | Only pins the darwin `msgpackr-extract` optional dependencies | Regenerate it on Linux or let npm pick the platform optional dependency. Verify `opencode` plugins load. |
 | `install/brewfile` | Contains `cask`/`mas` entries | `brew bundle` on Linux skips casks with warnings. Consider `if OS.mac?` blocks. |

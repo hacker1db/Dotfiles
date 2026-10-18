@@ -8,9 +8,9 @@ Personal macOS development configuration for Zsh, Neovim, tmux, Ghostty, Git, an
 bash <(curl -fsSL https://raw.githubusercontent.com/hacker1db/Dotfiles/main/install/bootstrap.sh)
 ```
 
-`install/bootstrap.sh` clones the repository bare into `~/.dotfiles/main/.bare`, the same layout `bin/git-bare-clone` creates, checks out `main` at `~/.dotfiles/main`, and runs `./install.sh all` there. Pass a subcommand to run something other than `all`. Branch worktrees (`wt switch -c <branch>`) land beside `main` in `~/.dotfiles/main/`; the installed links always point at `~/.dotfiles/main`. Rerunning it reuses an existing clone; it stops if `~/.dotfiles/main` exists in another layout.
+`install/bootstrap.sh` clones the repository bare into `~/.dotfiles/.bare`, the same layout `bin/git-bare-clone` creates, checks out `main` at `~/.dotfiles/main`, and runs `./install.sh all` there. Pass a subcommand to run something other than `all`. Branch worktrees (`wt switch -c <branch>`) land beside `main` in `~/.dotfiles/`; the installed links always point at `~/.dotfiles/main`. Rerunning it reuses an existing clone; it stops if `~/.dotfiles` exists in another layout.
 
-Review the scripts before running a full installation: they install packages, change macOS preferences, configure applications, and may prompt for authentication. `all` runs `link` before `homebrew`; plan-manager bootstrap in the link step already requires Node.js 20+, pnpm, and Pandoc. On a fresh machine, install those prerequisites and authenticate `gh` (or set `PLAN_MANAGER_REPO_URL`) first.
+Review the scripts before running a full installation: they install packages, change macOS preferences, configure applications, and may prompt for authentication. `all` runs `link` before `homebrew`, and the link step already needs git, gh, Node.js 20+, pnpm, and Pandoc. The bootstrap checks for them before cloning, lists anything missing, and runs `gh auth login` when GitHub is not logged in (skipped when `PLAN_MANAGER_REPO_URL` is set; `DOTFILES_NONINTERACTIVE=1` makes it fail instead of prompting).
 
 | Command | Purpose |
 | --- | --- |
@@ -26,9 +26,8 @@ Review the scripts before running a full installation: they install packages, ch
 | `./install.sh nvimtmux` | Create NvimTmux.app and register file associations with `duti` |
 | `./install.sh dotnet` / `./install.sh dotnet-tools` | Install .NET and global tools |
 | `./install.sh theme list` | List theme candidates |
-| `./install.sh codex-foundry --resource NAME --model DEPLOYMENT` | Configure a separate Codex home for Foundry |
 
-`all` runs backup, link, terminfo, homebrew, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Codex Foundry setup is explicit. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs backup, link, terminfo, homebrew, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; that catalog and the explicit lists in `install/install_tools.sh` are separate sources.
 
@@ -129,15 +128,6 @@ install-caido-skills /path/to/project
 ### Plan-manager integration
 
 [Plan-manager setup and troubleshooting](docs/plan-manager.md) documents the separate application checkout, `~/.local/bin/plan`, LaunchAgent, and Codex writable-root reconciliation. Dotfiles policy uses `~/notes/SecondBrain/4.Resources/plans` as the canonical library and `http://plans.localhost:4173/` as its local dashboard. The linker builds the application and checks its service; application source and plan data are not stored here. Publishing requires an explicit request.
-
-### Codex with Microsoft Foundry
-
-```sh
-az login
-./install.sh codex-foundry --resource YOUR_RESOURCE --model YOUR_DEPLOYMENT
-```
-
-This creates `~/.codex_foundry/config.toml`, using `bin/azure-openai-token` to obtain short-lived Entra tokens from Azure CLI. Start Codex with `CODEX_HOME="$HOME/.codex_foundry"`. A T3 Code provider can use the same environment and the installed Codex binary. Resource access and model deployments must already exist.
 
 ## Symlinks and themes
 
