@@ -93,18 +93,11 @@ The optional profile links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`.
 
 New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and Sonar pre-commit/pre-push adapters. Sonar adapters skip when `sonar` is absent. These Git hooks are separate from Claude's work-profile GitGuardian hook.
 
-## SonarQube Cloud CI
+## CI and security scanning
 
-`.github/workflows/sonarqube.yml` runs the portable repository tests and shell, Zsh, and Lua lint checks before scanning pushes to `main` and same-repository pull requests. Fork and Dependabot pull requests run tests and lint but cannot use the Actions scan token. The workflow uses project key `hacker1db_Dotfiles`. In the SonarQube Cloud project, select CI-based analysis for this repository and set these GitHub Actions settings:
+`.github/workflows/ci.yml` runs the portable repository tests and shell, Zsh, and Lua lint checks on pushes to `main` and on pull requests. On pull requests, dependency review fails if a change adds a dependency with a known vulnerability of any severity. ShellCheck checks errors across repository shell scripts, omitting the bundled `bin/dotnet-install.sh` with existing findings. Luacheck ignores existing unused-variable and line-length warnings.
 
-| Setting | GitHub location | Value |
-| --- | --- | --- |
-| `SONAR_TOKEN` | Actions secret | SonarQube Cloud token with Execute Analysis permission |
-| `SONAR_ORGANIZATION` | Actions variable | SonarQube Cloud organization key |
-
-Set `SONAR_ORGANIZATION` separately as an Actions variable.
-
-The scan fails with a named missing-setting error if any value is absent. The workflow check is `python3 install/tests/sonarqube-workflow.test.py`; `sonar-project.properties` marks `install/tests` as test files. ShellCheck checks errors across repository shell scripts, omitting the bundled `bin/dotnet-install.sh` with existing findings. Luacheck ignores existing unused-variable and line-length warnings. The separate local Sonar Git hooks do not supply these CI settings.
+`.github/workflows/codeql.yml` runs CodeQL `security-extended` queries for GitHub Actions, JavaScript/TypeScript, and Python on pushes to `main`, on pull requests, and weekly. `.github/dependabot.yml` opens update pull requests for npm, NuGet, Docker, and pinned GitHub Actions. The workflow check is `python3 install/tests/ci-workflow.test.py`; it also requires every action to be pinned to a commit SHA.
 
 ## AI tools and shared instructions
 
@@ -165,7 +158,7 @@ The installer fixture tests use temporary homes/repositories rather than changin
 
 ```sh
 bash install/tests/claude-profiles.test.sh
-python3 install/tests/sonarqube-workflow.test.py
+python3 install/tests/ci-workflow.test.py
 bash install/tests/plan-manager-bootstrap.test.sh
 node install/tests/plan-manager-harness-contracts.test.mjs
 zsh -n zsh/zshrc.symlink
