@@ -10,6 +10,41 @@ Three isolated profiles, each with its own `CLAUDE_CONFIG_DIR`, login, settings,
 
 `zsh/zshenv.symlink` exports `CLAUDE_CONFIG_DIR=~/.claude-personal`, so plain `claude` and `skillctl` use personal. The `bin/claude-*` wrappers override it for one launch and always run the native `~/.local/bin/claude`. GUI apps don't read `zshenv`; point them at a wrapper.
 
+## Where everything lives
+
+Use these absolute paths from GUI apps and other tools (such as T3 Code) that don't load the shell.
+
+| What | Path |
+| --- | --- |
+| Claude Code binary (native, auto-updating) | `~/.local/bin/claude` |
+| Personal launcher | `~/.dotfiles/bin/claude-personal` |
+| Work subscription launcher | `~/.dotfiles/bin/claude-subscription` |
+| Foundry launcher | `~/.dotfiles/bin/claude-foundry` |
+| Profile config dirs | `~/.claude-personal`, `~/.claude-subscription`, `~/.claude-foundry` |
+| Generated settings (ignored by Git, mode 600) | `~/.dotfiles/claude/.local/profiles/{personal,subscription,foundry}.json` |
+| Settings layers (committed) | `~/.dotfiles/claude/settings.{base,personal,work,foundry}.json` |
+| Foundry resource | `ANTHROPIC_FOUNDRY_RESOURCE` in `~/.localrc` → `~/OneDrive*/Personal/.localrc` |
+| Local autoMode input | `~/.config/claude-code/automode.json` (falls back to `foundry-automode.json`) |
+| MCP servers (all profiles) | `~/.mcp.json` → `~/.dotfiles/claude/mcp.json` |
+| Installer and test | `~/.dotfiles/install/claude-profiles.sh`, `install/tests/claude-profiles.test.sh` |
+
+Each profile dir contains:
+
+- `settings.json`: a symlink to that profile's generated settings
+- symlinks to the dotfiles copies of `CLAUDE.md`, `agents/`, `commands/`, `output-styles/` and `statusline-command.sh`
+- `skills/`: a real dir of links managed by skillctl
+- `plugins/`: plugins installed for that profile only
+- login credentials and history, which Claude writes itself
+
+There are two ways for a tool to select a profile:
+
+1. Run a launcher as the Claude binary. This is the simplest option and needs no environment setup.
+2. Run `~/.local/bin/claude` with `CLAUDE_CONFIG_DIR` set to the profile dir.
+
+The Foundry profile also needs a working `az login`. Its resource and model come from its settings file, not from the environment.
+
+`~/.claude` is the legacy config dir, and the profile installer no longer writes there. `install/agent-instructions.sh` (`CLAUDE.md`) and `install/plan-manager-bootstrap.sh` (`commands/plans.md`) still link into it. Remove those links before deleting `~/.claude`.
+
 ## Install
 
 `./install.sh link` runs `install/claude-profiles.sh`, which:
