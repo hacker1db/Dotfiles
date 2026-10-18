@@ -108,6 +108,9 @@ mv "$home/OneDrive - Fixture" "$temp/od"; rm "$home/.localrc"
 echo 'export ANTHROPIC_FOUNDRY_RESOURCE=fixture-resource' > "$home/.localrc"
 run > "$temp/out7" || fail "no-OneDrive install $(cat "$temp/out7")"
 [ ! -L "$home/.localrc" ] || fail "no-OneDrive linked .localrc"
+echo '# no resource' > "$home/.localrc"
+run > "$temp/out8" || fail "no-OneDrive without resource exited $? $(cat "$temp/out8")"
+grep -q 'Foundry skipped' "$temp/out8" || fail "no-OneDrive skip message"
 mv "$temp/od" "$home/OneDrive - Fixture"; rm "$home/.localrc"; ln -s "$home/OneDrive - Fixture/Personal/.localrc" "$home/.localrc"
 
 # Credentials in a layer are rejected before anything is written.
