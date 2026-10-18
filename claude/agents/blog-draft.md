@@ -37,7 +37,7 @@ Output: working title, opening hook, 3-5 main sections with key points, code exa
 Improve an existing draft.
 
 1. Read the draft and check: security filter compliance, brand voice, structure (h2/h3/h4), code examples, actionability
-2. If the post's `series` is `CyberSecurity`, `DevSecOps`, or `Security` — also spawn `oh-my-claudecode:security-reviewer` to check technical accuracy of security claims and code examples. Incorporate any findings before saving.
+2. If the post's `series` is `CyberSecurity`, `DevSecOps`, or `Security` — also spawn `security-review` to check technical accuracy of security claims and code examples. Incorporate any findings before saving.
 3. Output improved version with a list of changes made
 
 ### /blog-ideas [tag] [limit]

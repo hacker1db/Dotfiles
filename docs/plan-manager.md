@@ -9,7 +9,7 @@ The plan-manager application — CLI, local server, dashboard, hosted Next.js ap
 - Default location: `~/Developer/plan-manager`
 - Override: set `PLAN_MANAGER_REPO_DIR` before running `install/link.sh`
 
-Dotfiles owns the bootstrap configuration, CLI symlink, LaunchAgent template, global instructions, and command adapters. The shared `plans` skill is managed separately through the skills repository; legacy copies in `claude/skills/` are not installed by the linker. Application code is never copied into dotfiles.
+Dotfiles owns the bootstrap configuration, CLI symlink, LaunchAgent template, global instructions, and command adapters. The shared `plans` skill, including its contract and evals, lives in the skills repository. Application code is never copied into dotfiles.
 
 ### Repository layouts
 

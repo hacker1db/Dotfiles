@@ -76,8 +76,7 @@ Configured LSP servers include:
 
 ```bash
 # Isolated installer checks
-python3 install/tests/claude-profiles.test.py
-bash install/tests/claude-session.test.sh
+bash install/tests/claude-profiles.test.sh
 bash install/tests/plan-manager-bootstrap.test.sh
 node install/tests/plan-manager-harness-contracts.test.mjs
 
@@ -196,8 +195,7 @@ All directories under `config/` are symlinked to `~/.config/<name>`. When adding
 
 - The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out at `$HOME/Developer/skills/main` by default.
 - That repository provides `skillctl`, the skill manager for Codex, Claude Code, and GitHub Copilot CLI. Read its README before changing skill sources, selections, or installation behavior.
-- `claude/skills/` in this repository contains legacy copies during migration. Do not create or update personal skills here, and do not move installed skills back into this repository.
-- Existing global skill links may still point to `claude/skills/` until the migration is complete. Keep those links intact during dotfiles installation; use `skillctl` for the eventual migration.
+- Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/claude-profiles.sh` runs `skillctl sync --global` for each Claude profile.
 - The project-scoped Caido installer and the OpenCode skill under `config/opencode/skills/` are separate from the current `skillctl` global adapters.
 
 ## Important Files & Patterns
@@ -262,9 +260,9 @@ Template hooks in `git/templates/hooks/`:
 ## Configuration boundaries
 
 - The general linker skips existing configuration paths; selected managed integrations reconcile their own links.
-- Personal skills are maintained outside dotfiles; do not update the legacy `claude/skills/` tree.
+- Personal skills are maintained outside dotfiles in the skills repository.
 - lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories. Specs directly under `lua/plugins/` are not imported by this setup.
-- Use [README.md](README.md), [Claude profiles](claude/PROFILES.md), [session launchers](docs/claude-sessions.md), and [plan-manager integration](docs/plan-manager.md) for current setup details.
+- Use [README.md](README.md), [Claude profiles](claude/PROFILES.md) and [plan-manager integration](docs/plan-manager.md) for current setup details.
 
 ## Working With This Repository
 

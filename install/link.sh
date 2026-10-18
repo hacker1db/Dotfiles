@@ -94,63 +94,9 @@ fi
 
 bash "$DOTFILES/install/agent-instructions.sh" || exit 1
 
-echo -e "\n\nInstalling Claude Code settings"
+echo -e "\n\nInstalling Claude Code profiles"
 echo "=============================="
-for CLAUDE_FILE in statusline-command.sh; do
-  CLAUDE_SRC="$DOTFILES/claude/$CLAUDE_FILE"
-  CLAUDE_DEST="$HOME/.claude/$CLAUDE_FILE"
-  mkdir -p "$HOME/.claude"
-  if [ -e "$CLAUDE_SRC" ]; then
-    if [ -L "$CLAUDE_DEST" ]; then
-      CURRENT=$(readlink "$CLAUDE_DEST")
-      if [ "$CURRENT" != "$CLAUDE_SRC" ]; then
-        rm "$CLAUDE_DEST"
-        ln -s "$CLAUDE_SRC" "$CLAUDE_DEST"
-        echo "Updated symlink $CLAUDE_DEST -> $CLAUDE_SRC"
-      else
-        echo "~/.claude/$CLAUDE_FILE already symlinked correctly."
-      fi
-    elif [ ! -e "$CLAUDE_DEST" ]; then
-      ln -s "$CLAUDE_SRC" "$CLAUDE_DEST"
-      echo "Created symlink $CLAUDE_DEST -> $CLAUDE_SRC"
-    else
-      echo "~/.claude/$CLAUDE_FILE exists but is not a symlink; skipping."
-    fi
-  fi
-done
-
-if [ -x "$DOTFILES/install/claude-backend.sh" ]; then
-  "$DOTFILES/install/claude-backend.sh" || echo "Warning: Claude Code settings backend link failed; continuing."
-else
-  echo "Warning: $DOTFILES/install/claude-backend.sh is not executable; skipping Claude Code settings backend link."
-fi
-
-python3 "$DOTFILES/install/claude-profiles.py" || echo "Warning: Claude profile setup incomplete; see the reported local prerequisites."
-
-echo -e "\n\nInstalling Claude Code agents and commands"
-echo "=============================="
-for CLAUDE_SRC in "$DOTFILES/claude/agents" "$DOTFILES/claude/commands" "$DOTFILES/claude/output-styles"; do
-  DIR_NAME=$(basename "$CLAUDE_SRC")
-  CLAUDE_DEST="$HOME/.claude/$DIR_NAME"
-  mkdir -p "$HOME/.claude"
-  if [ -e "$CLAUDE_SRC" ]; then
-    if [ -L "$CLAUDE_DEST" ]; then
-      CURRENT=$(readlink "$CLAUDE_DEST")
-      if [ "$CURRENT" != "$CLAUDE_SRC" ]; then
-        rm "$CLAUDE_DEST"
-        ln -s "$CLAUDE_SRC" "$CLAUDE_DEST"
-        echo "Updated symlink $CLAUDE_DEST -> $CLAUDE_SRC"
-      else
-        echo "~/.claude/$DIR_NAME already symlinked correctly."
-      fi
-    elif [ ! -e "$CLAUDE_DEST" ]; then
-      ln -s "$CLAUDE_SRC" "$CLAUDE_DEST"
-      echo "Created symlink $CLAUDE_DEST -> $CLAUDE_SRC"
-    else
-      echo "~/.claude/$DIR_NAME exists but is not a symlink; skipping."
-    fi
-  fi
-done
+bash "$DOTFILES/install/claude-profiles.sh" || { echo "Claude profile setup failed or is incomplete; see the messages above."; exit 1; }
 
 echo -e "\n\nInstalling Claude Code MCP servers"
 echo "=============================="

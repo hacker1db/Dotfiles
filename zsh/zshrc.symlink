@@ -11,6 +11,9 @@ autoload -U compinit add-zsh-hook
 compinit -C
 # Reevaluate the prompt string each time it's displaying a prompt
 autoload bashcompinit && bashcompinit
+if command -v plan &> /dev/null; then
+    eval "$(plan completion bash)"
+fi
 setopt prompt_subst
 if command -v kubectl &> /dev/null; then
     source <(kubectl completion zsh)
@@ -144,5 +147,3 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 
 # Added by sonarqube-cli installer
 export PATH="$HOME/.local/share/sonarqube-cli/bin:$PATH"
-# Added by Maestro CLI installer
-export PATH="$HOME/.local/bin:$PATH"

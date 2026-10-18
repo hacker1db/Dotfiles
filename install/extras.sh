@@ -2,7 +2,6 @@
 
 echo "Setting up extras"
 mkdir -p "$HOME/.vim-tmp" "$HOME/Developer" "$HOME/Developer/Sites" "$HOME/Screenshots"
-[ -f "$HOME/.localrc" ] || touch "$HOME/.localrc"
 if command -v limactl >/dev/null 2>&1; then
   limactl start-at-login || echo "limactl start-at-login failed"
 fi

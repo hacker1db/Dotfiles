@@ -121,7 +121,7 @@ CASKS=(
   android-platform-tools
   basictex
   burp-suite-professional
-  claude-code
+  claude
   codex
   cursor
   dbeaver-community
@@ -185,7 +185,12 @@ if [[ "$(uname -s)" == Darwin ]]; then
   for c in "${CASKS[@]}"; do
     brew install --cask "$c" || true
   done
+  # Fonts via tap already handled; ensure nerd fonts present
+  brew tap homebrew/cask-fonts || true
 fi
+
+# Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
+[ -x "$HOME/.local/bin/claude" ] || curl -fsSL https://claude.ai/install.sh | bash || true
 
 if command -v limactl >/dev/null 2>&1; then
   echo Starting lima default instance

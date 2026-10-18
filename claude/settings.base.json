@@ -4,34 +4,30 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/statusline-command.sh"
+    "command": "bash ~/.dotfiles/claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "cli-anything@cli-anything": true,
     "typescript-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "oh-my-claudecode@omc": true,
     "frontend-design@claude-plugins-official": true,
-    "ponytail@ponytail": true
+    "pyright-lsp@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "claude-security@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    },
     "cli-anything": {
       "source": {
         "source": "github",
         "repo": "HKUDS/CLI-Anything"
-      }
-    },
-    "ponytail": {
-      "source": {
-        "source": "github",
-        "repo": "DietrichGebert/ponytail"
-      }
-    },
-    "omc": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/Yeachan-Heo/oh-my-claudecode.git"
       }
     },
     "claude-code-plugins": {
@@ -41,7 +37,8 @@
       }
     }
   },
-  "plansDirectory": "~/notes/SecondBrain/4.Resources/plans",
+  "enabledMcpjsonServers": ["github", "playwright"],
+  "plansDirectory": "~/Developer/plans",
   "effortLevel": "high",
   "theme": "dark-daltonized",
   "editorMode": "vim",
@@ -50,6 +47,7 @@
   "model": "claude-fable-5[1m]",
   "skillListingBudgetFraction": 0.02,
   "permissions": {
+    "defaultMode": "auto",
     "deny": [
       "Bash(sudo *)",
       "Bash(su *)",

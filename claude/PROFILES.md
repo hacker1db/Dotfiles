@@ -1,70 +1,97 @@
-# Native Claude Code profiles
+# Claude Code profiles
 
-Profiles separate account configuration and history. For provider selection within the existing configuration directory, see [per-session launchers](../docs/claude-sessions.md).
+Three isolated profiles, each with its own `CLAUDE_CONFIG_DIR`, login, settings, skills, and plugins.
 
-Run the installer from the dotfiles root:
+| Profile | Config dir | Command | Aliases | Settings layers |
+| --- | --- | --- | --- | --- |
+| personal (default) | `~/.claude-personal` | `claude-personal` | `cc`, `ccc` | base + personal |
+| work subscription | `~/.claude-subscription` | `claude-subscription` | `cw`, `cwc` | base + subscription |
+| Foundry | `~/.claude-foundry` | `claude-foundry` | `cf`, `cfc` | base + foundry + resource + local autoMode |
+
+`zsh/zshenv.symlink` exports `CLAUDE_CONFIG_DIR=~/.claude-personal`, so plain `claude` and `skillctl` use personal. The `bin/claude-*` wrappers override it for one launch and always run the native `~/.local/bin/claude`. GUI apps don't read `zshenv`; point them at a wrapper.
+
+## Where everything lives
+
+Use these absolute paths from GUI apps and other tools (such as T3 Code) that don't load the shell.
+
+| What | Path |
+| --- | --- |
+| Claude Code binary (native, auto-updating) | `~/.local/bin/claude` |
+| Personal launcher | `~/.dotfiles/bin/claude-personal` |
+| Work subscription launcher | `~/.dotfiles/bin/claude-subscription` |
+| Foundry launcher | `~/.dotfiles/bin/claude-foundry` |
+| Profile config dirs | `~/.claude-personal`, `~/.claude-subscription`, `~/.claude-foundry` |
+| Generated settings (ignored by Git, mode 600) | `~/.dotfiles/claude/.local/profiles/{personal,subscription,foundry}.json` |
+| Shared settings layer (committed) | `~/.dotfiles/claude/settings.base.json` |
+| Profile settings and hooks (committed) | `~/.dotfiles/claude/profiles/{personal,subscription,foundry}/{settings.json,hooks/}` |
+| Foundry resource | `ANTHROPIC_FOUNDRY_RESOURCE` in `~/.localrc` → `~/OneDrive*/Personal/.localrc` |
+| Local autoMode input | `~/.config/claude-code/automode.json` (falls back to `foundry-automode.json`) |
+| MCP servers (all profiles) | `~/.mcp.json` → `~/.dotfiles/claude/mcp.json` |
+| Installer and test | `~/.dotfiles/install/claude-profiles.sh`, `install/tests/claude-profiles.test.sh` |
+
+Each profile dir contains:
+
+- `settings.json`: a symlink to that profile's generated settings
+- symlinks to the dotfiles copies of `CLAUDE.md`, `agents/`, `commands/`, `output-styles/` and `statusline-command.sh`
+- `hooks/`: a symlink to `claude/profiles/<profile>/hooks`
+- `skills/`: a real dir of links managed by skillctl
+- `plugins/`: plugins installed for that profile only
+- login credentials and history, which Claude writes itself
+
+There are two ways for a tool to select a profile:
+
+1. Run a launcher as the Claude binary. This is the simplest option and needs no environment setup.
+2. Run `~/.local/bin/claude` with `CLAUDE_CONFIG_DIR` set to the profile dir.
+
+The Foundry profile also needs a working `az login`. Its resource and model come from its settings file, not from the environment.
+
+`~/.claude`, the legacy config dir, was removed on 2026-10-18. Dotfiles never writes there. If it reappears, a session was launched without `CLAUDE_CONFIG_DIR`.
+
+## Install
+
+`./install.sh link` runs `install/claude-profiles.sh`, which:
+
+- links `~/.localrc` to `~/OneDrive*/Personal/.localrc`, and fails if there isn't exactly one OneDrive dir or the file hasn't synced
+- merges the layers with jq into ignored `claude/.local/profiles/<profile>.json` (mode 600), linked as `~/.claude-<profile>/settings.json` (dir mode 700), and backs up an unmanaged `settings.json` once
+- links `CLAUDE.md`, `agents/`, `commands/`, `output-styles/`, `statusline-command.sh` into each profile
+- links `claude/profiles/<profile>/hooks` as `~/.claude-<profile>/hooks`
+- creates a real `skills/` dir and fills it with `CLAUDE_CONFIG_DIR=<dir> skillctl sync --global`
+- adds the declared marketplaces and installs the declared plugins per profile
+
+Foundry reads `ANTHROPIC_FOUNDRY_RESOURCE` from the environment, or from `~/.localrc`. Rerun the installer after changing it. `~/.config/claude-code/automode.json` (or `foundry-automode.json`) contributes only `autoMode.environment`. Layers that contain `apiKeyHelper` or API keys or tokens are rejected.
 
 ```sh
-python3 install/claude-profiles.py --skip-foundry
+install/claude-profiles.sh --check         # read-only audit
+install/claude-profiles.sh --skip-foundry  # leave Foundry untouched
 ```
 
-The installer is also invoked by `install/link.sh`. It creates independent settings targets in `claude/.local/profiles/` and links individual settings files into private profile directories. Existing settings receive a private backup before replacement. Existing profile status lines and unrelated hooks are preserved. Plain `claude` and the existing convenience launchers keep their existing selection behavior.
+Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout, symlinked dirs), and 2 means incomplete (no Foundry resource, stale state, or inherited `ANTHROPIC_*`/`CLAUDE_CODE_USE_*` variables, which are reported by name only).
 
-## Everyday commands
+## Layers
+
+- `settings.base.json`: shared plugins, `enabledMcpjsonServers` (github, playwright from `~/.mcp.json`), `permissions.defaultMode: auto`, deny rules, statusline.
+- `profiles/personal/settings.json`: personal-only plugins (vercel, todoist).
+- `profiles/subscription/settings.json`: settings for the work subscription only. GitGuardian runs as a git hook (`core.hooksPath`), not a Claude hook.
+- `profiles/foundry/settings.json`: Foundry provider and deployment model defaults. Uses `opus` (the configured Opus 4.8 deployment) for auto mode compatibility; `opusplan` would select the unsupported Sonnet 4.6 deployment during execution.
+
+Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`.
+
+The generated files also pin the provider: Foundry sets `CLAUDE_CODE_USE_FOUNDRY=1`, while personal and subscription set it to `0` and add `forceLoginMethod: claudeai`. All three set Bedrock and Vertex to `0`.
+
+## First use
+
+1. `cc` and `cw`: log in to the personal and the work claude.ai account. Then run `/status`, quit, relaunch, and check that `/status` shows the same account.
+2. `cf`: needs `az login`. In `/status`, confirm the provider is Foundry and the resource is correct. Confirm auto mode works.
+3. Open all three at once and check that each `/status` stays distinct.
+
+Claude Console (API-key) logins are stored outside `CLAUDE_CONFIG_DIR`, so they are not isolated. Profiles isolate config and auth, not the filesystem, so use separate worktrees when concurrent sessions edit one repo.
+
+## Tests
 
 ```sh
-CLAUDE_CONFIG_DIR="$HOME/.claude-foundry" claude
-CLAUDE_CONFIG_DIR="$HOME/.claude-subscription" claude
-CLAUDE_CONFIG_DIR="$HOME/.claude-personal" claude
+bash install/tests/claude-profiles.test.sh
 ```
 
-Use the same directory with `claude --continue` or `claude --resume` to resume that profile's history. These commands require a shell without conflicting provider or authentication exports. The installer reports relevant inherited variable names without printing values. In an externally configured shell, unset those variables in a subshell before launching. Do not assume changing the configuration directory neutralizes inherited API keys, tokens, model overrides, or project settings.
+## Rollback
 
-## Local verification
-
-```sh
-python3 install/claude-profiles.py --skip-foundry --check
-```
-
-This check makes no configuration changes and requires no login. It verifies distinct settings targets, private permissions, first party provider selection, claude.ai login settings, work hook scope, hook file availability, and inherited provider conflicts. Exit status 2 identifies unresolved prerequisites or conflicts. The installation command also returns 2 when prerequisites remain missing. Passing fixture tests prove installer behavior; they do not prove live authentication or hook scanning.
-
-Foundry setup is currently deferred. `--skip-foundry` leaves that profile untouched, including when a local Foundry input file exists. The full dotfiles installer still attempts all profiles and reports incomplete prerequisites without preventing unrelated links.
-
-## Foundry prerequisite
-
-Create a private local file at `~/.config/claude-code/foundry-profile.json`, with an `env` object containing the existing intended `ANTHROPIC_FOUNDRY_RESOURCE` or HTTPS `ANTHROPIC_FOUNDRY_BASE_URL`. Optional deployment names use `ANTHROPIC_DEFAULT_OPUS_MODEL`, `ANTHROPIC_DEFAULT_SONNET_MODEL`, and `ANTHROPIC_DEFAULT_HAIKU_MODEL`. Set restrictive permissions on this file. No resource is automatically discovered. Credentials are not accepted in this file. Existing Azure authentication remains outside the generated configuration.
-
-Rerun the installer after providing the configuration. It leaves Foundry uninstalled when no explicit endpoint is available and returns exit status 2 for missing prerequisites. The default deployment names come from `claude/settings.foundry.json`; verify those deployments exist before sending a request.
-
-## Account onboarding and verification
-
-1. Start subscription and personal separately with the direct commands. Log into the intended distinct claude.ai accounts. Confirm the browser account before authorizing. Use Chrome for computer assisted interaction. Do not copy tokens or credential files.
-2. Inspect `/status`, close and relaunch each profile, and inspect `/status` again. Keep only nonsecret identity labels in verification records.
-3. Authenticate Foundry using the existing Azure mechanism, launch its direct command, and confirm provider, resource, and model with `/status`.
-4. Send one harmless prompt in each profile and check concurrent sessions for stable identities. Billing attribution remains unverified without billing evidence.
-5. Review effective project and managed settings in each working repository. Personal sessions must not inherit work security hooks through project settings or plugins.
-
-## Work hooks
-
-`claude/settings.work.json` owns the commit security hook that runs GitGuardian. SonarQube hooks are managed separately and are not registered by this setup. Foundry and subscription receive these registrations. Personal excludes those registrations while preserving unrelated hooks. The legacy backend and session installers also load this fragment to preserve their existing work behavior.
-
-The installer removes obsolete Sonar hook registrations while preserving unrelated hooks. No Sonar scripts are required. Plugin credentials and runtime state are not copied or shared between profiles.
-
-## Tests and recovery
-
-```sh
-python3 install/tests/claude-profiles.test.py
-bash install/tests/claude-session.test.sh
-bash -n install/claude-backend.sh install/claude-session.sh install/link.sh
-git diff --check
-```
-
-Restore an individual settings backup after removing its generated symlink if needed. Leave account directories and credentials intact. No logout, credential revocation, or deletion is required for rollback. Review the Git diff and restore only these implementation changes if rolling back the code. Git lifecycle remains manual.
-
-## Current local setup
-
-Verified on 2026-10-15: subscription and personal settings are installed with separate generated targets, profile directory mode 700, and settings file mode 600. Both report the first party provider and no logged in account. Concurrent status checks did not authenticate either profile. Default Claude settings, their symlink target, and the user managed status line remain unchanged. Generated settings are ignored by Git.
-
-SonarQube hook registrations and the Sonar invocation in the commit hook were removed at user request. GitGuardian remains enabled for work profiles and excluded from personal. Account authentication and live service checks remain deferred. No plugin credentials or runtime state were shared.
-
-Foundry onboarding and account login are deferred. Run the two everyday account commands when ready to authenticate. The original plan remains active for the deferred identity, request routing, and concurrent authenticated session checks.
+Revert the dotfiles commits, rerun `./install.sh link`, and launch plain `claude` with `CLAUDE_CONFIG_DIR` unset. `~/.claude` stays intact until the profiles are verified.

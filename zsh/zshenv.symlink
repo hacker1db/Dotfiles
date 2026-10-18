@@ -3,6 +3,8 @@ export CACHEDIR="$HOME/.local/share"
 export VIM_TMP="$HOME/.vim-tmp"
 # add a config file for ripgrep
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
+# Default Claude Code profile; bin/claude-foundry and bin/claude-subscription override it per launch.
+export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
 
 [[ -d "$CACHEDIR" ]] || mkdir -p "$CACHEDIR"
 [[ -d "$VIM_TMP" ]] || mkdir -p "$VIM_TMP"
