@@ -214,7 +214,7 @@ All directories under `config/` are symlinked to `~/.config/<name>`. When adding
 ### Zsh Functions
 Custom functions in `zsh/functions/`, `zsh/functions.zsh`, and `zsh/git.zsh`:
 
-- `wt-pull-all` - Delegate to the Worktrunk `pull-all` alias for this repository
+- `wt-pull-all` - Fetch, add worktrees for unmerged remote branches, fast-forward every worktree, verify the default branch, and prune merged worktrees
 - `c` - Quick directory navigation
 - `h` - Command history search
 - `yy` - Yazi file manager with directory change
