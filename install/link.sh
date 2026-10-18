@@ -4,6 +4,126 @@ DOTFILES=$HOME/.dotfiles/main
 source "$DOTFILES/install/lib/log.sh"
 source "$DOTFILES/install/lib/env.sh"
 
+LINK_PHASE="${DOTFILES_LINK_PHASE:-all}"
+case "$LINK_PHASE" in
+    files|integrations|all) ;;
+    *) echo "Unknown DOTFILES_LINK_PHASE: $LINK_PHASE (expected files, integrations or all)" >&2; exit 1 ;;
+esac
+
+echo -e "\nCreating symlinks"
+echo "=============================="
+linkables=$(find -H "$DOTFILES" -maxdepth 3 -name '*.symlink')
+for file in $linkables; do
+    target="$HOME/.$(basename $file '.symlink')"
+    if [[ "$(basename "$file")" == gitconfig.symlink ]]; then
+        [[ "$LINK_PHASE" == files ]] && continue
+    else
+        [[ "$LINK_PHASE" == integrations ]] && continue
+    fi
+    [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
+    if [ -e "$target" ]; then
+        echo "~${target#$HOME} already exists... Skipping."
+    else
+        echo "Creating symlink for $file"
+        ln -s "$file" "$target"
+    fi
+done
+
+if [[ "$LINK_PHASE" != integrations ]]; then
+    echo -e "\n\ninstalling to ~/.config"
+    echo "=============================="
+    if [ ! -d "$HOME/.config" ]; then
+        echo "Creating ~/.config"
+        mkdir -p "$HOME/.config"
+    fi
+
+    for config in $DOTFILES/config/*; do
+        target="$HOME/.config/$(basename "$config")"
+        [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
+        if [ -e "$target" ]; then
+            echo "~${target#$HOME} already exists... Skipping."
+        else
+            echo "Creating symlink for $config"
+            ln -s "$config" "$target"
+        fi
+    done
+
+    OPENCODE_SRC="$DOTFILES/config/opencode"
+    OPENCODE_DEST="$HOME/.config/opencode"
+    if [[ -d "$OPENCODE_SRC" && ! "$OPENCODE_SRC" -ef "$OPENCODE_DEST" ]]; then
+        if [[ -d "$OPENCODE_DEST" && ! -L "$OPENCODE_DEST" ]]; then
+            echo "$OPENCODE_DEST is an unmanaged directory; preserving it and linking only managed files."
+        else
+            if [[ -e "$OPENCODE_DEST" || -L "$OPENCODE_DEST" ]]; then
+                OPENCODE_BACKUP_BASE="$OPENCODE_DEST.backup.$(date +%Y%m%d%H%M%S)"
+                OPENCODE_BACKUP=$OPENCODE_BACKUP_BASE
+                OPENCODE_BACKUP_SUFFIX=0
+                while [[ -e "$OPENCODE_BACKUP" || -L "$OPENCODE_BACKUP" ]]; do
+                    OPENCODE_BACKUP_SUFFIX=$((OPENCODE_BACKUP_SUFFIX + 1))
+                    OPENCODE_BACKUP="$OPENCODE_BACKUP_BASE.$OPENCODE_BACKUP_SUFFIX"
+                done
+                mv "$OPENCODE_DEST" "$OPENCODE_BACKUP" || exit 1
+                echo "Preserved existing OpenCode config: $OPENCODE_BACKUP"
+            fi
+            ln -s "$OPENCODE_SRC" "$OPENCODE_DEST" || exit 1
+        fi
+    fi
+
+    bash "$DOTFILES/install/agent-instructions.sh" || exit 1
+
+    echo -e "\n\nInstalling Claude Code MCP servers"
+    echo "=============================="
+    MCP_SRC="$DOTFILES/claude/mcp.json"
+    MCP_DEST="$HOME/.mcp.json"
+    if [ -e "$MCP_SRC" ]; then
+      if [ -L "$MCP_DEST" ]; then
+        CURRENT=$(readlink "$MCP_DEST")
+        if [ "$CURRENT" != "$MCP_SRC" ]; then
+          rm "$MCP_DEST"
+          ln -s "$MCP_SRC" "$MCP_DEST"
+          echo "Updated symlink $MCP_DEST -> $MCP_SRC"
+        else
+          echo "~/.mcp.json already symlinked correctly."
+        fi
+      elif [ ! -e "$MCP_DEST" ]; then
+        ln -s "$MCP_SRC" "$MCP_DEST"
+        echo "Created symlink $MCP_DEST -> $MCP_SRC"
+      else
+        echo "~/.mcp.json exists but is not a symlink; skipping."
+      fi
+    fi
+
+    echo -e "\n\nCreating vim symlinks"
+    echo "=============================="
+    VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim" "$HOME/.vimrc:$DOTFILES/vim/.vimrc")
+    for file in "${VIMFILES[@]}"; do
+        KEY=${file%%:*}
+        VALUE=${file#*:}
+        if [ -e "$KEY" ]; then
+            echo "${KEY} already exists... skipping."
+        else
+            echo "Creating symlink for $KEY"
+            ln -s "$VALUE" "$KEY"
+        fi
+    done
+
+    echo -e "\n\nCreating zshrc symlinks"
+    echo "=============================="
+    ZSHRC=("$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")
+    for file in "${ZSHRC[@]}"; do
+        KEY=${file%%:*}
+        VALUE=${file#*:}
+        if [ -e "$KEY" ]; then
+            echo "${KEY} already exists... skipping."
+        else
+            echo "Creating symlink for $KEY"
+            ln -s "$VALUE" "$KEY"
+        fi
+    done
+fi
+
+[[ "$LINK_PHASE" == files ]] && exit 0
+
 github_ssh_preflight >&2 || true
 
 # Ensure clitools repo is present before linking
@@ -40,87 +160,9 @@ else
   echo "Warning: plan-manager bootstrap helper is missing."
 fi
 
-
-echo -e "\nCreating symlinks"
-echo "=============================="
-linkables=$(find -H "$DOTFILES" -maxdepth 3 -name '*.symlink')
-for file in $linkables; do
-    target="$HOME/.$(basename $file '.symlink')"
-    [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
-    if [ -e "$target" ]; then
-        echo "~${target#$HOME} already exists... Skipping."
-    else
-        echo "Creating symlink for $file"
-        ln -s "$file" "$target"
-    fi
-done
-
-echo -e "\n\ninstalling to ~/.config"
-echo "=============================="
-if [ ! -d "$HOME/.config" ]; then
-    echo "Creating ~/.config"
-    mkdir -p "$HOME/.config"
-fi
-
-for config in $DOTFILES/config/*; do
-    target="$HOME/.config/$(basename "$config")"
-    [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
-    if [ -e "$target" ]; then
-        echo "~${target#$HOME} already exists... Skipping."
-    else
-        echo "Creating symlink for $config"
-        ln -s "$config" "$target"
-    fi
-done
-
-OPENCODE_SRC="$DOTFILES/config/opencode"
-OPENCODE_DEST="$HOME/.config/opencode"
-if [[ -d "$OPENCODE_SRC" && ! "$OPENCODE_SRC" -ef "$OPENCODE_DEST" ]]; then
-    if [[ -d "$OPENCODE_DEST" && ! -L "$OPENCODE_DEST" ]]; then
-        echo "$OPENCODE_DEST is an unmanaged directory; preserving it and linking only managed files."
-    else
-        if [[ -e "$OPENCODE_DEST" || -L "$OPENCODE_DEST" ]]; then
-            OPENCODE_BACKUP_BASE="$OPENCODE_DEST.backup.$(date +%Y%m%d%H%M%S)"
-            OPENCODE_BACKUP=$OPENCODE_BACKUP_BASE
-            OPENCODE_BACKUP_SUFFIX=0
-            while [[ -e "$OPENCODE_BACKUP" || -L "$OPENCODE_BACKUP" ]]; do
-                OPENCODE_BACKUP_SUFFIX=$((OPENCODE_BACKUP_SUFFIX + 1))
-                OPENCODE_BACKUP="$OPENCODE_BACKUP_BASE.$OPENCODE_BACKUP_SUFFIX"
-            done
-            mv "$OPENCODE_DEST" "$OPENCODE_BACKUP" || exit 1
-            echo "Preserved existing OpenCode config: $OPENCODE_BACKUP"
-        fi
-        ln -s "$OPENCODE_SRC" "$OPENCODE_DEST" || exit 1
-    fi
-fi
-
-bash "$DOTFILES/install/agent-instructions.sh" || exit 1
-
 echo -e "\n\nInstalling Claude Code profiles"
 echo "=============================="
 bash "$DOTFILES/install/claude-profiles.sh" || { echo "Claude profile setup failed or is incomplete; see the messages above."; exit 1; }
-
-echo -e "\n\nInstalling Claude Code MCP servers"
-echo "=============================="
-MCP_SRC="$DOTFILES/claude/mcp.json"
-MCP_DEST="$HOME/.mcp.json"
-if [ -e "$MCP_SRC" ]; then
-  if [ -L "$MCP_DEST" ]; then
-    CURRENT=$(readlink "$MCP_DEST")
-    if [ "$CURRENT" != "$MCP_SRC" ]; then
-      rm "$MCP_DEST"
-      ln -s "$MCP_SRC" "$MCP_DEST"
-      echo "Updated symlink $MCP_DEST -> $MCP_SRC"
-    else
-      echo "~/.mcp.json already symlinked correctly."
-    fi
-  elif [ ! -e "$MCP_DEST" ]; then
-    ln -s "$MCP_SRC" "$MCP_DEST"
-    echo "Created symlink $MCP_DEST -> $MCP_SRC"
-  else
-    echo "~/.mcp.json exists but is not a symlink; skipping."
-  fi
-fi
 
 echo -e "\n\nInstalling SSH config"
 echo "=============================="
@@ -146,34 +188,6 @@ if [ -e "$SSH_SRC" ]; then
     echo "~/.ssh/config exists but is not a symlink; skipping."
   fi
 fi
-
-echo -e "\n\nCreating vim symlinks"
-echo "=============================="
-VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim" "$HOME/.vimrc:$DOTFILES/vim/.vimrc")
-for file in "${VIMFILES[@]}"; do
-    KEY=${file%%:*}
-    VALUE=${file#*:}
-    if [ -e "$KEY" ]; then
-        echo "${KEY} already exists... skipping."
-    else
-        echo "Creating symlink for $KEY"
-        ln -s "$VALUE" "$KEY"
-    fi
-done
-
-echo -e "\n\nCreating zshrc symlinks"
-echo "=============================="
-ZSHRC=("$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")
-for file in "${ZSHRC[@]}"; do
-    KEY=${file%%:*}
-    VALUE=${file#*:}
-    if [ -e "$KEY" ]; then
-        echo "${KEY} already exists... skipping."
-    else
-        echo "Creating symlink for $KEY"
-        ln -s "$VALUE" "$KEY"
-    fi
-done
 
 echo -e "\n\nEnsuring ~/.gitconfig-local link"
 echo "=============================="

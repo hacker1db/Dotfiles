@@ -46,7 +46,7 @@ run_script() {
   fi
   load_brew_env || true
   case "$1" in
-    link) github_ssh_preflight || true ;;
+    link) [ "${DOTFILES_LINK_PHASE:-all}" = files ] || github_ssh_preflight || true ;;
   esac
   bash "$sc" "$@"
   local status=$?
@@ -61,9 +61,14 @@ if [ "$cmd" = "all" ]; then
   title "Running full install"
   failed=()
   export DOTFILES_DEFER_PROMPTS=1
-  for part in backup homebrew link terminfo node-tools git macos extras nvimtmux dotnet dotnet-tools theme deferred shell; do
+  for part in backup link-files homebrew link-integrations terminfo node-tools git macos extras nvimtmux dotnet dotnet-tools theme deferred shell; do
     info "Executing $part"
-    if ! run_script "$part"; then
+    case "$part" in
+      link-files) step=link; export DOTFILES_LINK_PHASE=files ;;
+      link-integrations) step=link; export DOTFILES_LINK_PHASE=integrations ;;
+      *) step="$part"; unset DOTFILES_LINK_PHASE ;;
+    esac
+    if ! run_script "$step"; then
       if [ "$part" = homebrew ]; then
         error "homebrew failed; the remaining steps need its tools, stopping"
         exit 1
