@@ -1,11 +1,11 @@
 [core]
-    sshCommand = ~/.dotfiles/bin/git-agent-ssh
-    hooksPath = ~/.dotfiles/git/templates/hooks
+    sshCommand = ~/.dotfiles/main/bin/git-agent-ssh
+    hooksPath = ~/.dotfiles/main/git/templates/hooks
 [gpg]
     format = ssh
 [gpg "ssh"]
-    program = ~/.dotfiles/bin/git-agent-sign
-    defaultKeyCommand = sh -c ~/.dotfiles/bin/git-agent-signing-key
+    program = ~/.dotfiles/main/bin/git-agent-sign
+    defaultKeyCommand = sh -c ~/.dotfiles/main/bin/git-agent-signing-key
     allowedSignersFile = ~/.ssh/allowed_signers
 [commit]
     gpgsign = true
@@ -40,18 +40,18 @@
     title = Github Work
 
 [includeIf "hasconfig:remote.*.url:git@github-hacker1db:*/**"]
-    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
 [includeIf "hasconfig:remote.*.url:git@hb1:*/**"]
-    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
 [includeIf "hasconfig:remote.*.url:git@github.com:hacker1db/**"]
-    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
 [includeIf "hasconfig:remote.*.url:https://github.com/hacker1db/**"]
-    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
 [includeIf "hasconfig:remote.*.url:ssh://git@github.com/hacker1db/**"]
-    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
 [includeIf "hasconfig:remote.*.url:git@github.com:zerobitconsulting/**"]
-    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
 [includeIf "hasconfig:remote.*.url:https://github.com/zerobitconsulting/**"]
-    path = ~/.dotfiles/git/profiles/hacker1db/identities/hacker1db.gitconfig
+    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
 [includeIf "hasconfig:remote.*.url:git@github-cyberdso:*/**"]
-    path = ~/.dotfiles/git/profiles/hacker1db/identities/cyberdso.gitconfig
+    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/cyberdso.gitconfig

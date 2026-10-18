@@ -5,10 +5,10 @@ Personal macOS development configuration for Zsh, Neovim, tmux, Ghostty, Git, an
 ## Installation
 
 ```sh
-git clone https://github.com/hacker1db/Dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-./install.sh all
+bash <(curl -fsSL https://raw.githubusercontent.com/hacker1db/Dotfiles/main/install/bootstrap.sh)
 ```
+
+`install/bootstrap.sh` clones the repository bare into `~/.dotfiles/main/.bare`, the same layout `bin/git-bare-clone` creates, checks out `main` at `~/.dotfiles/main`, and runs `./install.sh all` there. Pass a subcommand to run something other than `all`. Branch worktrees (`wt switch -c <branch>`) land beside `main` in `~/.dotfiles/main/`; the installed links always point at `~/.dotfiles/main`. Rerunning it reuses an existing clone; it stops if `~/.dotfiles/main` exists in another layout.
 
 Review the scripts before running a full installation: they install packages, change macOS preferences, configure applications, and may prompt for authentication. `all` runs `link` before `homebrew`; plan-manager bootstrap in the link step already requires Node.js 20+, pnpm, and Pandoc. On a fresh machine, install those prerequisites and authenticate `gh` (or set `PLAN_MANAGER_REPO_URL`) first.
 
@@ -52,7 +52,7 @@ wt pull-all
 
 `wt pull-all` fetches every remote with pruning, then runs `git pull --ff-only --no-autostash` in each worktree **of the current repository** using that branch's configured upstream. Worktrees without a resolvable upstream, including detached worktrees, are skipped. A failed initial fetch stops the operation; individual pull failures are reported while remaining worktrees continue. Diverged branches require manual resolution. Local edits are not stashed; Git refuses updates that would overwrite them. This does not discover unrelated repositories or change remote URLs.
 
-The `wt-pull-all` function in `zsh/functions.zsh` delegates to the same alias. Reload it with `source ~/.dotfiles/zsh/functions.zsh`. `cob` wraps `wt switch --create`; `git-bare-clone` supports cloning, `--init`, and `--fix` for a `.bare` repository with linked worktrees. Run `git-bare-clone --help` for its arguments. `gcc` invokes `git-clean-merged`, which can delete merged local **and remote** branches.
+The `wt-pull-all` function in `zsh/functions.zsh` delegates to the same alias. Reload it with `source ~/.dotfiles/main/zsh/functions.zsh`. `cob` wraps `wt switch --create`; `git-bare-clone` supports cloning, `--init`, and `--fix` for a `.bare` repository with linked worktrees. Run `git-bare-clone --help` for its arguments. `gcc` invokes `git-clean-merged`, which can delete merged local **and remote** branches.
 
 ## Neovim
 

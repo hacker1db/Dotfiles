@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-DOTFILES=$HOME/.dotfiles
+DOTFILES=$HOME/.dotfiles/main
 LOCAL_FILE="$HOME/.gitconfig-local"
 PROFILE_DIR="$DOTFILES/git/profiles"
 

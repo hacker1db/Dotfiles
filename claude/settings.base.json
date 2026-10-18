@@ -4,7 +4,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.dotfiles/claude/statusline-command.sh"
+    "command": "bash ~/.dotfiles/main/claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "cli-anything@cli-anything": true,

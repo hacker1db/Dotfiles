@@ -210,7 +210,7 @@ function gha(){
        gh project item-add 16 --owner Alaska-ITS --url "$@"
 }
 function brew-cleanup(){
-    local brewfile="${DOTFILES:-$HOME/.dotfiles}/install/brewfile"
+    local brewfile="${DOTFILES:-$HOME/.dotfiles/main}/install/brewfile"
     local snapshot
     local formula
     local -a missing_formulae

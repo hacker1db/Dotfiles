@@ -1,4 +1,4 @@
-export DOTFILES=$HOME/.dotfiles
+export DOTFILES=$HOME/.dotfiles/main
 export ZSH=$DOTFILES/zsh
 
 if [[ -d $DOTFILES/zsh/functions ]]; then

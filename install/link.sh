@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
  
-DOTFILES=$HOME/.dotfiles
+DOTFILES=$HOME/.dotfiles/main
 source "$DOTFILES/install/lib/log.sh"
 source "$DOTFILES/install/lib/env.sh"
 
@@ -46,6 +46,7 @@ echo "=============================="
 linkables=$(find -H "$DOTFILES" -maxdepth 3 -name '*.symlink')
 for file in $linkables; do
     target="$HOME/.$(basename $file '.symlink')"
+    [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
     if [ -e "$target" ]; then
         echo "~${target#$HOME} already exists... Skipping."
     else
@@ -63,6 +64,7 @@ fi
 
 for config in $DOTFILES/config/*; do
     target="$HOME/.config/$(basename "$config")"
+    [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
     if [ -e "$target" ]; then
         echo "~${target#$HOME} already exists... Skipping."
     else

@@ -3,7 +3,7 @@
 EXIT_CODE=0
 
 hook_type=$(basename "$0")
-hooks="$HOME/.dotfiles/git/hooks"
+hooks="$HOME/.dotfiles/main/git/hooks"
 
 echo "Executing $hook_type hook(s)"
 

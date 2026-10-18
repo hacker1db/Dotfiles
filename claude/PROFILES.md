@@ -17,17 +17,17 @@ Use these absolute paths from GUI apps and other tools (such as T3 Code) that do
 | What | Path |
 | --- | --- |
 | Claude Code binary (native, auto-updating) | `~/.local/bin/claude` |
-| Personal launcher | `~/.dotfiles/bin/claude-personal` |
-| Work subscription launcher | `~/.dotfiles/bin/claude-subscription` |
-| Foundry launcher | `~/.dotfiles/bin/claude-foundry` |
+| Personal launcher | `~/.dotfiles/main/bin/claude-personal` |
+| Work subscription launcher | `~/.dotfiles/main/bin/claude-subscription` |
+| Foundry launcher | `~/.dotfiles/main/bin/claude-foundry` |
 | Profile config dirs | `~/.claude-personal`, `~/.claude-subscription`, `~/.claude-foundry` |
-| Generated settings (ignored by Git, mode 600) | `~/.dotfiles/claude/.local/profiles/{personal,subscription,foundry}.json` |
-| Shared settings layer (committed) | `~/.dotfiles/claude/settings.base.json` |
-| Profile settings and hooks (committed) | `~/.dotfiles/claude/profiles/{personal,subscription,foundry}/{settings.json,hooks/}` |
+| Generated settings (ignored by Git, mode 600) | `~/.dotfiles/main/claude/.local/profiles/{personal,subscription,foundry}.json` |
+| Shared settings layer (committed) | `~/.dotfiles/main/claude/settings.base.json` |
+| Profile settings and hooks (committed) | `~/.dotfiles/main/claude/profiles/{personal,subscription,foundry}/{settings.json,hooks/}` |
 | Foundry resource | `ANTHROPIC_FOUNDRY_RESOURCE` in `~/.localrc` → `~/OneDrive*/Personal/.localrc` |
 | Local autoMode input | `~/.config/claude-code/automode.json` (falls back to `foundry-automode.json`) |
-| MCP servers (all profiles) | `~/.mcp.json` → `~/.dotfiles/claude/mcp.json` |
-| Installer and test | `~/.dotfiles/install/claude-profiles.sh`, `install/tests/claude-profiles.test.sh` |
+| MCP servers (all profiles) | `~/.mcp.json` → `~/.dotfiles/main/claude/mcp.json` |
+| Installer and test | `~/.dotfiles/main/install/claude-profiles.sh`, `install/tests/claude-profiles.test.sh` |
 
 Each profile dir contains:
 

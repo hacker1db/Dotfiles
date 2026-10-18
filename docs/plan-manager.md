@@ -58,7 +58,7 @@ with a validated origin and upstream may be fast-forwarded.
 
 ```bash
 # On any Mac after cloning dotfiles
-cd ~/.dotfiles
+cd ~/.dotfiles/main
 install/link.sh
 ```
 
@@ -280,7 +280,7 @@ Run the isolated installer checks without touching live tool configuration or
 loading a LaunchAgent:
 
 ```bash
-~/.dotfiles/install/tests/plan-manager-bootstrap.test.sh
+~/.dotfiles/main/install/tests/plan-manager-bootstrap.test.sh
 ```
 
 The checks cover current bare-worktree resolution, explicit-worktree

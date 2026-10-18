@@ -171,7 +171,7 @@ Once you have the articles, categorize them:
 ### Search Parameters to Store in Config
 
 ```bash
-# ~/.dotfiles/config/opencode/readwise-security-config.sh
+# ~/.dotfiles/main/config/opencode/readwise-security-config.sh
 
 # Timeframes
 DAILY_LOOKBACK="1d"

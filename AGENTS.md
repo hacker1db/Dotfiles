@@ -84,10 +84,10 @@ node install/tests/plan-manager-harness-contracts.test.mjs
 source ~/.zshrc
 
 # Check For Zsh Syntax Errors
-zsh -n ~/.dotfiles/zsh/zshrc.symlink
+zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
 
 # Install links and integrations (changes configuration and starts services)
-~/.dotfiles/install/link.sh
+~/.dotfiles/main/install/link.sh
 ```
 
 ### Neovim
@@ -98,7 +98,7 @@ zsh -n ~/.dotfiles/zsh/zshrc.symlink
 nvim +checkhealth
 
 # Check Lua Syntax
-luacheck ~/.dotfiles/config/nvim/
+luacheck ~/.dotfiles/main/config/nvim/
 
 # Update And Sync Plugins
 nvim --headless "+Lazy! sync" +qa
@@ -108,14 +108,14 @@ nvim --headless "+Lazy! sync" +qa
 
 ```bash
 # Install All Packages From Brewfile
-brew bundle --file=~/.dotfiles/install/brewfile
+brew bundle --file=~/.dotfiles/main/install/brewfile
 
 # Run Full Installation Script
-~/.dotfiles/install.sh all
+~/.dotfiles/main/install.sh all
 
 # Install Tools And Create Symlinks
-~/.dotfiles/install/install_tools.sh
-~/.dotfiles/install/link.sh
+~/.dotfiles/main/install/install_tools.sh
+~/.dotfiles/main/install/link.sh
 ```
 
 ## Code Style & Conventions
@@ -185,11 +185,11 @@ brew bundle --file=~/.dotfiles/install/brewfile
 
 All directories under `config/` are symlinked to `~/.config/<name>`. When adding a new app config:
 
-1. Create the directory at `~/.dotfiles/config/<appname>/`
+1. Create the directory at `~/.dotfiles/main/config/<appname>/`
 2. Preserve or back up existing configuration before replacing its path
-3. Symlink: `ln -s ~/.dotfiles/config/<appname> ~/.config/<appname>`
+3. Symlink: `ln -s ~/.dotfiles/main/config/<appname> ~/.config/<appname>`
 
-**Never create config files directly in `~/.config/`** — always source them from `~/.dotfiles/config/`.
+**Never create config files directly in `~/.config/`** — always source them from `~/.dotfiles/main/config/`.
 
 ## Agent Skills
 

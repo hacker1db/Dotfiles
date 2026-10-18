@@ -1,7 +1,7 @@
 # reload zsh config
 alias reload!='source ~/.zshrc'
 alias r!='reload!'
-alias e!="nvim ~/.dotfiles/config/nvim/init.vim"
+alias e!="nvim ~/.dotfiles/main/config/nvim/init.vim"
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
     colorflag="--color"
@@ -40,7 +40,7 @@ alias notes='cd $HOME/notes/SecondBrain'
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
 alias du='du -h -c' # calculate disk usage for a folder
-alias dotfiles="cd ~/.dotfiles"
+alias dotfiles="cd ~/.dotfiles/main"
 alias tfd="terraform apply --destroy --auto-approve"
 alias tfp="terraform plan"
 alias tfa="terraform apply --auto-approve"

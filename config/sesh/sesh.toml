@@ -11,7 +11,7 @@ preview_command = "eza --all --git --icons --color=always {}"
 # Pinned: dotfiles
 [[session]]
 name = "dotfiles"
-path = "~/.dotfiles"
+path = "~/.dotfiles/main"
 startup_command = "nvim ."
 
 # Pinned: Second Brain notes

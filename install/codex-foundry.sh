@@ -78,7 +78,7 @@ TOKEN_HELPER="$DOTFILES/bin/azure-openai-token"
   error "Token helper is missing or not executable: $TOKEN_HELPER"
   exit 1
 }
-AUTH_ARGS='["-c", "exec \"$HOME/.dotfiles/bin/azure-openai-token\""]'
+AUTH_ARGS='["-c", "exec \"$HOME/.dotfiles/main/bin/azure-openai-token\""]'
 
 mkdir -p "$codex_home"
 config="$codex_home/config.toml"
