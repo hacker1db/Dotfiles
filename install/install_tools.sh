@@ -228,6 +228,8 @@ fi
 if command -v go >/dev/null 2>&1; then
   go install github.com/cosmtrek/air@latest || true
   go install github.com/charmbracelet/glow@latest || true
+  # Dotfiles' own commands (machine-id for tmux, fleet-login)
+  (cd "$(dirname "${BASH_SOURCE[0]}")/.." && GOBIN="$HOME/.local/bin" go install ./cmd/...) || true
 fi
 
 # GitHub extensions

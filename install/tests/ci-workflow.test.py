@@ -19,6 +19,7 @@ class CiWorkflowTest(unittest.TestCase):
             'bash install/tests/claude-profiles.test.sh',
             'node install/tests/plan-manager-harness-contracts.test.mjs',
             'python3 install/tests/ci-workflow.test.py',
+            'go vet ./... && go test ./...',
         ):
             self.assertIn(command, CI)
 

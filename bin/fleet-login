@@ -1,6 +1,0 @@
-#!/bin/sh
-# Log in to a fleet host and attach its tmux session: `fleet-login <host> [session]`.
-# Hosts are the ~/.ssh/config aliases (stronghold, aiserver); the session defaults to "main".
-[ -n "$1" ] || { echo "usage: fleet-login <stronghold|aiserver> [session]" >&2; exit 2; }
-# A login shell puts Homebrew's tmux on PATH on macOS.
-exec ssh -t "$1" "exec \$SHELL -lc 'tmux new-session -A -s ${2:-main}'"
