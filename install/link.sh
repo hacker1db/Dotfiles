@@ -99,6 +99,7 @@ if [[ "$LINK_PHASE" != integrations ]]; then
     for file in "${VIMFILES[@]}"; do
         KEY=${file%%:*}
         VALUE=${file#*:}
+        [ -L "$KEY" ] && [ ! -e "$KEY" ] && rm "$KEY"
         if [ -e "$KEY" ]; then
             echo "${KEY} already exists... skipping."
         else
@@ -113,6 +114,7 @@ if [[ "$LINK_PHASE" != integrations ]]; then
     for file in "${ZSHRC[@]}"; do
         KEY=${file%%:*}
         VALUE=${file#*:}
+        [ -L "$KEY" ] && [ ! -e "$KEY" ] && rm "$KEY"
         if [ -e "$KEY" ]; then
             echo "${KEY} already exists... skipping."
         else
