@@ -6,7 +6,6 @@ Host github.com
 	HostKeyAlias github.com
 	User git
 
-# Fleet logins: `ssh stronghold` / `ssh aiserver`; `fleet-login <host>` also lands in tmux.
 Host stronghold
     HostName stronghold-2.local
 
@@ -22,8 +21,6 @@ Host aiserver 192.168.1.157
     ForwardAgent yes
     IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 
-# Send common dev-server ports back here so a remote http://localhost:<port> link opens on this machine.
-# A port already in use locally is skipped with a warning; add -o ClearAllForwardings=yes to opt out.
 Host stronghold stronghold-2.local aiserver 192.168.1.157
     LocalForward 3000 localhost:3000
     LocalForward 3001 localhost:3001

@@ -1,7 +1,3 @@
-// Command machine-id prints this machine's fleet identity: `machine-id [label|color]`.
-//
-// Fleet hosts are inventoried in fleet-manager (fleet.json); any other machine is the
-// work machine, which keeps the theme's standard accent (empty color).
 package main
 
 import (
@@ -16,14 +12,13 @@ type identity struct{ label, color string }
 func identify(name string) identity {
 	switch name = strings.ToLower(name); {
 	case strings.HasPrefix(name, "stronghold"):
-		return identity{"STRONGHOLD", "#f16c75"} // Eldritch red
+		return identity{"STRONGHOLD", "#f16c75"}
 	case strings.HasPrefix(name, "aiserver"):
-		return identity{"AISERVER", "#f7c67f"} // Eldritch orange
+		return identity{"AISERVER", "#f7c67f"}
 	}
 	return identity{"WORK", ""}
 }
 
-// machineName prefers the macOS LocalHostName because hostname is "MacBookPro" on every Mac.
 func machineName(localHostName, hostname func() (string, error)) string {
 	if name, err := localHostName(); err == nil && strings.TrimSpace(name) != "" {
 		return strings.TrimSpace(name)
