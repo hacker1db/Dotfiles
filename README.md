@@ -4,7 +4,7 @@ Personal macOS development configuration for Zsh, Neovim, tmux, Ghostty, Git, an
 
 ## Installation
 
-The repository is cloned bare with one worktree per branch, the same layout `bin/git-bare-clone` creates. That script is not on `PATH` yet, so clone by hand:
+On a new machine, nothing needs to be set up first. The repository is cloned bare with one worktree per branch, the same layout `bin/git-bare-clone` creates. That script is not on `PATH` yet, so clone by hand:
 
 ```sh
 mkdir -p ~/.dotfiles && cd ~/.dotfiles
@@ -18,9 +18,9 @@ cd main
 ./install.sh all
 ```
 
-The installed links always point at `~/.dotfiles/main`. Branch worktrees (`wt switch -c <branch>`) land beside it in `~/.dotfiles/`.
+The first clone uses HTTPS because 1Password and its SSH agent are not installed yet; the repository is public, so it needs no credentials. Once `install.sh` links `~/.gitconfig`, its `insteadOf` rule sends GitHub traffic over SSH, so later fetches and pushes in `~/.dotfiles` go through 1Password like any other repository. The installed links always point at `~/.dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/.dotfiles/`.
 
-Review the scripts before running a full installation: they install packages, change macOS preferences, configure applications, and prompt for logins as each step needs them. `all` runs `homebrew` right after `backup`; it installs the tools, then `install/verify.sh` checks for git, gh, Node.js 20+, pnpm, and Pandoc and runs `gh auth login` if GitHub is not logged in. If that check fails, `all` stops before linking. Run `bash install/verify.sh` on its own to recheck.
+`all` installs the tools first, right after `backup`. `install/verify.sh` then checks for git, gh, Node.js 20+, pnpm, and Pandoc, runs `gh auth login` if GitHub is not logged in, and tests SSH to GitHub. If SSH fails, it opens 1Password and waits while you sign in and turn on the SSH agent. If any check fails, `all` stops before linking; later steps prompt for their own logins. Run `bash install/verify.sh` to recheck, and set `DOTFILES_NONINTERACTIVE=1` to report problems instead of prompting. The scripts also change macOS preferences and configure applications, so review them before a full run.
 
 | Command | Purpose |
 | --- | --- |
