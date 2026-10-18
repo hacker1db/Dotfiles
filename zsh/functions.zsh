@@ -3,8 +3,137 @@
 ####################
 
 function wt-pull-all() {
-    wt pull-all
+    emulate -L zsh
+    setopt pipe_fail
+
+    local dry_run=0 arg
+    for arg in "$@"; do
+        case "$arg" in
+            -n|--dry-run) dry_run=1 ;;
+            -h|--help)
+                print "usage: wt-pull-all [--dry-run]"
+                print "Fetch all remotes, add a worktree for every unmerged remote branch, fast-forward every worktree,"
+                print "verify the default branch matches its upstream, then prune worktrees already merged into it."
+                return 0
+                ;;
+            *)
+                print -u2 "wt-pull-all: unknown option: $arg"
+                return 2
+                ;;
+        esac
+    done
+
+    if ! command -v wt &> /dev/null; then
+        print -u2 "wt-pull-all: wt is not installed"
+        return 127
+    fi
+    if ! git rev-parse --git-dir &> /dev/null; then
+        print -u2 "wt-pull-all: not inside a git repository"
+        return 1
+    fi
+
+    local remote
+    remote="$(git config --get checkout.defaultRemote)"
+    remote="${remote:-origin}"
+    if ! git remote get-url "$remote" &> /dev/null; then
+        print -u2 "wt-pull-all: remote '$remote' is not configured"
+        return 1
+    fi
+
+    print "==> Fetching all remotes"
+    git fetch --all --prune || return 1
+
+    local default_branch
+    default_branch="$(git symbolic-ref --short "refs/remotes/$remote/HEAD" 2> /dev/null)"
+    if [[ -z "$default_branch" ]]; then
+        git remote set-head "$remote" --auto &> /dev/null
+        default_branch="$(git symbolic-ref --short "refs/remotes/$remote/HEAD" 2> /dev/null)"
+    fi
+    default_branch="${default_branch#"$remote"/}"
+    if [[ -z "$default_branch" ]]; then
+        print -u2 "wt-pull-all: cannot determine the default branch of '$remote'"
+        return 1
+    fi
+
+    local -a failures worktree_branches remote_branches
+    worktree_branches=(${(f)"$(git worktree list --porcelain | awk '/^branch /{sub("refs/heads/", "", $2); print $2}')"})
+    remote_branches=(${(f)"$(git for-each-ref --format='%(refname:strip=3)' "refs/remotes/$remote/" | grep -vx HEAD)"})
+
+    print "==> Adding worktrees for remote branches"
+    local branch added=0
+    for branch in "${remote_branches[@]}"; do
+        if [[ "$branch" == "$default_branch" ]] || (( ${worktree_branches[(Ie)$branch]} )); then
+            continue
+        fi
+        if git merge-base --is-ancestor "$remote/$branch" "$remote/$default_branch" 2> /dev/null; then
+            print "    skipping $branch: already merged into $default_branch"
+            continue
+        fi
+        if (( dry_run )); then
+            print "    would add worktree for $branch"
+            continue
+        fi
+        if wt switch --no-cd --no-hooks "$branch"; then
+            (( added++ ))
+        else
+            failures+=("add worktree for $branch")
+        fi
+    done
+    (( dry_run )) || print "    added $added worktree(s)"
+
+    print "==> Pulling every worktree"
+    if (( dry_run )); then
+        print "    would run git pull --ff-only in each worktree with an upstream"
+    elif ! wt step for-each -- sh -c 'git rev-parse --verify -q @{u} > /dev/null || { echo "Skipping: no upstream"; exit 0; }; git pull --ff-only --no-autostash'; then
+        failures+=("pull one or more worktrees")
+    fi
+
+    print "==> Checking $default_branch against $remote/$default_branch"
+    local main_path ahead behind main_ok=1
+    main_path="$(git worktree list --porcelain | awk -v ref="refs/heads/$default_branch" '/^worktree /{path=$2} $0 == "branch " ref {print path}')"
+    if ! git show-ref --verify -q "refs/heads/$default_branch"; then
+        if (( dry_run )); then
+            print "    would create local $default_branch tracking $remote/$default_branch"
+        else
+            git branch --track "$default_branch" "$remote/$default_branch" > /dev/null
+        fi
+    fi
+    if [[ -z "$main_path" ]] && (( ! dry_run )) && git show-ref --verify -q "refs/heads/$default_branch"; then
+        git fetch "$remote" "$default_branch:$default_branch" 2> /dev/null
+    fi
+    read -r ahead behind <<< "$(git rev-list --left-right --count "$default_branch...$remote/$default_branch" 2> /dev/null)"
+    if [[ -z "$ahead" ]]; then
+        print -u2 "    $default_branch is not available locally"
+        main_ok=0
+    elif (( behind > 0 )); then
+        print -u2 "    $default_branch is behind $remote/$default_branch by $behind commit(s)$( (( ahead > 0 )) && print -n " and ahead by $ahead; the branches have diverged")"
+        [[ -n "$main_path" ]] && print -u2 "    resolve in $main_path (uncommitted changes or a non-fast-forward history block the update)"
+        main_ok=0
+    elif (( ahead > 0 )); then
+        print "    $default_branch has all remote changes but is ahead by $ahead unpushed commit(s)"
+    else
+        print "    $default_branch is up to date with $remote/$default_branch at $(git rev-parse --short "$default_branch")"
+    fi
+    (( main_ok )) || failures+=("$default_branch is not up to date")
+
+    print "==> Pruning worktrees merged into $default_branch"
+    if (( dry_run )); then
+        wt step prune --dry-run || failures+=("prune dry run")
+    else
+        wt step prune --foreground || failures+=("prune merged worktrees")
+    fi
+
+    if (( ${#failures} )); then
+        print -u2 "==> wt-pull-all finished with problems:"
+        local failure
+        for failure in "${failures[@]}"; do
+            print -u2 "    - $failure"
+        done
+        return 1
+    fi
+    print "==> Done"
 }
+
 
 function daily() {
     local date="${1:-$(date +%Y-%m-%d)}"
