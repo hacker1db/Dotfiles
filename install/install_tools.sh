@@ -177,7 +177,6 @@ CASKS=(
   spotify
   todoist-app
   unetbootin
-  visual-studio-code@insiders
   wireshark-app
   zen
   zoom
