@@ -247,3 +247,5 @@ if [[ "$(uname -s)" == Darwin ]] && command -v mas >/dev/null 2>&1; then
 fi
 
 echo Backup install complete
+
+bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/verify.sh"

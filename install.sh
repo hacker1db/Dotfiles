@@ -59,9 +59,13 @@ run_script() {
 if [ "$cmd" = "all" ]; then
   title "Running full install"
   failed=()
-  for part in backup link terminfo homebrew node-tools shell git macos extras nvimtmux dotnet dotnet-tools theme; do
+  for part in backup homebrew link terminfo node-tools shell git macos extras nvimtmux dotnet dotnet-tools theme; do
     info "Executing $part"
     if ! run_script "$part"; then
+      if [ "$part" = homebrew ]; then
+        error "homebrew failed; the remaining steps need its tools, stopping"
+        exit 1
+      fi
       error "$part failed; continuing"
       failed+=("$part")
     fi

@@ -4,13 +4,23 @@ Personal macOS development configuration for Zsh, Neovim, tmux, Ghostty, Git, an
 
 ## Installation
 
+The repository is cloned bare with one worktree per branch, the same layout `bin/git-bare-clone` creates. That script is not on `PATH` yet, so clone by hand:
+
 ```sh
-bash <(curl -fsSL https://raw.githubusercontent.com/hacker1db/Dotfiles/main/install/bootstrap.sh)
+mkdir -p ~/.dotfiles && cd ~/.dotfiles
+git clone --bare https://github.com/hacker1db/Dotfiles.git .bare
+echo "gitdir: ./.bare" > .git
+git --git-dir=.bare config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git --git-dir=.bare fetch origin
+git --git-dir=.bare worktree add main main
+git -C main branch --set-upstream-to=origin/main
+cd main
+./install.sh all
 ```
 
-`install/bootstrap.sh` clones the repository bare into `~/.dotfiles/.bare`, the same layout `bin/git-bare-clone` creates, checks out `main` at `~/.dotfiles/main`, and runs `./install.sh all` there. Pass a subcommand to run something other than `all`. Branch worktrees (`wt switch -c <branch>`) land beside `main` in `~/.dotfiles/`; the installed links always point at `~/.dotfiles/main`. Rerunning it reuses an existing clone; it stops if `~/.dotfiles` exists in another layout.
+The installed links always point at `~/.dotfiles/main`. Branch worktrees (`wt switch -c <branch>`) land beside it in `~/.dotfiles/`.
 
-Review the scripts before running a full installation: they install packages, change macOS preferences, configure applications, and may prompt for authentication. `all` runs `link` before `homebrew`, and the link step already needs git, gh, Node.js 20+, pnpm, and Pandoc. The bootstrap checks for them before cloning, lists anything missing, and runs `gh auth login` when GitHub is not logged in (skipped when `PLAN_MANAGER_REPO_URL` is set; `DOTFILES_NONINTERACTIVE=1` makes it fail instead of prompting).
+Review the scripts before running a full installation: they install packages, change macOS preferences, configure applications, and prompt for logins as each step needs them. `all` runs `homebrew` right after `backup`; it installs the tools, then `install/verify.sh` checks for git, gh, Node.js 20+, pnpm, and Pandoc and runs `gh auth login` if GitHub is not logged in. If that check fails, `all` stops before linking. Run `bash install/verify.sh` on its own to recheck.
 
 | Command | Purpose |
 | --- | --- |
@@ -27,7 +37,7 @@ Review the scripts before running a full installation: they install packages, ch
 | `./install.sh dotnet` / `./install.sh dotnet-tools` | Install .NET and global tools |
 | `./install.sh theme list` | List theme candidates |
 
-`all` runs backup, link, terminfo, homebrew, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs backup, homebrew, link, terminfo, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; that catalog and the explicit lists in `install/install_tools.sh` are separate sources.
 
