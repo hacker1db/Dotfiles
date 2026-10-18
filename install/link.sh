@@ -7,7 +7,7 @@ source "$DOTFILES/install/lib/env.sh"
 github_ssh_preflight >&2 || true
 
 # Ensure clitools repo is present before linking
-CLITOOLS_DIR="$HOME/Developer/clitools"
+CLITOOLS_DIR="$HOME/Developer/clitools/main"
 if [ -z "${CLITOOLS_REPO_URL:-}" ]; then
     GH_USER=$(github_owner || true)
     if [ -n "$GH_USER" ]; then
@@ -21,7 +21,7 @@ if [ -n "$CLITOOLS_REPO_URL" ] && [ ! -d "$CLITOOLS_DIR" ]; then
     echo "Cloning clitools repo to $CLITOOLS_DIR"
     mkdir -p "$(dirname "$CLITOOLS_DIR")"
     github_clone "$CLITOOLS_REPO_URL" "$CLITOOLS_DIR" || echo "Failed to clone clitools; continuing without it"
-elif [ -d "$CLITOOLS_DIR/.git" ]; then
+elif [ -e "$CLITOOLS_DIR/.git" ]; then
     github_git -C "$CLITOOLS_DIR" fetch --quiet && github_git -C "$CLITOOLS_DIR" pull --ff-only --quiet || echo "Could not update clitools; using existing copy"
 fi
 
@@ -230,7 +230,7 @@ done
 echo -e "\n\nEnsuring ~/.gitconfig-local link"
 echo "=============================="
 LOCAL_FILE="$HOME/.gitconfig-local"
-CLITOOLS_DIR_DEFAULT="$HOME/Developer/clitools"
+CLITOOLS_DIR_DEFAULT="$HOME/Developer/clitools/main"
 SOURCE_CANDIDATE=""
 if [ -d "$CLITOOLS_DIR_DEFAULT" ]; then
   for f in gitconfig-local .gitconfig-local gitconfig.local; do

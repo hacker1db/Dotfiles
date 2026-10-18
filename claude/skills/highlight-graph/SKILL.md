@@ -15,7 +15,7 @@ Follow `../readwise-cli/references/access-patterns.md`.
 
 ## Build Script
 
-`build_graph.py` lives at `$HOME/Developer/clitools/readwise/build_graph.py`. Use this absolute path in all commands below.
+`build_graph.py` lives at `$HOME/Developer/clitools/main/readwise/build_graph.py`. Use this absolute path in all commands below.
 
 ## Process
 
@@ -55,7 +55,7 @@ Write an empty connections file and run the build script to give the user someth
 
 ```bash
 echo '[]' > /tmp/connections.json
-python3 $HOME/Developer/clitools/readwise/build_graph.py --highlights /tmp/highlights.json --connections /tmp/connections.json --output highlight-graph.html
+python3 $HOME/Developer/clitools/main/readwise/build_graph.py --highlights /tmp/highlights.json --connections /tmp/connections.json --output highlight-graph.html
 open highlight-graph.html
 ```
 
@@ -93,7 +93,7 @@ Each agent should return a JSON array of connections:
 Merge all agent results into a single connections JSON array, write to `/tmp/connections.json`, and re-run the build script:
 
 ```bash
-python3 $HOME/Developer/clitools/readwise/build_graph.py --highlights /tmp/highlights.json --connections /tmp/connections.json --output highlight-graph.html
+python3 $HOME/Developer/clitools/main/readwise/build_graph.py --highlights /tmp/highlights.json --connections /tmp/connections.json --output highlight-graph.html
 open highlight-graph.html
 ```
 
@@ -114,10 +114,10 @@ Present a summary:
 
 ## The Build Script
 
-`build_graph.py` (at `$HOME/Developer/clitools/readwise/build_graph.py`) handles all the visualization logic. It takes two JSON files and outputs a self-contained HTML file:
+`build_graph.py` (at `$HOME/Developer/clitools/main/readwise/build_graph.py`) handles all the visualization logic. It takes two JSON files and outputs a self-contained HTML file:
 
 ```
-python3 $HOME/Developer/clitools/readwise/build_graph.py --highlights highlights.json --connections connections.json --output output.html
+python3 $HOME/Developer/clitools/main/readwise/build_graph.py --highlights highlights.json --connections connections.json --output output.html
 ```
 
 **highlights.json:** Array of `{id, text, note, book_id, source_title, source_author, url}`

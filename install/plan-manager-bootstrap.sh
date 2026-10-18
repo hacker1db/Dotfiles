@@ -12,7 +12,7 @@ source "$DOTFILES/install/lib/env.sh"
 PLAN_REPO_DIR="${PLAN_MANAGER_REPO_DIR:-$HOME/Developer/plan-manager}"
 LOCAL_BIN="$HOME/.local/bin"
 PLAN_LINK="$LOCAL_BIN/plan"
-PLAN_ROOT="${PLAN_HOME:-$HOME/Developer/plans}"
+PLAN_ROOT="${PLAN_HOME:-$HOME/notes/SecondBrain/4.Resources/plans}"
 
 canonical_dir() {
     (cd "$1" 2>/dev/null && pwd -P)
@@ -455,11 +455,16 @@ install_plan_launch_agent() {
 
 initialize_plan_library() {
     title "Initializing plan library"
+    if [ ! -d "$PLAN_ROOT" ]; then
+        warning "$PLAN_ROOT does not exist; it lives in the Second Brain vault. Sync the vault, then re-run the linker."
+        return 0
+    fi
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" init || return 1
 }
 
 check_plan_manager() {
     title "Checking plan-manager"
+    [ -d "$PLAN_ROOT" ] || return 0
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" serve --json >/dev/null || return 1
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" doctor --json || return 1
 }

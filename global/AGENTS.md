@@ -15,7 +15,7 @@ Excluded:
 
 For every in-scope plan:
 
-1. Use `~/Developer/plans` as the canonical library. Do not create tool-specific copies.
+1. Use `~/notes/SecondBrain/4.Resources/plans` as the canonical library. Do not create tool-specific copies.
 2. Delegate all operations to the `plan` executable in non-interactive JSON mode (`--json`).
 3. Before opening or reviewing a plan, run `plan serve` and `plan doctor --json`. Report failures without inventing a dashboard URL.
 4. Return the plan ID and stable local dashboard URL (`http://plans.localhost:4173/plans/<id>`) after every mutation.
@@ -28,11 +28,11 @@ Use the tool's plan adapter: Codex uses `$plans`; OpenCode and Copilot use `/pla
 
 ## Plan-manager source code
 
-Keep the plan-manager repository in `~/Developer/plan-manager`, alongside other code repositories. For the bare-repository layout, use its `main/` worktree. The plan library remains `~/Developer/plans`.
+Keep the plan-manager repository in `~/Developer/plan-manager`, alongside other code repositories. For the bare-repository layout, use its `main/` worktree. The plan library remains `~/notes/SecondBrain/4.Resources/plans`.
 
 ## Workspace access
 
-The plan library at `~/Developer/plans` is configured as a writable root in `~/.codex/config.toml`. If a managed application or organization policy prevents access, request approval when prompted and do not attempt to bypass the sandbox.
+The plan library at `~/notes/SecondBrain/4.Resources/plans` is configured as a writable root in `~/.codex/config.toml`. If a managed application or organization policy prevents access, request approval when prompted and do not attempt to bypass the sandbox.
 
 ## Model
 

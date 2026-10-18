@@ -81,7 +81,7 @@ for (const harness of harnesses) {
 }
 
 const settings = JSON.parse(read('claude/settings.base.json'))
-assert.equal(settings.plansDirectory, '~/Developer/plans')
+assert.equal(settings.plansDirectory, '~/notes/SecondBrain/4.Resources/plans')
 assert.match(read('claude/output-styles/plan-browser.md'), /Do not generate adjacent HTML files/)
 
 const evals = JSON.parse(read('claude/skills/plans/evals/evals.json'))

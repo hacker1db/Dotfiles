@@ -5,12 +5,12 @@ Run both Readwise cleanup scripts, one after the other, to organize YouTube cont
 
 ## Script Locations
 
-Both scripts live at: `$HOME/Developer/clitools/readwiseshortremover/readwise/`
-Python venv: `$HOME/Developer/clitools/readwiseshortremover/readwise/.venv/` (or `venv/`)
+Both scripts live at: `$HOME/Developer/clitools/main/readwiseshortremover/readwise/`
+Python venv: `$HOME/Developer/clitools/main/readwiseshortremover/readwise/.venv/` (or `venv/`)
 
 Activate venv before running:
 ```bash
-SCRIPT_DIR="$HOME/Developer/clitools/readwiseshortremover/readwise"
+SCRIPT_DIR="$HOME/Developer/clitools/main/readwiseshortremover/readwise"
 source "$SCRIPT_DIR/.venv/bin/activate" 2>/dev/null || source "$SCRIPT_DIR/venv/bin/activate"
 ```
 

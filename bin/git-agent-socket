@@ -1,0 +1,10 @@
+#!/bin/sh
+# Print the 1Password SSH agent socket: macOS app, Linux app, then a forwarded agent.
+for socket in \
+    "$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" \
+    "$HOME/.1password/agent.sock" \
+    "${SSH_AUTH_SOCK:-}"; do
+    [ -n "$socket" ] && [ -S "$socket" ] && { printf '%s\n' "$socket"; exit 0; }
+done
+echo 'The 1Password agent socket is unavailable.' >&2
+exit 1
