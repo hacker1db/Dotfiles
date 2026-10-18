@@ -2,6 +2,7 @@ if [[ -x /opt/homebrew/bin/brew ]]; then
     _brew_env="$(builtin cd -q / && /opt/homebrew/bin/brew shellenv zsh)" && eval "$_brew_env"
     unset _brew_env
 fi
+export HOMEBREW_NO_ASK=1
 [[ -n $HOMEBREW_PREFIX ]] || return
 # source z.sh if it exists
 zpath="$HOMEBREW_PREFIX/etc/profile.d/z.sh"

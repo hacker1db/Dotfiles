@@ -22,6 +22,8 @@ The first clone uses HTTPS because 1Password and its SSH agent are not installed
 
 `all` installs the tools first, right after `backup`. `install/verify.sh` then checks for git, gh, Node.js 20+, pnpm, and Pandoc, runs `gh auth login` if GitHub is not logged in, and tests SSH to GitHub. If SSH fails, it opens 1Password and waits while you sign in and turn on the SSH agent. If any check fails, `all` stops before linking; later steps prompt for their own logins. Run `bash install/verify.sh` to recheck, and set `DOTFILES_NONINTERACTIVE=1` to report problems instead of prompting. The scripts also change macOS preferences and configure applications, so review them before a full run.
 
+Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off, and `zsh/brew.zsh` exports it for interactive shells so `brew install` and `brew upgrade` do not stop at `[y/n]` prompts. On a fresh machine the Zsh config is not linked yet, so run the first install as `HOMEBREW_NO_ASK=1 ./install.sh all` to let every step inherit it. Remove the export from `zsh/brew.zsh` to get the prompts back.
+
 | Command | Purpose |
 | --- | --- |
 | `./install.sh backup` | Copy selected existing dotfiles into `~/dotfiles-backup` |
