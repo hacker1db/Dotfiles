@@ -16,7 +16,9 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 claude_dir="$root/claude"
 profiles_dir="$claude_dir/profiles"
 generated="$claude_dir/.local/profiles"
-linked_items=(CLAUDE.md agents commands output-styles statusline-command.sh)
+linked_items=(CLAUDE.md commands output-styles statusline-command.sh)
+# Subagents live in the skills repository, not here.
+skills_agents="${SKILLS_REPO:-$HOME/Developer/skills/main}/agents/claude"
 credential_keys='["ANTHROPIC_API_KEY","ANTHROPIC_AUTH_TOKEN","ANTHROPIC_FOUNDRY_API_KEY","ANTHROPIC_FOUNDRY_AUTH_TOKEN","CLAUDE_CODE_OAUTH_TOKEN"]'
 
 check=0
@@ -94,6 +96,14 @@ link_item() {
     fi
 }
 
+link_agents() {
+    if [ -d "$skills_agents" ]; then
+        link_item "$skills_agents" "$1/agents"
+    else
+        problem "$skills_agents not found (set SKILLS_REPO); skipped $1/agents"
+    fi
+}
+
 install_plugins() {
     local dir="$1" settings="$2" have name src id
     command -v claude >/dev/null || { problem "claude is not installed; skipped plugins for $dir"; return; }
@@ -134,6 +144,7 @@ for profile in personal subscription foundry; do
         [ -d "$dir/skills" ] && [ ! -L "$dir/skills" ] || problem "$profile: $dir/skills must be a real directory"
         for item in "${linked_items[@]}"; do link_item "$claude_dir/$item" "$dir/$item"; done
         link_item "$profiles_dir/$profile/hooks" "$dir/hooks"
+        link_agents "$dir"
         continue
     fi
 
@@ -155,6 +166,7 @@ for profile in personal subscription foundry; do
     fi
     for item in "${linked_items[@]}"; do link_item "$claude_dir/$item" "$dir/$item"; done
     link_item "$profiles_dir/$profile/hooks" "$dir/hooks"
+    link_agents "$dir"
     [ ! -L "$dir/skills" ] || die "Refusing symlinked skills directory: $dir/skills"
     mkdir -p "$dir/skills"
     if command -v skillctl >/dev/null; then

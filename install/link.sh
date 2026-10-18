@@ -94,6 +94,16 @@ if [[ -d "$OPENCODE_SRC" && ! "$OPENCODE_SRC" -ef "$OPENCODE_DEST" ]]; then
     fi
 fi
 
+# OpenCode subagents live in the skills repository (gitignored here).
+OPENCODE_AGENTS="${SKILLS_REPO:-$HOME/Developer/skills/main}/agents/opencode"
+if [[ ! -d "$OPENCODE_AGENTS" ]]; then
+    echo "$OPENCODE_AGENTS not found (set SKILLS_REPO); skipping OpenCode agents."
+elif [[ -L "$OPENCODE_DEST/agent" || ! -e "$OPENCODE_DEST/agent" ]]; then
+    ln -sfn "$OPENCODE_AGENTS" "$OPENCODE_DEST/agent"
+else
+    echo "$OPENCODE_DEST/agent exists and is not a symlink; skipping."
+fi
+
 bash "$DOTFILES/install/agent-instructions.sh" || exit 1
 
 echo -e "\n\nInstalling Claude Code profiles"

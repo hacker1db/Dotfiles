@@ -9,7 +9,8 @@ repo="$temp/repo"
 home="$temp/home"
 stubs="$temp/bin"
 log="$temp/calls.log"
-mkdir -p "$repo/install" "$home/OneDrive - Fixture/Personal" "$stubs"
+agents="$home/Developer/skills/main/agents/claude"
+mkdir -p "$repo/install" "$home/OneDrive - Fixture/Personal" "$stubs" "$agents"
 rsync -a --exclude .local --exclude skills --exclude plugins "$root/claude" "$repo/"
 cp "$root/install/claude-profiles.sh" "$repo/install/"
 # Fixture subscription layer so hook scoping is tested independently of the real file's contents.
@@ -45,9 +46,10 @@ for p in personal subscription foundry; do
     [ "$(readlink "$d/settings.json")" = "$repo/claude/.local/profiles/$p.json" ] || fail "$p settings target"
     [ "$(mode_of "$repo/claude/.local/profiles/$p.json")" = 600 ] || fail "$p settings mode"
     [ -d "$d/skills" ] && [ ! -L "$d/skills" ] || fail "$p skills dir"
-    for item in CLAUDE.md agents commands output-styles statusline-command.sh; do
+    for item in CLAUDE.md commands output-styles statusline-command.sh; do
         [ "$(readlink "$d/$item")" = "$repo/claude/$item" ] || fail "$p link $item"
     done
+    [ "$(readlink "$d/agents")" = "$agents" ] || fail "$p agents link"
     [ "$(readlink "$d/hooks")" = "$repo/claude/profiles/$p/hooks" ] || fail "$p hooks link"
     grep -qx "skillctl .claude-$p sync --global" "$log" || fail "$p skillctl sync"
     [ "$(setting "$p" '.env.CLAUDE_CODE_USE_BEDROCK + .env.CLAUDE_CODE_USE_VERTEX')" = 00 ] || fail "$p bedrock/vertex"
@@ -94,6 +96,10 @@ echo '{}' > "$repo/claude/.local/profiles/subscription.json"
 code=0; run > "$temp/out5" || code=$?
 [ "$code" = 2 ] && grep -q 'subscription: generated settings are stale' "$temp/out5" || fail "stale check"
 args=(); run > /dev/null || fail "repair run"
+
+# A missing skills checkout is incomplete, not fatal.
+code=0; run SKILLS_REPO="$temp/nowhere" > "$temp/out8" || code=$?
+[ "$code" = 2 ] && grep -q 'agents/claude not found' "$temp/out8" || fail "missing skills repo"
 
 # --skip-foundry leaves Foundry untouched; missing resource is incomplete, not fatal.
 rm "$home/.claude-foundry/settings.json"
