@@ -47,6 +47,7 @@
   "model": "claude-fable-5[1m]",
   "skillListingBudgetFraction": 0.02,
   "permissions": {
+    "defaultMode": "auto",
     "deny": [
       "Bash(sudo *)",
       "Bash(su *)",
