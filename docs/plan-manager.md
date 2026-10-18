@@ -1,6 +1,6 @@
 # Plan Manager
 
-A tool-neutral local plan library backed by `~/Developer/plans`, served at `http://plans.localhost:4173/`, and accessible from Claude Code, OpenCode, Copilot, and Codex through the shared `plans` skill.
+A tool-neutral local plan library backed by `~/notes/SecondBrain/4.Resources/plans`, served at `http://plans.localhost:4173/`, and accessible from Claude Code, OpenCode, Copilot, and Codex through the shared `plans` skill.
 
 ## Application repository
 
@@ -28,7 +28,7 @@ The following overrides are supported:
 - `PLAN_MANAGER_REPO_DIR`: repository container or normal-clone path
 - `PLAN_MANAGER_WORKTREE`: an explicit worktree that must belong to the configured repository
 - `PLAN_MANAGER_REPO_URL`: the expected origin and clone URL
-- `PLAN_HOME`: canonical plan-library path, defaulting to `~/Developer/plans`
+- `PLAN_HOME`: canonical plan-library path, defaulting to `~/notes/SecondBrain/4.Resources/plans`
 
 ### Remote setup
 
@@ -68,10 +68,10 @@ The installer:
 2. Installs locked application dependencies (`pnpm install --frozen-lockfile`) and runs `pnpm build`.
 3. Validates `bin/plan` and links it to `~/.local/bin/plan`.
 4. Links global instructions and command adapters. Install the `plans` skill separately through skillctl.
-5. Merges `~/Developer/plans` into the Codex writable-root config.
-6. Initializes `~/Developer/plans` and its `archive/` subdirectory.
+5. Merges `~/notes/SecondBrain/4.Resources/plans` into the Codex writable-root config.
+6. Initializes `~/notes/SecondBrain/4.Resources/plans` and its `archive/` subdirectory only if the vault folder already exists; it never creates the folder.
 7. Installs the LaunchAgent and loads it with `launchctl`.
-8. Runs `plan serve --json` and `plan doctor --json`, reporting failures.
+8. Runs `plan serve --json` and `plan doctor --json`, reporting failures (skipped when the vault folder is missing).
 
 The bootstrap preserves correct managed links and backs up replaced files. Rerunning can fetch and fast-forward the application checkout, reinstall dependencies, rebuild the CLI, and check/start the service. It is not a no-op verification command. A plan-manager failure is reported after other dotfiles links have been attempted and makes the linker exit nonzero.
 
@@ -92,10 +92,10 @@ array without setting a sandbox mode or approval policy.
 
 The `plan` executable is linked at `~/.local/bin/plan` after installation. Dotfiles Zsh startup adds that directory to `PATH`.
 
-The bootstrap and LaunchAgent explicitly pass `PLAN_HOME=~/Developer/plans`. The application can have a different default, and the symlink does not set environment variables. For terminal invocations, set the canonical root in `~/.localrc` and reload the shell:
+The bootstrap and LaunchAgent explicitly pass `PLAN_HOME=~/notes/SecondBrain/4.Resources/plans`. The application can have a different default, and the symlink does not set environment variables. For terminal invocations, set the canonical root in `~/.localrc` and reload the shell:
 
 ```sh
-export PLAN_HOME="$HOME/Developer/plans"
+export PLAN_HOME="$HOME/notes/SecondBrain/4.Resources/plans"
 ```
 
 Confirm the effective root with `plan doctor --json` before creating or importing plans. Agent operations use non-interactive JSON mode; opening/reviewing requires `plan serve` and `plan doctor --json` first.
@@ -205,7 +205,7 @@ Standalone Markdown or HTML artifacts created by Claude Code, Codex, OpenCode, o
 plan capture ~/.codex/visualizations/<task>/implementation-plan.html --json
 ```
 
-HTML capture uses Pandoc to create canonical GitHub-flavored Markdown. External artifacts remain unchanged and are recorded as the plan's source. Unmanaged Markdown already written inside `~/Developer/plans` is normalized in place with plan-manager metadata. Capturing the same absolute source again updates the existing managed plan only when its converted content changed, preserving its ID and stable dashboard URL. All CLI and dashboard mutations share a bounded writer lock so identical sources converge on one plan, equal-title operations do not overwrite each other, and concurrent revision-guarded updates produce one winner. The dashboard does not crawl tool-specific artifact directories.
+HTML capture uses Pandoc to create canonical GitHub-flavored Markdown. External artifacts remain unchanged and are recorded as the plan's source. Unmanaged Markdown already written inside `~/notes/SecondBrain/4.Resources/plans` is normalized in place with plan-manager metadata. Capturing the same absolute source again updates the existing managed plan only when its converted content changed, preserving its ID and stable dashboard URL. All CLI and dashboard mutations share a bounded writer lock so identical sources converge on one plan, equal-title operations do not overwrite each other, and concurrent revision-guarded updates produce one winner. The dashboard does not crawl tool-specific artifact directories.
 
 ## Hosted publishing (optional)
 
@@ -243,7 +243,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 Then reload: `source ~/.zshrc`. Rerun `install/link.sh` only if the CLI symlink needs repair; its environment changes do not modify the parent shell.
 
-### Codex cannot write to `~/Developer/plans`
+### Codex cannot write to `~/notes/SecondBrain/4.Resources/plans`
 
 Check `~/.codex/config.toml` for `sandbox_workspace_write.writable_roots`. If a managed application or organization policy overrides local settings, Codex will request approval — approve it when prompted. `plan doctor` reports this as an effective-access limitation.
 
@@ -272,7 +272,7 @@ mv ~/.codex/AGENTS.md.backup-<timestamp> ~/.codex/AGENTS.md
 plan auth logout
 ```
 
-Removing the `~/.local/bin/plan` symlink does not delete `~/Developer/plan-manager` or its worktrees. Markdown files under `~/Developer/plans` are user data and are never deleted by rollback or uninstall.
+Removing the `~/.local/bin/plan` symlink does not delete `~/Developer/plan-manager` or its worktrees. Markdown files under `~/notes/SecondBrain/4.Resources/plans` are user data and are never deleted by rollback or uninstall.
 
 ## Installer verification
 

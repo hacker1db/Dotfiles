@@ -12,6 +12,14 @@ ensure_theme_file() {
   fi
 }
 
+sed_inplace() {
+  if [ "$(uname -s)" = "Darwin" ]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
+
 resolve_theme() {
   if [ -n "${DOTFILES_THEME:-}" ]; then
     echo "$DOTFILES_THEME"
@@ -34,10 +42,10 @@ apply_tmux() {
   local target_conf="$tmux_dir/${theme}.conf"
   if [ -f "$target_conf" ]; then
     # create/update current.conf symlink
-    ln -sf "$target_conf" "$tmux_dir/current.conf"
+    ln -sfn "${theme}.conf" "$tmux_dir/current.conf"
     # ensure tmux.conf sources current.conf instead of a fixed theme
     if grep -q 'themes/eldritch.conf' "$DOTFILES/config/tmux/tmux.conf"; then
-      sed -i '' 's/themes\/eldritch.conf/themes\/current.conf/' "$DOTFILES/config/tmux/tmux.conf" || true
+      sed_inplace 's/themes\/eldritch.conf/themes\/current.conf/' "$DOTFILES/config/tmux/tmux.conf" || true
     fi
     if [ -n "${TMUX:-}" ]; then
       tmux source-file "$HOME/.dotfiles/config/tmux/tmux.conf" || warning "tmux reload failed"
@@ -57,7 +65,7 @@ apply_ghostty() {
     theme_display=$(printf '%s' "$theme" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')
   fi
   if grep -qi '^theme' "$ghostty_cfg"; then
-    sed -i '' -E "s/^theme\s*=.*/theme = ${theme_display}/" "$ghostty_cfg" || true
+    sed_inplace -E "s/^theme[[:space:]]*=.*/theme = ${theme_display}/" "$ghostty_cfg" || true
     info "Updated Ghostty theme: ${theme_display}"
   else
     echo "theme = ${theme_display}" >> "$ghostty_cfg"
@@ -69,7 +77,7 @@ apply_starship() {
   local theme="$1"
   local starship_cfg="$DOTFILES/config/starship/starship.toml"
   if grep -q '^palette =' "$starship_cfg"; then
-    sed -i '' -E "s/^palette\s*=\s*\".*\"/palette = \"$theme\"/" "$starship_cfg" || true
+    sed_inplace -E "s/^palette[[:space:]]*=[[:space:]]*\".*\"/palette = \"$theme\"/" "$starship_cfg" || true
     info "Starship palette set to $theme"
   else
     printf '\npalette = "%s"\n' "$theme" >> "$starship_cfg"
@@ -114,7 +122,11 @@ apply_all() {
   success "Theme applied: $theme"
 }
 
-case "${1:-}" in
+if [ "${1:-}" = "theme" ]; then
+  shift
+fi
+
+case "${1:-sync}" in
   list) list_themes ;;
   current) resolve_theme ;;
   apply)

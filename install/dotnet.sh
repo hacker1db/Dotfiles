@@ -14,6 +14,15 @@ DOTNET_VERSIONS=("8.0" "10.0")
 
 echo "Setting up .NET SDK and runtimes..."
 
+cp() {
+    local args=() arg
+    for arg in "$@"; do
+        [ "$arg" = "-n" ] || args+=("$arg")
+    done
+    command cp "${args[@]}"
+}
+export -f cp
+
 # Create install directory
 mkdir -p "$DOTNET_ROOT"
 

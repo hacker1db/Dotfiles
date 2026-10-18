@@ -38,7 +38,7 @@
     }
   },
   "enabledMcpjsonServers": ["github", "playwright"],
-  "plansDirectory": "~/Developer/plans",
+  "plansDirectory": "~/notes/SecondBrain/4.Resources/plans",
   "effortLevel": "high",
   "theme": "dark-daltonized",
   "editorMode": "vim",

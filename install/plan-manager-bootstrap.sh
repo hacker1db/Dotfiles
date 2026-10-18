@@ -7,11 +7,12 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 DOTFILES="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 source "$DOTFILES/install/lib/log.sh"
+source "$DOTFILES/install/lib/env.sh"
 
 PLAN_REPO_DIR="${PLAN_MANAGER_REPO_DIR:-$HOME/Developer/plan-manager}"
 LOCAL_BIN="$HOME/.local/bin"
 PLAN_LINK="$LOCAL_BIN/plan"
-PLAN_ROOT="${PLAN_HOME:-$HOME/Developer/plans}"
+PLAN_ROOT="${PLAN_HOME:-$HOME/notes/SecondBrain/4.Resources/plans}"
 
 canonical_dir() {
     (cd "$1" 2>/dev/null && pwd -P)
@@ -123,11 +124,10 @@ resolve_clone_url() {
         printf '%s\n' "$PLAN_MANAGER_REPO_URL"
         return
     fi
-    command -v gh >/dev/null 2>&1 || return 1
     local gh_user
-    gh_user="$(gh api user --jq '.login' 2>/dev/null || true)"
+    gh_user="$(github_owner || true)"
     [ -n "$gh_user" ] || return 1
-    printf 'git@github.com:%s/plan-manager.git\n' "$gh_user"
+    github_repo_url "$gh_user/plan-manager"
 }
 
 normalize_remote_url() {
@@ -184,7 +184,7 @@ update_clean_worktree() {
         warning "$worktree has no upstream branch; preserving it without updating."
         return
     fi
-    if ! git -C "$worktree" fetch --quiet origin; then
+    if ! github_git -C "$worktree" fetch --quiet origin; then
         error "Could not fetch the configured plan-manager origin."
         return 1
     fi
@@ -225,7 +225,7 @@ bootstrap_plan_repo() {
             return 1
         fi
         info "Cloning $expected_url"
-        if ! git clone "$expected_url" "$clone_tmp"; then
+        if ! github_clone "$expected_url" "$clone_tmp"; then
             rm -rf "$clone_tmp"
             error "Clone failed; no checkout was installed at $PLAN_REPO_DIR."
             return 1
@@ -396,6 +396,11 @@ reconcile_codex_config() {
 install_plan_launch_agent() {
     title "Installing plan-manager LaunchAgent"
 
+    if [ "$(uname -s)" != "Darwin" ]; then
+        warning "LaunchAgent is macOS-only; skipping plan-manager service on $(uname -s)."
+        return 0
+    fi
+
     local worktree="${PLAN_WORKTREE:-}"
     local template="$DOTFILES/launchd/com.plan-manager.serve.plist.template"
     local destination="$HOME/Library/LaunchAgents/com.plan-manager.serve.plist"
@@ -446,11 +451,16 @@ install_plan_launch_agent() {
 
 initialize_plan_library() {
     title "Initializing plan library"
+    if [ ! -d "$PLAN_ROOT" ]; then
+        warning "$PLAN_ROOT does not exist; it lives in the Second Brain vault. Sync the vault, then re-run the linker."
+        return 0
+    fi
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" init || return 1
 }
 
 check_plan_manager() {
     title "Checking plan-manager"
+    [ -d "$PLAN_ROOT" ] || return 0
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" serve --json >/dev/null || return 1
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" doctor --json || return 1
 }

@@ -128,7 +128,7 @@ install-caido-skills /path/to/project
 
 ### Plan-manager integration
 
-[Plan-manager setup and troubleshooting](docs/plan-manager.md) documents the separate application checkout, `~/.local/bin/plan`, LaunchAgent, and Codex writable-root reconciliation. Dotfiles policy uses `~/Developer/plans` as the canonical library and `http://plans.localhost:4173/` as its local dashboard. The linker builds the application and checks its service; application source and plan data are not stored here. Publishing requires an explicit request.
+[Plan-manager setup and troubleshooting](docs/plan-manager.md) documents the separate application checkout, `~/.local/bin/plan`, LaunchAgent, and Codex writable-root reconciliation. Dotfiles policy uses `~/notes/SecondBrain/4.Resources/plans` as the canonical library and `http://plans.localhost:4173/` as its local dashboard. The linker builds the application and checks its service; application source and plan data are not stored here. Publishing requires an explicit request.
 
 ### Codex with Microsoft Foundry
 

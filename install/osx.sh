@@ -1,5 +1,10 @@
 #!/usr/bin/env sh
 
+if [ "$(uname -s)" != "Darwin" ]; then
+  echo "Skipping macOS defaults: not running on macOS"
+  exit 0
+fi
+
 # echo "Finder: show all filename extensions"
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 

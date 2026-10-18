@@ -149,8 +149,14 @@
 [grep]
     extendRegexp = true
     lineNumber = true
+# Git talks to GitHub over SSH only; HTTPS URLs are rewritten and no
+# credential helper exists to fall back to.
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+	insteadOf = http://github.com/
+	insteadOf = git://github.com/
 [credential]
-	helper = osxkeychain
+	helper =
 ; [difftool "Kaleidoscope"] cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
 ;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
 ;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]

@@ -8,4 +8,6 @@ Host github.com
 
 Host 192.168.1.157
     User aiserver
+    # Lend the Mac's 1Password agent so no key ever lives on the server
+    ForwardAgent yes
     IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"

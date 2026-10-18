@@ -139,7 +139,7 @@ chmod +x "$fake_worktree/bin/plan"
 
 cat > "$HOME/.codex/config.toml" <<EOF
 model = "existing"
-# $HOME/Developer/plans in a comment must not count
+# $HOME/notes/SecondBrain/4.Resources/plans in a comment must not count
 
 [sandbox_workspace_write]
 writable_roots = [
@@ -151,15 +151,15 @@ enabled = true
 EOF
 
 node "$ROOT/install/reconcile-codex-config.mjs" \
-    "$HOME/.codex/config.toml" "$HOME/Developer/plans" >/dev/null
+    "$HOME/.codex/config.toml" "$HOME/notes/SecondBrain/4.Resources/plans" >/dev/null
 assert_contains "$HOME/.codex/config.toml" 'model = "existing"'
 assert_contains "$HOME/.codex/config.toml" '"/tmp/existing", # keep this root'
-assert_contains "$HOME/.codex/config.toml" "\"$HOME/Developer/plans\""
+assert_contains "$HOME/.codex/config.toml" "\"$HOME/notes/SecondBrain/4.Resources/plans\""
 assert_contains "$HOME/.codex/config.toml" 'enabled = true'
 
 before="$(shasum -a 256 "$HOME/.codex/config.toml")"
 node "$ROOT/install/reconcile-codex-config.mjs" \
-    "$HOME/.codex/config.toml" "$HOME/Developer/plans" >/dev/null
+    "$HOME/.codex/config.toml" "$HOME/notes/SecondBrain/4.Resources/plans" >/dev/null
 after="$(shasum -a 256 "$HOME/.codex/config.toml")"
 [ "$before" = "$after" ] || fail "second Codex reconciliation changed the file"
 [ "$(find "$HOME/.codex" -name 'config.toml.backup-*' | wc -l | tr -d ' ')" = "1" ] ||
@@ -167,9 +167,9 @@ after="$(shasum -a 256 "$HOME/.codex/config.toml")"
 
 mkdir -p "$FIXTURE/new-codex"
 node "$ROOT/install/reconcile-codex-config.mjs" \
-    "$FIXTURE/new-codex/config.toml" "$HOME/Developer/plans" >/dev/null
+    "$FIXTURE/new-codex/config.toml" "$HOME/notes/SecondBrain/4.Resources/plans" >/dev/null
 assert_contains "$FIXTURE/new-codex/config.toml" '[sandbox_workspace_write]'
-assert_contains "$FIXTURE/new-codex/config.toml" "\"$HOME/Developer/plans\""
+assert_contains "$FIXTURE/new-codex/config.toml" "\"$HOME/notes/SecondBrain/4.Resources/plans\""
 
 cat > "$FIXTURE/duplicate.toml" <<'EOF'
 [sandbox_workspace_write]
@@ -178,7 +178,7 @@ writable_roots = []
 EOF
 duplicate_before="$(shasum -a 256 "$FIXTURE/duplicate.toml")"
 node "$ROOT/install/reconcile-codex-config.mjs" \
-    "$FIXTURE/duplicate.toml" "$HOME/Developer/plans" >/dev/null 2>&1 &&
+    "$FIXTURE/duplicate.toml" "$HOME/notes/SecondBrain/4.Resources/plans" >/dev/null 2>&1 &&
     fail "duplicate writable_roots was accepted"
 duplicate_after="$(shasum -a 256 "$FIXTURE/duplicate.toml")"
 [ "$duplicate_before" = "$duplicate_after" ] || fail "invalid TOML was modified"
@@ -226,7 +226,7 @@ plist="$HOME/Library/LaunchAgents/com.plan-manager.serve.plist"
 plutil -lint "$plist" >/dev/null
 assert_contains "$plist" "$PLAN_LINK"
 assert_contains "$plist" "$PLAN_WORKTREE"
-assert_contains "$plist" "$HOME/Developer/plans"
+assert_contains "$plist" "$HOME/notes/SecondBrain/4.Resources/plans"
 plist_before="$(shasum -a 256 "$plist")"
 install_plan_launch_agent >/dev/null
 plist_after="$(shasum -a 256 "$plist")"

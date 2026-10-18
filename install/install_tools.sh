@@ -2,9 +2,12 @@
 
 set -euo pipefail
 
-if ! command -v brew >/dev/null 2>&1; then
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/env.sh"
+
+if ! load_brew_env; then
   echo Installing Homebrew
   /bin/bash -c "$(curl --proto "=https" --tlsv1.2 -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  load_brew_env || { echo "Homebrew installed but brew is not on PATH" >&2; exit 1; }
 fi
 
 # Backup installation for when brew bundle is unreliable
@@ -24,7 +27,6 @@ TAPS=(
   dart-lang/dart
   derailed/k9s
   felixkratz/formulae
-  fsouza/prettierd
   gitguardian/tap
   hashicorp/tap
   iina/mpv-iina
@@ -71,7 +73,6 @@ FORMULAS=(
   lima
   lnav
   markdown
-  mas
   mysql-client
   tree-sitter
   tree-sitter-cli
@@ -79,7 +80,6 @@ FORMULAS=(
   nmap
   opencode
   pandoc
-  reattach-to-user-namespace
   ripgrep
   rustscan
   shellcheck
@@ -103,6 +103,13 @@ FORMULAS=(
   pnpm
 )
 
+if [[ "$(uname -s)" == Darwin ]]; then
+  FORMULAS+=(
+    mas
+    reattach-to-user-namespace
+  )
+fi
+
 for f in "${FORMULAS[@]}"; do
   brew install "$f" || true
 done
@@ -112,7 +119,6 @@ CASKS=(
   1password-cli
   alfred
   android-platform-tools
-  azure-data-studio
   basictex
   burp-suite-professional
   claude
@@ -175,15 +181,16 @@ CASKS=(
   zoom
 )
 
-for c in "${CASKS[@]}"; do
-  brew install --cask "$c" || true
-done
+if [[ "$(uname -s)" == Darwin ]]; then
+  for c in "${CASKS[@]}"; do
+    brew install --cask "$c" || true
+  done
+  # Fonts via tap already handled; ensure nerd fonts present
+  brew tap homebrew/cask-fonts || true
+fi
 
 # Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
 [ -x "$HOME/.local/bin/claude" ] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
-
-# Fonts via tap already handled; ensure nerd fonts present
-brew tap homebrew/cask-fonts || true
 
 if command -v limactl >/dev/null 2>&1; then
   echo Starting lima default instance
@@ -225,14 +232,13 @@ fi
 
 # GitHub extensions
 if command -v gh >/dev/null 2>&1; then
-  gh auth login || true
-  gh extension upgrade gh-copilot || true
+  gh auth status >/dev/null 2>&1 || gh auth login || true
   gh extension install dlvhdr/gh-dash || true
   gh extension install advanced-security/gh-sbom || true
 fi
 
 # MAS apps
-if command -v mas >/dev/null 2>&1; then
+if [[ "$(uname -s)" == Darwin ]] && command -v mas >/dev/null 2>&1; then
   mas install 640199958 || true
   mas install 424389933 || true
   mas install 302584613 || true
