@@ -43,7 +43,7 @@ There are two ways for a tool to select a profile:
 
 The Foundry profile also needs a working `az login`. Its resource and model come from its settings file, not from the environment.
 
-`~/.claude` is the legacy config dir. Dotfiles no longer links anything into it. The only managed links left there are skillctl's in `~/.claude/skills`, which skillctl keeps and never relinks.
+`~/.claude`, the legacy config dir, was removed on 2026-10-18. Dotfiles never writes there. If it reappears, a session was launched without `CLAUDE_CONFIG_DIR`.
 
 ## Install
 

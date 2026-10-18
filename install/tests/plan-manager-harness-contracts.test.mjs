@@ -20,10 +20,6 @@ for (const path of [
 ]) {
   assert.equal(realpathSync(join(root, path)), join(root, 'global/AGENTS.md'))
 }
-const sharedContract = read('claude/skills/plans/SKILL.md')
-assert.match(sharedContract, /plan capture <artifact> --json/)
-assert.match(sharedContract, /regardless of where the harness wrote it/)
-assert.ok(sharedContract.includes(stableUrl))
 
 const harnesses = [
   {
@@ -32,7 +28,6 @@ const harnesses = [
       'claude/commands/plans.md',
       'claude/output-styles/plan-browser.md',
     ],
-    evalId: 'claude-native-plan-finalization',
     mockAdapter(artifact) {
       assert.match(read('claude/commands/plans.md'), /Use the `plans` skill/)
       return ['capture', artifact, '--json']
@@ -41,7 +36,6 @@ const harnesses = [
   {
     name: 'Codex desktop/CLI',
     policy: ['global/AGENTS.md'],
-    evalId: 'codex-visualization-finalization',
     mockAdapter(artifact) {
       assert.match(read('global/AGENTS.md'), /Codex uses `\$plans`/)
       return ['capture', artifact, '--json']
@@ -53,7 +47,6 @@ const harnesses = [
       'global/AGENTS.md',
       'config/opencode/command/plans.md',
     ],
-    evalId: 'opencode-plan-agent-finalization',
     mockAdapter(artifact) {
       assert.match(read('config/opencode/command/plans.md'), /Delegate to the `plan` CLI/)
       assert.match(read('global/AGENTS.md'), /OpenCode and Copilot use `\/plans`/)
@@ -63,7 +56,6 @@ const harnesses = [
   {
     name: 'Copilot',
     policy: ['global/AGENTS.md'],
-    evalId: 'copilot-native-plan-finalization',
     mockAdapter(artifact) {
       assert.match(read('global/AGENTS.md'), /OpenCode and Copilot use `\/plans`/)
       return ['capture', artifact, '--json']
@@ -83,18 +75,6 @@ for (const harness of harnesses) {
 const settings = JSON.parse(read('claude/settings.base.json'))
 assert.equal(settings.plansDirectory, '~/Developer/plans')
 assert.match(read('claude/output-styles/plan-browser.md'), /Do not generate adjacent HTML files/)
-
-const evals = JSON.parse(read('claude/skills/plans/evals/evals.json'))
-const evalById = new Map(evals.map(item => [item.id, item]))
-for (const harness of harnesses) {
-  const evaluation = evalById.get(harness.evalId)
-  assert.ok(evaluation, `missing ${harness.name} regression eval`)
-  const assertions = evaluation.assertions.join('\n')
-  assert.match(assertions, /plan.*CLI|plan create|plan capture/i, `${harness.name} eval does not require CLI delegation`)
-  assert.match(assertions, /stable local dashboard URL/i, `${harness.name} eval does not require the stable URL`)
-  assert.match(assertions, /does NOT invoke `plan push`/, `${harness.name} eval permits implicit publishing`)
-  assert.match(assertions, /native|Plan agent|visualization/i, `${harness.name} eval does not preserve native behavior`)
-}
 
 const bootstrap = read('install/plan-manager-bootstrap.sh')
 for (const target of [

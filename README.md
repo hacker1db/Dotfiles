@@ -127,7 +127,7 @@ Claude installation links instructions, agents, commands, output styles, and the
 
 Personal skill sources live in [hacker1db/skills](https://github.com/hacker1db/skills). `bin/skillctl` resolves a normal checkout at `~/Developer/skills` or its `main/` worktree, rebuilds the Go CLI for normal invocations, and reuses the last build for completion. Set `SKILLCTL_REPO_DIR` for another checkout. Follow that repository's README for selections and installation.
 
-`claude/skills/` contains legacy reading, research, writing, diagrams, review, security, and planning skills. Dotfiles preserves existing installed links but no longer installs or migrates this tree. New global skill setup belongs to skillctl. The OpenCode Supacode skill and project-only `bin/install-caido-skills` remain separate.
+Dotfiles holds no personal skills; they come from the skills repository through skillctl, which the profile installer runs for each Claude profile. The OpenCode Supacode skill and project-only `bin/install-caido-skills` remain separate.
 
 ```sh
 install-caido-skills /path/to/project
