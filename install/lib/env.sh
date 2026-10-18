@@ -14,6 +14,10 @@ load_brew_env() {
   return 1
 }
 
+deferred_casks_file() {
+  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/deferred-casks"
+}
+
 github_ssh_preflight() {
   if [ -n "${GITHUB_SSH_OK:-}" ]; then
     [ "$GITHUB_SSH_OK" = "1" ]

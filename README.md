@@ -38,8 +38,9 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | `./install.sh nvimtmux` | Create NvimTmux.app and register file associations with `duti` |
 | `./install.sh dotnet` / `./install.sh dotnet-tools` | Install .NET and global tools |
 | `./install.sh theme list` | List theme candidates |
+| `./install.sh deferred` | Install casks that were skipped because they need a password |
 
-`all` runs backup, homebrew, link, terminfo, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs backup, homebrew, link, terminfo, node-tools, git, macos, extras, nvimtmux, dotnet, dotnet-tools, theme, deferred, and shell, in that order. Steps that ask for your macOS password (casks that need `sudo`, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; that catalog and the explicit lists in `install/install_tools.sh` are separate sources.
 

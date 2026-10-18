@@ -185,9 +185,19 @@ CASKS=(
 )
 
 if [[ "$(uname -s)" == Darwin ]]; then
-  for c in "${CASKS[@]}"; do
-    brew install --cask "$c" || true
-  done
+  if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
+    deferred="$(deferred_casks_file)"
+    mkdir -p "$(dirname "$deferred")"
+    : > "$deferred"
+    for c in "${CASKS[@]}"; do
+      SUDO_ASKPASS=/usr/bin/false brew install --cask "$c" || echo "$c" >> "$deferred"
+    done
+    [[ -s "$deferred" ]] && echo "Deferred casks that need a password: $(tr '\n' ' ' < "$deferred")"
+  else
+    for c in "${CASKS[@]}"; do
+      brew install --cask "$c" || true
+    done
+  fi
 fi
 
 # Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
