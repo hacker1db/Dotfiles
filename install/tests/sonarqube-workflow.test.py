@@ -16,7 +16,6 @@ class SonarQubeWorkflowTest(unittest.TestCase):
         self.assertIn("github.actor != 'dependabot[bot]'", WORKFLOW)
         for command in (
             'bash install/tests/claude-profiles.test.sh',
-            'bash install/tests/claude-session.test.sh',
             'node install/tests/plan-manager-harness-contracts.test.mjs',
             'python3 install/tests/sonarqube-workflow.test.py',
         ):

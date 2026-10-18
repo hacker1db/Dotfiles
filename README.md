@@ -16,7 +16,6 @@ Review the scripts before running a full installation: they install packages, ch
 | --- | --- |
 | `./install.sh backup` | Copy selected existing dotfiles into `~/dotfiles-backup` |
 | `./install.sh link` | Link configuration, generate Claude settings/profiles, and bootstrap plan-manager |
-| `./install.sh claude anthropic` / `./install.sh claude foundry` | Select the legacy global Claude backend |
 | `./install.sh terminfo` | Install terminal capability entries |
 | `./install.sh homebrew` | Run the explicit package lists and tool setup in `install/install_tools.sh` |
 | `./install.sh node-tools` | Install pnpm global tools; run Readwise and Codex Security login setup |
@@ -29,7 +28,7 @@ Review the scripts before running a full installation: they install packages, ch
 | `./install.sh theme list` | List theme candidates |
 | `./install.sh codex-foundry --resource NAME --model DEPLOYMENT` | Configure a separate Codex home for Foundry |
 
-`all` runs backup, link, claude, terminfo, homebrew, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Codex Foundry setup is explicit. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs backup, link, terminfo, homebrew, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Codex Foundry setup is explicit. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; that catalog and the explicit lists in `install/install_tools.sh` are separate sources.
 
@@ -118,10 +117,10 @@ The scan fails with a named missing-setting error if any value is absent. The wo
 
 Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for shared policy. `bash install/agent-instructions.sh` installs just the instruction links with backups. Start a new tool session to reload them.
 
-Claude installation links individual files/directories for instructions, agents, commands, output styles, and the statusline script; it does not replace the entire `~/.claude` directory. MCP configuration is linked to `~/.mcp.json`. Backend settings are generated from base, provider, work-hook, and optional local fragments.
+Claude installation links instructions, agents, commands, output styles, and the statusline script into each profile directory, and generates each profile's settings from layered fragments. MCP configuration is linked to `~/.mcp.json`.
 
 - [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh link` generates and installs all three.
-- Claude agents and commands cover reviews, GitHub/Azure DevOps, security, notes, reading, and writing workflows. Work profiles register a GitGuardian commit hook; personal profiles omit that registration. Sonar remains separate in Git hooks.
+- Claude agents and commands cover reviews, GitHub/Azure DevOps, security, notes, reading, and writing workflows. GitGuardian and Sonar run as Git hooks, not Claude hooks.
 - OpenCode includes agent/command definitions, TUI settings, and a Supacode presence plugin that emits activity only inside Supacode surfaces.
 
 ### Personal skills
@@ -165,9 +164,8 @@ The theme script writes Neovim, Starship, Ghostty, and tmux settings. Candidate 
 The installer fixture tests use temporary homes/repositories rather than changing live profiles or loading a LaunchAgent:
 
 ```sh
-python3 install/tests/claude-profiles.test.py
+bash install/tests/claude-profiles.test.sh
 python3 install/tests/sonarqube-workflow.test.py
-bash install/tests/claude-session.test.sh
 bash install/tests/plan-manager-bootstrap.test.sh
 node install/tests/plan-manager-harness-contracts.test.mjs
 zsh -n zsh/zshrc.symlink

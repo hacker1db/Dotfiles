@@ -77,7 +77,6 @@ Configured LSP servers include:
 ```bash
 # Isolated installer checks
 bash install/tests/claude-profiles.test.sh
-bash install/tests/claude-session.test.sh
 bash install/tests/plan-manager-bootstrap.test.sh
 node install/tests/plan-manager-harness-contracts.test.mjs
 
@@ -264,7 +263,7 @@ Template hooks in `git/templates/hooks/`:
 - The general linker skips existing configuration paths; selected managed integrations reconcile their own links.
 - Personal skills are maintained outside dotfiles; do not update the legacy `claude/skills/` tree.
 - lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories. Specs directly under `lua/plugins/` are not imported by this setup.
-- Use [README.md](README.md), [Claude profiles](claude/PROFILES.md), [session launchers](docs/claude-sessions.md), and [plan-manager integration](docs/plan-manager.md) for current setup details.
+- Use [README.md](README.md), [Claude profiles](claude/PROFILES.md) and [plan-manager integration](docs/plan-manager.md) for current setup details.
 
 ## Working With This Repository
 
