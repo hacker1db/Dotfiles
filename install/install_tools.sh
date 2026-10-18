@@ -179,7 +179,6 @@ CASKS=(
   unetbootin
   visual-studio-code@insiders
   wireshark-app
-  zap
   zen
   zoom
 )
