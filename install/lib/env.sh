@@ -14,8 +14,8 @@ load_brew_env() {
   return 1
 }
 
-deferred_casks_file() {
-  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/deferred-casks"
+deferred_installs_file() {
+  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/deferred-installs"
 }
 
 github_ssh_preflight() {

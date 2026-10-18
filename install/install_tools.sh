@@ -184,13 +184,13 @@ CASKS=(
 
 if [[ "$(uname -s)" == Darwin ]]; then
   if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
-    deferred="$(deferred_casks_file)"
+    deferred="$(deferred_installs_file)"
     mkdir -p "$(dirname "$deferred")"
     : > "$deferred"
     for c in "${CASKS[@]}"; do
       SUDO_ASKPASS=/usr/bin/false brew install --cask "$c" || echo "$c" >> "$deferred"
     done
-    [[ -s "$deferred" ]] && echo "Deferred casks that need a password: $(tr '\n' ' ' < "$deferred")"
+    [[ -s "$deferred" ]] && echo "Deferred installs that need a password: $(tr '\n' ' ' < "$deferred")"
   else
     for c in "${CASKS[@]}"; do
       brew install --cask "$c" || true
@@ -235,7 +235,7 @@ fi
 
 # Go tools
 if command -v go >/dev/null 2>&1; then
-  go install github.com/cosmtrek/air@latest || true
+  go install github.com/air-verse/air@latest || true
   go install github.com/charmbracelet/glow@latest || true
 fi
 
@@ -248,11 +248,15 @@ fi
 
 # MAS apps
 if [[ "$(uname -s)" == Darwin ]] && command -v mas >/dev/null 2>&1; then
-  mas install 640199958 || true
-  mas install 424389933 || true
-  mas install 302584613 || true
-  mas install 6445813049 || true
-  mas install 497799835 || true
+  for app in 640199958 424389933 302584613 6445813049 497799835; do
+    if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
+      deferred="$(deferred_installs_file)"
+      mkdir -p "$(dirname "$deferred")"
+      echo "mas:$app" >> "$deferred"
+    else
+      mas install "$app" || true
+    fi
+  done
 fi
 
 echo Backup install complete
