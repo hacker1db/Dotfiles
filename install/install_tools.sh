@@ -10,6 +10,8 @@ if ! load_brew_env; then
   load_brew_env || { echo "Homebrew installed but brew is not on PATH" >&2; exit 1; }
 fi
 
+export HOMEBREW_NO_ASK=1
+
 # Backup installation for when brew bundle is unreliable
 
 TAPS=(
@@ -43,6 +45,7 @@ TAPS=(
 
 for tap in "${TAPS[@]}"; do
   brew tap "$tap" || true
+  brew trust --tap "$tap" || true
 done
 
 FORMULAS=(
@@ -111,7 +114,7 @@ if [[ "$(uname -s)" == Darwin ]]; then
 fi
 
 for f in "${FORMULAS[@]}"; do
-  brew install "$f" || true
+  brew install --formula "$f" || true
 done
 
 CASKS=(
@@ -185,8 +188,6 @@ if [[ "$(uname -s)" == Darwin ]]; then
   for c in "${CASKS[@]}"; do
     brew install --cask "$c" || true
   done
-  # Fonts via tap already handled; ensure nerd fonts present
-  brew tap homebrew/cask-fonts || true
 fi
 
 # Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
@@ -194,7 +195,7 @@ fi
 
 if command -v limactl >/dev/null 2>&1; then
   echo Starting lima default instance
-  limactl start || true
+  limactl start --tty=false || true
 fi
 
 # Terraform setup
