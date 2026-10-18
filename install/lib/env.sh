@@ -18,6 +18,22 @@ deferred_installs_file() {
   printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/deferred-installs"
 }
 
+find_github_checkout() {
+  local slug dir url
+  slug="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  for dir in "$HOME/Developer/${slug#*/}" "$HOME"/Developer/*/"${slug#*/}"; do
+    [ -d "$dir" ] || continue
+    url="$(git -C "$dir" remote get-url origin 2>/dev/null | tr '[:upper:]' '[:lower:]')" || continue
+    case "$url" in
+      *"github.com:$slug"|*"github.com:$slug.git"|*"github.com/$slug"|*"github.com/$slug.git")
+        printf '%s\n' "$dir"
+        return 0
+        ;;
+    esac
+  done
+  return 1
+}
+
 github_ssh_preflight() {
   if [ -n "${GITHUB_SSH_OK:-}" ]; then
     [ "$GITHUB_SSH_OK" = "1" ]
@@ -92,6 +108,10 @@ github_git() {
       -c url.https://github.com/.insteadOf=git@github.com: \
       "$@"
   fi
+}
+
+github_repo_accessible() {
+  github_git ls-remote --exit-code "$1" HEAD >/dev/null 2>&1
 }
 
 github_clone() {

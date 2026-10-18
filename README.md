@@ -144,7 +144,7 @@ install-caido-skills /path/to/project
 
 ## Symlinks and themes
 
-`*.symlink` sources map into `$HOME` with a leading dot; `config/*` maps into `~/.config/`. The general loops skip existing targets. Managed instruction links and selected integrations have their own replacement/backup behavior. In particular, a discovered clitools Git config replaces `~/.gitconfig-local`; preserve local edits before relinking. `link` may clone/update clitools and plan-manager, build dependencies, and start the dashboard service.
+`*.symlink` sources map into `$HOME` with a leading dot; `config/*` maps into `~/.config/`. The general loops skip existing targets. Managed instruction links and selected integrations have their own replacement/backup behavior. In particular, a discovered clitools Git config replaces `~/.gitconfig-local`; preserve local edits before relinking. `link` may clone/update clitools and plan-manager, build dependencies, and start the dashboard service. Before cloning, it looks for an existing checkout of either repository under `~/Developer/<name>` or `~/Developer/*/<name>` whose `origin` matches, and uses it instead. clitools is a private repository: when it cannot be reached, the clone is skipped and `~/.gitconfig-local` is left as an empty file. plan-manager is public; a fork without its own plan-manager clones `hacker1db/plan-manager`.
 
 ```sh
 ./install.sh theme list

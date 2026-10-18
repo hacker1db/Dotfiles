@@ -9,7 +9,11 @@ DOTFILES="$(cd "$SCRIPT_DIR/.." && pwd -P)"
 source "$DOTFILES/install/lib/log.sh"
 source "$DOTFILES/install/lib/env.sh"
 
+if [ -z "${PLAN_MANAGER_REPO_DIR:-}" ] && PLAN_OWNER="$(github_owner 2>/dev/null)"; then
+    PLAN_MANAGER_REPO_DIR="$(find_github_checkout "$PLAN_OWNER/plan-manager" || true)"
+fi
 PLAN_REPO_DIR="${PLAN_MANAGER_REPO_DIR:-$HOME/Developer/plan-manager}"
+PLAN_MANAGER_UPSTREAM_OWNER="hacker1db"
 LOCAL_BIN="$HOME/.local/bin"
 PLAN_LINK="$LOCAL_BIN/plan"
 PLAN_ROOT="${PLAN_HOME:-$HOME/notes/SecondBrain/4.Resources/plans}"
@@ -124,10 +128,16 @@ resolve_clone_url() {
         printf '%s\n' "$PLAN_MANAGER_REPO_URL"
         return
     fi
-    local gh_user
+    local gh_user url
     gh_user="$(github_owner || true)"
-    [ -n "$gh_user" ] || return 1
-    github_repo_url "$gh_user/plan-manager"
+    if [ -n "$gh_user" ]; then
+        url="$(github_repo_url "$gh_user/plan-manager")"
+        if [ "$gh_user" = "$PLAN_MANAGER_UPSTREAM_OWNER" ] || github_repo_accessible "$url"; then
+            printf '%s\n' "$url"
+            return
+        fi
+    fi
+    printf 'https://github.com/%s/plan-manager.git\n' "$PLAN_MANAGER_UPSTREAM_OWNER"
 }
 
 normalize_remote_url() {
