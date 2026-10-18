@@ -48,7 +48,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 
 - Zsh loads `zsh/**/*.zsh`, autoloads `zsh/functions/`, and reads `~/.localrc` for local overrides.
 - Starship supplies the prompt; zoxide provides `cd`; eza provides `l` and `ll`.
-- fzf-tab uses zfetch; completion includes kubectl, limactl, 1Password, sesh, and skillctl. fnm selects Node versions when entering directories with Node project markers.
+- fzf-tab uses zfetch; completion includes kubectl, 1Password, sesh, and skillctl. fnm selects Node versions when entering directories with Node project markers.
 - `daily` opens a dated SecondBrain note, `yy` changes directory through Yazi, `ts` and Alt+s select sesh sessions, and `gh-rate-limit` inspects GitHub limits.
 - Ghostty uses `config/ghostty/config`: JetBrains Mono italic at 14pt, 78% opacity, blur, linkarzu colors, and clipboard copy-on-select. The old WezTerm configuration has been removed.
 - tmux lives in `config/tmux/tmux.conf`, uses Ctrl+a as its prefix, and includes vi copy mode, mouse support, undercurl colors, session persistence through resurrect/continuum, and Neovim pane navigation. Prefix+o opens sesh; prefix+g opens lazygit; prefix+G opens gh-dash; prefix+O opens OpenCode; prefix+u uses the fzf URL picker.

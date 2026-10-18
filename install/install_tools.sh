@@ -73,7 +73,6 @@ FORMULAS=(
   kubectx
   lazydocker
   lazygit
-  lima
   lnav
   markdown
   mysql-client
@@ -104,6 +103,7 @@ FORMULAS=(
   zsh-autosuggestions
   zsh-syntax-highlighting
   pnpm
+  podman
 )
 
 if [[ "$(uname -s)" == Darwin ]]; then
@@ -200,11 +200,6 @@ fi
 
 # Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
 [ -x "$HOME/.local/bin/claude" ] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
-
-if command -v limactl >/dev/null 2>&1; then
-  echo Starting lima default instance
-  limactl start --tty=false || true
-fi
 
 # Terraform setup
 if command -v tfenv >/dev/null 2>&1; then

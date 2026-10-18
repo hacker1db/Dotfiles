@@ -18,9 +18,6 @@ setopt prompt_subst
 if command -v kubectl &> /dev/null; then
     source <(kubectl completion zsh)
 fi
-if command -v limactl &> /dev/null; then
-    source <(limactl completion zsh)
-fi
 if command -v op &> /dev/null; then
     eval "$(op completion zsh)"; compdef _op op
 fi
