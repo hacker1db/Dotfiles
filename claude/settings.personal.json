@@ -1,0 +1,14 @@
+{
+  "enabledPlugins": {
+    "vercel@claude-plugins-official": true,
+    "todoist@doist": true
+  },
+  "extraKnownMarketplaces": {
+    "doist": {
+      "source": {
+        "source": "github",
+        "repo": "doist/todoist-mcp"
+      }
+    }
+  }
+}

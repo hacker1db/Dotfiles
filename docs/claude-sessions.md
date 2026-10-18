@@ -1,15 +1,15 @@
 # Claude Code sessions
 
-These launchers select a provider for one invocation while using the existing Claude configuration directory. For separate account configuration and history, use [native profiles](../claude/PROFILES.md).
+> **Legacy.** `claude-subscription` and `claude-foundry` now launch the [Claude profiles](../claude/PROFILES.md). This launcher remains only until the profiles are verified, then it is retired.
 
-Run these in separate terminal tabs or tmux panes:
+This launcher selects a provider for one invocation while using the existing `~/.claude` configuration directory:
 
 ```sh
-claude-subscription
-claude-foundry
+CLAUDE_CONFIG_DIR="$HOME/.claude" install/claude-session.sh anthropic
+CLAUDE_CONFIG_DIR="$HOME/.claude" install/claude-session.sh foundry
 ```
 
-The commands are available through the existing dotfiles `bin` PATH entry. They choose the provider for that invocation and leave global settings, backend markers, subscription login, and the status line untouched. Plain `claude`, `cc`, and the legacy backend installer retain their existing behavior.
+It chooses the provider for that invocation and leaves global settings, backend markers, subscription login, and the status line untouched.
 
 Subscription sessions use your existing Claude subscription login and the model in `claude/settings.base.json`. Foundry sessions use your `az login` credentials and the deployment defaults in `claude/settings.foundry.json`. Azure CLI and jq must be installed. Inherited API keys, bearer tokens, other provider flags, and Azure service principal credentials are cleared for the child process.
 

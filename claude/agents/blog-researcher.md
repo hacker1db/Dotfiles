@@ -12,13 +12,13 @@ Research a topic comprehensively and generate a complete blog post draft. Before
 
 Spawn all three research streams simultaneously — don't wait for one to finish before starting the next:
 
-**Stream A — Vault search** via `oh-my-claudecode:explore` (haiku):
+**Stream A — Vault search** via `Explore` (haiku):
 > Search `$HOME/notes/SecondBrain/` for files related to [topic]. Check: work notes, quick notes, existing blog posts (to avoid duplication), AppSec resources. Extract key concepts, code examples, personal experiences, tools used, best practices documented.
 
 **Stream B — Readwise highlights** via `readwise-research` agent:
 > Search Readwise vault for saved articles, books, and podcasts on [topic] and return structured references and key insights.
 
-**Stream C — Online research** via `oh-my-claudecode:document-specialist` (sonnet):
+**Stream C — Online research** via `general-purpose` (sonnet):
 > Research current best practices for [topic] from: OWASP docs, NIST guidelines, official tool documentation, public CVE data. Focus on 2024+ content. Return concrete techniques, stats, and code patterns.
 
 Synthesize after all three streams complete. If a stream returns nothing, proceed without it — don't block.

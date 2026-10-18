@@ -31,9 +31,9 @@ STUB
 chmod +x "$fixture/bin/claude" "$fixture/bin/az"
 before="$(shasum "$HOME/.claude/settings.json" "$HOME/.config/claude-code/backend")"
 export ANTHROPIC_API_KEY=bad ANTHROPIC_AUTH_TOKEN=bad AZURE_CLIENT_SECRET=bad CLAUDE_CODE_USE_VERTEX=1
-"$root/bin/claude-subscription" subscription 'prompt with spaces' &
+"$root/install/claude-session.sh" anthropic subscription 'prompt with spaces' &
 pid=$!
-ANTHROPIC_DEFAULT_OPUS_MODEL=custom-opus "$root/bin/claude-foundry" foundry --continue
+ANTHROPIC_DEFAULT_OPUS_MODEL=custom-opus "$root/install/claude-session.sh" foundry foundry --continue
 wait "$pid"
 jq -e '.env.CLAUDE_CODE_USE_FOUNDRY == "0" and .env.CLAUDE_CODE_USE_VERTEX == "0" and .env.ANTHROPIC_DEFAULT_OPUS_MODEL == "" and .env.ANTHROPIC_AUTH_TOKEN == "" and .env.AZURE_CLIENT_SECRET == "" and .env.CUSTOM_SETTING == "kept" and .apiKeyHelper == "" and (has("statusLine") | not)' "$fixture/subscription.json" >/dev/null
 jq -e '.env.CLAUDE_CODE_USE_FOUNDRY == "1" and .env.ANTHROPIC_FOUNDRY_RESOURCE == "only-resource" and .env.ANTHROPIC_DEFAULT_OPUS_MODEL == "custom-opus" and .env.ANTHROPIC_DEFAULT_SONNET_MODEL == "claude-sonnet-4-6" and .env.ANTHROPIC_FOUNDRY_API_KEY == "" and .env.ANTHROPIC_FOUNDRY_AUTH_TOKEN == ""' "$fixture/foundry.json" >/dev/null
@@ -41,13 +41,13 @@ jq -e '.env.CLAUDE_CODE_USE_FOUNDRY == "1" and .env.ANTHROPIC_FOUNDRY_RESOURCE =
 [[ ! -e "$(cat "$fixture/subscription.path")" && ! -e "$(cat "$fixture/foundry.path")" ]]
 [[ "$(sed -n '2p' "$fixture/subscription.args")" == 'prompt with spaces' ]]
 [[ "$before" == "$(shasum "$HOME/.claude/settings.json" "$HOME/.config/claude-code/backend")" ]]
-if AZ_RESOURCES='["one","two"]' "$root/bin/claude-foundry" ambiguous 2>/dev/null; then exit 1; fi
-if AZ_RESOURCES='[]' "$root/bin/claude-foundry" missing 2>/dev/null; then exit 1; fi
-if AZ_LOGIN_EXIT=1 "$root/bin/claude-foundry" login 2>/dev/null; then exit 1; fi
-if "$root/bin/claude-subscription" --settings '{}' 2>/dev/null; then exit 1; fi
-ANTHROPIC_FOUNDRY_BASE_URL=https://explicit.example/anthropic AZ_RESOURCES='[]' "$root/bin/claude-foundry" explicit
+if AZ_RESOURCES='["one","two"]' "$root/install/claude-session.sh" foundry ambiguous 2>/dev/null; then exit 1; fi
+if AZ_RESOURCES='[]' "$root/install/claude-session.sh" foundry missing 2>/dev/null; then exit 1; fi
+if AZ_LOGIN_EXIT=1 "$root/install/claude-session.sh" foundry login 2>/dev/null; then exit 1; fi
+if "$root/install/claude-session.sh" anthropic --settings '{}' 2>/dev/null; then exit 1; fi
+ANTHROPIC_FOUNDRY_BASE_URL=https://explicit.example/anthropic AZ_RESOURCES='[]' "$root/install/claude-session.sh" foundry explicit
 jq -e '.env.ANTHROPIC_FOUNDRY_BASE_URL == "https://explicit.example/anthropic"' "$fixture/explicit.json" >/dev/null
 code=0
-STUB_EXIT=23 "$root/bin/claude-subscription" failure || code=$?
+STUB_EXIT=23 "$root/install/claude-session.sh" anthropic failure || code=$?
 [[ "$code" == 23 && ! -e "$(cat "$fixture/failure.path")" ]]
 printf '%s\n' 'Claude session tests passed.'

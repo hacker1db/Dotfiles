@@ -27,10 +27,9 @@ Review the scripts before running a full installation: they install packages, ch
 | `./install.sh nvimtmux` | Create NvimTmux.app and register file associations with `duti` |
 | `./install.sh dotnet` / `./install.sh dotnet-tools` | Install .NET and global tools |
 | `./install.sh theme list` | List theme candidates |
-| `./install.sh ponytail` | Install Ponytail for Claude Code and Codex |
 | `./install.sh codex-foundry --resource NAME --model DEPLOYMENT` | Configure a separate Codex home for Foundry |
 
-`all` runs backup, link, claude, terminfo, homebrew, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, theme, and ponytail, in that order. Codex Foundry setup is explicit. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs backup, link, claude, terminfo, homebrew, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Codex Foundry setup is explicit. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; that catalog and the explicit lists in `install/install_tools.sh` are separate sources.
 
@@ -121,11 +120,9 @@ Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for shared 
 
 Claude installation links individual files/directories for instructions, agents, commands, output styles, and the statusline script; it does not replace the entire `~/.claude` directory. MCP configuration is linked to `~/.mcp.json`. Backend settings are generated from base, provider, work-hook, and optional local fragments.
 
-- [Native Claude profiles](claude/PROFILES.md): separate subscription, personal, and Foundry configuration directories, private generated settings, and scoped work hooks. Foundry requires an explicit local endpoint configuration; account logins are separate onboarding steps.
-- [Per-session Claude providers](docs/claude-sessions.md): `claude-subscription` and `claude-foundry` select a provider for one invocation without switching the global backend.
+- [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh link` generates and installs all three.
 - Claude agents and commands cover reviews, GitHub/Azure DevOps, security, notes, reading, and writing workflows. Work profiles register a GitGuardian commit hook; personal profiles omit that registration. Sonar remains separate in Git hooks.
 - OpenCode includes agent/command definitions, TUI settings, and a Supacode presence plugin that emits activity only inside Supacode surfaces.
-- `./install.sh ponytail` installs the declared Ponytail plugin for Claude Code and Codex. In Codex, review its hooks through `/hooks` and restart the session/app.
 
 ### Personal skills
 

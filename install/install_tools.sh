@@ -115,7 +115,7 @@ CASKS=(
   azure-data-studio
   basictex
   burp-suite-professional
-  claude-code
+  claude
   codex
   cursor
   dbeaver-community
@@ -178,6 +178,9 @@ CASKS=(
 for c in "${CASKS[@]}"; do
   brew install --cask "$c" || true
 done
+
+# Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
+[ -x "$HOME/.local/bin/claude" ] || curl -fsSL https://claude.ai/install.sh | bash || true
 
 # Fonts via tap already handled; ensure nerd fonts present
 brew tap homebrew/cask-fonts || true

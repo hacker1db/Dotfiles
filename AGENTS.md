@@ -76,7 +76,7 @@ Configured LSP servers include:
 
 ```bash
 # Isolated installer checks
-python3 install/tests/claude-profiles.test.py
+bash install/tests/claude-profiles.test.sh
 bash install/tests/claude-session.test.sh
 bash install/tests/plan-manager-bootstrap.test.sh
 node install/tests/plan-manager-harness-contracts.test.mjs

@@ -147,5 +147,3 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 
 # Added by sonarqube-cli installer
 export PATH="$HOME/.local/share/sonarqube-cli/bin:$PATH"
-# Added by Maestro CLI installer
-export PATH="$HOME/.local/bin:$PATH"

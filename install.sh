@@ -5,7 +5,7 @@ DOTFILES="$SCRIPT_DIR"
 source "$DOTFILES/install/lib/log.sh"
 
 usage() {
-  echo "Usage: $(basename "$0") {backup|link|claude|codex-foundry|ponytail|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
+  echo "Usage: $(basename "$0") {backup|link|claude|codex-foundry|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
   exit 1
 }
 
@@ -22,7 +22,6 @@ script_for() {
     link) echo "$DOTFILES/install/link.sh" ;;
     claude) echo "$DOTFILES/install/claude-backend.sh" ;;
     codex-foundry) echo "$DOTFILES/install/codex-foundry.sh" ;;
-    ponytail) echo "$DOTFILES/install/ponytail.sh" ;;
     git) echo "$DOTFILES/install/git.sh" ;;
     homebrew) echo "$DOTFILES/install/install_tools.sh" ;;
     shell) echo "$DOTFILES/install/shell.sh" ;;
@@ -50,7 +49,7 @@ run_script() {
 
 if [ "$cmd" = "all" ]; then
   title "Running full install"
-  for part in backup link claude terminfo homebrew node-tools shell git macos extras nvimtmux dotnet dotnet-tools theme ponytail; do
+  for part in backup link claude terminfo homebrew node-tools shell git macos extras nvimtmux dotnet dotnet-tools theme; do
     info "Executing $part"
     run_script "$part"
   done
