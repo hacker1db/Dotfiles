@@ -32,4 +32,3 @@ config/opencode/service.json
 
 # hunk writes its release-check timestamp here on every run; machine-local cache
 config/hunk/state.json
-config/opencode/agent

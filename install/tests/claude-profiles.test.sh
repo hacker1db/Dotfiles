@@ -9,8 +9,7 @@ repo="$temp/repo"
 home="$temp/home"
 stubs="$temp/bin"
 log="$temp/calls.log"
-agents="$home/Developer/skills/main/agents/claude"
-mkdir -p "$repo/install" "$home/OneDrive - Fixture/Personal" "$stubs" "$agents"
+mkdir -p "$repo/install" "$home/OneDrive - Fixture/Personal" "$stubs"
 rsync -a --exclude .local --exclude skills --exclude plugins "$root/claude" "$repo/"
 cp "$root/install/claude-profiles.sh" "$repo/install/"
 # Fixture subscription layer so hook scoping is tested independently of the real file's contents.
@@ -28,6 +27,8 @@ EOF
 done
 mkdir -p "$home/.claude-personal"
 echo '{"theme": "unmanaged"}' > "$home/.claude-personal/settings.json"
+# Legacy agents link from before skillctl managed subagents.
+ln -s "$repo/claude/agents" "$home/.claude-personal/agents"
 
 run() {
     env -i HOME="$home" PATH="$stubs:$(dirname "$(command -v jq)"):/usr/bin:/bin" CALL_LOG="$log" "$@" "$repo/install/claude-profiles.sh" ${args[@]+"${args[@]}"}
@@ -49,7 +50,7 @@ for p in personal subscription foundry; do
     for item in CLAUDE.md commands output-styles statusline-command.sh; do
         [ "$(readlink "$d/$item")" = "$repo/claude/$item" ] || fail "$p link $item"
     done
-    [ "$(readlink "$d/agents")" = "$agents" ] || fail "$p agents link"
+    [ ! -e "$d/agents" ] && [ ! -L "$d/agents" ] || fail "$p agents must be left to skillctl"
     [ "$(readlink "$d/hooks")" = "$repo/claude/profiles/$p/hooks" ] || fail "$p hooks link"
     grep -qx "skillctl .claude-$p sync --global" "$log" || fail "$p skillctl sync"
     [ "$(setting "$p" '.env.CLAUDE_CODE_USE_BEDROCK + .env.CLAUDE_CODE_USE_VERTEX')" = 00 ] || fail "$p bedrock/vertex"
@@ -96,10 +97,6 @@ echo '{}' > "$repo/claude/.local/profiles/subscription.json"
 code=0; run > "$temp/out5" || code=$?
 [ "$code" = 2 ] && grep -q 'subscription: generated settings are stale' "$temp/out5" || fail "stale check"
 args=(); run > /dev/null || fail "repair run"
-
-# A missing skills checkout is incomplete, not fatal.
-code=0; run SKILLS_REPO="$temp/nowhere" > "$temp/out8" || code=$?
-[ "$code" = 2 ] && grep -q 'agents/claude not found' "$temp/out8" || fail "missing skills repo"
 
 # --skip-foundry leaves Foundry untouched; missing resource is incomplete, not fatal.
 rm "$home/.claude-foundry/settings.json"
