@@ -18,4 +18,5 @@ Tools seen asking for a password during an install. Revisit each one to decide w
 | Tool | Step | Trigger | First seen |
 | --- | --- | --- | --- |
 | `discord` cask | homebrew | Upgrade removes the `com.discord.discord.ShipIt` launchctl service | 2026-10-18 |
+| `gcloud-cli` cask | homebrew | Upgrade (449.0.0 to 589.0.0) removes the old `Caskroom/gcloud-cli/latest` files | 2026-10-18 |
 | `chsh` / `sudo tee /etc/shells` | shell | Changing the login shell to Homebrew zsh | Known from `install/shell.sh` |
