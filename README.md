@@ -91,7 +91,7 @@ DOTFILES_GIT_PROFILE=hacker1db ./install.sh git
 
 The optional profile links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`. It supplies remote-specific identities, SSH host aliases, and 1Password agent-backed authentication/signing through `bin/git-agent-key`, `bin/git-agent-ssh`, and `bin/git-agent-signing-key`. Keys are selected by configured agent item titles; private key files are not installed. Profile setup removes a local `user.signingkey` override. Review profile-specific account mappings before enabling it.
 
-New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and Sonar pre-commit/pre-push adapters. Sonar adapters skip when `sonar` is absent. These Git hooks are separate from Claude's work-profile GitGuardian hook.
+New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a gitleaks secret scan of staged changes. The gitleaks hook blocks the commit when it finds a secret, and also when `gitleaks` is not installed. The hacker1db account profile sets `core.hooksPath` to `git/templates/hooks`, so the dispatcher runs for every repository. These Git hooks are separate from Claude's work-profile GitGuardian hook.
 
 ## CI and security scanning
 
@@ -113,7 +113,7 @@ Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for shared 
 Claude installation links instructions, agents, commands, output styles, and the statusline script into each profile directory, and generates each profile's settings from layered fragments. MCP configuration is linked to `~/.mcp.json`.
 
 - [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh link` generates and installs all three.
-- Claude agents and commands cover reviews, GitHub/Azure DevOps, security, notes, reading, and writing workflows. GitGuardian and Sonar run as Git hooks, not Claude hooks.
+- Claude agents and commands cover reviews, GitHub/Azure DevOps, security, notes, reading, and writing workflows. gitleaks runs as a Git hook, not a Claude hook.
 - OpenCode includes agent/command definitions, TUI settings, and a Supacode presence plugin that emits activity only inside Supacode surfaces.
 
 ### Personal skills

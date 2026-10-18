@@ -144,6 +144,3 @@ fi
 [[ -n "${DOTNET_ROOT:-}" ]] && export PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:$PATH"
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
-
-# Added by sonarqube-cli installer
-export PATH="$HOME/.local/share/sonarqube-cli/bin:$PATH"
