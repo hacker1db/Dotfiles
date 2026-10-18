@@ -1,0 +1,43 @@
+#!/bin/sh
+set -u
+
+host=
+for arg in "$@"; do
+    case "$arg" in
+        -*) ;;
+        *@*) host=${arg#*@}; break ;;
+    esac
+done
+
+[ -n "$host" ] || exec ssh "$@"
+title=$(git config --get "agentkey.$host.title" || true)
+[ -n "$title" ] || [ "$host" = github.com ] || exec ssh "$@"
+
+dir=$(mktemp -d "${TMPDIR:-/tmp}/git-agent-ssh.XXXXXX") || exit 1
+trap 'rm -rf "$dir"' EXIT
+trap 'exit 130' INT TERM HUP
+
+ref=$(git config --get agentkey.automation || true)
+if [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] && [ -n "$ref" ] &&
+    op read --out-file "$dir/id.pub" "$ref/public key" >/dev/null 2>&1; then
+    eval "$(/usr/bin/ssh-agent -s -a "$dir/agent.sock")" >/dev/null
+    trap 'kill "$SSH_AGENT_PID" 2>/dev/null; rm -rf "$dir"' EXIT
+    op read "$ref/private key?ssh-format=openssh" | /usr/bin/ssh-add -q - &&
+        ssh -o IdentitiesOnly=yes -o IdentityAgent=SSH_AUTH_SOCK -i "$dir/id.pub" "$@"
+    exit
+fi
+
+if ! key=$("$(dirname "$0")/git-agent-key" ${title:+"$title"}); then
+    # A managed account must never fall back to unrestricted key selection,
+    # or SSH may authenticate as a different GitHub account.
+    if [ -n "$title" ]; then
+        echo "git-agent-ssh: could not select agent key \"$title\" for $host" >&2
+        exit 1
+    fi
+    exec ssh "$@"
+fi
+printf '%s\n' "$key" > "$dir/id.pub"
+
+SSH_AUTH_SOCK=$("$(dirname "$0")/git-agent-socket") || exit 1
+export SSH_AUTH_SOCK
+ssh -o IdentitiesOnly=yes -o IdentityAgent=SSH_AUTH_SOCK -i "$dir/id.pub" "$@"

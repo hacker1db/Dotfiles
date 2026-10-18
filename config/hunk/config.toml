@@ -1,0 +1,24 @@
+theme = "custom"
+mode = "auto"
+vcs = "git"
+watch = false
+exclude_untracked = false
+line_numbers = true
+wrap_lines = false
+agent_notes = false
+transparent_background = true
+
+[custom_theme]
+base = "catppuccin-mocha"
+label = "Eldritch"
+accent = "#987afb"
+panel = "#0D1116"
+noteBorder = "#fca6ff"
+
+[custom_theme.syntax_scopes]
+"keyword" = "#987afb"
+"string" = "#37f499"
+"comment" = "#b7bfce"
+"punctuation.definition.comment" = "#b7bfce"
+"keyword.operator" = "#04d1f9"
+"variable" = "#fca6ff"

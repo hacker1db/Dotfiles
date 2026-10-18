@@ -1,0 +1,35 @@
+#!/bin/sh
+set -eu
+
+title=${1:-}
+if [ -z "$title" ]; then
+    title=$(git config --get agentkey.title || true)
+fi
+if [ -z "$title" ]; then
+    email=$(git config --get user.email || true)
+    [ -n "$email" ] && title=$(git config --get "agentkey.$email.title" || true)
+fi
+[ -n "$title" ] || {
+    echo 'No agentkey title configured for this Git identity.' >&2
+    exit 1
+}
+socket=$("$(dirname "$0")/git-agent-socket") || exit 1
+keys=$(SSH_AUTH_SOCK="$socket" /usr/bin/ssh-add -L) || exit 1
+printf '%s\n' "$keys" | awk -v title="$title" '
+    NF >= 3 {
+        comment = $0
+        sub(/^[^[:space:]]+[[:space:]]+[^[:space:]]+[[:space:]]+/, "", comment)
+        sub(/[[:space:]]+$/, "", comment)
+        if (tolower(comment) == tolower(title)) {
+            selected = $1 " " $2
+            count++
+        }
+    }
+    END {
+        if (count != 1) {
+            print "Expected exactly one 1Password SSH key titled \"" title "\"; refusing to choose." > "/dev/stderr"
+            exit 1
+        }
+        print selected
+    }
+'

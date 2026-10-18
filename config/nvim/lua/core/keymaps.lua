@@ -1,70 +1,64 @@
--- set leader key to space
+-- leader key ; (was space previously)
 vim.g.mapleader = ";"
 local keymap = vim.keymap -- for conciseness local opts = { noremap = true, silent = true }
 ---------------------
 -- General Keymaps
 ---------------------
-
+-- make quitting stuff easier map command Wq to :wq
+vim.cmd("command! Wq wq!")
+-- save all buffers and quit neovim
+keymap.set("n", "<leader>qa", ":wa<CR>:qa<CR>", { desc = "Save all buffers and quit" })
 -- indentation carry
-keymap.set("v", "<leader>[", "<gv", opts)
-keymap.set("v", "<leader>]", ">gv", opts)
+keymap.set("v", "<leader>[", "<gv", { desc = "indent selection left" })
+keymap.set("v", "<leader>]", ">gv", { desc = "indent selection right" })
 
 -- use jk to exit insert mode
-keymap.set("i", "jk", "<ESC>")
+keymap.set("i", "jk", "<ESC>", { desc = "exit insert mode with jk" })
+keymap.set("n", "<leader>q", ":q!<CR>", { desc = "quit" }) -- quit
 
 -- clear search highlights
-keymap.set("n", "<space>", ":nohl<CR>")
-
--- delete single character without copying into register
-keymap.set("n", "x", '"_x')
+keymap.set("n", "<space>", ":nohl<CR>", { desc = "Clear search highlights" })
 
 -- window management
-keymap.set("n", "<leader>\\", "<C-w>v") -- split window vertically
-keymap.set("n", "<leader>-", "<C-w>s") -- split window horizontally
-keymap.set("n", "<leader>=", "<C-w>=") -- make split windows equal width & height
-keymap.set("n", "<leader>w", ":close<CR>") -- close current split window, also close current tab
+-- nvim-tree
 
-keymap.set("n", "<leader>t", ":tabnew<CR>") -- open new tab
-keymap.set("n", "<leader>tn", ":tabn<CR>") --  go to next tab
-keymap.set("n", "<leader>tp", ":tabp<CR>") --  go to previous tab
-keymap.set("n", ",,", ":w<CR>")
-keymap.set("n", "<leader>ff", ":lua vim.lsp.buf.format()<CR>")
-keymap.set("n", "<leader>s", ":so<CR>")
+keymap.set("n", "<leader>\\", "<C-w>v", { desc = "split virtically" })
+keymap.set("n", "<leader>-", "<C-w>s", { desc = "split horizontally" })
+keymap.set("n", "<leader>=", "<C-w>=", { desc = "make split windows equal width & height" })
+keymap.set("n", "<leader>w", ":close<CR>", { desc = "close current buffer or tab" })
+keymap.set("n", "<C-h>", "<cmd>TmuxNavigateLeft<CR>", { desc = "Tmux navigate left" })
+keymap.set("n", "<C-j>", "<cmd>TmuxNavigateDown<CR>", { desc = "Tmux navigate down" })
+keymap.set("n", "<C-k>", "<cmd>TmuxNavigateUp<CR>", { desc = "Tmux navigate up" })
+keymap.set("n", "<C-l>", "<cmd>TmuxNavigateRight<CR>", { desc = "Tmux navigate right" })
+keymap.set("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<CR>", { desc = "Tmux navigate previous" })
 
+keymap.set("n", ",,", ":w<CR>", { desc = "Save file" })
+keymap.set("n", "<leader>cf", ":lua vim.lsp.buf.format()<CR>", { desc = "Format file" })
+keymap.set("n", "<leader>s", ":so<CR>", { desc = "Source file" })
+keymap.set("n", "<leader>yf", ':let @+=expand("<cfile>:p")<CR>', { desc = "Yank file path under cursor" })
+
+-- window management buffers
+keymap.set("n", "bn", "<cmd>bn<CR>", { desc = "Go to next buffer" }) -- go to next buffer
+keymap.set("n", "bp", "<cmd>bp<CR>", { desc = "Go to previous buffer" }) -- go to previous buffer
 ----------------------
 -- Plugin Keybinds
 ----------------------
 
 -- gopher
 -- json tags
-keymap.set("n", "<leader>gtj", ":GoTagAdd json<CR>") -- generate tags for json
+keymap.set("n", "<leader>gtj", ":GoTagAdd json<CR>", { desc = "gopher generate json tags" }) -- generate tags for json
 -- yaml tags
-keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>") -- generate tags for yaml
+keymap.set("n", "<leader>gty", ":GoTagAdd yaml<CR>", { desc = "gopher generate json tags" }) -- generate tags for yaml
 -- gopher tests and iferr
 keymap.set("n", "<leader>gt", ":GoTestsAll<CR>") -- generate tests for current file
 keymap.set("n", "<leader>gi", ":GoIfErr<CR>") -- generate if err check for current file
+keymap.set("n", "<leader>ee", "<cmd>GoIfErr<cr>", { silent = true, noremap = true })
 
--- vim-maximizer
-keymap.set("n", "<leader>sm", ":MaximizerToggle<CR>") -- toggle split window maximization
-
--- nvim-tree
-keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>") -- toggle file explorer
-
--- telescope
-keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>") -- find files within current working directory, respects .gitignore
-keymap.set("n", "<leader>fr", "<cmd>Telescope live_grep<cr>") -- find string in current working directory as you type
-keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>") -- find string under cursor in current working directory
-keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<cr>") -- list open buffers in current neovim instance
-keymap.set("n", "<leader>fg", "<cmd>Telescope git_files<cr>") -- list git_files
-keymap.set("n", ";;", "<cmd>Telescope help_tags<cr>") -- list available help tags
--- vim.api.nvim_set_keymap("n", ":", ":Telescope cmdline<CR>", { noremap = true, desc = "Cmdline" })
--- vim.api.nvim_set_keymap("n", "<leader><leader>", ":Telescope cmdline<CR>", { noremap = true, desc = "Cmdline" })
-
--- telescope git commands
-keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>") -- list all git commits (use <cr> to checkout) ["gc" for git commits]
-keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>") -- list git commits for current file/buffer (use <cr> to checkout) ["gfc" for git file commits]
-keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>") -- list git branches (use <cr> to checkout) ["gb" for git branch]
-keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>") -- list current changes per file with diff preview ["gs" for git status]
+-- telescope git commands (keep telescope for git, mini.pick doesn't have built-in git support)
+keymap.set("n", "<leader>gc", "<cmd>Telescope git_commits<cr>", { desc = "Telescope git commit search" })
+keymap.set("n", "<leader>gfc", "<cmd>Telescope git_bcommits<cr>", { desc = "Telescope show current commits from file" })
+keymap.set("n", "<leader>gb", "<cmd>Telescope git_branches<cr>", { desc = "Telescope show branches" })
+keymap.set("n", "<leader>gs", "<cmd>Telescope git_status<cr>", { desc = "Telescope show git status" })
 
 -- restart lsp server
 keymap.set("n", "<leader>rs", ":LspRestart<CR>") -- mapping to restart lsp if necessary
@@ -72,3 +66,60 @@ keymap.set("n", "<leader>rs", ":LspRestart<CR>") -- mapping to restart lsp if ne
 -- Markdown key mapping
 keymap.set("n", "<leader>mp", ":MarkdownPreview<CR>")
 keymap.set("n", "<leader>mps", ":MarkdownPreviewStop<CR>")
+
+-- undotree
+keymap.set("n", "<leader>u", ":UndotreeToggle<CR>", { desc = "Toggle Undotree" })
+
+-- gitsigns
+keymap.set("n", "<leader>gd", function()
+    require("gitsigns").diffthis()
+end, { desc = "Git diff this" })
+keymap.set("n", "<leader>gD", function()
+    require("gitsigns").diffthis("~")
+end, { desc = "Git diff this ~" })
+
+-- mini.diff
+keymap.set("n", "<leader>go", function()
+    require("mini.diff").toggle_overlay()
+end, { desc = "Toggle git overlay (mini.diff)" })
+-- Git Stuff
+keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
+keymap.set("n", "<leader>gB", ":Gitsigns toggle_current_line_blame<CR>", { desc = "Toggle git blame" })
+
+-- Snacks explorer
+-- Toggle logic: if an explorer buffer is visible, close it; otherwise open/reveal
+keymap.set("n", "<leader>bp", "<Cmd>BufferLineTogglePin<CR>", { desc = "Toggle Pin" })
+keymap.set("n", "<leader>bP", "<Cmd>BufferLineGroupClose ungrouped<CR>", { desc = "Delete Non-Pinned Buffers" })
+keymap.set("n", "<leader>br", "<Cmd>BufferLineCloseRight<CR>", { desc = "Delete Buffers to the Right" })
+keymap.set("n", "<leader>bl", "<Cmd>BufferLineCloseLeft<CR>", { desc = "Delete Buffers to the Left" })
+keymap.set("n", "<S-h>", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev Buffer" })
+keymap.set("n", "<S-l>", "<cmd>BufferLineCycleNext<cr>", { desc = "Next Buffer" })
+keymap.set("n", "[b", "<cmd>BufferLineCyclePrev<cr>", { desc = "Prev Buffer" })
+keymap.set("n", "]b", "<cmd>BufferLineCycleNext<cr>", { desc = "Next Buffer" })
+keymap.set("n", "[B", "<cmd>BufferLineMovePrev<cr>", { desc = "Move buffer prev" })
+keymap.set("n", "]B", "<cmd>BufferLineMoveNext<cr>", { desc = "Move buffer next" })
+
+-- lsp config keymaps
+vim.api.nvim_create_autocmd("LspAttach", {
+    group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+    callback = function(ev)
+        -- Buffer local mappings.
+        -- See `:help vim.lsp.*` for documentation on any of the below functions
+        local opts = { buffer = ev.buf, silent = true }
+
+        -- set keybinds (gr, gd, gi, gy handled by snacks.lua; ca, rn, K handled by lspsaga)
+        opts.desc = "Go to declaration"
+        keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
+
+        opts.desc = "Show buffer diagnostics"
+        keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
+
+        opts.desc = "Show line diagnostics"
+        keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
+
+        -- [d / ]d handled by lspsaga diagnostic_jump_prev/next
+
+        opts.desc = "Restart LSP"
+        keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
+    end,
+})

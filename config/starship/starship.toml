@@ -1,0 +1,162 @@
+add_newline = false
+# A minimal left prompt
+palette = "eldritch"
+# A minimal left prompt
+format = """$directory$python$golang$rust$nodejs$fill
+$character"""
+# move the rest of the prompt to the right
+right_format = """$git_branch$git_state$git_status"""
+command_timeout = 1000
+continuation_prompt = '▷'
+
+[username]
+disabled = true
+show_always = false
+
+[golang]
+format = '[ ](bold cyan)'
+version_format = '[$symbol$version ]($style)'
+
+[git_status]
+conflicted = '🏳'
+ahead = '🏎💨'
+behind = '😰'
+diverged = '😵'
+up_to_date = '✓'
+untracked = '🤷'
+stashed = '📦'
+modified = '📝'
+staged = '[++\($count\)](green)'
+renamed = '👅'
+deleted = '🗑'
+## --- GIT
+[kubernetes]
+symbol = '☸ '
+disabled = false
+detect_files = ['Dockerfile']
+format = '[$context(\[$namespace\])]($style) '
+
+[docker_context]
+disabled = true
+
+[python]
+python_binary = 'python3'
+pyenv_version_name = true
+format = '[${symbol}(${version} )(\($virtualenv\) )]($style)'
+symbol = '🐍 '
+
+[terraform]
+format = '[🏎💨 $version$workspace]($style) '
+
+[palettes.eldritch]
+# Based on Eldritch theme colors from eldritch.nvim
+bg_dark = "#171928"
+bg = "#212337"
+bg_highlight = "#292e42"
+terminal_black = "#414868"
+fg = "#ebfafa"
+fg_dark = "#ABB4DA"
+fg_gutter = "#3b4261"
+fg_gutter_light = "#7081d0"
+dark3 = "#6473B7"
+comment = "#7081d0"
+dark5 = "#5866A2"
+bright_cyan = "#39DDFD"
+visual = "#76639e"
+bg_visual = "#76639e"
+cyan = "#04d1f9"
+dark_cyan = "#10A1BD"
+magenta = "#a48cf2"
+magenta2 = "#bf4f8e"
+magenta3 = "#722f55"
+pink = "#f265b5"
+purple = "#a48cf2"
+orange = "#f7c67f"
+yellow = "#f1fc79"
+dark_yellow = "#c0c95f"
+green = "#37f499"
+bright_green = "#00FA82"
+dark_green = "#33C57F"
+red = "#f16c75"
+bright_red = "#f0313e"
+
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
+
+
+[nodejs]
+format = "[$symbol($version )]($style)"
+
+[fill]
+symbol = " "
+
+[directory]
+style = "cyan"
+read_only = " "
+truncation_length = 4
+truncate_to_repo = false
+
+[character]
+success_symbol = "[❯](purple)"
+error_symbol = "[❯](red)"
+vicmd_symbol = "[❮](green)"
+
+[git_branch]
+symbol = " "
+format = "[$symbol$branch]($style) "
+style = "bright-black"
+
+[jobs]
+symbol = ""
+style = "bold red"
+number_threshold = 1
+format = "[$symbol]($style)"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "bright-black"
+
+[git_metrics]
+disabled = false
+
+[cmd_duration]
+format = "[$duration]($style)"
+style = "yellow"
+
+[memory_usage]
+symbol = " "
+
+[rust]
+symbol = " "
+
+[time]
+disabled = false
+style = "bold white"
+format = "[$time]($style)"
+
+

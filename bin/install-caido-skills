@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+usage() {
+    cat <<EOF
+Usage: $(basename "${BASH_SOURCE[0]}") <project-directory>
+
+Install all official Caido skills and their dependencies into one Codex project.
+
+Options:
+  -h, --help  Show this help
+EOF
+}
+
+die() {
+    printf 'Error: %s\n' "$1" >&2
+    exit 1
+}
+
+if [[ $# -ne 1 ]]; then
+    usage >&2
+    die "exactly one project directory is required"
+fi
+
+case "$1" in
+    -h | --help)
+        usage
+        exit 0
+        ;;
+esac
+
+project_directory=$1
+
+[[ -d "$project_directory" ]] || die "project directory does not exist: $project_directory"
+[[ -w "$project_directory" ]] || die "project directory is not writable: $project_directory"
+
+for required_command in pnpm npm git; do
+    command -v "$required_command" >/dev/null 2>&1 || die "required command not found: $required_command"
+done
+
+(
+    cd -- "$project_directory"
+    pnpm dlx skills add caido/skills --skill='*' --agent codex --yes
+
+    caido_mode_package=.agents/skills/caido-mode/package.json
+    [[ -f "$caido_mode_package" ]] || die "installer did not create $caido_mode_package"
+
+    npm install --prefix .agents/skills/caido-mode
+
+    shopt -s nullglob
+    skill_files=(.agents/skills/*/SKILL.md)
+    if (( ${#skill_files[@]} > 0 )) \
+        && git rev-parse --is-inside-work-tree >/dev/null 2>&1 \
+        && git check-ignore -q -- "${skill_files[@]}"; then
+        printf 'Warning: Git ignores one or more installed Caido SKILL.md files.\n' >&2
+    fi
+)
+
+printf 'Installed Caido skills in %s\n' "$project_directory"

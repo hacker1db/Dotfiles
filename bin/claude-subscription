@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+CLAUDE_CONFIG_DIR="$HOME/.claude-subscription" exec claude "$@"

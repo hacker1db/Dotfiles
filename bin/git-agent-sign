@@ -1,0 +1,16 @@
+#!/bin/sh
+set -u
+
+ref=$(git config --get agentkey.automation || true)
+if [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || [ -z "$ref" ]; then
+    exec /Applications/1Password.app/Contents/MacOS/op-ssh-sign "$@"
+fi
+
+dir=$(mktemp -d "${TMPDIR:-/tmp}/git-agent-sign.XXXXXX") || exit 1
+trap 'rm -rf "$dir"' EXIT
+trap 'exit 130' INT TERM HUP
+
+eval "$(/usr/bin/ssh-agent -s -a "$dir/agent.sock")" >/dev/null
+trap 'kill "$SSH_AGENT_PID" 2>/dev/null; rm -rf "$dir"' EXIT
+op read "$ref/private key?ssh-format=openssh" | /usr/bin/ssh-add -q - &&
+    /usr/bin/ssh-keygen "$@"

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_TOKEN_MCP}"
+      }
+    },
+    "azure-devops": {
+      "type": "local",
+      "command": ["npx", "-y", "@azure-devops/mcp", "itsals"]
+    },
+    "postman": {
+      "type": "remote",
+      "url": "https://mcp.postman.com/mcp",
+      "oauth": {}
+    },
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "-y", "@playwright/mcp"]
+    },
+    "app-modernization": {
+      "type": "local",
+      "command": ["npx", "-y", "@microsoft/github-copilot-app-modernization-mcp-server@latest"]
+    }
+  },
+  "lsp": {
+    "markdownlint": {
+      "command": ["markdownlint-language-server", "--stdio"],
+      "extensions": [".md"]
+    },
+    "marksman": {
+      "command": ["marksman", "server"],
+      "extensions": [".md"]
+    }
+  }
+}
+

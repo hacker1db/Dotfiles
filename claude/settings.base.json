@@ -1,0 +1,63 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.dotfiles/main/claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "cli-anything@cli-anything": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "claude-security@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "cli-anything": {
+      "source": {
+        "source": "github",
+        "repo": "HKUDS/CLI-Anything"
+      }
+    },
+    "claude-code-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-code"
+      }
+    }
+  },
+  "enabledMcpjsonServers": ["github", "playwright"],
+  "plansDirectory": "~/notes/SecondBrain/4.Resources/plans",
+  "effortLevel": "high",
+  "theme": "dark-daltonized",
+  "editorMode": "vim",
+  "outputStyle": "Plan Manager",
+  "tui": "fullscreen",
+  "model": "claude-fable-5[1m]",
+  "skillListingBudgetFraction": 0.02,
+  "permissions": {
+    "defaultMode": "auto",
+    "deny": [
+      "Bash(sudo *)",
+      "Bash(su *)",
+      "Bash(shred *)",
+      "Bash(dd *)",
+      "Bash(mkfs*)",
+      "Bash(fdisk*)",
+      "Bash(diskutil erase*)",
+      "Bash(diskutil unmount*)"
+    ],
+    "disableBypassPermissionsMode": "disable"
+  }
+}

@@ -16,3 +16,19 @@ bin/pycharm
 bin/fleet
 config/nvim/plugin/
 !/config/nvim/plugin/packer_compiled.lua
+Brewfile.lock.json
+config/tmux/plugins/
+node_modules/
+claude/.local/
+codex/.local/
+
+config/opencode/node_modules/
+config/opencode/package.json
+config/opencode/package-lock.json
+config/opencode/bun.lock
+
+# Local secrets: never commit
+config/opencode/service.json
+
+# hunk writes its release-check timestamp here on every run; machine-local cache
+config/hunk/state.json
