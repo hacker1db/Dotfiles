@@ -304,8 +304,8 @@ do_init() {
     msg "${YELLOW}Pushing '$default_branch' to origin...${NOFORMAT}"
     git -C "$default_branch" push -u origin "$default_branch"
 
-    msg "${YELLOW}Enabling delete-branch-on-merge...${NOFORMAT}"
-    gh repo edit "$github_org/$repo_name" --delete-branch-on-merge
+    msg "${YELLOW}Enabling delete-branch-on-merge and auto-merge...${NOFORMAT}"
+    gh repo edit "$github_org/$repo_name" --delete-branch-on-merge --enable-auto-merge
 
     msg "${YELLOW}Adding default branch ruleset: require a pull request with 1 approval...${NOFORMAT}"
     gh api -X POST "repos/$github_org/$repo_name/rulesets" --input - > /dev/null << 'EOF'
