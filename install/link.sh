@@ -160,7 +160,13 @@ fi
 
 echo -e "\n\nInstalling Claude Code profiles"
 echo "=============================="
-bash "$DOTFILES/install/claude-profiles.sh" || { echo "Claude profile setup failed or is incomplete; see the messages above."; exit 1; }
+CLAUDE_PROFILES_STATUS=0
+bash "$DOTFILES/install/claude-profiles.sh" || CLAUDE_PROFILES_STATUS=$?
+case "$CLAUDE_PROFILES_STATUS" in
+    0) ;;
+    2) warning "Claude profile setup is incomplete; see the messages above." ;;
+    *) echo "Claude profile setup failed; see the messages above."; LINK_FAILURE=1 ;;
+esac
 
 echo -e "\n\nInstalling SSH config"
 echo "=============================="
@@ -244,7 +250,7 @@ if [ "$PLAN_MANAGER_READY" -eq 1 ]; then
   fi
 fi
 
-if [ "$PLAN_MANAGER_FAILURE" -ne 0 ]; then
+if [ "$PLAN_MANAGER_FAILURE" -ne 0 ] || [ "${LINK_FAILURE:-0}" -ne 0 ]; then
   echo "Dotfiles installation needs attention; see the diagnostics above."
   exit 1
 fi
