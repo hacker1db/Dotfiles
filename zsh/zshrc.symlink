@@ -11,6 +11,9 @@ autoload -U compinit add-zsh-hook
 compinit -C
 # Reevaluate the prompt string each time it's displaying a prompt
 autoload bashcompinit && bashcompinit
+if command -v plan &> /dev/null; then
+    eval "$(plan completion bash)"
+fi
 setopt prompt_subst
 if command -v kubectl &> /dev/null; then
     source <(kubectl completion zsh)
