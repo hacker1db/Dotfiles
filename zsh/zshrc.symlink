@@ -127,9 +127,6 @@ fi
 if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
 export STARSHIP_CONFIG=~/.config/starship/starship.toml
 
-### MANAGED BY RANCHER DESKTOP START (DO NOT EDIT)
-export PATH="$HOME/.rd/bin:$PATH"
-### MANAGED BY RANCHER DESKTOP END (DO NOT EDIT)
 
 if [[ -d /opt/homebrew/opt/dotnet/libexec ]]; then
     export DOTNET_ROOT="/opt/homebrew/opt/dotnet/libexec"

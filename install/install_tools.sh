@@ -170,7 +170,6 @@ CASKS=(
   podman-desktop
   postman
   powershell
-  rancher
   raycast
   reader
   signal
