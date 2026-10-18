@@ -96,6 +96,8 @@ brew "ggshield"
 brew "gh"
 # Distributed revision control system
 brew "git"
+# Audit git repos for secrets
+brew "gitleaks"
 # GitHub Model Context Protocol server for AI tools
 brew "github-mcp-server"
 # Render markdown on the CLI

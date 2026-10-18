@@ -1,10 +1,10 @@
 [core]
     sshCommand = ~/.dotfiles/bin/git-agent-ssh
-    hooksPath = ~/.sonar/sonarqube-cli/hooks
+    hooksPath = ~/.dotfiles/git/templates/hooks
 [gpg]
     format = ssh
 [gpg "ssh"]
-    program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+    program = ~/.dotfiles/bin/git-agent-sign
     defaultKeyCommand = sh -c ~/.dotfiles/bin/git-agent-signing-key
     allowedSignersFile = ~/.ssh/allowed_signers
 [commit]
@@ -24,6 +24,8 @@
     insteadOf = git@github.com:zerobitconsulting/
     insteadOf = https://github.com/zerobitconsulting/
 
+[agentkey]
+    automation = op://automation/ay3jayregkyfvdis6q7kuxgena
 [agentkey "hb1"]
     title = Github personal
 [agentkey "github-hacker1db"]

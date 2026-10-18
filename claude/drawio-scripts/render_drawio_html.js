@@ -1,6 +1,6 @@
 /**
  * render_drawio_html.js — Draw.io XML → HTML preview file
- * Parses .drawio XML using mxGraph/JSDOM and outputs a self-contained HTML file
+ * Parses .drawio XML with JSDOM's XML parser and outputs a self-contained HTML file
  * that can be screenshotted by any browser (e.g. Playwright MCP).
  *
  * Usage: node render_drawio_html.js <input.drawio> <output.html> [pageIndex]
@@ -11,21 +11,26 @@ const fs   = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
 const { inputPath, outputPath } = require('./safe_path');
-const MXGRAPH_JS = path.resolve(__dirname, 'node_modules/mxgraph/javascript/mxClient.js');
 
 // ─── 1. Parse drawio XML → cell list ──────────────────────────────────────
 
-async function parseDiagram(xml, pageIndex = 0) {
-  if (!fs.existsSync(MXGRAPH_JS)) throw new Error('Run: npm install in scripts/');
-  const dom = new JSDOM('<!DOCTYPE html><html><body><div id="c"></div></body></html>', {
-    runScripts: 'dangerously', pretendToBeVisual: true,
-  });
-  const { window: win } = dom;
-  const s = win.document.createElement('script');
-  s.textContent = fs.readFileSync(MXGRAPH_JS, 'utf8');
-  win.document.head.appendChild(s);
-  await new Promise(r => setTimeout(r, 400));
+// Labels may hold HTML; reduce them to plain text. Tags are stripped until none
+// remain, and &amp; is decoded last so entities are never decoded twice.
+function htmlToText(s) {
+  let prev;
+  do { prev = s; s = s.replace(/<[^>]*>/g, ''); } while (s !== prev);
+  return s.replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&')
+          .replace(/\s+/g, ' ').trim();
+}
 
+function num(el, name) {
+  const v = el ? Number.parseFloat(el.getAttribute(name)) : Number.NaN;
+  return Number.isFinite(v) ? v : 0;
+}
+
+async function parseDiagram(xml, pageIndex = 0) {
+  const { window: win } = new JSDOM('');
   const parser   = new win.DOMParser();
   const mxDoc    = parser.parseFromString(xml, 'text/xml');
   const diagrams = Array.from(mxDoc.getElementsByTagName('diagram'));
@@ -37,45 +42,46 @@ async function parseDiagram(xml, pageIndex = 0) {
 
   let gmEl = diagram.querySelector('mxGraphModel');
   if (!gmEl) gmEl = parser.parseFromString(diagram.textContent.trim(), 'text/xml').documentElement;
+  const root = gmEl && gmEl.getElementsByTagName('root')[0];
 
-  const container = win.document.getElementById('c');
-  const graph     = new win.mxGraph(container);
-  graph.setEnabled(false);
-  graph.setHtmlLabels(false);
-  new win.mxCodec(gmEl.ownerDocument).decode(gmEl, graph.getModel());
+  const raw = [];
+  for (const el of root ? Array.from(root.children) : []) {
+    const wrapped = el.tagName !== 'mxCell';
+    const mx = wrapped ? el.getElementsByTagName('mxCell')[0] : el;
+    if (!mx) continue;
+    const geo = Array.from(mx.children).find(g => g.tagName === 'mxGeometry');
+    raw.push({
+      id: el.getAttribute('id'),
+      label: htmlToText(wrapped ? (el.getAttribute('label') || el.textContent || '') : (mx.getAttribute('value') || '')),
+      link: wrapped ? el.getAttribute('link') : null,
+      style: mx.getAttribute('style') || '',
+      x: num(geo, 'x'), y: num(geo, 'y'), w: num(geo, 'width'), h: num(geo, 'height'),
+      isEdge: mx.getAttribute('edge') === '1',
+      source: mx.getAttribute('source'),
+      target: mx.getAttribute('target'),
+      parent: mx.getAttribute('parent'),
+    });
+  }
 
-  const model = graph.getModel();
+  const ids = new Set(raw.map(c => c.id));
+  const children = new Map();
+  for (const c of raw) {
+    if (!children.has(c.parent)) children.set(c.parent, []);
+    children.get(c.parent).push(c);
+  }
+
   const cells = [];
   const cellMap = {};
-
-  function collectCells(cell) {
-    if (!cell) return;
-    const geo   = cell.geometry;
-    const style = cell.style || '';
-    let label   = '';
-    const val   = cell.value;
-    if (typeof val === 'string') label = val;
-    else if (val && val.getAttribute) label = val.getAttribute('label') || val.textContent || '';
-    const link = (val && val.getAttribute) ? val.getAttribute('link') : null;
-    label = label.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<')
-                 .replace(/&gt;/g,'>').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();
-
-    if (cell.id !== '0' && cell.id !== '1') {
-      const c = {
-        id: cell.id, label, link, style,
-        x: geo ? (geo.x || 0) : 0, y: geo ? (geo.y || 0) : 0,
-        w: geo ? (geo.width  || 0) : 0, h: geo ? (geo.height || 0) : 0,
-        isEdge: cell.isEdge() || false,
-        source: cell.source ? cell.source.id : null,
-        target: cell.target ? cell.target.id : null,
-        parent: cell.parent ? cell.parent.id : '1',
-      };
+  function collectCells(parentId) {
+    for (const c of children.get(parentId) || []) {
+      c.source = ids.has(c.source) ? c.source : null;
+      c.target = ids.has(c.target) ? c.target : null;
       cells.push(c);
       cellMap[c.id] = c;
+      collectCells(c.id);
     }
-    for (const child of model.getChildCells(cell)) collectCells(child);
   }
-  collectCells(model.getCell('1'));
+  collectCells('1');
 
   function absPos(cell) {
     if (!cell) return { x:0, y:0 };
@@ -286,7 +292,7 @@ function buildHtml({ cells, cellMap, minX, minY, maxX, maxY, diagramName }) {
     const rx     = Math.round(arcSize * Math.min(tw(z.w), th(z.h)) / 2 * 2);
     const dashAttr= isDash ? 'stroke-dasharray="7,4"' : '';
     const sw     = isDash ? '1.5' : '2';
-    const labelClean = z.label.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').trim();
+    const labelClean = z.label;
     svgZones += `
       <rect x="${tx(z.ax)}" y="${ty(z.ay)}" width="${tw(z.w)}" height="${th(z.h)}"
             rx="${rx}" fill="${fillCss}" stroke="${stroke}" stroke-width="${sw}" ${dashAttr}/>
