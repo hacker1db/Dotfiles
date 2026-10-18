@@ -12,9 +12,9 @@ log="$temp/calls.log"
 mkdir -p "$repo/install" "$home/OneDrive - Fixture/Personal" "$stubs"
 rsync -a --exclude .local --exclude skills --exclude plugins "$root/claude" "$repo/"
 cp "$root/install/claude-profiles.sh" "$repo/install/"
-# Fixture work layer so hook scoping is tested independently of the real file's contents.
-cat > "$repo/claude/settings.work.json" << 'EOF'
-{"hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "fixture-work-hook"}]}]}}
+# Fixture subscription layer so hook scoping is tested independently of the real file's contents.
+cat > "$repo/claude/profiles/subscription/settings.json" << 'EOF'
+{"hooks": {"PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "fixture-subscription-hook"}]}]}}
 EOF
 echo 'export ANTHROPIC_FOUNDRY_RESOURCE=fixture-resource' > "$home/OneDrive - Fixture/Personal/.localrc"
 for tool in claude skillctl; do
@@ -48,13 +48,16 @@ for p in personal subscription foundry; do
     for item in CLAUDE.md agents commands output-styles statusline-command.sh; do
         [ "$(readlink "$d/$item")" = "$repo/claude/$item" ] || fail "$p link $item"
     done
+    [ "$(readlink "$d/hooks")" = "$repo/claude/profiles/$p/hooks" ] || fail "$p hooks link"
     grep -qx "skillctl .claude-$p sync --global" "$log" || fail "$p skillctl sync"
     [ "$(setting "$p" '.env.CLAUDE_CODE_USE_BEDROCK + .env.CLAUDE_CODE_USE_VERTEX')" = 00 ] || fail "$p bedrock/vertex"
 done
 [ "$(setting personal '.enabledPlugins["vercel@claude-plugins-official"] and .enabledPlugins["todoist@doist"]')" = true ] || fail "personal plugins"
-[ "$(setting personal '.hooks // {} | tostring | contains("fixture-work-hook")')" = false ] || fail "personal has work hook"
+[ "$(setting subscription '.hooks | tostring | contains("fixture-subscription-hook")')" = true ] || fail "subscription missing its hook"
+for p in personal foundry; do
+    [ "$(setting "$p" '.hooks // {} | tostring | contains("fixture-subscription-hook")')" = false ] || fail "$p has subscription hook"
+done
 for p in subscription foundry; do
-    [ "$(setting "$p" '.hooks | tostring | contains("fixture-work-hook")')" = true ] || fail "$p missing work hook"
     [ "$(setting "$p" '.enabledPlugins | has("vercel@claude-plugins-official") or has("todoist@doist")')" = false ] || fail "$p has personal plugins"
 done
 for p in personal subscription; do
@@ -103,7 +106,7 @@ args=(); code=0; run > "$temp/out6" || code=$?
 # Credentials in a layer are rejected before anything is written.
 echo 'export ANTHROPIC_FOUNDRY_RESOURCE=fixture-resource' > "$home/OneDrive - Fixture/Personal/.localrc"
 before="$(snapshot)"
-jq '.apiKeyHelper = "helper"' "$repo/claude/settings.personal.json" > "$temp/p.json" && mv "$temp/p.json" "$repo/claude/settings.personal.json"
+jq '.apiKeyHelper = "helper"' "$repo/claude/profiles/personal/settings.json" > "$temp/p.json" && mv "$temp/p.json" "$repo/claude/profiles/personal/settings.json"
 code=0; run > /dev/null 2>&1 || code=$?
 [ "$code" = 1 ] || fail "credential rejection exit $code"
 [ "$(snapshot)" = "$before" ] || fail "credential rejection changed state"

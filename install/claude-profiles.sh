@@ -3,10 +3,9 @@
 # ~/.claude-subscription and ~/.claude-foundry.
 #
 # Each profile's settings.json links to claude/.local/profiles/<profile>.json,
-# a jq deep merge of the committed layers:
-#   personal      base + personal
-#   subscription  base + work
-#   foundry       base + work + foundry + local autoMode.environment + resource
+# a jq deep merge of claude/settings.base.json and claude/profiles/<profile>/settings.json
+# (Foundry adds local autoMode.environment and the resource). Each profile's hooks/
+# links to claude/profiles/<profile>/hooks.
 # The Foundry resource comes from $ANTHROPIC_FOUNDRY_RESOURCE (exported by ~/.localrc).
 #
 # Usage: claude-profiles.sh [--check] [--skip-foundry]
@@ -15,6 +14,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 claude_dir="$root/claude"
+profiles_dir="$claude_dir/profiles"
 generated="$claude_dir/.local/profiles"
 linked_items=(CLAUDE.md agents commands output-styles statusline-command.sh)
 credential_keys='["ANTHROPIC_API_KEY","ANTHROPIC_AUTH_TOKEN","ANTHROPIC_FOUNDRY_API_KEY","ANTHROPIC_FOUNDRY_AUTH_TOKEN","CLAUDE_CODE_OAUTH_TOKEN"]'
@@ -69,12 +69,7 @@ auto='{}'
 [ ! -f "$automode" ] || auto="$(jq -c 'if .autoMode.environment then {autoMode: {environment: .autoMode.environment}} else {} end' "$automode")"
 
 build() {
-    local layers=("$claude_dir/settings.base.json")
-    case "$1" in
-        personal) layers+=("$claude_dir/settings.personal.json") ;;
-        subscription) layers+=("$claude_dir/settings.work.json") ;;
-        foundry) layers+=("$claude_dir/settings.work.json" "$claude_dir/settings.foundry.json") ;;
-    esac
+    local layers=("$claude_dir/settings.base.json" "$profiles_dir/$1/settings.json")
     jq -S -s --arg profile "$1" --arg resource "$resource" --argjson auto "$auto" '
         reduce .[] as $layer ({}; . * $layer)
         | .env += {CLAUDE_CODE_USE_BEDROCK: "0", CLAUDE_CODE_USE_VERTEX: "0"}
@@ -135,6 +130,7 @@ for profile in personal subscription foundry; do
         [ -f "$target" ] && [ "$(jq -S . "$target")" = "$want" ] || problem "$profile: generated settings are stale"
         [ -d "$dir/skills" ] && [ ! -L "$dir/skills" ] || problem "$profile: $dir/skills must be a real directory"
         for item in "${linked_items[@]}"; do link_item "$claude_dir/$item" "$dir/$item"; done
+        link_item "$profiles_dir/$profile/hooks" "$dir/hooks"
         continue
     fi
 
@@ -155,6 +151,7 @@ for profile in personal subscription foundry; do
         echo "Linked $dest -> $target"
     fi
     for item in "${linked_items[@]}"; do link_item "$claude_dir/$item" "$dir/$item"; done
+    link_item "$profiles_dir/$profile/hooks" "$dir/hooks"
     [ ! -L "$dir/skills" ] || die "Refusing symlinked skills directory: $dir/skills"
     mkdir -p "$dir/skills"
     if command -v skillctl >/dev/null; then

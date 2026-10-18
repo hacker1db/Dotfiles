@@ -5,8 +5,8 @@ Three isolated profiles, each with its own `CLAUDE_CONFIG_DIR`, login, settings,
 | Profile | Config dir | Command | Aliases | Settings layers |
 | --- | --- | --- | --- | --- |
 | personal (default) | `~/.claude-personal` | `claude-personal` | `cc`, `ccc` | base + personal |
-| work subscription | `~/.claude-subscription` | `claude-subscription` | `cw`, `cwc` | base + work |
-| Foundry | `~/.claude-foundry` | `claude-foundry` | `cf`, `cfc` | base + work + foundry + resource + local autoMode |
+| work subscription | `~/.claude-subscription` | `claude-subscription` | `cw`, `cwc` | base + subscription |
+| Foundry | `~/.claude-foundry` | `claude-foundry` | `cf`, `cfc` | base + foundry + resource + local autoMode |
 
 `zsh/zshenv.symlink` exports `CLAUDE_CONFIG_DIR=~/.claude-personal`, so plain `claude` and `skillctl` use personal. The `bin/claude-*` wrappers override it for one launch and always run the native `~/.local/bin/claude`. GUI apps don't read `zshenv`; point them at a wrapper.
 
@@ -22,7 +22,8 @@ Use these absolute paths from GUI apps and other tools (such as T3 Code) that do
 | Foundry launcher | `~/.dotfiles/bin/claude-foundry` |
 | Profile config dirs | `~/.claude-personal`, `~/.claude-subscription`, `~/.claude-foundry` |
 | Generated settings (ignored by Git, mode 600) | `~/.dotfiles/claude/.local/profiles/{personal,subscription,foundry}.json` |
-| Settings layers (committed) | `~/.dotfiles/claude/settings.{base,personal,work,foundry}.json` |
+| Shared settings layer (committed) | `~/.dotfiles/claude/settings.base.json` |
+| Profile settings and hooks (committed) | `~/.dotfiles/claude/profiles/{personal,subscription,foundry}/{settings.json,hooks/}` |
 | Foundry resource | `ANTHROPIC_FOUNDRY_RESOURCE` in `~/.localrc` → `~/OneDrive*/Personal/.localrc` |
 | Local autoMode input | `~/.config/claude-code/automode.json` (falls back to `foundry-automode.json`) |
 | MCP servers (all profiles) | `~/.mcp.json` → `~/.dotfiles/claude/mcp.json` |
@@ -32,6 +33,7 @@ Each profile dir contains:
 
 - `settings.json`: a symlink to that profile's generated settings
 - symlinks to the dotfiles copies of `CLAUDE.md`, `agents/`, `commands/`, `output-styles/` and `statusline-command.sh`
+- `hooks/`: a symlink to `claude/profiles/<profile>/hooks`
 - `skills/`: a real dir of links managed by skillctl
 - `plugins/`: plugins installed for that profile only
 - login credentials and history, which Claude writes itself
@@ -52,6 +54,7 @@ The Foundry profile also needs a working `az login`. Its resource and model come
 - links `~/.localrc` to `~/OneDrive*/Personal/.localrc`, and fails if there isn't exactly one OneDrive dir or the file hasn't synced
 - merges the layers with jq into ignored `claude/.local/profiles/<profile>.json` (mode 600), linked as `~/.claude-<profile>/settings.json` (dir mode 700), and backs up an unmanaged `settings.json` once
 - links `CLAUDE.md`, `agents/`, `commands/`, `output-styles/`, `statusline-command.sh` into each profile
+- links `claude/profiles/<profile>/hooks` as `~/.claude-<profile>/hooks`
 - creates a real `skills/` dir and fills it with `CLAUDE_CONFIG_DIR=<dir> skillctl sync --global`
 - adds the declared marketplaces and installs the declared plugins per profile
 
@@ -67,9 +70,11 @@ Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout,
 ## Layers
 
 - `settings.base.json`: shared plugins, `enabledMcpjsonServers` (github, playwright from `~/.mcp.json`), `permissions.defaultMode: auto`, deny rules, statusline.
-- `settings.personal.json`: personal-only plugins (vercel, todoist).
-- `settings.work.json`: work-only settings for subscription and Foundry. GitGuardian runs as a git hook (`core.hooksPath`), not a Claude hook.
-- `settings.foundry.json`: Foundry provider and deployment model defaults. Uses `opus` (the configured Opus 4.8 deployment) for auto mode compatibility; `opusplan` would select the unsupported Sonnet 4.6 deployment during execution.
+- `profiles/personal/settings.json`: personal-only plugins (vercel, todoist).
+- `profiles/subscription/settings.json`: settings for the work subscription only. GitGuardian runs as a git hook (`core.hooksPath`), not a Claude hook.
+- `profiles/foundry/settings.json`: Foundry provider and deployment model defaults. Uses `opus` (the configured Opus 4.8 deployment) for auto mode compatibility; `opusplan` would select the unsupported Sonnet 4.6 deployment during execution.
+
+Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`.
 
 The generated files also pin the provider: Foundry sets `CLAUDE_CODE_USE_FOUNDRY=1`, while personal and subscription set it to `0` and add `forceLoginMethod: claudeai`. All three set Bedrock and Vertex to `0`.
 
