@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
  
 DOTFILES=$HOME/.dotfiles/main
-source "$DOTFILES/install/lib/log.sh"
-source "$DOTFILES/install/lib/env.sh"
+LINK_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib"
+source "$LINK_LIB/log.sh"
+source "$LINK_LIB/env.sh"
 
 LINK_PHASE="${DOTFILES_LINK_PHASE:-all}"
 case "$LINK_PHASE" in
