@@ -61,6 +61,8 @@ for p in personal subscription; do
     [ "$(setting "$p" '.env.CLAUDE_CODE_USE_FOUNDRY + .forceLoginMethod')" = 0claudeai ] || fail "$p provider"
 done
 [ "$(setting foundry '.env.CLAUDE_CODE_USE_FOUNDRY + .env.ANTHROPIC_FOUNDRY_RESOURCE')" = 1fixture-resource ] || fail "foundry provider"
+[ "$(setting foundry '.model')" = opus ] || fail "foundry must use Opus for auto mode"
+[ "$(setting foundry '.permissions.defaultMode')" = auto ] || fail "foundry auto permission mode"
 grep -q 'claude .claude-personal plugin install todoist@doist' "$log" || fail "personal plugin install"
 grep -q 'claude .claude-subscription plugin install todoist@doist' "$log" && fail "subscription installed personal plugin"
 grep -q 'claude .claude-foundry plugin marketplace add HKUDS/CLI-Anything' "$log" || fail "marketplace add"

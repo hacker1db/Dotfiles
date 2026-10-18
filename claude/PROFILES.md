@@ -34,7 +34,7 @@ Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout,
 - `settings.base.json`: shared plugins, `enabledMcpjsonServers` (github, playwright from `~/.mcp.json`), `permissions.defaultMode: auto`, deny rules, statusline.
 - `settings.personal.json`: personal-only plugins (vercel, todoist).
 - `settings.work.json`: work-only settings for subscription and Foundry. GitGuardian runs as a git hook (`core.hooksPath`), not a Claude hook.
-- `settings.foundry.json`: Foundry provider and deployment model defaults.
+- `settings.foundry.json`: Foundry provider and deployment model defaults. Uses `opus` (the configured Opus 4.8 deployment) for auto mode compatibility; `opusplan` would select the unsupported Sonnet 4.6 deployment during execution.
 
 The generated files also pin the provider: Foundry sets `CLAUDE_CODE_USE_FOUNDRY=1`, while personal and subscription set it to `0` and add `forceLoginMethod: claudeai`. All three set Bedrock and Vertex to `0`.
 
