@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-CLAUDE_CONFIG_DIR="$HOME/.claude-foundry" exec "$HOME/.local/bin/claude" "$@"
+CLAUDE_CONFIG_DIR="$HOME/.claude-foundry" exec claude "$@"

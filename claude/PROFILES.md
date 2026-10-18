@@ -51,7 +51,7 @@ The Foundry profile also needs a working `az login`. Its resource and model come
 
 `./install.sh link` runs `install/claude-profiles.sh`, which:
 
-- links `~/.localrc` to `~/OneDrive*/Personal/.localrc`, and fails if there isn't exactly one OneDrive dir or the file hasn't synced
+- links `~/.localrc` to `~/OneDrive*/Personal/.localrc` when a OneDrive dir exists (fails on two dirs or an unsynced file); without OneDrive, the existing `~/.localrc` is used as is
 - merges the layers with jq into ignored `claude/.local/profiles/<profile>.json` (mode 600), linked as `~/.claude-<profile>/settings.json` (dir mode 700), and backs up an unmanaged `settings.json` once
 - links `CLAUDE.md`, `agents/`, `commands/`, `output-styles/`, `statusline-command.sh` into each profile
 - links `claude/profiles/<profile>/hooks` as `~/.claude-<profile>/hooks`

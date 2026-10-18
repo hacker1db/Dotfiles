@@ -40,10 +40,13 @@ mode_of() { stat -c %a "$1" 2>/dev/null || stat -f %Lp "$1"; }
 shopt -s nullglob
 drives=("$HOME"/OneDrive*)
 shopt -u nullglob
-[ "${#drives[@]}" -eq 1 ] || die "Expected exactly one ~/OneDrive* directory, found ${#drives[@]}."
-localrc_target="${drives[0]}/Personal/.localrc"
-[ -f "$localrc_target" ] || die "OneDrive has not synced $localrc_target yet."
-if [ -L "$HOME/.localrc" ] && [ "$(readlink "$HOME/.localrc")" = "$localrc_target" ]; then
+[ "${#drives[@]}" -le 1 ] || die "Expected at most one ~/OneDrive* directory, found ${#drives[@]}."
+localrc_target="${drives[0]:-}/Personal/.localrc"
+if [ "${#drives[@]}" -eq 0 ]; then
+    : # no OneDrive on this machine (Linux); use whatever ~/.localrc exists
+elif [ ! -f "$localrc_target" ]; then
+    die "OneDrive has not synced $localrc_target yet."
+elif [ -L "$HOME/.localrc" ] && [ "$(readlink "$HOME/.localrc")" = "$localrc_target" ]; then
     :
 elif [ -e "$HOME/.localrc" ] || [ -L "$HOME/.localrc" ]; then
     die "~/.localrc exists but is not a link to $localrc_target; move it aside and rerun."

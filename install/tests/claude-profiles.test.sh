@@ -103,6 +103,13 @@ echo '# no resource' > "$home/OneDrive - Fixture/Personal/.localrc"
 args=(); code=0; run > "$temp/out6" || code=$?
 [ "$code" = 2 ] && grep -q 'Foundry skipped' "$temp/out6" || fail "missing resource"
 
+# Without OneDrive (Linux), a regular ~/.localrc is used as is.
+mv "$home/OneDrive - Fixture" "$temp/od"; rm "$home/.localrc"
+echo 'export ANTHROPIC_FOUNDRY_RESOURCE=fixture-resource' > "$home/.localrc"
+run > "$temp/out7" || fail "no-OneDrive install $(cat "$temp/out7")"
+[ ! -L "$home/.localrc" ] || fail "no-OneDrive linked .localrc"
+mv "$temp/od" "$home/OneDrive - Fixture"; rm "$home/.localrc"; ln -s "$home/OneDrive - Fixture/Personal/.localrc" "$home/.localrc"
+
 # Credentials in a layer are rejected before anything is written.
 echo 'export ANTHROPIC_FOUNDRY_RESOURCE=fixture-resource' > "$home/OneDrive - Fixture/Personal/.localrc"
 before="$(snapshot)"
