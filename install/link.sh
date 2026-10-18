@@ -116,15 +116,8 @@ github_ssh_preflight >&2 || true
 
 # Ensure clitools repo is present before linking
 GH_USER=$(github_owner || true)
-if [ -z "${CLITOOLS_DIR:-}" ] && [ -n "$GH_USER" ] && CLITOOLS_FOUND="$(find_github_checkout "$GH_USER/clitools")"; then
-    if [ -d "$CLITOOLS_FOUND/.bare" ]; then
-        CLITOOLS_DIR="$CLITOOLS_FOUND/main"
-    else
-        CLITOOLS_DIR="$CLITOOLS_FOUND"
-    fi
-    echo "Using existing clitools checkout at $CLITOOLS_DIR"
-fi
-CLITOOLS_DIR="${CLITOOLS_DIR:-$HOME/Developer/clitools/main}"
+CLITOOLS_DIR="$(clitools_dir)"
+[ -d "$CLITOOLS_DIR" ] && echo "Using existing clitools checkout at $CLITOOLS_DIR"
 if [ -z "${CLITOOLS_REPO_URL:-}" ]; then
     if [ -n "$GH_USER" ]; then
         CLITOOLS_REPO_URL="$(github_repo_url "${GH_USER}/clitools")"

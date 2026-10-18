@@ -23,7 +23,7 @@ find_github_checkout() {
   slug="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
   for dir in "$HOME/Developer/${slug#*/}" "$HOME"/Developer/*/"${slug#*/}"; do
     [ -d "$dir" ] || continue
-    url="$(git -C "$dir" remote get-url origin 2>/dev/null | tr '[:upper:]' '[:lower:]')" || continue
+    url="$(git -C "$dir" config --get remote.origin.url 2>/dev/null | tr '[:upper:]' '[:lower:]')" || continue
     case "$url" in
       *"github.com:$slug"|*"github.com:$slug.git"|*"github.com/$slug"|*"github.com/$slug.git")
         printf '%s\n' "$dir"
@@ -32,6 +32,24 @@ find_github_checkout() {
     esac
   done
   return 1
+}
+
+clitools_dir() {
+  local owner found
+  if [ -n "${CLITOOLS_DIR:-}" ]; then
+    printf '%s\n' "$CLITOOLS_DIR"
+    return
+  fi
+  owner="$(github_owner 2>/dev/null || true)"
+  if [ -n "$owner" ] && found="$(find_github_checkout "$owner/clitools")"; then
+    if [ -d "$found/.bare" ]; then
+      printf '%s\n' "$found/main"
+    else
+      printf '%s\n' "$found"
+    fi
+    return
+  fi
+  printf '%s\n' "$HOME/Developer/clitools/main"
 }
 
 github_ssh_preflight() {
