@@ -14,12 +14,6 @@ function allowedBase() {
   return fs.realpathSync(path.resolve(process.env.DRAWIO_ALLOWED_DIR || process.cwd()));
 }
 
-function assertInside(base, target, original) {
-  if (!path.normalize(target).startsWith(base + path.sep)) {
-    throw new Error(`Refusing path outside ${base}: ${original}`);
-  }
-}
-
 function checkExt(p, exts) {
   const ext = path.extname(p).toLowerCase();
   if (!exts.includes(ext)) throw new Error(`Expected ${exts.join(' or ')} file: ${p}`);
@@ -31,10 +25,10 @@ function inputPath(p, exts) {
   checkExt(p, exts);
   const base = allowedBase();
   const resolved = path.resolve(base, p);
-  assertInside(base, resolved, p);
+  if (!resolved.startsWith(base + path.sep)) throw new Error(`Refusing path outside ${base}: ${p}`);
   if (!fs.existsSync(resolved)) throw new Error(`Not found: ${p}`);
   const real = fs.realpathSync(resolved);
-  assertInside(base, real, p);
+  if (!real.startsWith(base + path.sep)) throw new Error(`Refusing path outside ${base}: ${p}`);
   if (!fs.statSync(real).isFile()) throw new Error(`Not a regular file: ${p}`);
   return real;
 }
@@ -45,10 +39,10 @@ function outputPath(p, exts) {
   checkExt(p, exts);
   const base = allowedBase();
   const resolved = path.resolve(base, p);
-  assertInside(base, resolved, p);
+  if (!resolved.startsWith(base + path.sep)) throw new Error(`Refusing path outside ${base}: ${p}`);
   const dir = fs.realpathSync(path.dirname(resolved));
   const target = path.join(dir, path.basename(resolved));
-  assertInside(base, target, p);
+  if (!target.startsWith(base + path.sep)) throw new Error(`Refusing path outside ${base}: ${p}`);
   let st = null;
   try { st = fs.lstatSync(target); } catch { /* new file */ }
   if (st && !st.isFile()) throw new Error(`Refusing to overwrite non-regular file or symlink: ${p}`);
