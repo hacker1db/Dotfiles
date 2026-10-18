@@ -1,6 +1,5 @@
 [core]
     sshCommand = ~/.dotfiles/bin/git-agent-ssh
-    hooksPath = ~/.sonar/sonarqube-cli/hooks
 [gpg]
     format = ssh
 [gpg "ssh"]

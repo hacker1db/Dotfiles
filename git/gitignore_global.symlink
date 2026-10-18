@@ -33,7 +33,6 @@ tmp
 .terraform.lock
 .Claude
 .vscode
-.sonarlint/
 .omc
 
 **/.claude/settings.local.json

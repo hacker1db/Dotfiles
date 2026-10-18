@@ -91,20 +91,13 @@ DOTFILES_GIT_PROFILE=hacker1db ./install.sh git
 
 The optional profile links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`. It supplies remote-specific identities, SSH host aliases, and 1Password agent-backed authentication/signing through `bin/git-agent-key`, `bin/git-agent-ssh`, and `bin/git-agent-signing-key`. Keys are selected by configured agent item titles; private key files are not installed. Profile setup removes a local `user.signingkey` override. Review profile-specific account mappings before enabling it.
 
-New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and Sonar pre-commit/pre-push adapters. Sonar adapters skip when `sonar` is absent. These Git hooks are separate from Claude's work-profile GitGuardian hook.
+New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge. These Git hooks are separate from Claude's work-profile GitGuardian hook.
 
-## SonarQube Cloud CI
+## CI and GitHub Advanced Security
 
-`.github/workflows/sonarqube.yml` runs the portable repository tests and shell, Zsh, and Lua lint checks before scanning pushes to `main` and same-repository pull requests. Fork and Dependabot pull requests run tests and lint but cannot use the Actions scan token. The workflow uses project key `hacker1db_Dotfiles`. In the SonarQube Cloud project, select CI-based analysis for this repository and set these GitHub Actions settings:
+`.github/workflows/ci.yml` runs the tests and lint on pull requests and on `main`. ShellCheck checks errors across repository shell scripts, omitting the bundled `bin/dotnet-install.sh` with existing findings. Luacheck ignores existing unused-variable and line-length warnings.
 
-| Setting | GitHub location | Value |
-| --- | --- | --- |
-| `SONAR_TOKEN` | Actions secret | SonarQube Cloud token with Execute Analysis permission |
-| `SONAR_ORGANIZATION` | Actions variable | SonarQube Cloud organization key |
-
-Set `SONAR_ORGANIZATION` separately as an Actions variable.
-
-The scan fails with a named missing-setting error if any value is absent. The workflow check is `python3 install/tests/sonarqube-workflow.test.py`; `sonar-project.properties` marks `install/tests` as test files. ShellCheck checks errors across repository shell scripts, omitting the bundled `bin/dotnet-install.sh` with existing findings. Luacheck ignores existing unused-variable and line-length warnings. The separate local Sonar Git hooks do not supply these CI settings.
+`.github/workflows/codeql.yml` runs CodeQL code scanning for GitHub Actions, JavaScript and Python on pull requests, on `main`, and weekly. Results appear under the repository's **Security → Code scanning** tab. Secret scanning, push protection, and Dependabot alerts are repository settings that an admin enables under **Settings → Advanced Security**.
 
 ## AI tools and shared instructions
 
@@ -120,7 +113,7 @@ Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for shared 
 Claude installation links instructions, agents, commands, output styles, and the statusline script into each profile directory, and generates each profile's settings from layered fragments. MCP configuration is linked to `~/.mcp.json`.
 
 - [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh link` generates and installs all three.
-- Claude agents and commands cover reviews, GitHub/Azure DevOps, security, notes, reading, and writing workflows. GitGuardian and Sonar run as Git hooks, not Claude hooks.
+- Claude agents and commands cover reviews, GitHub/Azure DevOps, security, notes, reading, and writing workflows. GitGuardian runs as a Git hook, not Claude hooks.
 - OpenCode includes agent/command definitions, TUI settings, and a Supacode presence plugin that emits activity only inside Supacode surfaces.
 
 ### Personal skills
@@ -165,7 +158,6 @@ The installer fixture tests use temporary homes/repositories rather than changin
 
 ```sh
 bash install/tests/claude-profiles.test.sh
-python3 install/tests/sonarqube-workflow.test.py
 bash install/tests/plan-manager-bootstrap.test.sh
 node install/tests/plan-manager-harness-contracts.test.mjs
 zsh -n zsh/zshrc.symlink

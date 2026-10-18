@@ -1,5 +1,5 @@
 ---
-allowed-tools: Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(git show:*), Bash(git remote show:*), Bash(sonar-scanner:*), Bash(curl:*), Bash(jq:*), Read, Glob, Grep, LS, Task
+allowed-tools: Bash(git diff:*), Bash(git status:*), Bash(git log:*), Bash(git show:*), Bash(git remote show:*), Bash(curl:*), Bash(jq:*), Read, Glob, Grep, LS, Task
 description: Complete a focused security review of the pending branch changes.
 ---
 
