@@ -341,6 +341,7 @@ function gha(){
 function brew-cleanup(){
     local brewfile="${DOTFILES:-$HOME/.dotfiles/main}/install/brewfile"
     local snapshot
+    local leaves
     local formula
     local -a missing_formulae
 
@@ -355,14 +356,19 @@ function brew-cleanup(){
         return 1
     }
 
-    for formula in ${(f)"$(command brew leaves)"}; do
+    leaves="$(command brew leaves)" || {
+        rm -f "$snapshot"
+        return 1
+    }
+
+    for formula in ${(f)leaves}; do
         if ! awk -v target="$formula" '
             /^brew "/ {
                 name = $0
                 sub(/^brew "/, "", name)
                 sub(/".*/, "", name)
                 count = split(name, parts, "/")
-                if (parts[count] == target) found = 1
+                if (name == target || (index(target, "/") == 0 && parts[count] == target)) found = 1
             }
             END { exit(found ? 0 : 1) }
         ' "$snapshot"; then
