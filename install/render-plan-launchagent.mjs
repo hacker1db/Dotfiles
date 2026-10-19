@@ -3,10 +3,10 @@
 import { chmod, mkdir, open, readFile, rename, stat, unlink } from 'node:fs/promises'
 import { dirname } from 'node:path'
 
-const [templatePath, destination, home, plan, worktree, planRoot, runtimePath] = process.argv.slice(2)
+const [templatePath, destination, home, plan, worktree, planRoot, runtimePath, cliIdentity] = process.argv.slice(2)
 
-if (!runtimePath) {
-  process.stderr.write('Usage: render-plan-launchagent.mjs <template> <destination> <home> <plan> <worktree> <plan-root> <path>\n')
+if (!cliIdentity) {
+  process.stderr.write('Usage: render-plan-launchagent.mjs <template> <destination> <home> <plan> <worktree> <plan-root> <path> <cli-identity>\n')
   process.exit(2)
 }
 
@@ -25,6 +25,7 @@ const replacements = new Map([
   ['@@WORKTREE@@', worktree],
   ['@@PLAN_ROOT@@', planRoot],
   ['@@PATH@@', runtimePath],
+  ['@@CLI_ID@@', cliIdentity],
 ])
 
 let content = await readFile(templatePath, 'utf8')

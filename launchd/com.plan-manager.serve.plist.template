@@ -19,6 +19,8 @@
     <string>@@HOME@@</string>
     <key>PLAN_HOME</key>
     <string>@@PLAN_ROOT@@</string>
+    <key>PLAN_CLI_IDENTITY</key>
+    <string>@@CLI_ID@@</string>
     <key>PATH</key>
     <string>@@PATH@@</string>
   </dict>

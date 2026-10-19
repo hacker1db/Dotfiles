@@ -5,6 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
 PLAN_REPOSITORY="${PLAN_MANAGER_TEST_REPO_DIR:-$HOME/Developer/plan-manager}"
 FIXTURE="$(mktemp -d /tmp/plan-manager-installer-test.XXXXXX)"
+FIXTURE="$(cd "$FIXTURE" && pwd -P)"
 trap 'rm -rf "$FIXTURE"' EXIT
 
 fail() {
@@ -23,7 +24,7 @@ assert_contains "$ROOT/install/link.sh" 'bootstrap_plan_repo && install_plan_cli
 assert_contains "$ROOT/install/link.sh" 'install_plan_launch_agent'
 assert_contains "$ROOT/install/link.sh" 'initialize_plan_library'
 assert_contains "$ROOT/install/link.sh" 'check_plan_manager'
-assert_contains "$ROOT/zsh/zshrc.symlink" 'export PATH="$HOME/.local/bin:$PATH"'
+assert_contains "$ROOT/zsh/zshrc.symlink" 'path=("$HOME/.local/bin" $path)'
 if grep -qE '/Users/[^<]' "$ROOT/launchd/com.plan-manager.serve.plist.template"; then
     fail "LaunchAgent template contains a machine-specific user path"
 fi
@@ -136,40 +137,92 @@ printf 'conflict\n' > "$PLAN_REPO_DIR"
 bootstrap_plan_repo >/dev/null 2>&1 && fail "non-directory repository target was accepted"
 PLAN_REPO_DIR="$original_repo_dir"
 
-fake_worktree="$FIXTURE/fake-worktree"
-mkdir -p "$fake_worktree/bin"
-printf '{}\n' > "$fake_worktree/package.json"
-printf 'lockfileVersion: 9.0\n' > "$fake_worktree/pnpm-lock.yaml"
-cat > "$fake_worktree/bin/plan" <<'EOF'
+rm "$FIXTURE/fake-bin/git"
+fake_worktree="$FIXTURE/fake worktree"
+mkdir -p "$fake_worktree/cli/cmd/plan"
+printf 'module github.com/hacker1db/plan-manager/cli\n\ngo 1.26.2\n' > "$fake_worktree/cli/go.mod"
+printf 'package main\n' > "$fake_worktree/cli/cmd/plan/main.go"
+cat > "$FIXTURE/fake-bin/go" <<'EOF'
+#!/bin/bash
+if [ "$1" = install ]; then
+    printf '%s|%s|%s|%s|%s\n' "$PWD" "$GOBIN" "$GOWORK" "$GOFLAGS" "$*" >> "$GO_TEST_LOG"
+    [ "${GO_TEST_FAILURE:-}" != build ] || exit 1
+    cat > "$GOBIN/plan" <<'BIN'
 #!/bin/sh
-if [ "${1:-}" = "--version" ]; then
-    echo "1.2.3"
+case "$*" in
+    --version) [ "${GO_TEST_FAILURE:-}" != version ] || exit 1; echo 'plan version 1.2.3' ;;
+    'completion zsh') [ "${GO_TEST_FAILURE:-}" != completion ] || exit 1; echo 'compdef _plan plan' ;;
+esac
+BIN
+    chmod +x "$GOBIN/plan"
     exit 0
 fi
-exit 0
+if [ "$1 $2" = 'version -m' ]; then
+    echo 'path github.com/hacker1db/plan-manager/cli/cmd/plan'
+    [ "${GO_TEST_FAILURE:-}" != identity ] || exit 1
+    echo 'mod github.com/hacker1db/plan-manager/cli (devel)'
+    exit 0
+fi
+exit 99
 EOF
-chmod +x "$fake_worktree/bin/plan"
-cat > "$FIXTURE/fake-bin/pnpm" <<EOF
-#!/bin/sh
-printf '%s\n' "\$*" >> "$FIXTURE/pnpm-arguments"
-exit 0
-EOF
-chmod +x "$FIXTURE/fake-bin/pnpm"
+chmod +x "$FIXTURE/fake-bin/go"
+export GO_TEST_LOG="$FIXTURE/go-arguments"
 PLAN_WORKTREE="$fake_worktree"
 export PLAN_WORKTREE
-PATH="$FIXTURE/fake-bin:$PATH" install_plan_cli >/dev/null
+PATH="$FIXTURE/fake-bin:$PATH" GOBIN="$FIXTURE/ambient-bin" install_plan_cli >/dev/null
 [ -L "$PLAN_LINK" ] || fail "validated CLI was not linked"
-[ "$(readlink "$PLAN_LINK")" = "$fake_worktree/bin/plan" ] || fail "CLI link target is wrong"
-assert_contains "$FIXTURE/pnpm-arguments" "--dir $fake_worktree install --frozen-lockfile"
-assert_contains "$FIXTURE/pnpm-arguments" "--dir $fake_worktree build"
+[ "$(readlink "$PLAN_LINK")" = "$HOME/.local/lib/plan-manager/plan" ] || fail "CLI link target is wrong"
+assert_contains "$GO_TEST_LOG" "$fake_worktree/cli|$HOME/.local/lib/plan-manager/.stage."
+assert_contains "$GO_TEST_LOG" '|off||install -mod=readonly ./cmd/plan'
+[ ! -e "$FIXTURE/ambient-bin" ] || fail "ambient GOBIN was used"
 PATH="$FIXTURE/fake-bin:$PATH" install_plan_cli >/dev/null
-[ "$(find "$LOCAL_BIN" -name 'plan.backup-*' | wc -l | tr -d ' ')" = "0" ] ||
-    fail "idempotent CLI linking created a backup"
-chmod -x "$fake_worktree/bin/plan"
-PATH="$FIXTURE/fake-bin:$PATH" install_plan_cli >/dev/null 2>&1 &&
-    fail "non-executable repository CLI was accepted"
-[ -L "$PLAN_LINK" ] || fail "invalid repository CLI removed the working link"
-chmod +x "$fake_worktree/bin/plan"
+[ "$PLAN_CLI_CHANGED" = 0 ] || fail "identical binary was reported changed"
+[ "$(find "$LOCAL_BIN" -name 'plan.backup-*' | wc -l | tr -d ' ')" = 0 ] || fail "reinstall backed up unchanged link"
+
+rm "$PLAN_LINK"
+ln -s "$fake_worktree/legacy-plan" "$PLAN_LINK"
+printf '#!/bin/sh\necho legacy\n' > "$fake_worktree/legacy-plan"
+chmod +x "$fake_worktree/legacy-plan"
+PATH="$FIXTURE/fake-bin:$PATH" install_plan_cli >/dev/null
+[ "$(readlink "$PLAN_LINK")" = "$HOME/.local/lib/plan-manager/plan" ] || fail "TypeScript migration failed"
+legacy_backup="$(find "$LOCAL_BIN" -name 'plan.backup-*')"
+[ "$("$legacy_backup")" = legacy ] || fail "legacy backup is unusable"
+
+previous="$(shasum -a 256 "$PLAN_LINK")"
+for failure in build identity version completion; do
+    PATH="$FIXTURE/fake-bin:$PATH" GO_TEST_FAILURE="$failure" install_plan_cli >/dev/null 2>&1 && fail "$failure failure accepted"
+    [ "$(shasum -a 256 "$PLAN_LINK")" = "$previous" ] || fail "$failure replaced the previous binary"
+    [ "$("$PLAN_LINK" --version)" = 'plan version 1.2.3' ] || fail "$failure broke previous command"
+done
+mv "$fake_worktree/cli/cmd/plan/main.go" "$fake_worktree/main.go"
+PATH="$FIXTURE/fake-bin:$PATH" install_plan_cli >/dev/null 2>&1 && fail "missing Go source accepted"
+[ "$(shasum -a 256 "$PLAN_LINK")" = "$previous" ] || fail "missing source changed previous command"
+mv "$fake_worktree/main.go" "$fake_worktree/cli/cmd/plan/main.go"
+mkdir -p "$FIXTURE/no-go"
+ln -s /usr/bin/dirname "$FIXTURE/no-go/dirname"
+PATH="$FIXTURE/no-go" install_plan_cli >/dev/null 2>&1 && fail "missing Go accepted"
+[ "$(shasum -a 256 "$PLAN_LINK")" = "$previous" ] || fail "missing Go changed previous command"
+
+normal="$FIXTURE/normal clone"
+git init -q "$normal"
+printf 'fixture\n' > "$normal/README"
+git -C "$normal" add README
+git -C "$normal" -c user.name=Fixture -c user.email=fixture@example.test -c commit.gpgsign=false commit -qm fixture
+[ "$(resolve_worktree "$normal")" = "$normal" ] || fail "normal clone resolution failed"
+git -C "$normal" branch -M main
+bare="$FIXTURE/bare repo"
+mkdir -p "$bare"
+git clone --bare -q "$normal" "$bare/.bare"
+git --git-dir="$bare/.bare" worktree add -q "$bare/main" main
+git --git-dir="$bare/.bare" worktree add -qb explicit "$bare/custom worktree"
+[ "$(resolve_worktree "$bare")" = "$bare/main" ] || fail "fixture bare resolution failed"
+[ "$(PLAN_MANAGER_WORKTREE="$bare/custom worktree" resolve_worktree "$bare")" = "$bare/custom worktree" ] || fail "explicit bare override failed"
+PLAN_MANAGER_WORKTREE="$normal" resolve_worktree "$bare" >/dev/null 2>&1 && fail "unrelated override accepted"
+for selected in "$normal" "$bare/main" "$bare/custom worktree"; do
+    cp -R "$fake_worktree/cli" "$selected/cli"
+    PLAN_WORKTREE="$selected" PATH="$FIXTURE/fake-bin:$PATH" install_plan_cli >/dev/null
+    assert_contains "$GO_TEST_LOG" "$selected/cli|"
+done
 
 cat > "$HOME/.codex/config.toml" <<EOF
 model = "existing"
@@ -265,5 +318,50 @@ plist_before="$(shasum -a 256 "$plist")"
 install_plan_launch_agent >/dev/null
 plist_after="$(shasum -a 256 "$plist")"
 [ "$plist_before" = "$plist_after" ] || fail "second LaunchAgent render changed the file"
+
+cat > "$FIXTURE/fake-bin/launchctl" <<'EOF'
+#!/bin/sh
+printf '%s\n' "$*" >> "$LAUNCH_TEST_LOG"
+case "$1" in
+    print) [ -f "$LAUNCH_TEST_STATE" ] ;;
+    bootout) rm "$LAUNCH_TEST_STATE" ;;
+    bootstrap) touch "$LAUNCH_TEST_STATE" ;;
+    *) exit 99 ;;
+esac
+EOF
+chmod +x "$FIXTURE/fake-bin/launchctl"
+export LAUNCH_TEST_LOG="$FIXTURE/launchctl-arguments"
+export LAUNCH_TEST_STATE="$FIXTURE/launchctl-loaded"
+PLAN_MANAGER_SKIP_LAUNCHCTL=0 PATH="$FIXTURE/fake-bin:$PATH" install_plan_launch_agent >/dev/null
+PLAN_MANAGER_SKIP_LAUNCHCTL=0 PATH="$FIXTURE/fake-bin:$PATH" install_plan_launch_agent >/dev/null
+[ "$(grep -c '^bootstrap ' "$LAUNCH_TEST_LOG")" = 1 ] || fail "unchanged agent was reloaded"
+printf '\n# changed binary\n' >> "$HOME/.local/lib/plan-manager/plan"
+PLAN_MANAGER_SKIP_LAUNCHCTL=0 PATH="$FIXTURE/fake-bin:$PATH" install_plan_launch_agent >/dev/null
+[ "$(grep -c '^bootout ' "$LAUNCH_TEST_LOG")" = 1 ] || fail "binary-only change did not unload service"
+[ "$(grep -c '^bootstrap ' "$LAUNCH_TEST_LOG")" = 2 ] || fail "binary-only change did not reload service"
+
+cat > "$FIXTURE/fake-bin/lsof" <<'EOF'
+#!/bin/sh
+case "$*" in
+    *-iTCP:*) echo 123 ;;
+    *) printf 'p123\nn%s\n' "$LSOF_TEST_EXEC" ;;
+esac
+EOF
+chmod +x "$FIXTURE/fake-bin/lsof"
+LSOF_TEST_EXEC="$HOME/.local/lib/plan-manager/plan" PATH="$FIXTURE/fake-bin:$PATH" verify_plan_service >/dev/null || fail "managed service executable rejected"
+LSOF_TEST_EXEC='/usr/bin/node' PATH="$FIXTURE/fake-bin:$PATH" verify_plan_service >/dev/null 2>&1 && fail "legacy service executable accepted"
+cat > "$FIXTURE/fake-bin/zsh" <<'EOF'
+#!/bin/sh
+case "$*" in
+    *'whence -w'*) echo "plan: ${ZSH_TEST_KIND:-command}" ;;
+    *) echo "$PLAN_LINK" ;;
+esac
+EOF
+chmod +x "$FIXTURE/fake-bin/zsh"
+export PLAN_LINK
+PATH="$FIXTURE/fake-bin:$PATH" diagnose_plan_command >/dev/null || fail "managed command diagnostic failed"
+for kind in alias function; do
+    ZSH_TEST_KIND="$kind" PATH="$FIXTURE/fake-bin:$PATH" diagnose_plan_command >/dev/null 2>&1 && fail "$kind shadow was not diagnosed"
+done
 
 echo "plan-manager installer tests passed"

@@ -299,66 +299,87 @@ bootstrap_plan_repo() {
 
 install_plan_cli() {
     local worktree="${PLAN_WORKTREE:-}"
-    local major bin_path version replacement
+    local module="github.com/hacker1db/plan-manager/cli"
+    local managed="$HOME/.local/lib/plan-manager"
+    local stage identity version completion replacement link_stage
 
     [ -n "$worktree" ] || worktree="$(resolve_worktree "$PLAN_REPO_DIR")" || return 1
-    title "Installing plan CLI"
-
-    command -v node >/dev/null 2>&1 || {
-        error "Node.js is required to install plan-manager."
+    title "Installing Go plan CLI from $worktree"
+    command -v go >/dev/null 2>&1 || {
+        error "Go is required to build plan-manager (see cli/go.mod for the required toolchain)."
         return 1
     }
-    major="$(node -p 'Number(process.versions.node.split(".")[0])')"
-    if [ "$major" -lt 20 ]; then
-        error "Node.js 20 or newer is required; found $(node --version)."
+    if [ ! -f "$worktree/cli/go.mod" ] || [ ! -f "$worktree/cli/cmd/plan/main.go" ]; then
+        error "Missing Go CLI in $worktree; select a checkout containing cli/cmd/plan. The existing command was preserved."
         return 1
     fi
-    command -v pnpm >/dev/null 2>&1 || {
-        error "pnpm is required to install plan-manager."
-        return 1
-    }
-    [ -f "$worktree/package.json" ] || {
-        error "Missing package.json in $worktree."
-        return 1
-    }
-    [ -f "$worktree/pnpm-lock.yaml" ] || {
-        error "Missing pnpm-lock.yaml in $worktree."
-        return 1
-    }
-
-    if ! pnpm --dir "$worktree" install --frozen-lockfile; then
-        error "Frozen dependency installation failed; the existing CLI link was not changed."
+    if [ "$(awk '$1 == "module" { print $2; exit }' "$worktree/cli/go.mod")" != "$module" ] ||
+        ! awk '$1 == "go" && $2 ~ /^[0-9]+\.[0-9]+/ { found=1 } END { exit !found }' "$worktree/cli/go.mod"; then
+        error "Unexpected or incomplete Go module in $worktree/cli/go.mod."
         return 1
     fi
-    if ! pnpm --dir "$worktree" build; then
-        error "TypeScript build failed; the existing CLI link was not changed."
+    mkdir -p "$managed" "$LOCAL_BIN" || return 1
+    stage="$(mktemp -d "$managed/.stage.XXXXXX")" || return 1
+    if ! (cd "$worktree/cli" && GOBIN="$stage" GOWORK=off GOFLAGS= go install -mod=readonly ./cmd/plan); then
+        rm -rf "$stage"
+        error "Go package build failed; the previous plan command was preserved. Check the toolchain requirement in cli/go.mod."
         return 1
     fi
-
-    bin_path="$worktree/bin/plan"
-    if [ ! -x "$bin_path" ]; then
-        error "$bin_path is missing or not executable; the existing CLI link was not changed."
+    identity="$(go version -m "$stage/plan" 2>/dev/null)" || identity=""
+    version="$("$stage/plan" --version 2>/dev/null)" || version=""
+    completion="$("$stage/plan" completion zsh 2>/dev/null)" || completion=""
+    if [ ! -x "$stage/plan" ] ||
+        ! printf '%s\n' "$identity" | awk -v expected="$module" '$1 == "path" && $2 == expected "/cmd/plan" { path=1 } $1 == "mod" && $2 == expected { module=1 } END { exit !(path && module) }' ||
+        [[ ! "$version" =~ [0-9]+\.[0-9]+\.[0-9]+ ]] ||
+        [[ "$completion" != *"compdef"* ]]; then
+        rm -rf "$stage"
+        error "Staged plan failed Go identity, version, or Zsh completion validation; the previous command was preserved."
         return 1
     fi
-    version="$("$bin_path" --version 2>/dev/null || true)"
-    if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-        error "$bin_path failed its version check; the existing CLI link was not changed."
-        return 1
+    PLAN_CLI_CHANGED=0
+    if ! cmp -s "$stage/plan" "$managed/plan"; then
+        if [ -e "$managed/plan" ] || [ -L "$managed/plan" ]; then
+            replacement="$(backup_path "$managed/plan")"
+            cp -p "$managed/plan" "$replacement" || { rm -rf "$stage"; return 1; }
+            info "Previous Go binary backed up to $replacement"
+        fi
+        mv -f "$stage/plan" "$managed/plan" || { rm -rf "$stage"; return 1; }
+        PLAN_CLI_CHANGED=1
     fi
-
-    mkdir -p "$LOCAL_BIN"
-    if [ -L "$PLAN_LINK" ] && [ "$(readlink "$PLAN_LINK")" = "$bin_path" ]; then
-        info "$PLAN_LINK already points to $bin_path."
-    else
+    rm -rf "$stage"
+    if [ ! -L "$PLAN_LINK" ] || [ "$(readlink "$PLAN_LINK")" != "$managed/plan" ]; then
+        if [ -d "$PLAN_LINK" ] && [ ! -L "$PLAN_LINK" ]; then
+            error "$PLAN_LINK is a directory; refusing to replace it."
+            return 1
+        fi
         if [ -e "$PLAN_LINK" ] || [ -L "$PLAN_LINK" ]; then
             replacement="$(backup_path "$PLAN_LINK")"
-            mv "$PLAN_LINK" "$replacement"
+            cp -Pp "$PLAN_LINK" "$replacement" || return 1
             warning "Backed up the previous plan command to $replacement"
         fi
-        ln -s "$bin_path" "$PLAN_LINK"
-        success "Linked ~/.local/bin/plan to $bin_path"
+        link_stage="$(mktemp -d "$LOCAL_BIN/.plan-link.XXXXXX")" || return 1
+        ln -s "$managed/plan" "$link_stage/plan" && mv -f "$link_stage/plan" "$PLAN_LINK" || {
+            rm -rf "$link_stage"
+            return 1
+        }
+        rmdir "$link_stage"
+        PLAN_CLI_CHANGED=1
     fi
+    export PLAN_CLI_CHANGED
     export PATH="$LOCAL_BIN:$PATH"
+    success "Installed Go plan $version: $PLAN_LINK -> $managed/plan (source: $worktree/cli)"
+}
+
+diagnose_plan_command() {
+    local selected kind
+    command -v zsh >/dev/null 2>&1 || { warning "Zsh is unavailable; cannot check fresh-shell plan resolution."; return 0; }
+    kind="$(zsh -ic 'whence -w plan' 2>/dev/null | tail -n 1)"
+    selected="$(zsh -ic 'whence -p plan' 2>/dev/null | tail -n 1)"
+    if [ "$kind" != 'plan: command' ] || [ "$selected" != "$PLAN_LINK" ]; then
+        warning "Fresh Zsh selects $kind at $selected; expected $PLAN_LINK. Inspect type -a plan for stale wrappers, aliases, or functions."
+        return 1
+    fi
+    success "Fresh Zsh selects $PLAN_LINK. Existing shells: source ~/.zshrc; rehash."
 }
 
 link_managed_file() {
@@ -427,6 +448,7 @@ reconcile_codex_config() {
     title "Reconciling Codex plan-library access"
     local config="$HOME/.codex/config.toml"
     local output
+    command -v node >/dev/null 2>&1 || { error "Node.js is required by the Codex config reconciler."; return 1; }
     output="$(node "$DOTFILES/install/reconcile-codex-config.mjs" "$config" "$PLAN_ROOT")" || {
         error "Could not reconcile $config."
         return 1
@@ -448,7 +470,9 @@ install_plan_launch_agent() {
     local template="$DOTFILES/launchd/com.plan-manager.serve.plist.template"
     local destination="$HOME/Library/LaunchAgents/com.plan-manager.serve.plist"
     local log_dir="$HOME/Library/Logs/plan-manager"
-    local runtime_path render_state uid domain label
+    local runtime_path render_state uid domain label cli_identity
+
+    command -v node >/dev/null 2>&1 || { error "Node.js is required by the LaunchAgent renderer."; return 1; }
 
     [ -n "$worktree" ] || worktree="$(resolve_worktree "$PLAN_REPO_DIR")" || return 1
     command -v pandoc >/dev/null 2>&1 || {
@@ -457,8 +481,11 @@ install_plan_launch_agent() {
     }
     mkdir -p "$(dirname "$destination")" "$log_dir"
     runtime_path="$LOCAL_BIN:$(dirname "$(command -v node)"):$(dirname "$(command -v pandoc)"):/usr/bin:/bin:/usr/sbin:/sbin"
+    cli_identity="$(shasum -a 256 "$PLAN_LINK")" || return 1
+    cli_identity="${cli_identity%% *}"
+    [[ "$cli_identity" =~ ^[0-9a-f]{64}$ ]] || { error "Could not identify the installed plan binary."; return 1; }
     render_state="$(node "$DOTFILES/install/render-plan-launchagent.mjs" \
-        "$template" "$destination" "$HOME" "$PLAN_LINK" "$worktree" "$PLAN_ROOT" "$runtime_path")" || {
+        "$template" "$destination" "$HOME" "$PLAN_LINK" "$worktree" "$PLAN_ROOT" "$runtime_path" "$cli_identity")" || {
         error "Could not render the plan-manager LaunchAgent."
         return 1
     }
@@ -501,11 +528,30 @@ initialize_plan_library() {
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" init || return 1
 }
 
+verify_plan_service() {
+    local pid executable expected
+    command -v lsof >/dev/null 2>&1 || { error "lsof is required to verify the dashboard executable."; return 1; }
+    expected="$(canonical_dir "$HOME/.local/lib/plan-manager")/plan" || return 1
+    for pid in $(lsof -nP -iTCP:"${PLAN_PORT:-4173}" -sTCP:LISTEN -t 2>/dev/null | sort -u); do
+        executable="$(lsof -a -p "$pid" -d txt -Fn 2>/dev/null | sed -n 's/^n//p' | head -n 1)"
+        if [ "$executable" != "$expected" ]; then
+            error "Dashboard PID $pid runs $executable; expected $expected. Inspect the existing listener before restarting the service."
+            return 1
+        fi
+        success "Dashboard PID $pid runs $executable."
+        return 0
+    done
+    error "Cannot verify a dashboard listener on port ${PLAN_PORT:-4173}."
+    return 1
+}
+
 check_plan_manager() {
     title "Checking plan-manager"
     [ -d "$PLAN_ROOT" ] || return 0
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" serve --json >/dev/null || return 1
     PLAN_HOME="$PLAN_ROOT" "$PLAN_LINK" doctor --json || return 1
+    verify_plan_service || return 1
+    diagnose_plan_command || return 1
 }
 
 run_plan_manager_install() {

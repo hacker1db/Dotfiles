@@ -22,7 +22,8 @@ class StartupTests(unittest.TestCase):
     def check_completion(self, mode):
         config = (ROOT / 'zsh/zshrc.symlink').read_text()
         start = config.index('if command -v plan ')
-        end = config.index('setopt prompt_subst', start)
+        marker = '    unset _plan_completion\nfi\n'
+        end = config.index(marker, start) + len(marker)
         with tempfile.TemporaryDirectory() as temp:
             fixture = Path(temp)
             plan = fixture / 'plan'
