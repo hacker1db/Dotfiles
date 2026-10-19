@@ -12,174 +12,28 @@ fi
 
 export HOMEBREW_NO_ASK=1
 
-# Backup installation for when brew bundle is unreliable
+# Backup installation for when brew bundle is unreliable; the Brewfile is the
+# single source of truth for taps, formulas, casks, and MAS apps.
+BREWFILE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/brewfile"
+[ -f "$BREWFILE" ] || { echo "Brewfile not found at $BREWFILE" >&2; exit 1; }
 
-TAPS=(
-  1password/tap
-  anchore/grype
-  anchore/syft
-  aquasecurity/trivy
-  arl/arl
-  azure/functions
-  azure/kubelogin
-  brandonskerritt/rustscan
-  caffix/amass
-  cantino/mcfly
-  dapr/tap
-  dart-lang/dart
-  derailed/k9s
-  felixkratz/formulae
-  gitguardian/tap
-  hashicorp/tap
-  iina/mpv-iina
-  jesseduffield/lazygit
-  majd/repo
-  mondoohq/mondoo
-  noahgorstein/tap
-  planetscale/tap
-  rcmdnk/file
-  robscott/tap
-  sst/tap
-  trufflesecurity/trufflehog
-)
-
-for tap in "${TAPS[@]}"; do
-  brew tap "$tap" || true
+while IFS=$'\t' read -r tap url; do
+  if [[ -n "$url" ]]; then
+    brew tap "$tap" "$url" || true
+  else
+    brew tap "$tap" || true
+  fi
   brew trust --tap "$tap" || true
-done
+done < <(sed -nE 's/^tap "([^"]+)"(, "([^"]+)")?.*/\1'$'\t''\3/p' "$BREWFILE")
 
-FORMULAS=(
-  ack
-  act
-  amass
-  angular-cli
-  azure-cli
-  bat
-  bat-extras
-  dotnet
-  eza
-  fd
-  fnm
-  fzf
-  gh
-  git
-  go
-  grype
-  highlight
-  httpie
-  hub
-  hugo
-  jq
-  kubectx
-  lazydocker
-  lazygit
-  lnav
-  markdown
-  mysql-client
-  tree-sitter
-  tree-sitter-cli
-  neovim
-  nmap
-  opencode
-  pandoc
-  ripgrep
-  rustscan
-  shellcheck
-  starship
-  syft
-  terraform-lsp
-  tfenv
-  tfsec
-  tmux
-  tree
-  watch
-  wget
-  yaml-language-server
-  yazi
-  yq
-  yt-dlp
-  zoxide
-  zsh
-  zsh-autosuggestions
-  zsh-syntax-highlighting
-  pnpm
-  podman
-)
-
-if [[ "$(uname -s)" == Darwin ]]; then
-  FORMULAS+=(
-    mas
-    reattach-to-user-namespace
-  )
-fi
-
-for f in "${FORMULAS[@]}"; do
+while IFS= read -r f; do
   brew install --formula "$f" || true
-done
+done < <(sed -nE 's/^brew "([^"]+)".*/\1/p' "$BREWFILE")
 
-CASKS=(
-  1password
-  1password-cli
-  alfred
-  android-platform-tools
-  basictex
-  burp-suite-professional
-  claude
-  codex
-  cursor
-  dbeaver-community
-  devtoys
-  devtunnel
-  discord
-  drawio
-  figma
-  flutter
-  flux-app
-  font-cascadia-code
-  font-caskaydia-cove-nerd-font
-  font-dejavu-sans-mono-nerd-font
-  font-hack-nerd-font
-  font-jetbrains-mono
-  font-jetbrains-mono-nerd-font
-  font-monaspace
-  font-monaspice-nerd-font
-  font-symbols-only-nerd-font
-  gcloud-cli
-  ghostty
-  gpg-suite-no-mail
-  handbrake-app
-  hiddenbar
-  httpie-desktop
-  iina
-  karabiner-elements
-  keycastr
-  krisp
-  kubecontext
-  losslesscut
-  menumeters
-  microsoft-auto-update
-  microsoft-azure-storage-explorer
-  microsoft-edge
-  microsoft-remote-desktop
-  microsoft-teams
-  netnewswire
-  notion
-  notion-mail
-  obs
-  obsidian
-  podman-desktop
-  postman
-  powershell
-  raycast
-  reader
-  signal
-  spotify
-  todoist-app
-  unetbootin
-  wireshark-app
-  zen
-  zoom
-)
+CASKS=()
+while IFS= read -r c; do
+  CASKS+=("$c")
+done < <(sed -nE 's/^cask "([^"]+)".*/\1/p' "$BREWFILE")
 
 if [[ "$(uname -s)" == Darwin ]]; then
   if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
@@ -242,7 +96,7 @@ fi
 
 # MAS apps
 if [[ "$(uname -s)" == Darwin ]] && command -v mas >/dev/null 2>&1; then
-  for app in 640199958 424389933 302584613 6445813049 497799835; do
+  while IFS= read -r app; do
     if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
       deferred="$(deferred_installs_file)"
       mkdir -p "$(dirname "$deferred")"
@@ -250,7 +104,7 @@ if [[ "$(uname -s)" == Darwin ]] && command -v mas >/dev/null 2>&1; then
     else
       mas install "$app" || true
     fi
-  done
+  done < <(sed -nE 's/^mas .*id: ([0-9]+).*/\1/p' "$BREWFILE")
 fi
 
 echo Backup install complete
