@@ -65,7 +65,7 @@ install/claude-profiles.sh --check         # read-only audit
 install/claude-profiles.sh --skip-foundry  # leave Foundry untouched
 ```
 
-Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout, symlinked dirs), and 2 means incomplete (no Foundry resource, stale state, or inherited `ANTHROPIC_*`/`CLAUDE_CODE_USE_*` variables, which are reported by name only).
+Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout, symlinked dirs), and 2 means incomplete (no Foundry resource, stale state, or inherited `ANTHROPIC_*`/`CLAUDE_CODE_USE_*` variables, which are reported by name only). A `CLAUDE_CODE_USE_*` flag set to `0`, `false`, `no` or `off` is ignored, except `CLAUDE_CODE_USE_FOUNDRY` while Foundry is managed, because it would turn off the Foundry profile's provider.
 
 ## Layers
 

@@ -57,7 +57,16 @@ else
     echo "Linked ~/.localrc -> $localrc_target"
 fi
 
-conflicts="$(compgen -e | grep -E '^(ANTHROPIC_|CLAUDE_CODE_USE_|CLAUDE_CODE_OAUTH_TOKEN$)' | grep -vx ANTHROPIC_FOUNDRY_RESOURCE | while read -r name; do [ -n "${!name}" ] && echo "$name"; done | tr '\n' ' ' || true)"
+overrides_profile() {
+    local name="$1" value="${!1}"
+    [ -n "$value" ] || return 1
+    case "$name" in CLAUDE_CODE_USE_*) ;; *) return 0 ;; esac
+    case "$(tr '[:upper:]' '[:lower:]' <<< "$value")" in
+        0|false|no|off) [ "$name" = CLAUDE_CODE_USE_FOUNDRY ] && [ "$skip_foundry" -eq 0 ] ;;
+        *) return 0 ;;
+    esac
+}
+conflicts="$(compgen -e | grep -E '^(ANTHROPIC_|CLAUDE_CODE_USE_|CLAUDE_CODE_OAUTH_TOKEN$)' | grep -vx ANTHROPIC_FOUNDRY_RESOURCE | while read -r name; do overrides_profile "$name" && echo "$name"; done | tr '\n' ' ' || true)"
 [ -z "$conflicts" ] || problem "Inherited variables override profile settings; unset before launching: $conflicts"
 
 resource="${ANTHROPIC_FOUNDRY_RESOURCE:-}"

@@ -92,6 +92,16 @@ run ANTHROPIC_API_KEY=dummy-never-print CLAUDE_CODE_USE_BEDROCK=1 > "$temp/out4"
 grep -q 'ANTHROPIC_API_KEY' "$temp/out4" && grep -q CLAUDE_CODE_USE_BEDROCK "$temp/out4" || fail "conflict names"
 grep -q dummy-never-print "$temp/out4" && fail "leaked value"
 
+# Falsy provider flags (Claude Code exports them as 0) match the pinned profiles, except Foundry's own flag.
+code=0
+run CLAUDE_CODE_USE_BEDROCK=0 CLAUDE_CODE_USE_VERTEX=False CLAUDE_CODE_USE_FOUNDRY=0 ANTHROPIC_FOUNDRY_RESOURCE=fixture-resource > "$temp/out9" || code=$?
+grep -q -E 'CLAUDE_CODE_USE_(BEDROCK|VERTEX)' "$temp/out9" && fail "falsy flags reported: $(cat "$temp/out9")"
+grep -q CLAUDE_CODE_USE_FOUNDRY "$temp/out9" || fail "falsy foundry flag must be reported while Foundry is managed"
+args=(--check --skip-foundry)
+run CLAUDE_CODE_USE_BEDROCK=off CLAUDE_CODE_USE_VERTEX= CLAUDE_CODE_USE_FOUNDRY=no > "$temp/out10" || fail "falsy flags with --skip-foundry $(cat "$temp/out10")"
+grep -q Inherited "$temp/out10" && fail "falsy flags reported with --skip-foundry"
+args=(--check)
+
 # Stale generated settings fail the check.
 echo '{}' > "$repo/claude/.local/profiles/subscription.json"
 code=0; run > "$temp/out5" || code=$?
