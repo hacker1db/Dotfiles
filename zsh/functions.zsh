@@ -59,6 +59,12 @@ function wt-pull-all() {
     worktree_branches=(${(f)"$(git worktree list --porcelain | awk '/^branch /{sub("refs/heads/", "", $2); print $2}')"})
     remote_branches=(${(f)"$(git for-each-ref --format='%(refname:strip=3)' "refs/remotes/$remote/" | grep -vx HEAD)"})
 
+    local -a closed_branches
+    if command -v gh &> /dev/null; then
+        closed_branches=(${(f)"$(gh pr list --state all --limit 500 --json headRefName,state \
+            -q 'group_by(.headRefName)[] | select(all(.state != "OPEN")) | .[0].headRefName' 2> /dev/null)"})
+    fi
+
     print "==> Adding worktrees for remote branches"
     local branch added=0
     for branch in "${remote_branches[@]}"; do
@@ -67,6 +73,10 @@ function wt-pull-all() {
         fi
         if git merge-base --is-ancestor "$remote/$branch" "$remote/$default_branch" 2> /dev/null; then
             print "    skipping $branch: already merged into $default_branch"
+            continue
+        fi
+        if (( ${closed_branches[(Ie)$branch]} )); then
+            print "    skipping $branch: its pull request is merged or closed"
             continue
         fi
         if (( dry_run )); then
