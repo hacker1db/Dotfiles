@@ -8,7 +8,7 @@ fi
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
-compinit -C
+compinit -C -d "$HOME/.zcompdump-$ZSH_VERSION"
 # Reevaluate the prompt string each time it's displaying a prompt
 autoload bashcompinit && bashcompinit
 if command -v plan &> /dev/null; then
