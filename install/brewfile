@@ -1,34 +1,30 @@
-tap "1password/tap"
-tap "anchore/grype"
-tap "anchore/syft"
-tap "anomalyco/tap"
-tap "aquasecurity/trivy"
-tap "arl/arl"
-tap "azure/functions"
-tap "azure/kubelogin"
-tap "cantino/mcfly"
-tap "dapr/tap"
-tap "dart-lang/dart"
-tap "derailed/k9s"
-tap "felixkratz/formulae"
+tap "1password/tap", trusted: true
+tap "anchore/grype", trusted: true
+tap "anchore/syft", trusted: true
+tap "anomalyco/tap", trusted: true
+tap "aquasecurity/trivy", trusted: true
+tap "azure/functions", trusted: true
+tap "azure/kubelogin", trusted: true
+tap "brandonskerritt/rustscan", trusted: true
+tap "caffix/amass", trusted: true
+tap "clerk/stable"
+tap "derailed/k9s", trusted: true
 tap "fsouza/prettierd"
-tap "gitguardian/tap"
-tap "hashicorp/tap"
+tap "gitguardian/tap", trusted: true
+tap "hashicorp/tap", trusted: true
 tap "homebrew/bundle"
-tap "iina/mpv-iina"
-tap "jesseduffield/lazygit"
-tap "majd/repo"
-tap "mondoohq/mondoo"
-tap "noahgorstein/tap"
+tap "homebrew/cask-fonts"
+tap "jesseduffield/lazygit", trusted: true
+tap "majd/repo", trusted: true
+tap "mondoohq/mondoo", trusted: true
+tap "noahgorstein/tap", trusted: true
 tap "oven-sh/bun"
 tap "owasp-amass/amass", "https://github.com/owasp-amass/homebrew-amass.git"
-tap "planetscale/tap"
-tap "rcmdnk/file"
-tap "robscott/tap"
+tap "rcmdnk/file", trusted: true
+tap "robscott/tap", trusted: true
 tap "rustscan/rustscan", "https://github.com/RustScan/homebrew-rustscan.git"
 tap "slp/krunkit"
-tap "sst/tap", "https://github.com/anomalyco/homebrew-tap.git"
-tap "trufflesecurity/trufflehog"
+tap "sst/tap", "https://github.com/anomalyco/homebrew-tap.git", trusted: true
 # Search tool like grep, but optimized for programmers
 brew "ack"
 # Run your GitHub Actions locally
@@ -57,6 +53,8 @@ brew "azure-cli"
 brew "bat"
 # Bash scripts that integrate bat with various command-line tools
 brew "bat-extras"
+# Statistics utility to count lines of code
+brew "cloc"
 # Dependency manager for Cocoa projects
 brew "cocoapods"
 # Tool for interacting with remote images and registries
@@ -71,6 +69,8 @@ brew "docker-compose"
 brew "docker-credential-helper"
 # Text processing system for reStructuredText
 brew "docutils"
+# .NET Core
+brew "dotnet"
 # .NET Core
 brew "dotnet@6"
 # Select default apps for documents and URL schemes on macOS
@@ -95,10 +95,10 @@ brew "ggshield"
 brew "gh"
 # Distributed revision control system
 brew "git"
-# Audit git repos for secrets
-brew "gitleaks"
 # GitHub Model Context Protocol server for AI tools
 brew "github-mcp-server"
+# Audit git repos for secrets
+brew "gitleaks"
 # Render markdown on the CLI
 brew "glow"
 # Open source programming language to build simple/reliable/efficient software
@@ -123,6 +123,8 @@ brew "htop"
 brew "httpie"
 # Add GitHub support to git on the command-line
 brew "hub"
+# Configurable static site generator
+brew "hugo"
 # Review-first terminal diff viewer for agent-authored changesets
 brew "hunk"
 # Network logon cracker which supports many services
@@ -161,7 +163,6 @@ brew "lazydocker"
 brew "lazygit"
 # Provides library functionality for FIDO U2F & FIDO 2.0, including USB
 brew "libfido2"
-# Linux virtual machines
 # Access large language models from the command-line
 brew "llm"
 # Curses-based tool for viewing and analyzing log files
@@ -180,8 +181,6 @@ brew "mcp-publisher"
 brew "mysql-client"
 # Incremental parsing library
 brew "tree-sitter"
-# CLI used by nvim-treesitter to build parsers
-brew "tree-sitter-cli"
 # Ambitious Vim-fork focused on extensibility and agility
 brew "neovim"
 # Web server scanner
@@ -192,6 +191,8 @@ brew "nmap"
 brew "nushell"
 # Manage multiple Node.js versions
 brew "nvm"
+# Create, run, and share large language models (LLMs)
+brew "ollama", restart_service: :changed
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
 # AI coding agent, built for the terminal
@@ -262,6 +263,8 @@ brew "tfsec"
 brew "the_silver_searcher"
 # Terminal multiplexer
 brew "tmux"
+# Parser generator tool
+brew "tree-sitter-cli"
 # Find and verify credentials
 brew "trufflehog"
 # Extremely fast Python package installer and resolver, written in Rust
@@ -294,10 +297,24 @@ brew "zsh"
 brew "zsh-autosuggestions"
 # Fish shell like syntax highlighting for zsh
 brew "zsh-syntax-highlighting"
+# Scanner for vulnerabilities in container images, file systems, and Git repositories, as well as for configuration issues
+brew "aquasecurity/trivy/trivy"
+# Azure Functions Core Tools 4.0
+brew "azure/functions/azure-functions-core-tools@4"
+# Command-line interface for Clerk
+brew "clerk/stable/clerk", trusted: true
+# Packer
+brew "hashicorp/tap/packer"
+# Terraform
+brew "hashicorp/tap/terraform", link: false
+# Vault
+brew "hashicorp/tap/vault"
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
 cask "1password-cli"
+# Application launcher and productivity software
+cask "alfred"
 # Toolset to implement parts of Android apps in native code
 cask "android-ndk"
 # Android SDK component
@@ -308,6 +325,8 @@ cask "azure-data-studio"
 cask "basictex"
 # Virtual Audio Driver
 cask "blackhole-2ch"
+# Web security testing toolkit
+cask "burp-suite"
 # Web security auditing toolkit
 cask "caido"
 # OpenAI's official ChatGPT desktop app
@@ -315,24 +334,21 @@ cask "chatgpt"
 # Anthropic's official Claude AI desktop app
 cask "claude"
 # Terminal-based AI coding assistant
+cask "claude-code"
 # OpenAI's coding agent that runs in your terminal
 cask "codex"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
-# Browser for SQLite databases
-cask "db-browser-for-sqlite"
 # Utilities designed to make common development tasks easier
 cask "devtoys"
+# Provides developers secure tunnels to share local web services
+cask "devtunnel"
 # Voice and text chat software
 cask "discord"
 # Online diagram software
 cask "drawio"
 # Collaborative team software
 cask "figma"
-cask "font-cascadia-code"
-cask "font-caskaydia-cove-nerd-font"
-cask "font-dejavu-sans-mono-nerd-font"
-cask "font-fira-code"
 cask "font-hack-nerd-font"
 cask "font-jetbrains-mono"
 cask "font-jetbrains-mono-nerd-font"
@@ -345,50 +361,29 @@ cask "gcloud-cli"
 cask "ghostty"
 # Client for the Google Drive storage service
 cask "google-drive"
-# Tools to protect your files
-cask "gpg-suite-no-mail"
 # Utility to hide menu bar items
 cask "hiddenbar"
 # Free and open-source media player
 cask "iina"
-cask "ipatool"
-# Menu bar manager
-cask "jordanbaird-ice"
-# Keyboard customiser
-cask "karabiner-elements"
+# CLI tool for searching and downloading iOS app packages from the App Store
+cask "majd/repo/ipatool"
 # Open-source keystroke visualiser
 cask "keycastr"
 # Noise cancelling application
 cask "krisp"
 # Menu bar app for managing Kubernetes contexts
 cask "kubecontext"
-# Kubernetes IDE
-cask "lens"
 cask "livetail"
 # Discover, download, and run local LLMs
 cask "lm-studio"
-# Bible study software
-cask "logos"
 # Trims video and audio files losslessly
 cask "losslesscut"
 # Set of CPU, memory, disk, and network monitoring tools
 cask "menumeters"
 # Provides updates to various Microsoft products
 cask "microsoft-auto-update"
-# Explorer for Azure Storage
-cask "microsoft-azure-storage-explorer"
-# Multi-platform web browser
-cask "microsoft-edge"
-# Remote desktop client
-cask "microsoft-remote-desktop"
 # Meet, chat, call, and collaborate in just one place
 cask "microsoft-teams"
-# Online collaborative whiteboard platform
-cask "miro"
-# Interactive tool for analyzing MongoDB data
-cask "mongodb-compass"
-# App to write, plan, collaborate, and get organised
-cask "notion"
 # Open-source software for live streaming and screen recording
 cask "obs"
 # Knowledge base that works on top of a local folder of plain text Markdown files
@@ -398,47 +393,40 @@ cask "podman-desktop"
 # Collaboration platform for API development
 cask "postman"
 cask "powershell"
-# VPN client
-cask "private-internet-access"
 # Control your tools with a few keystrokes
 cask "raycast"
 # Save articles to read, highlight key content, and organise notes for review
 cask "reader"
-# GUI for streamlined Redis application development
-cask "redis-insight"
 # Instant messaging application focusing on security
 cask "signal"
+# Code quality and security for terminal workflows, scripts, and AI agents
+cask "sonarqube-cli"
 # Music streaming service
 cask "spotify"
 # Video game digital distribution service
 cask "steam"
+# Minimal GUI for AI code agents
+cask "t3-code"
 # To-do list
 cask "todoist-app"
 # Tool to install Linux/BSD distributions to a partition or USB drive
 cask "unetbootin"
-# Network protocol analyzer
-cask "wireshark-app"
+# Open-source code editor
+cask "visual-studio-code@insiders"
+# Voice-to-text dictation with AI-powered auto-editing
+cask "wispr-flow"
 # Gecko based web browser
 cask "zen"
 # Video communication and virtual meeting platform
 cask "zoom"
 mas "Amphetamine", id: 937984704
+mas "Developer", id: 640199958
 mas "Final Cut Pro", id: 424389933
-mas "GarageBand", id: 682658836
 mas "Goodnotes", id: 1444383602
 mas "Grit", id: 6446997766
-mas "iMovie", id: 408981434
 mas "Keynote", id: 409183694
 mas "Kindle", id: 302584613
-mas "Moom Classic", id: 419330170
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
-mas "Pluralsight", id: 431748264
-mas "ScreenBrush", id: 1233965871
-mas "Slack", id: 803453959
 mas "Spark Desktop", id: 6445813049
-mas "Speechify", id: 1624912180
-mas "Structured", id: 1499198946
-mas "Wallpapers HD Lite", id: 441812880
-mas "Windows App", id: 1295203466
 mas "Xcode", id: 497799835
