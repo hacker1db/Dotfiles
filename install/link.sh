@@ -39,6 +39,7 @@ if [[ "$LINK_PHASE" != integrations ]]; then
     fi
 
     for config in $DOTFILES/config/*; do
+        [ "$(basename "$config")" = opencode ] && continue  # opencode-config.sh links it per entry
         target="$HOME/.config/$(basename "$config")"
         [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
         if [ -e "$target" ]; then
@@ -49,26 +50,7 @@ if [[ "$LINK_PHASE" != integrations ]]; then
         fi
     done
 
-    OPENCODE_SRC="$DOTFILES/config/opencode"
-    OPENCODE_DEST="$HOME/.config/opencode"
-    if [[ -d "$OPENCODE_SRC" && ! "$OPENCODE_SRC" -ef "$OPENCODE_DEST" ]]; then
-        if [[ -d "$OPENCODE_DEST" && ! -L "$OPENCODE_DEST" ]]; then
-            echo "$OPENCODE_DEST is an unmanaged directory; preserving it and linking only managed files."
-        else
-            if [[ -e "$OPENCODE_DEST" || -L "$OPENCODE_DEST" ]]; then
-                OPENCODE_BACKUP_BASE="$OPENCODE_DEST.backup.$(date +%Y%m%d%H%M%S)"
-                OPENCODE_BACKUP=$OPENCODE_BACKUP_BASE
-                OPENCODE_BACKUP_SUFFIX=0
-                while [[ -e "$OPENCODE_BACKUP" || -L "$OPENCODE_BACKUP" ]]; do
-                    OPENCODE_BACKUP_SUFFIX=$((OPENCODE_BACKUP_SUFFIX + 1))
-                    OPENCODE_BACKUP="$OPENCODE_BACKUP_BASE.$OPENCODE_BACKUP_SUFFIX"
-                done
-                mv "$OPENCODE_DEST" "$OPENCODE_BACKUP" || exit 1
-                echo "Preserved existing OpenCode config: $OPENCODE_BACKUP"
-            fi
-            ln -s "$OPENCODE_SRC" "$OPENCODE_DEST" || exit 1
-        fi
-    fi
+    bash "$DOTFILES/install/opencode-config.sh" || exit 1
 
     bash "$DOTFILES/install/agent-instructions.sh" || exit 1
 

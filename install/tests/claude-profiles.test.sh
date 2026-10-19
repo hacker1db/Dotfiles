@@ -27,6 +27,8 @@ EOF
 done
 mkdir -p "$home/.claude-personal"
 echo '{"theme": "unmanaged"}' > "$home/.claude-personal/settings.json"
+# Legacy agents link from before skillctl managed subagents.
+ln -s "$repo/claude/agents" "$home/.claude-personal/agents"
 
 run() {
     env -i HOME="$home" PATH="$stubs:$(dirname "$(command -v jq)"):/usr/bin:/bin" CALL_LOG="$log" "$@" "$repo/install/claude-profiles.sh" ${args[@]+"${args[@]}"}
@@ -45,9 +47,10 @@ for p in personal subscription foundry; do
     [ "$(readlink "$d/settings.json")" = "$repo/claude/.local/profiles/$p.json" ] || fail "$p settings target"
     [ "$(mode_of "$repo/claude/.local/profiles/$p.json")" = 600 ] || fail "$p settings mode"
     [ -d "$d/skills" ] && [ ! -L "$d/skills" ] || fail "$p skills dir"
-    for item in CLAUDE.md agents commands output-styles statusline-command.sh; do
+    for item in CLAUDE.md commands output-styles statusline-command.sh; do
         [ "$(readlink "$d/$item")" = "$repo/claude/$item" ] || fail "$p link $item"
     done
+    [ ! -e "$d/agents" ] && [ ! -L "$d/agents" ] || fail "$p agents must be left to skillctl"
     [ "$(readlink "$d/hooks")" = "$repo/claude/profiles/$p/hooks" ] || fail "$p hooks link"
     grep -qx "skillctl .claude-$p sync --global" "$log" || fail "$p skillctl sync"
     [ "$(setting "$p" '.env.CLAUDE_CODE_USE_BEDROCK + .env.CLAUDE_CODE_USE_VERTEX')" = 00 ] || fail "$p bedrock/vertex"
