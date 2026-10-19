@@ -21,6 +21,7 @@ tools=(
   "eslint"
   "markdownlint-cli2"
   "md-to-pdf"
+  "obsidian-headless" # ob CLI: Obsidian Sync without the desktop app (servers)
   "prettier"
   "typescript"
   "typescript-language-server"
