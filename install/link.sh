@@ -96,6 +96,8 @@ fi
 
 github_ssh_preflight >&2 || true
 
+bash "$DOTFILES/install/tmux-plugins.sh" || LINK_FAILURE=1
+
 # Ensure clitools repo is present before linking
 GH_USER=$(github_owner || true)
 CLITOOLS_DIR="$(clitools_dir)"

@@ -12,7 +12,12 @@ compinit -C -d "$HOME/.zcompdump-$ZSH_VERSION"
 # Reevaluate the prompt string each time it's displaying a prompt
 autoload bashcompinit && bashcompinit
 if command -v plan &> /dev/null; then
-    source <(plan completion zsh)
+    if _plan_completion="$(plan completion zsh 2>/dev/null)"; then
+        [[ -n $_plan_completion ]] && eval "$_plan_completion"
+    elif _plan_completion="$(plan completion bash 2>/dev/null)"; then
+        [[ -n $_plan_completion ]] && eval "$_plan_completion"
+    fi
+    unset _plan_completion
 fi
 setopt prompt_subst
 if command -v kubectl &> /dev/null; then
