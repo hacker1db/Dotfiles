@@ -49,6 +49,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 - Zsh loads `zsh/**/*.zsh`, autoloads `zsh/functions/`, and reads `~/.localrc` for local overrides.
 - Starship supplies the prompt; zoxide provides `cd`; eza provides `l` and `ll`.
 - fzf-tab uses zfetch; completion includes kubectl, 1Password, sesh, and skillctl. fnm selects Node versions when entering directories with Node project markers.
+- Plan completion uses native Zsh output when supported and falls back to Bash completion through the initialized `bashcompinit` for older CLI installations.
 - `daily` opens a dated SecondBrain note, `yy` changes directory through Yazi, `ts` and Alt+s select sesh sessions, and `gh-rate-limit` inspects GitHub limits.
 - Ghostty uses `config/ghostty/config`: JetBrains Mono italic at 14pt, 78% opacity, blur, linkarzu colors, and clipboard copy-on-select. The old WezTerm configuration has been removed.
 - tmux lives in `config/tmux/tmux.conf`, uses Ctrl+a as its prefix, and includes vi copy mode, mouse support, undercurl colors, session persistence through resurrect/continuum, and Neovim pane navigation. Prefix+o opens sesh; prefix+g opens lazygit; prefix+G opens gh-dash; prefix+O opens OpenCode; prefix+u uses the fzf URL picker.
@@ -97,6 +98,15 @@ Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not 
 ## Git identities and hooks
 
 `git/gitconfig.symlink` provides account-neutral defaults, `~/.gitconfig-local` overrides, `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls. `ssh/config` includes local and optional account configuration. It names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
+
+SSH connections do not reserve development ports automatically. Open a tunnel only for the service you need, choosing an unused local port:
+
+```sh
+ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:13000:127.0.0.1:3000 stronghold
+ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:23000:127.0.0.1:3000 aiserver
+```
+
+These expose each machine's port 3000 at `http://127.0.0.1:13000` and `http://127.0.0.1:23000`, while local port 3000 remains available. Choose another local port if one is occupied. Stop a tunnel with Ctrl+c. Existing SSH sessions retain their forwards until disconnected; remove any duplicate automatic `LocalForward` entries from `~/.ssh/config.local` as well.
 
 ```sh
 DOTFILES_GIT_PROFILE=hacker1db ./install.sh git
