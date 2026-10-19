@@ -2,15 +2,14 @@
 
 Audit of macOS-only behavior, run on Ubuntu (Linux 7.0, Linuxbrew at `/home/linuxbrew/.linuxbrew`, `/bin/sh` → dash) on 2026-10-16. The goal for a follow-up PR is for every item to work on macOS and Linux, or to be skipped cleanly on Linux.
 
-Detect the platform with `[[ "$(uname -s)" == Darwin ]]` in installer scripts and `[[ $OSTYPE == darwin* ]]` in zsh, which matches the existing code.
+Detect the platform with `[[ $OSTYPE == darwin* ]]`; the installer scripts are zsh too.
 
 ## Already handled on `feature/cleanUpNvimfiles`
 
-- `install/lib/env.sh`: `load_brew_env` finds Homebrew under `/opt/homebrew`, `/usr/local`, and `/home/linuxbrew`. The SSH preflight falls back to HTTPS when no agent is available.
-- `install/install_tools.sh`: casks, `mas`, and `reattach-to-user-namespace` only run on Darwin.
-- `install/osx.sh`, `install/nvimtmux.sh`, and the plan-manager LaunchAgent skip on Linux.
-- `install/shell.sh`: reads the login shell from `getent` on Linux and `dscl` on macOS.
-- `install/theme.sh`: `sed_inplace` wraps the BSD and GNU `sed -i` differences and uses `[[:space:]]` instead of `\s`.
+- `install/lib.zsh`: `load_brew_env` finds Homebrew under `/opt/homebrew`, `/usr/local`, and `/home/linuxbrew`. The SSH preflight falls back to HTTPS when no agent is available.
+- `install/tools.zsh`: casks and `mas` only run on Darwin, and the shell change reads the login shell from `getent` on Linux and `dscl` on macOS.
+- `install/osx.zsh` skips entirely on Linux.
+- `install/theme.zsh`: `sed_inplace` wraps the BSD and GNU `sed -i` differences and uses `[[:space:]]` instead of `\s`.
 - `zsh/zshrc.symlink`: `pyenv init` is guarded.
 - `zsh/functions/zfetch`: clones over HTTPS.
 
@@ -28,9 +27,8 @@ Detect the platform with `[[ "$(uname -s)" == Darwin ]]` in installer scripts an
 | `config/tmux/tmux.conf:113-114` | `C-c`/`C-v` use `reattach-to-user-namespace pbcopy/pbpaste`. | tmux-yank is already loaded, so drop the bindings or switch per OS with `if-shell 'uname \| grep -q Darwin'`. |
 | `zsh/zshrc.symlink:116` | Always prepends `/opt/homebrew/bin`. This is harmless on Linux but it puts a nonexistent directory first in PATH. | Guard it with `[[ -d /opt/homebrew/bin ]]`. `zsh/brew.zsh` already does the shellenv part. |
 | `zsh/brew.zsh` | Only loads `/opt/homebrew`. Linuxbrew shellenv, nvm, and mysql-client never load in an interactive zsh. | Use the same candidate loop as `load_brew_env`. Base `nvm`/`mysql-client` on `$HOMEBREW_PREFIX`. |
-| `zsh/zshrc.symlink:134-137`, `install/dotnet-tools.sh:13-14` | `DOTNET_ROOT` only checks the macOS brew prefixes. | Check `$HOMEBREW_PREFIX/opt/dotnet/libexec` first. |
-| `PNPM_HOME` default (`zsh/zshrc.symlink:111`, `zsh/functions.zsh:261`, `install/node-tools.sh:10`, `install/install_tools.sh:207`) | `~/Library/pnpm` is used on every OS. pnpm uses `~/.local/share/pnpm` on Linux. | Choose the path per OS in one place. Keep the existing `${PNPM_HOME:-...}` override. |
-| `install/tests/plan-manager-bootstrap.test.sh:230` | Calls `plutil`, which only exists on macOS. Confirmed: this test fails on Linux. | Skip the LaunchAgent assertions when the OS isn't Darwin. |
+| `zsh/zshrc.symlink:134-137`, `install/dotnet.zsh` | `DOTNET_ROOT` only checks the macOS brew prefixes before `$HOMEBREW_PREFIX`. | Check `$HOMEBREW_PREFIX/opt/dotnet/libexec` first. |
+| `PNPM_HOME` default (`zsh/zshrc.symlink:111`, `zsh/functions.zsh:261`, `install/node.zsh`) | `~/Library/pnpm` is used on every OS. pnpm uses `~/.local/share/pnpm` on Linux. | Choose the path per OS in one place. Keep the existing `${PNPM_HOME:-...}` override. |
 
 ## macOS-only, should no-op or have a Linux equivalent
 
@@ -51,7 +49,7 @@ Detect the platform with `[[ "$(uname -s)" == Darwin ]]` in installer scripts an
 
 ## Linux gaps (no equivalent yet)
 
-- **Plan-manager service**: macOS uses launchd. Linux has no service. `~/.config/systemd/user/` exists on this host (lima only), so a systemd user unit template beside `launchd/` would match.
+- **Plan-manager service**: no service is installed on any OS anymore; the hosted site is the dashboard, and `plan serve` runs the local one by hand.
 - **1Password SSH agent on Linux**: the socket is `~/.1password/agent.sock`. `config/1Password/ssh/agent.toml` is cross-platform.
 - **Clipboard over SSH**: tmux has `set-clipboard on`, so OSC 52 works in Ghostty. Nvim's `unnamedplus` needs a provider (`wl-copy`, `xclip`, or `vim.g.clipboard = "osc52"` when headless).
 
@@ -59,5 +57,3 @@ Detect the platform with `[[ "$(uname -s)" == Darwin ]]` in installer scripts an
 
 - `zsh -n` passes for every file under `zsh/`.
 - `zsh -i -c exit` starts without errors.
-- `install/tests/claude-profiles.test.py`, `claude-session.test.sh`, and `plan-manager-harness-contracts.test.mjs` pass.
-- `plan-manager-bootstrap.test.sh` fails at `plutil` (see the table above).

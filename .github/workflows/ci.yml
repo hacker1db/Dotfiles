@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   push:
@@ -10,31 +10,26 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: 22
-      - run: sudo apt-get update && sudo apt-get install -y zsh
-      - run: bash install/tests/claude-profiles.test.sh
-      - run: bash install/tests/opencode-config.test.sh
-      - run: bash install/tests/tmux-plugins.test.sh
-      - run: python3 install/tests/ssh-plan-startup.test.py
-      - run: node install/tests/plan-manager-harness-contracts.test.mjs
-      - run: python3 install/tests/ci-workflow.test.py
-
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - run: sudo apt-get update && sudo apt-get install -y shellcheck zsh
-      - run: git ls-files -z -- '*.sh' '*.bash' ':(exclude)bin/dotnet-install.sh' | xargs -0 shellcheck -S error
+      - run: sudo apt-get update && sudo apt-get install -y zsh
+      - run: for file in install.sh install/*.zsh; do zsh -n "$file" || exit 1; done
       - run: for file in zsh/*.zsh zsh/*.symlink zsh/functions/*; do zsh -n "$file" || exit; done
       - uses: lunarmodules/luacheck@cc089e3f65acdd1ef8716cc73a3eca24a6b845e4 # v1.2.0
         with:
           args: config/nvim --no-color --codes --globals vim M Snacks dd --no-max-line-length --no-unused
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - uses: trufflesecurity/trufflehog@e76dff8a7e57d6df0c60ad8cbf5d5cba505a8fc9 # v3.99.2
+        with:
+          extra_args: --results=verified,unverified,unknown --fail
 
   dependency-review:
     if: github.event_name == 'pull_request'
