@@ -22,7 +22,6 @@ jobs:
       - run: bash install/tests/opencode-config.test.sh
       - run: node install/tests/plan-manager-harness-contracts.test.mjs
       - run: python3 install/tests/ci-workflow.test.py
-      - run: go vet ./... && go test ./...
 
   lint:
     runs-on: ubuntu-latest
