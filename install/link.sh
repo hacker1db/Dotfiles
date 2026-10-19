@@ -115,7 +115,11 @@ elif [ -n "$CLITOOLS_REPO_URL" ] && [ ! -d "$CLITOOLS_DIR" ]; then
     mkdir -p "$(dirname "$CLITOOLS_DIR")"
     github_clone "$CLITOOLS_REPO_URL" "$CLITOOLS_DIR" || echo "Failed to clone clitools; continuing without it"
 elif [ -e "$CLITOOLS_DIR/.git" ]; then
-    github_git -C "$CLITOOLS_DIR" fetch --quiet && github_git -C "$CLITOOLS_DIR" pull --ff-only --quiet || echo "Could not update clitools; using existing copy"
+    if [ -n "$(git -C "$CLITOOLS_DIR" status --porcelain --untracked-files=normal 2>/dev/null)" ]; then
+        warning "$CLITOOLS_DIR has local changes; preserving it without fetching or updating."
+    else
+        github_git -C "$CLITOOLS_DIR" fetch --quiet && git -C "$CLITOOLS_DIR" merge --ff-only --quiet '@{u}' 2>/dev/null || echo "Could not update clitools; using existing copy"
+    fi
 fi
 
 PLAN_MANAGER_READY=0
