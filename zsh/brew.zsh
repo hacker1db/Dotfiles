@@ -1,6 +1,7 @@
 if [[ -x /opt/homebrew/bin/brew ]]; then
     _brew_env="$(builtin cd -q / && /opt/homebrew/bin/brew shellenv zsh)" && eval "$_brew_env"
     unset _brew_env
+    typeset +x FPATH
 fi
 export HOMEBREW_NO_ASK=1
 [[ -n $HOMEBREW_PREFIX ]] || return
