@@ -44,7 +44,12 @@ else
 fi
 ''')
             plan.chmod(0o755)
-            script = 'autoload -U compinit bashcompinit\ncompinit -d "$HOME/.zcompdump"\nbashcompinit\n'
+            insecure = fixture / 'insecure-completions'
+            insecure.mkdir()
+            insecure.chmod(0o777)
+            (insecure / '_untrusted_fixture').write_text('#compdef untrusted_fixture\n')
+            script = 'fpath=("$HOME/insecure-completions" $fpath)\nautoload -U compinit bashcompinit\ncompinit -i -d "$HOME/.zcompdump" || exit 13\nbashcompinit\n'
+            script += '[[ -z ${_comps[untrusted_fixture]-} ]] || exit 14\n'
             script += config[start:end]
             if mode == 'native':
                 script += '[[ ${_comps[plan]} == _plan_native ]] || exit 10\n'
