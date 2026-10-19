@@ -6,7 +6,7 @@
 # Exit: 0 ready, 1 hard error, 2 incomplete (missing resource, conflicts, stale state).
 set -euo pipefail
 
-root="${0:A:h:h}"
+root="${DOTFILES:-$HOME/.dotfiles/main}"
 claude_dir="$root/claude"
 profiles_dir="$claude_dir/profiles"
 generated="$claude_dir/.local/profiles"
