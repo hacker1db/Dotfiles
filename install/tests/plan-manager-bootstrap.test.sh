@@ -70,6 +70,40 @@ unset PLAN_MANAGER_WORKTREE
 validate_origin "$resolved" "git@github.com:example/plan-manager.git" >/dev/null 2>&1 &&
     fail "missing expected origin was accepted"
 
+mkdir -p "$FIXTURE/fake-ssh"
+cat > "$FIXTURE/fake-ssh/ssh" <<'EOF'
+#!/bin/sh
+if [ "${1:-}" = "-G" ] && [ "${2:-}" = "github-alias" ]; then
+    echo "hostname ssh.github.com"
+    exit 0
+fi
+if [ "${1:-}" = "-G" ] && [ "${2:-}" = "github.com" ]; then
+    echo "hostname ssh.github.com"
+    exit 0
+fi
+[ "${1:-}" = "-G" ] && echo "hostname ${2:-}"
+exit 0
+EOF
+chmod +x "$FIXTURE/fake-ssh/ssh"
+alias_repo="$FIXTURE/alias-origin"
+git init -q "$alias_repo"
+git -C "$alias_repo" remote add origin "git@github-alias:hacker1db/plan-manager.git"
+PATH="$FIXTURE/fake-ssh:$PATH" validate_origin "$alias_repo" "git@github.com:hacker1db/plan-manager.git" >/dev/null 2>&1 ||
+    fail "SSH host alias for the expected origin was rejected"
+PATH="$FIXTURE/fake-ssh:$PATH" validate_origin "$alias_repo" "https://github.com/hacker1db/plan-manager.git" >/dev/null 2>&1 ||
+    fail "SSH host alias was not equivalent to the HTTPS origin"
+PATH="$FIXTURE/fake-ssh:$PATH" validate_origin "$alias_repo" "git@github.com:example/plan-manager.git" >/dev/null 2>&1 &&
+    fail "SSH host alias for a different owner was accepted"
+git -C "$alias_repo" remote set-url origin "git@gitlab-alias:hacker1db/plan-manager.git"
+PATH="$FIXTURE/fake-ssh:$PATH" validate_origin "$alias_repo" "git@github.com:hacker1db/plan-manager.git" >/dev/null 2>&1 &&
+    fail "SSH host alias for a different host was accepted"
+git -C "$alias_repo" remote set-url origin "git@unresolved-alias:hacker1db/plan-manager.git"
+git -C "$alias_repo" config url."git@unresolved-alias:hacker1db/".insteadOf "git@github.com:hacker1db/"
+PATH="$FIXTURE/fake-ssh:$PATH" validate_origin "$alias_repo" "git@github.com:hacker1db/plan-manager.git" >/dev/null 2>&1 ||
+    fail "insteadOf-rewritten expected origin was rejected"
+PATH="$FIXTURE/fake-ssh:$PATH" validate_origin "$alias_repo" "git@github.com:example/plan-manager.git" >/dev/null 2>&1 &&
+    fail "insteadOf rewrite accepted a different owner"
+
 mkdir -p "$FIXTURE/fake-bin"
 cat > "$FIXTURE/fake-bin/gh" <<'EOF'
 #!/bin/sh
