@@ -171,5 +171,5 @@
 	ff = only
 
 [include]
-    # Optional account profile linked by install/git.sh; ignored when missing
+    # Optional account profile linked by install/tools.zsh; ignored when missing
     path = ~/.gitconfig-accounts

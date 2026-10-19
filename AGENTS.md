@@ -75,19 +75,18 @@ Configured LSP servers include:
 ### Shell/Dotfiles
 
 ```bash
-# Isolated installer checks
-bash install/tests/claude-profiles.test.sh
-bash install/tests/plan-manager-bootstrap.test.sh
-node install/tests/plan-manager-harness-contracts.test.mjs
+# Check Installer And Zsh Syntax
+for f in install.sh install/*.zsh; do zsh -n "$f" || exit 1; done
+zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
+
+# Audit The Claude Profiles (read-only)
+zsh ~/.dotfiles/main/install/claude-profiles.zsh --check
 
 # Manual Testing: Source Configuration In New Shell
 source ~/.zshrc
 
-# Check For Zsh Syntax Errors
-zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
-
-# Install links and integrations (changes configuration and starts services)
-~/.dotfiles/main/install/link.sh
+# Install links and integrations (changes configuration)
+~/.dotfiles/main/install.sh link
 ```
 
 ### Neovim
@@ -114,8 +113,8 @@ brew bundle --file=~/.dotfiles/main/install/brewfile
 ~/.dotfiles/main/install.sh all
 
 # Install Tools And Create Symlinks
-~/.dotfiles/main/install/install_tools.sh
-~/.dotfiles/main/install/link.sh
+~/.dotfiles/main/install.sh tools
+~/.dotfiles/main/install.sh link
 ```
 
 ## Code Style & Conventions
@@ -195,7 +194,7 @@ All directories under `config/` are symlinked to `~/.config/<name>`. When adding
 
 - The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out at `$HOME/Developer/skills/main` by default.
 - That repository provides `skillctl`, the skill manager for Codex, Claude Code, and GitHub Copilot CLI. Read its README before changing skill sources, selections, or installation behavior.
-- Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/claude-profiles.sh` runs `skillctl sync --global` for each Claude profile.
+- Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/claude-profiles.zsh` runs `skillctl sync --global` for each Claude profile.
 - The project-scoped Caido installer and the OpenCode skill under `config/opencode/skills/` are separate from the current `skillctl` global adapters.
 
 ## Important Files & Patterns
@@ -253,7 +252,7 @@ Template hooks in `git/templates/hooks/`:
 ### Compatibility
 
 - **Platform**: macOS (darwin)
-- **Shell**: Zsh interactively; installer scripts use Bash
+- **Shell**: Zsh, interactively and for the installer scripts
 - **Terminal**: Ghostty
 - **Package manager**: Homebrew
 
