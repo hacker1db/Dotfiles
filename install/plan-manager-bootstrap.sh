@@ -140,20 +140,52 @@ resolve_clone_url() {
     printf 'https://github.com/%s/plan-manager.git\n' "$PLAN_MANAGER_UPSTREAM_OWNER"
 }
 
+resolve_ssh_host() {
+    local host="$1"
+    local resolved=""
+    if command -v ssh >/dev/null 2>&1; then
+        resolved="$(ssh -G "$host" 2>/dev/null | awk '$1 == "hostname" { print $2; exit }' || true)"
+    fi
+    resolved="${resolved:-$host}"
+    if [ "$resolved" = "ssh.github.com" ]; then
+        resolved="github.com"
+    fi
+    printf '%s\n' "$resolved"
+}
+
 normalize_remote_url() {
-    local value="$1"
-    value="${value#ssh://}"
-    value="${value/git@github.com:/github.com/}"
-    value="${value/https:\/\/github.com\//github.com/}"
-    value="${value/http:\/\/github.com\//github.com/}"
-    value="${value%.git}"
-    printf '%s\n' "$value"
+    local value="${1%.git}"
+    local host path
+    case "$value" in
+        http://* | https://*)
+            value="${value#*://}"
+            printf '%s\n' "${value#*@}"
+            return
+            ;;
+        ssh://*)
+            value="${value#ssh://}"
+            value="${value#*@}"
+            host="${value%%/*}"
+            host="${host%%:*}"
+            path="${value#*/}"
+            ;;
+        *:*)
+            value="${value#*@}"
+            host="${value%%:*}"
+            path="${value#*:}"
+            ;;
+        *)
+            printf '%s\n' "$value"
+            return
+            ;;
+    esac
+    printf '%s/%s\n' "$(resolve_ssh_host "$host")" "$path"
 }
 
 validate_origin() {
     local worktree="$1"
     local expected_url="${2:-}"
-    local actual_url
+    local actual_url rewritten_url
 
     actual_url="$(git -C "$worktree" remote get-url origin 2>/dev/null || true)"
     if [ -z "$expected_url" ]; then
@@ -168,7 +200,8 @@ validate_origin() {
         error "The plan-manager checkout has no origin, but $expected_url is configured."
         return 1
     fi
-    if [ "$(normalize_remote_url "$actual_url")" != "$(normalize_remote_url "$expected_url")" ]; then
+    rewritten_url="$(git -C "$worktree" ls-remote --get-url "$expected_url" 2>/dev/null || true)"
+    if [ "$(normalize_remote_url "$actual_url")" != "$(normalize_remote_url "${rewritten_url:-$expected_url}")" ]; then
         error "Unexpected plan-manager origin."
         error "Expected: $expected_url"
         error "Actual:   $actual_url"
