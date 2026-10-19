@@ -16,7 +16,7 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 claude_dir="$root/claude"
 profiles_dir="$claude_dir/profiles"
 generated="$claude_dir/.local/profiles"
-linked_items=(CLAUDE.md agents commands output-styles statusline-command.sh)
+linked_items=(CLAUDE.md commands output-styles statusline-command.sh)
 credential_keys='["ANTHROPIC_API_KEY","ANTHROPIC_AUTH_TOKEN","ANTHROPIC_FOUNDRY_API_KEY","ANTHROPIC_FOUNDRY_AUTH_TOKEN","CLAUDE_CODE_OAUTH_TOKEN"]'
 
 check=0
@@ -94,6 +94,18 @@ link_item() {
     fi
 }
 
+# skillctl installs subagents from the skills repository; remove the agents link this script used to own.
+unlink_legacy_agents() {
+    local dest="$1/agents"
+    [ -L "$dest" ] && [ "$(readlink "$dest")" = "$claude_dir/agents" ] || return 0
+    if [ "$check" -eq 1 ]; then
+        problem "$dest is a stale link to $claude_dir/agents"
+    else
+        rm "$dest"
+        echo "Removed stale $dest"
+    fi
+}
+
 install_plugins() {
     local dir="$1" settings="$2" have name src id
     command -v claude >/dev/null || { problem "claude is not installed; skipped plugins for $dir"; return; }
@@ -134,6 +146,7 @@ for profile in personal subscription foundry; do
         [ -d "$dir/skills" ] && [ ! -L "$dir/skills" ] || problem "$profile: $dir/skills must be a real directory"
         for item in "${linked_items[@]}"; do link_item "$claude_dir/$item" "$dir/$item"; done
         link_item "$profiles_dir/$profile/hooks" "$dir/hooks"
+        unlink_legacy_agents "$dir"
         continue
     fi
 
@@ -155,6 +168,7 @@ for profile in personal subscription foundry; do
     fi
     for item in "${linked_items[@]}"; do link_item "$claude_dir/$item" "$dir/$item"; done
     link_item "$profiles_dir/$profile/hooks" "$dir/hooks"
+    unlink_legacy_agents "$dir"
     [ ! -L "$dir/skills" ] || die "Refusing symlinked skills directory: $dir/skills"
     mkdir -p "$dir/skills"
     if command -v skillctl >/dev/null; then

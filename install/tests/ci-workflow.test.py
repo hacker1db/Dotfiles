@@ -17,6 +17,7 @@ class CiWorkflowTest(unittest.TestCase):
         self.assertRegex(CI, r'(?m)^permissions:\n  contents: read$')
         for command in (
             'bash install/tests/claude-profiles.test.sh',
+            'bash install/tests/opencode-config.test.sh',
             'node install/tests/plan-manager-harness-contracts.test.mjs',
             'python3 install/tests/ci-workflow.test.py',
         ):
