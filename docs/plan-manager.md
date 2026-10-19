@@ -65,15 +65,15 @@ install/link.sh
 The installer:
 
 1. Resolves or clones the plan-manager repository.
-2. Installs locked application dependencies (`pnpm install --frozen-lockfile`) and runs `pnpm build`.
-3. Validates `bin/plan` and links it to `~/.local/bin/plan`.
+2. Builds the selected checkout's Go package from `cli/` using a private staged `GOBIN` and `go install -mod=readonly ./cmd/plan` (`GOWORK=off`, ignoring ambient `GOFLAGS`). Go enforces the toolchain requirement in `cli/go.mod`; missing Go sources stop installation.
+3. Validates Go module/package build identity, version, and Zsh completions, then atomically promotes the binary to `~/.local/lib/plan-manager/plan` and links `~/.local/bin/plan` to it. Failed builds or validation leave the previous command usable.
 4. Links global instructions and command adapters. Install the `plans` skill separately through skillctl.
 5. Merges `~/notes/SecondBrain/4.Resources/plans` into the Codex writable-root config.
 6. Initializes `~/notes/SecondBrain/4.Resources/plans` and its `archive/` subdirectory only if the vault folder already exists; it never creates the folder.
 7. Installs the LaunchAgent and loads it with `launchctl`.
 8. Runs `plan serve --json` and `plan doctor --json`, reporting failures (skipped when the vault folder is missing).
 
-The bootstrap preserves correct managed links and backs up replaced files. Rerunning can fetch and fast-forward the application checkout, reinstall dependencies, rebuild the CLI, and check/start the service. It is not a no-op verification command. A plan-manager failure is reported after other dotfiles links have been attempted and makes the linker exit nonzero.
+The bootstrap preserves correct managed links and backs up replaced files. Rerunning can fetch and fast-forward the application checkout, rebuild the Go CLI, and check/start the service. It is not a no-op verification command. A plan-manager failure is reported after other dotfiles links have been attempted and makes the linker exit nonzero.
 
 The Codex reconciler creates `~/.codex/config.toml` when absent. Before changing
 an existing file it writes a timestamped same-directory backup, then atomically
@@ -83,14 +83,15 @@ array without setting a sandbox mode or approval policy.
 ### Prerequisites
 
 - macOS
-- Node.js ≥ 20 (verified at install time)
-- pnpm (verified at install time)
+- Go satisfying `cli/go.mod` (Go may download the required toolchain)
+- Node.js for the LaunchAgent renderer and Codex configuration reconciler; the full dotfiles installer also requires Node.js ≥ 20 and pnpm for other tools
+- `lsof` for dashboard executable verification
 - Pandoc (verified before service installation)
 - `gh` CLI authenticated (only needed to derive the default clone URL)
 
 ## CLI usage
 
-The `plan` executable is linked at `~/.local/bin/plan` after installation. Dotfiles Zsh startup adds that directory to `PATH`.
+The `plan` executable is linked at `~/.local/bin/plan` after installation. Dotfiles Zsh startup deduplicates `PATH` and puts that directory first after tool initialization, then loads completions from the selected command. pnpm global commands remain available. Explicit user aliases and functions are preserved and reported by the installer diagnostic.
 
 The bootstrap and LaunchAgent explicitly pass `PLAN_HOME=~/notes/SecondBrain/4.Resources/plans`. The application can have a different default, and the symlink does not set environment variables. For terminal invocations, set the canonical root in `~/.localrc` and reload the shell:
 
@@ -99,6 +100,8 @@ export PLAN_HOME="$HOME/notes/SecondBrain/4.Resources/plans"
 ```
 
 Confirm the effective root with `plan doctor --json` before creating or importing plans. Agent operations use non-interactive JSON mode; opening/reviewing requires `plan serve` and `plan doctor --json` first.
+
+Bare `plan` opens the dashboard. `plan list` prints the styled list when stdout is a terminal, and plain text when piped; `plan list --json` preserves automation output. `plan tui` opens the interactive terminal manager. Installing an individual Go source file may create `~/go/bin/main`; use the package command above to get a binary named `plan`. The installer leaves unrelated commands, including `~/go/bin/main` and pnpm wrappers, intact.
 
 ### Common operations
 
@@ -180,7 +183,7 @@ The LaunchAgent starts the dashboard service automatically at login. If the serv
 The generated LaunchAgent is installed at
 `~/Library/LaunchAgents/com.plan-manager.serve.plist`. Its resolved home,
 worktree, executable, plan root, and runtime `PATH` are machine-specific and are
-not committed to dotfiles. Logs remain at:
+not committed to dotfiles. A binary content hash in the agent environment forces unload/reload when the installed Go binary changes, even when the paths stay the same. Node is used to render the plist; the Go dashboard serves its embedded assets and needs Pandoc for rendering. The installer checks the listener executable and canonical library health. Logs remain at:
 
 - `~/Library/Logs/plan-manager/serve.log`
 - `~/Library/Logs/plan-manager/serve.error.log`
@@ -241,7 +244,18 @@ Common causes:
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Then reload: `source ~/.zshrc`. Rerun `install/link.sh` only if the CLI symlink needs repair; its environment changes do not modify the parent shell.
+Then reload: `source ~/.zshrc; rehash`, or open a fresh terminal. Rerun `install/link.sh` only if the CLI symlink needs repair; its environment changes do not modify the parent shell.
+
+### Wrong implementation or stale completions
+
+```sh
+type -a plan
+whence -w plan
+go version -m "$HOME/.local/bin/plan"
+plan completion zsh
+```
+
+Expect `~/.local/bin/plan` first and package identity `github.com/hacker1db/plan-manager/cli/cmd/plan` with module `github.com/hacker1db/plan-manager/cli`. Versions alone do not distinguish Go and TypeScript. Reload Zsh and run `rehash` after updating dotfiles. Inspect user aliases/functions if the diagnostic still reports a different selection. The Go default requires the selected main checkout to contain `cli/go.mod` and `cli/cmd/plan/main.go`; the installer never silently changes branches or falls back to TypeScript.
 
 ### Codex cannot write to `~/notes/SecondBrain/4.Resources/plans`
 
@@ -256,6 +270,9 @@ A non-empty `AGENTS.override.md` takes precedence over `~/.codex/AGENTS.md`. `pl
 Codex loads global guidance once per run. If plan policy changes are not reflected, start a new desktop task or CLI session.
 
 ## Rollback
+
+Restore `~/.local/lib/plan-manager/plan.backup-<timestamp>` over the managed binary, or restore the backed up `~/.local/bin/plan.backup-<timestamp>` link for the prior TypeScript installation. Revert the Zsh changes, reload with `source ~/.zshrc; rehash`, then reload the previous LaunchAgent and verify executable identity and health. Binary and link backups are retained by the installer.
+
 
 ```bash
 # Unload and remove the LaunchAgent
@@ -284,8 +301,12 @@ loading a LaunchAgent:
 ```
 
 The checks cover current bare-worktree resolution, explicit-worktree
-validation, missing and conflicting targets, frozen dependency invocation, CLI
-link repair, instruction backups, atomic Codex config reconciliation, and
-idempotent LaunchAgent rendering under a temporary `HOME`.
+validation, normal-clone/bare/override builds, missing Go/sources, build and
+validation failure preservation, private staging, TypeScript link migration,
+instruction backups, atomic Codex config reconciliation, and binary-triggered
+LaunchAgent reconciliation under a temporary `HOME`.
+
+Run `bash install/tests/plan-manager-zsh.test.sh` for fresh-shell selection and
+completion checks with legacy pnpm wrappers, duplicate PATH entries, and spaces.
 
 To undo an output-style change, inspect its Git history and restore the intended revision of `claude/output-styles/plan-browser.md`; do not assume the previous commit contains the desired version.

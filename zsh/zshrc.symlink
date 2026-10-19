@@ -11,14 +11,6 @@ autoload -U compinit add-zsh-hook
 compinit -C -d "$HOME/.zcompdump-$ZSH_VERSION"
 # Reevaluate the prompt string each time it's displaying a prompt
 autoload bashcompinit && bashcompinit
-if command -v plan &> /dev/null; then
-    if _plan_completion="$(plan completion zsh 2>/dev/null)"; then
-        [[ -n $_plan_completion ]] && eval "$_plan_completion"
-    elif _plan_completion="$(plan completion bash 2>/dev/null)"; then
-        [[ -n $_plan_completion ]] && eval "$_plan_completion"
-    fi
-    unset _plan_completion
-fi
 setopt prompt_subst
 if command -v kubectl &> /dev/null; then
     source <(kubectl completion zsh)
@@ -48,7 +40,6 @@ fi
 
 # adding path directory for custom scripts
 export PATH=$DOTFILES/bin:$PATH
-export PATH="$HOME/.local/bin:$PATH"
 
 # check for custom bin directory and add to path
 if [[ -d ~/bin ]]; then
@@ -143,3 +134,15 @@ fi
 [[ -n "${DOTNET_ROOT:-}" ]] && export PATH="$DOTNET_ROOT:$HOME/.dotnet/tools:$PATH"
 
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
+
+typeset -U path
+path=("$HOME/.local/bin" $path)
+export PATH
+if command -v plan &> /dev/null; then
+    if _plan_completion="$(plan completion zsh 2>/dev/null)"; then
+        [[ -n $_plan_completion ]] && eval "$_plan_completion"
+    elif _plan_completion="$(plan completion bash 2>/dev/null)"; then
+        [[ -n $_plan_completion ]] && eval "$_plan_completion"
+    fi
+    unset _plan_completion
+fi
