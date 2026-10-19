@@ -74,10 +74,11 @@ Configured LSP servers include:
 
 ### Shell/Dotfiles
 
-```bash
+```zsh
 # Check Installer And Zsh Syntax
 for f in install.sh install/*.zsh; do zsh -n "$f" || exit 1; done
 zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
+zsh -n bin/tmux-reload-all
 
 # Audit The Claude Profiles (read-only)
 zsh ~/.dotfiles/main/install/claude-profiles.zsh --check
@@ -91,7 +92,7 @@ source ~/.zshrc
 
 ### Neovim
 
-```bash
+```zsh
 # No Automated Tests For Nvim Config
 # Manual Testing: Open Neovim And Check For Errors
 nvim +checkhealth
@@ -105,7 +106,7 @@ nvim --headless "+Lazy! sync" +qa
 
 ### Installation
 
-```bash
+```zsh
 # Install All Packages From Brewfile
 brew bundle --file=~/.dotfiles/main/install/brewfile
 
@@ -157,6 +158,9 @@ brew bundle --file=~/.dotfiles/main/install/brewfile
 
 ### Shell Scripts (Zsh)
 
+- **Command execution**: Run shell commands and scripts with Zsh, not Bash. Set the command runner's shell to `/bin/zsh` explicitly.
+- **Syntax checks**: Use `zsh -n <script>`, including for `bin/tmux-reload-all`; do not use `bash -n`.
+- **Examples**: Label shell command code blocks as `zsh`.
 - **Indentation**: 4 spaces
 - **Conditionals**: Use `[[ ]]` for tests
 - **Functions**: Define in `zsh/functions/` or `zsh/functions.zsh`

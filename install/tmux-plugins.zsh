@@ -2,7 +2,18 @@
 # Bootstrap TPM so tmux can install its configured plugins.
 set -euo pipefail
 
-tpm="$HOME/.config/tmux/plugins/tpm"
+plugins_dir="$HOME/.local/share/tmux/plugins"
+tpm="$plugins_dir/tpm"
+
+if [[ ! -e "$plugins_dir" ]]; then
+    for legacy in "$HOME/.config/tmux/plugins" "$HOME"/.dotfiles/*/config/tmux/plugins(N-/); do
+        [[ -x "$legacy/tpm/tpm" && -x "$legacy/tpm/bindings/install_plugins" ]] || continue
+        mkdir -p "${plugins_dir:h}"
+        cp -R "$legacy/." "$plugins_dir"
+        print "Copied existing tmux plugins from $legacy to $plugins_dir"
+        break
+    done
+fi
 
 if [[ -e "$tpm" || -L "$tpm" ]]; then
     if [[ ! -x "$tpm/tpm" || ! -x "$tpm/bindings/install_plugins" ]]; then

@@ -1,21 +1,15 @@
-#!/usr/bin/env bash
-# Reload tmux config for all sessions and clients
+#!/usr/bin/env zsh
+set -euo pipefail
 
 CONFIG="${HOME}/.config/tmux/tmux.conf"
-TPM="${HOME}/.config/tmux/plugins/tpm/tpm"
-
-# reload server config
 tmux source-file "$CONFIG"
 
-# reload TPM plugins if installed
-if [ -f "$TPM" ]; then
-    "$TPM"
-fi
-
-# refresh all attached clients
-tmux list-clients -F "#{client_tty}" | while read -r tty; do
-    [ -n "$tty" ] && tmux refresh-client -t "$tty"
+tmux list-clients -F "#{client_tty}" | while IFS= read -r client; do
+    [[ -n "$client" ]] || continue
+    tmux refresh-client -t "$client"
 done
 
-# show confirmation
 tmux display-message "Reloaded tmux.conf for all sessions"
+if [[ -t 0 && -t 1 ]]; then
+    exec zsh -i
+fi
