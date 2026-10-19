@@ -22,6 +22,24 @@ The first clone uses HTTPS because 1Password and its SSH agent are not installed
 
 Each step under `install/` is one zsh script with the same name; `install.sh` runs them in order. The scripts change macOS preferences and configure applications, so review them before a full run.
 
+To try the configuration from a different worktree, select it explicitly:
+
+```zsh
+cd ~/.dotfiles/refactor-install-cleanup
+./install.sh use ~/.dotfiles/refactor-install-cleanup
+```
+
+`use` retargets existing configuration symlinks from the active checkout to the selected checkout, then opens a fresh Zsh automatically when run in a terminal. It preserves unmanaged files, checks replacement paths before changing links, and runs no package installs. Zsh derives `DOTFILES` from its selected configuration file. Other existing terminals need to reload; applications load the selected configuration when they next reload or restart. This selection applies across terminals. Keep the selected worktree until you switch away from it. Noninteractive invocations only update the links.
+
+From the selected feature shell, switch back with:
+
+```zsh
+cd ~/.dotfiles/main
+dotfiles-use
+```
+
+`dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer.
+
 Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/tools.zsh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. `tools.zsh` also trusts each tap it adds, because Homebrew 7 ignores formulae from untrusted taps. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
 | Command | Purpose |
@@ -32,7 +50,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | `./install.sh dotnet` | Install .NET SDKs, runtimes, and global tools |
 | `./install.sh osx` | Apply macOS preferences, create standard folders, and install NvimTmux.app with `duti` associations |
 | `./install.sh theme list` | List theme candidates (`apply <name>`, `current`, and `sync` also work) |
-| `./install.sh tmux-plugins` | Bootstrap TPM at `~/.config/tmux/plugins/tpm` |
+| `./install.sh tmux-plugins` | Bootstrap TPM at `~/.local/share/tmux/plugins/tpm` |
 | `./install.sh claude-profiles` | Generate and link the Claude Code profiles (`--check`, `--skip-foundry`) |
 | `./install.sh deferred` | Run the cask and App Store installs that were skipped because they need a password, then `chsh` |
 
@@ -44,12 +62,14 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 
 - Zsh loads `zsh/**/*.zsh`, autoloads `zsh/functions/`, and reads `~/.localrc` for local overrides.
 - Starship supplies the prompt; zoxide provides `cd`; eza provides `l` and `ll`.
+- `r!` and `reload!` source `~/.zshrc` in the current shell. If a Homebrew upgrade removed that shell's module directory, `.zshrc` starts fresh Zsh to restore completion support.
 - fzf-tab uses zfetch; completion includes kubectl, 1Password, sesh, and skillctl. fnm selects Node versions when entering directories with Node project markers.
 - Plan completion uses native Zsh output when supported and falls back to Bash completion through the initialized `bashcompinit` for older CLI installations.
 - `daily` opens a dated SecondBrain note, `yy` changes directory through Yazi, `ts` and Alt+s select sesh sessions, and `gh-rate-limit` inspects GitHub limits.
 - Ghostty uses `config/ghostty/config`: JetBrains Mono italic at 14pt, 78% opacity, blur, linkarzu colors, and clipboard copy-on-select. The old WezTerm configuration has been removed.
 - tmux lives in `config/tmux/tmux.conf`, uses Ctrl+a as its prefix, and includes vi copy mode, mouse support, undercurl colors, session persistence through resurrect/continuum, and Neovim pane navigation. Prefix+o opens sesh; prefix+g opens lazygit; prefix+G opens gh-dash; prefix+O opens OpenCode; prefix+u uses the fzf URL picker.
-- `./install.sh tmux-plugins` bootstraps TPM over SSH at `~/.config/tmux/plugins/tpm`. Existing installations are preserved, and incomplete ones fail with a diagnostic. Reload tmux, then press Ctrl+a followed by Shift+i to install the configured plugins.
+- `./install.sh tmux-plugins` bootstraps TPM at `~/.local/share/tmux/plugins/tpm`, copying an existing plugin directory from a dotfiles worktree when available and otherwise cloning over SSH. Plugin storage is shared across worktrees. Incomplete installations fail with a diagnostic. Reload tmux, then press Ctrl+a followed by Shift+i to install configured plugins.
+- `tmux-reload-all` reloads the server configuration, refreshes attached clients, and starts a fresh Zsh in the current terminal. Run it once in each affected shell after a Homebrew Zsh upgrade; other panes keep their running programs. Reloading configuration alone cannot restore module files removed from an older Zsh installation.
 
 ### Worktrunk and Git worktrees
 

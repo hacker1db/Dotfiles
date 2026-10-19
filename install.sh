@@ -5,7 +5,7 @@ source "$ROOT/install/lib.zsh"
 
 typeset -a steps=(tools link node dotnet osx theme tmux-plugins claude-profiles)
 
-usage() { print -u2 "Usage: ${0:t} {all|${(j:|:)steps}|deferred} [args]"; exit 1 }
+usage() { print -u2 "Usage: ${0:t} {all|${(j:|:)steps}|deferred|use} [args]"; exit 1 }
 
 run_step() {
     local name="$1"; shift
@@ -46,6 +46,10 @@ if [[ "$cmd" == all ]]; then
 fi
 
 case "$cmd" in
+    use)
+        [[ $# -le 1 ]] || usage
+        exec zsh "$ROOT/bin/dotfiles-use" "${1:-$ROOT}"
+        ;;
     deferred) run_step tools deferred "$@" ;;
     ${(~j:|:)steps}) run_step "$cmd" "$@" ;;
     *) usage ;;
