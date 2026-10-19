@@ -1,3 +1,4 @@
+Include ~/.ssh/config.local
 Include ~/.ssh/config-accounts
 
 Host github.com
@@ -9,19 +10,12 @@ Host github.com
 Host stronghold
     HostName stronghold-2.local
 
-Host stronghold stronghold-2.local
-    User hacker1db
-
 Host aiserver
-    HostName 192.168.1.157
-
-Host aiserver 192.168.1.157
-    User aiserver
     # Lend the Mac's 1Password agent so no key ever lives on the server
     ForwardAgent yes
     IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 
-Host stronghold stronghold-2.local aiserver 192.168.1.157
+Host stronghold stronghold-2.local aiserver
     LocalForward 3000 localhost:3000
     LocalForward 3001 localhost:3001
     LocalForward 5173 localhost:5173

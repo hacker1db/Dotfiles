@@ -95,7 +95,7 @@ Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not 
 
 ## Git identities and hooks
 
-`git/gitconfig.symlink` provides account-neutral defaults, `~/.gitconfig-local` overrides, `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls. `ssh/config` includes local and optional account configuration.
+`git/gitconfig.symlink` provides account-neutral defaults, `~/.gitconfig-local` overrides, `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls. `ssh/config` includes local and optional account configuration. It names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
 
 ```sh
 DOTFILES_GIT_PROFILE=hacker1db ./install.sh git
