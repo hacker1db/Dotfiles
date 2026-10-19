@@ -172,4 +172,4 @@ zsh install/claude-profiles.zsh --check
 git diff --check
 ```
 
-Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) zsh install/link.zsh`. These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` loops plus TruffleHog, which fails on any finding.
+Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh` (links target `~/.dotfiles/main` unless `DOTFILES` says otherwise). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` loops plus TruffleHog, which fails on any finding.

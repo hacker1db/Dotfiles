@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 set -uo pipefail
-DOTFILES="${0:A:h}"
-source "$DOTFILES/install/lib.zsh"
+ROOT="${0:A:h}"
+source "$ROOT/install/lib.zsh"
 
 typeset -a steps=(tools link node dotnet osx theme tmux-plugins claude-profiles)
 
@@ -10,7 +10,7 @@ usage() { print -u2 "Usage: ${0:t} {all|${(j:|:)steps}|deferred} [args]"; exit 1
 run_step() {
     local name="$1"; shift
     load_brew_env || true
-    zsh "$DOTFILES/install/${name}.zsh" "$@"
+    zsh "$ROOT/install/${name}.zsh" "$@"
 }
 
 [[ $# -ge 1 ]] || usage
