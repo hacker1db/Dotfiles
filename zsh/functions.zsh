@@ -388,30 +388,44 @@ function brew-cleanup(){
 }
 
 function update-node-tools(){
-if ! command -v pnpm >/dev/null 2>&1; then
-  echo "pnpm not found."
-  return 1
-fi
-
-export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
-mkdir -p "$PNPM_HOME"
-export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
-
-if ! pnpm list --global --depth -1 2>/dev/null | grep -Eq '^[├└]── '; then
-  echo "No global pnpm packages found."
-  if command -v npm >/dev/null 2>&1; then
-    local npm_global_count
-    npm_global_count="$(npm list -g --depth=0 2>/dev/null | grep -Ec '^[├└]── ' || true)"
-    if [[ "${npm_global_count:-0}" -gt 0 ]]; then
-      echo "Found ${npm_global_count} npm global package(s). Run: npm update -g"
+    if ! command -v pnpm >/dev/null 2>&1; then
+        echo "pnpm not found."
+        return 1
     fi
-  fi
-  return 0
-fi
 
-echo "Updating global pnpm packages..."
-pnpm update --global --latest
-echo "All global pnpm packages updated!"
+    local -x PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+    local -x PATH="$PATH:$PNPM_HOME/bin:$PNPM_HOME"
+    local packages
+    mkdir -p "$PNPM_HOME" || return 1
+    packages="$(pnpm list --global --depth -1)" || return 1
+
+    if ! print -r -- "$packages" | grep -Eq '^[├└]── '; then
+        echo "No global pnpm packages found."
+        if command -v npm >/dev/null 2>&1; then
+            local npm_global_count
+            npm_global_count="$(npm list -g --depth=0 2>/dev/null | grep -Ec '^[├└]── ' || true)"
+            if [[ "${npm_global_count:-0}" -gt 0 ]]; then
+                echo "Found ${npm_global_count} npm global package(s). Run: npm update -g"
+            fi
+        fi
+        return 0
+    fi
+
+    echo "Updating global pnpm packages..."
+    if ! pnpm update --global --latest; then
+        echo "Global pnpm update failed."
+        return 1
+    fi
+
+    if [[ "$packages" == *'@anthropic-ai/claude-code@'* ]]; then
+        local pnpm_bin
+        pnpm_bin="$(pnpm bin --global)" || return 1
+        if ! "$pnpm_bin/claude" --version; then
+            echo "Claude Code verification failed. Check its pnpm build approval and optional dependencies."
+            return 1
+        fi
+    fi
+    echo "All global pnpm packages updated!"
 }
 
 function get-azsubcount(){
