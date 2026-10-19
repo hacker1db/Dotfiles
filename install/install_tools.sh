@@ -236,6 +236,7 @@ if command -v gh >/dev/null 2>&1; then
   gh auth status >/dev/null 2>&1 || gh auth login || true
   gh extension install dlvhdr/gh-dash || true
   gh extension install advanced-security/gh-sbom || true
+  gh extension install github/gh-stack || true
 fi
 
 # MAS apps
