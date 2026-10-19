@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # NvimTmux App Installer - Opens files in Neovim inside tmux via Ghostty
 
-CLITOOLS="$HOME/Developer/clitools/main"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/env.sh"
+
+CLITOOLS="$(clitools_dir)"
 APP_SOURCE="$CLITOOLS/NvimTmux.app"
 APP_DEST="$HOME/Applications/NvimTmux.app"
 BUNDLE_ID="dev.hacker1db.nvimtmux"

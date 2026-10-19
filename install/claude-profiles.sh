@@ -127,7 +127,14 @@ install_plugins() {
 for profile in personal subscription foundry; do
     if [ "$profile" = foundry ]; then
         [ "$skip_foundry" -eq 0 ] || continue
-        [ -n "$resource" ] || { problem "Foundry skipped: ANTHROPIC_FOUNDRY_RESOURCE is unset (export it from ~/.localrc)."; continue; }
+        if [ -z "$resource" ]; then
+            if [ "${#drives[@]}" -eq 0 ]; then
+                echo "Foundry skipped: no ~/OneDrive* directory and ANTHROPIC_FOUNDRY_RESOURCE is unset."
+            else
+                problem "Foundry skipped: ANTHROPIC_FOUNDRY_RESOURCE is unset (export it from ~/.localrc)."
+            fi
+            continue
+        fi
     fi
     dir="$HOME/.claude-$profile"
     dest="$dir/settings.json"

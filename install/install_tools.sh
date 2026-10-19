@@ -10,6 +10,8 @@ if ! load_brew_env; then
   load_brew_env || { echo "Homebrew installed but brew is not on PATH" >&2; exit 1; }
 fi
 
+export HOMEBREW_NO_ASK=1
+
 # Backup installation for when brew bundle is unreliable
 
 TAPS=(
@@ -43,6 +45,7 @@ TAPS=(
 
 for tap in "${TAPS[@]}"; do
   brew tap "$tap" || true
+  brew trust --tap "$tap" || true
 done
 
 FORMULAS=(
@@ -70,7 +73,6 @@ FORMULAS=(
   kubectx
   lazydocker
   lazygit
-  lima
   lnav
   markdown
   mysql-client
@@ -101,6 +103,7 @@ FORMULAS=(
   zsh-autosuggestions
   zsh-syntax-highlighting
   pnpm
+  podman
 )
 
 if [[ "$(uname -s)" == Darwin ]]; then
@@ -111,7 +114,7 @@ if [[ "$(uname -s)" == Darwin ]]; then
 fi
 
 for f in "${FORMULAS[@]}"; do
-  brew install "$f" || true
+  brew install --formula "$f" || true
 done
 
 CASKS=(
@@ -167,35 +170,35 @@ CASKS=(
   podman-desktop
   postman
   powershell
-  rancher
   raycast
   reader
   signal
   spotify
   todoist-app
   unetbootin
-  visual-studio-code@insiders
   wireshark-app
-  zap
   zen
   zoom
 )
 
 if [[ "$(uname -s)" == Darwin ]]; then
-  for c in "${CASKS[@]}"; do
-    brew install --cask "$c" || true
-  done
-  # Fonts via tap already handled; ensure nerd fonts present
-  brew tap homebrew/cask-fonts || true
+  if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
+    deferred="$(deferred_installs_file)"
+    mkdir -p "$(dirname "$deferred")"
+    : > "$deferred"
+    for c in "${CASKS[@]}"; do
+      SUDO_ASKPASS=/usr/bin/false brew install --cask "$c" || echo "$c" >> "$deferred"
+    done
+    [[ -s "$deferred" ]] && echo "Deferred installs that need a password: $(tr '\n' ' ' < "$deferred")"
+  else
+    for c in "${CASKS[@]}"; do
+      brew install --cask "$c" || true
+    done
+  fi
 fi
 
 # Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
 [ -x "$HOME/.local/bin/claude" ] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
-
-if command -v limactl >/dev/null 2>&1; then
-  echo Starting lima default instance
-  limactl start || true
-fi
 
 # Terraform setup
 if command -v tfenv >/dev/null 2>&1; then
@@ -226,7 +229,7 @@ fi
 
 # Go tools
 if command -v go >/dev/null 2>&1; then
-  go install github.com/cosmtrek/air@latest || true
+  go install github.com/air-verse/air@latest || true
   go install github.com/charmbracelet/glow@latest || true
 fi
 
@@ -239,11 +242,15 @@ fi
 
 # MAS apps
 if [[ "$(uname -s)" == Darwin ]] && command -v mas >/dev/null 2>&1; then
-  mas install 640199958 || true
-  mas install 424389933 || true
-  mas install 302584613 || true
-  mas install 6445813049 || true
-  mas install 497799835 || true
+  for app in 640199958 424389933 302584613 6445813049 497799835; do
+    if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
+      deferred="$(deferred_installs_file)"
+      mkdir -p "$(dirname "$deferred")"
+      echo "mas:$app" >> "$deferred"
+    else
+      mas install "$app" || true
+    fi
+  done
 fi
 
 echo Backup install complete

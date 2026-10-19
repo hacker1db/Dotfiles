@@ -1,15 +1,106 @@
 #!/usr/bin/env bash
  
 DOTFILES=$HOME/.dotfiles/main
-source "$DOTFILES/install/lib/log.sh"
-source "$DOTFILES/install/lib/env.sh"
+LINK_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib"
+source "$LINK_LIB/log.sh"
+source "$LINK_LIB/env.sh"
+
+LINK_PHASE="${DOTFILES_LINK_PHASE:-all}"
+case "$LINK_PHASE" in
+    files|integrations|all) ;;
+    *) echo "Unknown DOTFILES_LINK_PHASE: $LINK_PHASE (expected files, integrations or all)" >&2; exit 1 ;;
+esac
+
+echo -e "\nCreating symlinks"
+echo "=============================="
+linkables=$(find -H "$DOTFILES" -maxdepth 3 -name '*.symlink')
+for file in $linkables; do
+    target="$HOME/.$(basename $file '.symlink')"
+    if [[ "$(basename "$file")" == gitconfig.symlink ]]; then
+        [[ "$LINK_PHASE" == files ]] && continue
+    else
+        [[ "$LINK_PHASE" == integrations ]] && continue
+    fi
+    [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
+    if [ -e "$target" ]; then
+        echo "~${target#$HOME} already exists... Skipping."
+    else
+        echo "Creating symlink for $file"
+        ln -s "$file" "$target"
+    fi
+done
+
+if [[ "$LINK_PHASE" != integrations ]]; then
+    echo -e "\n\ninstalling to ~/.config"
+    echo "=============================="
+    if [ ! -d "$HOME/.config" ]; then
+        echo "Creating ~/.config"
+        mkdir -p "$HOME/.config"
+    fi
+
+    for config in $DOTFILES/config/*; do
+        [ "$(basename "$config")" = opencode ] && continue  # opencode-config.sh links it per entry
+        target="$HOME/.config/$(basename "$config")"
+        [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
+        if [ -e "$target" ]; then
+            echo "~${target#$HOME} already exists... Skipping."
+        else
+            echo "Creating symlink for $config"
+            ln -s "$config" "$target"
+        fi
+    done
+
+    bash "$DOTFILES/install/opencode-config.sh" || exit 1
+
+    bash "$DOTFILES/install/agent-instructions.sh" || exit 1
+
+    echo -e "\n\nInstalling Claude Code MCP servers"
+    echo "=============================="
+    MCP_SRC="$DOTFILES/claude/mcp.json"
+    MCP_DEST="$HOME/.mcp.json"
+    if [ -e "$MCP_SRC" ]; then
+      if [ -L "$MCP_DEST" ]; then
+        CURRENT=$(readlink "$MCP_DEST")
+        if [ "$CURRENT" != "$MCP_SRC" ]; then
+          rm "$MCP_DEST"
+          ln -s "$MCP_SRC" "$MCP_DEST"
+          echo "Updated symlink $MCP_DEST -> $MCP_SRC"
+        else
+          echo "~/.mcp.json already symlinked correctly."
+        fi
+      elif [ ! -e "$MCP_DEST" ]; then
+        ln -s "$MCP_SRC" "$MCP_DEST"
+        echo "Created symlink $MCP_DEST -> $MCP_SRC"
+      else
+        echo "~/.mcp.json exists but is not a symlink; skipping."
+      fi
+    fi
+
+    echo -e "\n\nCreating zshrc symlinks"
+    echo "=============================="
+    ZSHRC=("$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")
+    for file in "${ZSHRC[@]}"; do
+        KEY=${file%%:*}
+        VALUE=${file#*:}
+        [ -L "$KEY" ] && [ ! -e "$KEY" ] && rm "$KEY"
+        if [ -e "$KEY" ]; then
+            echo "${KEY} already exists... skipping."
+        else
+            echo "Creating symlink for $KEY"
+            ln -s "$VALUE" "$KEY"
+        fi
+    done
+fi
+
+[[ "$LINK_PHASE" == files ]] && exit 0
 
 github_ssh_preflight >&2 || true
 
 # Ensure clitools repo is present before linking
-CLITOOLS_DIR="$HOME/Developer/clitools/main"
+GH_USER=$(github_owner || true)
+CLITOOLS_DIR="$(clitools_dir)"
+[ -d "$CLITOOLS_DIR" ] && echo "Using existing clitools checkout at $CLITOOLS_DIR"
 if [ -z "${CLITOOLS_REPO_URL:-}" ]; then
-    GH_USER=$(github_owner || true)
     if [ -n "$GH_USER" ]; then
         CLITOOLS_REPO_URL="$(github_repo_url "${GH_USER}/clitools")"
     else
@@ -17,7 +108,9 @@ if [ -z "${CLITOOLS_REPO_URL:-}" ]; then
         CLITOOLS_REPO_URL=""
     fi
 fi
-if [ -n "$CLITOOLS_REPO_URL" ] && [ ! -d "$CLITOOLS_DIR" ]; then
+if [ -n "$CLITOOLS_REPO_URL" ] && [ ! -d "$CLITOOLS_DIR" ] && ! github_repo_accessible "$CLITOOLS_REPO_URL"; then
+    echo "clitools is private or missing at $CLITOOLS_REPO_URL; skipping it (set CLITOOLS_REPO_URL to use your own)"
+elif [ -n "$CLITOOLS_REPO_URL" ] && [ ! -d "$CLITOOLS_DIR" ]; then
     echo "Cloning clitools repo to $CLITOOLS_DIR"
     mkdir -p "$(dirname "$CLITOOLS_DIR")"
     github_clone "$CLITOOLS_REPO_URL" "$CLITOOLS_DIR" || echo "Failed to clone clitools; continuing without it"
@@ -40,69 +133,15 @@ else
   echo "Warning: plan-manager bootstrap helper is missing."
 fi
 
-
-echo -e "\nCreating symlinks"
-echo "=============================="
-linkables=$(find -H "$DOTFILES" -maxdepth 3 -name '*.symlink')
-for file in $linkables; do
-    target="$HOME/.$(basename $file '.symlink')"
-    [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
-    if [ -e "$target" ]; then
-        echo "~${target#$HOME} already exists... Skipping."
-    else
-        echo "Creating symlink for $file"
-        ln -s "$file" "$target"
-    fi
-done
-
-echo -e "\n\ninstalling to ~/.config"
-echo "=============================="
-if [ ! -d "$HOME/.config" ]; then
-    echo "Creating ~/.config"
-    mkdir -p "$HOME/.config"
-fi
-
-for config in $DOTFILES/config/*; do
-    [ "$(basename "$config")" = opencode ] && continue  # opencode-config.sh links it per entry
-    target="$HOME/.config/$(basename "$config")"
-    [ -L "$target" ] && [ ! -e "$target" ] && rm "$target"
-    if [ -e "$target" ]; then
-        echo "~${target#$HOME} already exists... Skipping."
-    else
-        echo "Creating symlink for $config"
-        ln -s "$config" "$target"
-    fi
-done
-
-bash "$DOTFILES/install/opencode-config.sh" || exit 1
-
-bash "$DOTFILES/install/agent-instructions.sh" || exit 1
-
 echo -e "\n\nInstalling Claude Code profiles"
 echo "=============================="
-bash "$DOTFILES/install/claude-profiles.sh" || { echo "Claude profile setup failed or is incomplete; see the messages above."; exit 1; }
-
-echo -e "\n\nInstalling Claude Code MCP servers"
-echo "=============================="
-MCP_SRC="$DOTFILES/claude/mcp.json"
-MCP_DEST="$HOME/.mcp.json"
-if [ -e "$MCP_SRC" ]; then
-  if [ -L "$MCP_DEST" ]; then
-    CURRENT=$(readlink "$MCP_DEST")
-    if [ "$CURRENT" != "$MCP_SRC" ]; then
-      rm "$MCP_DEST"
-      ln -s "$MCP_SRC" "$MCP_DEST"
-      echo "Updated symlink $MCP_DEST -> $MCP_SRC"
-    else
-      echo "~/.mcp.json already symlinked correctly."
-    fi
-  elif [ ! -e "$MCP_DEST" ]; then
-    ln -s "$MCP_SRC" "$MCP_DEST"
-    echo "Created symlink $MCP_DEST -> $MCP_SRC"
-  else
-    echo "~/.mcp.json exists but is not a symlink; skipping."
-  fi
-fi
+CLAUDE_PROFILES_STATUS=0
+bash "$DOTFILES/install/claude-profiles.sh" || CLAUDE_PROFILES_STATUS=$?
+case "$CLAUDE_PROFILES_STATUS" in
+    0) ;;
+    2) warning "Claude profile setup is incomplete; see the messages above." ;;
+    *) echo "Claude profile setup failed; see the messages above."; LINK_FAILURE=1 ;;
+esac
 
 echo -e "\n\nInstalling SSH config"
 echo "=============================="
@@ -129,38 +168,10 @@ if [ -e "$SSH_SRC" ]; then
   fi
 fi
 
-echo -e "\n\nCreating vim symlinks"
-echo "=============================="
-VIMFILES=("$HOME/.vim:$DOTFILES/vim/.vim" "$HOME/.vimrc:$DOTFILES/vim/.vimrc")
-for file in "${VIMFILES[@]}"; do
-    KEY=${file%%:*}
-    VALUE=${file#*:}
-    if [ -e "$KEY" ]; then
-        echo "${KEY} already exists... skipping."
-    else
-        echo "Creating symlink for $KEY"
-        ln -s "$VALUE" "$KEY"
-    fi
-done
-
-echo -e "\n\nCreating zshrc symlinks"
-echo "=============================="
-ZSHRC=("$HOME/.zshrc:$DOTFILES/zsh/zshrc.symlink")
-for file in "${ZSHRC[@]}"; do
-    KEY=${file%%:*}
-    VALUE=${file#*:}
-    if [ -e "$KEY" ]; then
-        echo "${KEY} already exists... skipping."
-    else
-        echo "Creating symlink for $KEY"
-        ln -s "$VALUE" "$KEY"
-    fi
-done
-
 echo -e "\n\nEnsuring ~/.gitconfig-local link"
 echo "=============================="
 LOCAL_FILE="$HOME/.gitconfig-local"
-CLITOOLS_DIR_DEFAULT="$HOME/Developer/clitools/main"
+CLITOOLS_DIR_DEFAULT="$CLITOOLS_DIR"
 SOURCE_CANDIDATE=""
 if [ -d "$CLITOOLS_DIR_DEFAULT" ]; then
   for f in gitconfig-local .gitconfig-local gitconfig.local; do
@@ -214,7 +225,7 @@ if [ "$PLAN_MANAGER_READY" -eq 1 ]; then
   fi
 fi
 
-if [ "$PLAN_MANAGER_FAILURE" -ne 0 ]; then
+if [ "$PLAN_MANAGER_FAILURE" -ne 0 ] || [ "${LINK_FAILURE:-0}" -ne 0 ]; then
   echo "Dotfiles installation needs attention; see the diagnostics above."
   exit 1
 fi

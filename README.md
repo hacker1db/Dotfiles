@@ -22,7 +22,7 @@ The first clone uses HTTPS because 1Password and its SSH agent are not installed
 
 `all` installs the tools first, right after `backup`. `install/verify.sh` then checks for git, gh, Node.js 20+, pnpm, and Pandoc, runs `gh auth login` if GitHub is not logged in, and tests SSH to GitHub. If SSH fails, it opens 1Password and waits while you sign in and turn on the SSH agent. If any check fails, `all` stops before linking; later steps prompt for their own logins. Run `bash install/verify.sh` to recheck, and set `DOTFILES_NONINTERACTIVE=1` to report problems instead of prompting. The scripts also change macOS preferences and configure applications, so review them before a full run.
 
-Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off, and `zsh/brew.zsh` exports it for interactive shells so `brew install` and `brew upgrade` do not stop at `[y/n]` prompts. On a fresh machine the Zsh config is not linked yet, so run the first install as `HOMEBREW_NO_ASK=1 ./install.sh all` to let every step inherit it. Remove the export from `zsh/brew.zsh` to get the prompts back.
+Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/install_tools.sh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. `install_tools.sh` also trusts each tap it adds, because Homebrew 7 ignores formulae from untrusted taps. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
 | Command | Purpose |
 | --- | --- |
@@ -38,8 +38,9 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | `./install.sh nvimtmux` | Create NvimTmux.app and register file associations with `duti` |
 | `./install.sh dotnet` / `./install.sh dotnet-tools` | Install .NET and global tools |
 | `./install.sh theme list` | List theme candidates |
+| `./install.sh deferred` | Run the cask and App Store installs that were skipped because they need a password |
 
-`all` runs backup, homebrew, link, terminfo, node-tools, shell, git, macos, extras, nvimtmux, dotnet, dotnet-tools, and theme, in that order. Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs backup, link (files), homebrew, link (integrations), terminfo, node-tools, git, macos, extras, nvimtmux, dotnet, dotnet-tools, theme, deferred, and shell, in that order. The first link pass makes the plain symlinks (`~/.config/*`, Zsh, Vim, ack, `~/.gitignore_global`, agent instructions, `~/.mcp.json`) before the long package install. The second pass, after Homebrew and `verify.sh`, links `~/.gitconfig` and `~/.ssh/config` (their GitHub-over-SSH settings need the 1Password agent), clones clitools, and generates the Claude profiles and plan-manager, which need the installed tools. `./install.sh link` on its own runs both passes; set `DOTFILES_LINK_PHASE=files` or `integrations` to run one. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; that catalog and the explicit lists in `install/install_tools.sh` are separate sources.
 
@@ -47,7 +48,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 
 - Zsh loads `zsh/**/*.zsh`, autoloads `zsh/functions/`, and reads `~/.localrc` for local overrides.
 - Starship supplies the prompt; zoxide provides `cd`; eza provides `l` and `ll`.
-- fzf-tab uses zfetch; completion includes kubectl, limactl, 1Password, sesh, and skillctl. fnm selects Node versions when entering directories with Node project markers.
+- fzf-tab uses zfetch; completion includes kubectl, 1Password, sesh, and skillctl. fnm selects Node versions when entering directories with Node project markers.
 - `daily` opens a dated SecondBrain note, `yy` changes directory through Yazi, `ts` and Alt+s select sesh sessions, and `gh-rate-limit` inspects GitHub limits.
 - Ghostty uses `config/ghostty/config`: JetBrains Mono italic at 14pt, 78% opacity, blur, linkarzu colors, and clipboard copy-on-select. The old WezTerm configuration has been removed.
 - tmux lives in `config/tmux/tmux.conf`, uses Ctrl+a as its prefix, and includes vi copy mode, mouse support, undercurl colors, session persistence through resurrect/continuum, and Neovim pane navigation. Prefix+o opens sesh; prefix+g opens lazygit; prefix+G opens gh-dash; prefix+O opens OpenCode; prefix+u uses the fzf URL picker.
@@ -90,7 +91,7 @@ nvim +checkhealth
 nvim --headless "+Lazy! sync" +qa
 ```
 
-Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not a read-only check. Obsidian and snippet configuration assumes a personal SecondBrain vault; adjust those paths for another machine. Legacy UltiSnips files remain under `vim/`.
+Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not a read-only check. Obsidian and snippet configuration assumes a personal SecondBrain vault; adjust those paths for another machine.
 
 ## Git identities and hooks
 
@@ -143,7 +144,7 @@ install-caido-skills /path/to/project
 
 ## Symlinks and themes
 
-`*.symlink` sources map into `$HOME` with a leading dot; `config/*` maps into `~/.config/`. The general loops skip existing targets. Managed instruction links and selected integrations have their own replacement/backup behavior. In particular, a discovered clitools Git config replaces `~/.gitconfig-local`; preserve local edits before relinking. `link` may clone/update clitools and plan-manager, build dependencies, and start the dashboard service.
+`*.symlink` sources map into `$HOME` with a leading dot; `config/*` maps into `~/.config/`. The general loops skip existing targets. Managed instruction links and selected integrations have their own replacement/backup behavior. In particular, a discovered clitools Git config replaces `~/.gitconfig-local`; preserve local edits before relinking. `link` may clone/update clitools and plan-manager, build dependencies, and start the dashboard service. Before cloning, it looks for an existing checkout of either repository under `~/Developer/<name>` or `~/Developer/*/<name>` whose `origin` matches, and uses it instead. clitools is a private repository: when it cannot be reached, the clone is skipped and `~/.gitconfig-local` is left as an empty file. plan-manager is public; a fork without its own plan-manager clones `hacker1db/plan-manager`.
 
 ```sh
 ./install.sh theme list

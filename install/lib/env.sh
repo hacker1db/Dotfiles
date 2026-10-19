@@ -14,6 +14,44 @@ load_brew_env() {
   return 1
 }
 
+deferred_installs_file() {
+  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/deferred-installs"
+}
+
+find_github_checkout() {
+  local slug dir url
+  slug="$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')"
+  for dir in "$HOME/Developer/${slug#*/}" "$HOME"/Developer/*/"${slug#*/}"; do
+    [ -d "$dir" ] || continue
+    url="$(git -C "$dir" config --get remote.origin.url 2>/dev/null | tr '[:upper:]' '[:lower:]')" || continue
+    case "$url" in
+      *"github.com:$slug"|*"github.com:$slug.git"|*"github.com/$slug"|*"github.com/$slug.git")
+        printf '%s\n' "$dir"
+        return 0
+        ;;
+    esac
+  done
+  return 1
+}
+
+clitools_dir() {
+  local owner found
+  if [ -n "${CLITOOLS_DIR:-}" ]; then
+    printf '%s\n' "$CLITOOLS_DIR"
+    return
+  fi
+  owner="$(github_owner 2>/dev/null || true)"
+  if [ -n "$owner" ] && found="$(find_github_checkout "$owner/clitools")"; then
+    if [ -d "$found/.bare" ]; then
+      printf '%s\n' "$found/main"
+    else
+      printf '%s\n' "$found"
+    fi
+    return
+  fi
+  printf '%s\n' "$HOME/Developer/clitools/main"
+}
+
 github_ssh_preflight() {
   if [ -n "${GITHUB_SSH_OK:-}" ]; then
     [ "$GITHUB_SSH_OK" = "1" ]
@@ -88,6 +126,10 @@ github_git() {
       -c url.https://github.com/.insteadOf=git@github.com: \
       "$@"
   fi
+}
+
+github_repo_accessible() {
+  github_git ls-remote --exit-code "$1" HEAD >/dev/null 2>&1
 }
 
 github_clone() {

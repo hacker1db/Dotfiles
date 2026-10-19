@@ -2,7 +2,7 @@
 background-opacity = 0.78
 background-blur = true
 # Color Scheme - linkarzu custom palette
-theme = linkarzu
+theme = Eldritch
 link-url = true
 window-decoration = true
 window-padding-balance = true

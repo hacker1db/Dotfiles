@@ -6,7 +6,7 @@ source "$DOTFILES/install/lib/log.sh"
 source "$DOTFILES/install/lib/env.sh"
 
 usage() {
-  echo "Usage: $(basename "$0") {backup|link|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|all}" >&2
+  echo "Usage: $(basename "$0") {backup|link|git|homebrew|shell|terminfo|macos|extras|node-tools|nvimtmux|dotnet|dotnet-tools|theme|deferred|all}" >&2
   exit 1
 }
 
@@ -32,6 +32,7 @@ script_for() {
     dotnet) echo "$DOTFILES/install/dotnet.sh" ;;
     dotnet-tools) echo "$DOTFILES/install/dotnet-tools.sh" ;;
     theme) echo "$DOTFILES/install/theme.sh" ;;
+    deferred) echo "$DOTFILES/install/deferred.sh" ;;
     *) return 1 ;;
   esac
 }
@@ -45,7 +46,7 @@ run_script() {
   fi
   load_brew_env || true
   case "$1" in
-    link) github_ssh_preflight || true ;;
+    link) [ "${DOTFILES_LINK_PHASE:-all}" = files ] || github_ssh_preflight || true ;;
   esac
   bash "$sc" "$@"
   local status=$?
@@ -59,9 +60,15 @@ run_script() {
 if [ "$cmd" = "all" ]; then
   title "Running full install"
   failed=()
-  for part in backup homebrew link terminfo node-tools shell git macos extras nvimtmux dotnet dotnet-tools theme; do
+  export DOTFILES_DEFER_PROMPTS=1
+  for part in backup link-files homebrew link-integrations terminfo node-tools git macos extras nvimtmux dotnet dotnet-tools theme deferred shell; do
     info "Executing $part"
-    if ! run_script "$part"; then
+    case "$part" in
+      link-files) step=link; export DOTFILES_LINK_PHASE=files ;;
+      link-integrations) step=link; export DOTFILES_LINK_PHASE=integrations ;;
+      *) step="$part"; unset DOTFILES_LINK_PHASE ;;
+    esac
+    if ! run_script "$step"; then
       if [ "$part" = homebrew ]; then
         error "homebrew failed; the remaining steps need its tools, stopping"
         exit 1
