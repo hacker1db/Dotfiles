@@ -11,7 +11,6 @@ function read(path) {
   return readFileSync(join(root, path), 'utf8')
 }
 
-const hostedUrl = 'https://planmanager.hacker1db.dev'
 for (const path of [
   'codex/AGENTS.md',
   'config/opencode/AGENTS.md',
@@ -68,7 +67,11 @@ for (const harness of harnesses) {
   assert.match(contract, /plan capture <artifact> --json/, `${harness.name} lacks artifact capture`)
   assert.match(contract, /Before the final response/i, `${harness.name} lacks finalization guard`)
   assert.match(contract, /durable plan/i, `${harness.name} lacks durable-plan boundary`)
-  assert.ok(contract.includes(hostedUrl), `${harness.name} lacks the hosted Plan Manager URL`)
+  const documentedUrls = contract.match(/https:\/\/[^\s`),;]+/g) ?? []
+  assert.ok(
+    documentedUrls.some((url) => url === 'https://planmanager.hacker1db.dev'),
+    `${harness.name} lacks the exact hosted Plan Manager URL`,
+  )
   assert.match(contract, /plan push <id> --json/, `${harness.name} does not publish plan mutations by default`)
   assert.match(contract, /local-only/i, `${harness.name} lacks the explicit local-only override`)
   assert.match(contract, /native|built-in|Plan agent/i, `${harness.name} does not preserve native planning`)
