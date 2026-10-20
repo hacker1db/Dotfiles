@@ -299,7 +299,6 @@ printf 'preserve\n' > "$HOME/.config/opencode/custom-state"
 install_plan_instruction_links >/dev/null
 [ -f "$HOME/.config/opencode/custom-state" ] || fail "unmanaged OpenCode state was removed"
 [ -L "$HOME/.config/opencode/AGENTS.md" ] || fail "OpenCode global instructions were not linked"
-[ -L "$HOME/.config/opencode/command/plans.md" ] || fail "OpenCode plans command was not linked"
 [ -L "$HOME/.copilot/copilot-instructions.md" ] || fail "Copilot global instructions were not linked"
 [ -L "$HOME/.codex/AGENTS.md" ] || fail "Codex global instructions were not linked"
 

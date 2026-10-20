@@ -5,6 +5,18 @@ Closes #<issue-number>
 
 # What is changing?
 
+## Validation
+
+<!-- Identify who tested the change (human or agent), the commands and scenarios they ran, the actual results, and anything not tested. -->
+
+## Evidence
+
+<!-- Add screenshots for UI changes. For other changes, include the relevant test output, logs, or API responses that support the validation claims. -->
+
+## Rollback
+
+<!-- Give the exact rollback steps, including deployment, configuration, database, or data-recovery considerations. State whether reverting the commit is sufficient. -->
+
 Describe what has changed as a part of this pull request.
 
 # What does the change fix?

@@ -433,10 +433,6 @@ install_plan_instruction_links() {
         "$DOTFILES/global/AGENTS.md" \
         "$HOME/.config/opencode/AGENTS.md" \
         "OpenCode global instructions" || return 1
-    link_managed_file \
-        "$DOTFILES/config/opencode/command/plans.md" \
-        "$HOME/.config/opencode/command/plans.md" \
-        "OpenCode plans command" || return 1
     if [ -s "$HOME/.codex/AGENTS.override.md" ]; then
         warning "$HOME/.codex/AGENTS.override.md is non-empty and shadows the managed plan policy."
         PLAN_CODEX_OVERRIDE_CONFLICT=1

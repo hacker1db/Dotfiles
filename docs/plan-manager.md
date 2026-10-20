@@ -9,7 +9,7 @@ The plan-manager application — CLI, local server, dashboard, hosted Next.js ap
 - Default location: `~/Developer/plan-manager`
 - Override: set `PLAN_MANAGER_REPO_DIR` before running `install/link.sh`
 
-Dotfiles owns the bootstrap configuration, CLI symlink, LaunchAgent template, global instructions, and command adapters. The shared `plans` skill, including its contract and evals, lives in the skills repository. Application code is never copied into dotfiles.
+Dotfiles owns the bootstrap configuration, CLI symlink, LaunchAgent template, and global routing policy. The shared `plans` skill, including its contract and evals, lives in the skills repository and `skillctl` symlinks that one source into supported harnesses. Application code is never copied into dotfiles.
 
 ### Repository layouts
 
@@ -67,7 +67,7 @@ The installer:
 1. Resolves or clones the plan-manager repository.
 2. Builds the selected checkout's Go package from `cli/` using a private staged `GOBIN` and `go install -mod=readonly ./cmd/plan` (`GOWORK=off`, ignoring ambient `GOFLAGS`). Go enforces the toolchain requirement in `cli/go.mod`; missing Go sources stop installation.
 3. Validates Go module/package build identity, version, and Zsh completions, then atomically promotes the binary to `~/.local/lib/plan-manager/plan` and links `~/.local/bin/plan` to it. Failed builds or validation leave the previous command usable.
-4. Links global instructions and command adapters. Install the `plans` skill separately through skillctl.
+4. Links global instructions. `skillctl sync --global` links the one canonical `plans` skill into each supported harness's skill directory.
 5. Merges `~/notes/SecondBrain/4.Resources/plans` into the Codex writable-root config.
 6. Initializes `~/notes/SecondBrain/4.Resources/plans` and its `archive/` subdirectory only if the vault folder already exists; it never creates the folder.
 7. Installs the LaunchAgent and loads it with `launchctl`.
@@ -180,7 +180,7 @@ If a push fails, the canonical vault plan remains intact. Report its absolute pa
 
 After `install/link.sh` completes:
 
-- **Claude Code, OpenCode, Copilot**: start a new session to pick up updated instructions and command adapters; ensure the shared skill is installed separately.
+- **Claude Code, OpenCode, Copilot**: run `skillctl sync --global`, then start a new session to pick up the updated shared skill and instructions.
 - **Codex desktop**: global guidance loads once at the beginning of a run; start a new desktop task after linking.
 - **Codex CLI**: start a new CLI session after linking.
 
