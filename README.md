@@ -44,8 +44,8 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 
 | Command | Purpose |
 | --- | --- |
-| `./install.sh tools` | Install Homebrew, the brewfile packages, developer tools, and Git identity/profiles; finish with the deferred installs and `chsh` |
-| `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, and install the Go `plan` CLI |
+| `./install.sh tools` | Install Homebrew, the brewfile packages, and developer tools; finish with the deferred installs and `chsh` |
+| `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, configure Git identity/profiles, and install the Go `plan` CLI |
 | `./install.sh node` | Install pnpm global tools; run Readwise and Codex Security login setup |
 | `./install.sh dotnet` | Install .NET SDKs, runtimes, and global tools |
 | `./install.sh osx` | Apply macOS preferences, create standard folders, and install NvimTmux.app with `duti` associations |
@@ -56,7 +56,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 
 `all` runs tools, link, node, dotnet, osx, theme, tmux-plugins, and claude-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` and `~/.ssh/config` (their GitHub-over-SSH settings need the 1Password agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
-`DOTFILES_NONINTERACTIVE=1 ./install.sh tools` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; the brewfile is the single catalog `tools.zsh` reads.
+`DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; the brewfile is the single catalog `tools.zsh` reads.
 
 ## Shell and terminal workflow
 

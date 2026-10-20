@@ -1,6 +1,4 @@
 #!/usr/bin/env zsh
-# Homebrew, brewfile packages, developer tools, and Git identity.
-# `tools.zsh deferred` runs the password-prompting installs recorded earlier, then chsh.
 set -uo pipefail
 source "${0:A:h}/lib.zsh"
 
@@ -112,7 +110,6 @@ if [[ "$OSTYPE" == darwin* ]]; then
         print "Deferred installs that need a password: $(tr '\n' ' ' < "$(deferred_installs_file)")"
 fi
 
-# Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
 [[ -x "$HOME/.local/bin/claude" ]] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
 
 if command -v tfenv >/dev/null 2>&1; then
@@ -134,39 +131,6 @@ if command -v gh >/dev/null 2>&1; then
     typeset ext
     for ext in dlvhdr/gh-dash advanced-security/gh-sbom github/gh-stack; do
         gh extension install "$ext" || true
-    done
-fi
-
-title "Configuring Git identity"
-LOCAL_FILE="$HOME/.gitconfig-local"
-PROFILE_DIR="$DOTFILES/git/profiles"
-[[ -e "$LOCAL_FILE" ]] || touch "$LOCAL_FILE"
-
-profile="${DOTFILES_GIT_PROFILE:-}"
-interactive=0
-[[ "${DOTFILES_NONINTERACTIVE:-0}" != 1 && -t 0 ]] && interactive=1
-if [[ -z "$profile" && "$interactive" == 1 ]]; then
-    typeset -a profiles=("$PROFILE_DIR"/*/gitconfig(N:h:t))
-    if [[ "${#profiles}" -gt 0 ]]; then
-        print "Available Git account profiles: $profiles"
-        read -r "profile?Profile to enable (blank for none): "
-    fi
-fi
-if [[ -n "$profile" ]]; then
-    [[ -f "$PROFILE_DIR/$profile/gitconfig" ]] || { error "Unknown Git profile: $profile"; exit 1 }
-    link_file "$PROFILE_DIR/$profile/gitconfig" "$HOME/.gitconfig-accounts"
-    if [[ -f "$PROFILE_DIR/$profile/ssh_config" ]]; then
-        mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
-        link_file "$PROFILE_DIR/$profile/ssh_config" "$HOME/.ssh/config-accounts"
-    fi
-    git config -f "$LOCAL_FILE" --unset-all user.signingkey 2>/dev/null || true
-fi
-if [[ "$interactive" == 1 ]]; then
-    typeset key value
-    for key in user.name user.email; do
-        [[ -n "$(git config --get "$key")" ]] && continue
-        read -r "value?Git $key: "
-        [[ -n "$value" ]] && git config -f "$LOCAL_FILE" "$key" "$value"
     done
 fi
 

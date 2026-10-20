@@ -1,6 +1,4 @@
 #!/usr/bin/env zsh
-# .NET SDKs and ASP.NET Core runtimes in ~/.dotnet, plus global tools.
-# PATH setup lives in zsh/zshrc.symlink; this script does not edit shell config.
 set -uo pipefail
 source "${0:A:h}/lib.zsh"
 

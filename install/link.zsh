@@ -1,5 +1,4 @@
 #!/usr/bin/env zsh
-# Link dotfiles into $HOME, clone companion repositories, and install the plan CLI.
 set -uo pipefail
 source "${0:A:h}/lib.zsh"
 
@@ -29,9 +28,6 @@ for config in "$DOTFILES"/config/*(N); do
     link_new "$config" "$HOME/.config/${config:t}"
 done
 
-# ~/.config/opencode stays a real directory: skillctl installs subagents into its
-# agent/ directory and refuses symlinked parents; the unmanaged entries are
-# runtime state OpenCode writes into its config directory.
 title "Linking OpenCode configuration"
 typeset -a opencode_unmanaged=(agent node_modules package.json package-lock.json bun.lock service.json)
 opencode_dest="$HOME/.config/opencode"
@@ -116,7 +112,36 @@ else
     print "$LOCAL_FILE exists (no clitools source found); leaving as-is."
 fi
 
-# Codex saves plans only when the library is in its sandbox writable_roots.
+title "Configuring Git identity"
+PROFILE_DIR="$DOTFILES/git/profiles"
+profile="${DOTFILES_GIT_PROFILE:-}"
+interactive=0
+[[ "${DOTFILES_NONINTERACTIVE:-0}" != 1 && -t 0 ]] && interactive=1
+if [[ -z "$profile" && "$interactive" == 1 ]]; then
+    typeset -a profiles=("$PROFILE_DIR"/*/gitconfig(N:h:t))
+    if [[ "${#profiles}" -gt 0 ]]; then
+        print "Available Git account profiles: $profiles"
+        read -r "profile?Profile to enable (blank for none): "
+    fi
+fi
+if [[ -n "$profile" ]]; then
+    [[ -f "$PROFILE_DIR/$profile/gitconfig" ]] || { error "Unknown Git profile: $profile"; exit 1 }
+    link_file "$PROFILE_DIR/$profile/gitconfig" "$HOME/.gitconfig-accounts"
+    if [[ -f "$PROFILE_DIR/$profile/ssh_config" ]]; then
+        mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
+        link_file "$PROFILE_DIR/$profile/ssh_config" "$HOME/.ssh/config-accounts"
+    fi
+    git config -f "$LOCAL_FILE" --unset-all user.signingkey 2>/dev/null || true
+fi
+if [[ "$interactive" == 1 ]]; then
+    typeset key value
+    for key in user.name user.email; do
+        [[ -n "$(git config --get "$key")" ]] && continue
+        read -r "value?Git $key: "
+        [[ -n "$value" ]] && git config -f "$LOCAL_FILE" "$key" "$value"
+    done
+fi
+
 title "Checking Codex plan-library access"
 PLAN_ROOT="${PLAN_HOME:-$HOME/notes/SecondBrain/4.Resources/plans}"
 CODEX_CONFIG="$HOME/.codex/config.toml"
@@ -124,14 +149,21 @@ if [[ ! -f "$CODEX_CONFIG" ]]; then
     mkdir -p "${CODEX_CONFIG:h}"
     printf '[sandbox_workspace_write]\nwritable_roots = ["%s"]\n' "$PLAN_ROOT" > "$CODEX_CONFIG"
     print "Created $CODEX_CONFIG with the plan library writable"
-elif grep -qF "$PLAN_ROOT" "$CODEX_CONFIG"; then
-    print "Codex already allows writes to $PLAN_ROOT"
-elif grep -q '^\[sandbox_workspace_write\]' "$CODEX_CONFIG"; then
-    warning "Add \"$PLAN_ROOT\" to writable_roots under [sandbox_workspace_write] in $CODEX_CONFIG"
-    LINK_FAILURE=1
 else
-    printf '\n[sandbox_workspace_write]\nwritable_roots = ["%s"]\n' "$PLAN_ROOT" >> "$CODEX_CONFIG"
-    print "Added the plan library to writable_roots in $CODEX_CONFIG"
+    node "$DOTFILES/install/check-codex-writable-root.mjs" "$CODEX_CONFIG" "$PLAN_ROOT"
+    writable_root_status=$?
+    if [[ "$writable_root_status" -eq 0 ]]; then
+        print "Codex already allows writes to $PLAN_ROOT"
+    elif [[ "$writable_root_status" -eq 2 ]]; then
+        warning "Could not validate writable_roots in $CODEX_CONFIG"
+        LINK_FAILURE=1
+    elif grep -q '^[[:space:]]*\[sandbox_workspace_write\][[:space:]]*\(#.*\)\?$' "$CODEX_CONFIG"; then
+        warning "Add \"$PLAN_ROOT\" to writable_roots under [sandbox_workspace_write] in $CODEX_CONFIG"
+        LINK_FAILURE=1
+    else
+        printf '\n[sandbox_workspace_write]\nwritable_roots = ["%s"]\n' "$PLAN_ROOT" >> "$CODEX_CONFIG"
+        print "Added the plan library to writable_roots in $CODEX_CONFIG"
+    fi
 fi
 
 title "Installing the Go plan CLI"
