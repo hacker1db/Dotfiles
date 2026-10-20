@@ -1,7 +1,4 @@
 #!/usr/bin/env zsh
-# Record and apply the shared theme across tmux, Ghostty, Starship, and Neovim.
-# Neovim needs no per-apply edit: config/nvim/lua/core/colorscheme.lua reads the
-# theme file at startup.
 set -euo pipefail
 source "${0:A:h}/lib.zsh"
 

@@ -1,9 +1,4 @@
 #!/usr/bin/env zsh
-# Generate and link the Claude Code profiles (~/.claude-{personal,subscription,foundry}):
-# settings.json links to a jq deep merge of claude/settings.base.json and the profile layer
-# (Foundry adds local autoMode.environment and $ANTHROPIC_FOUNDRY_RESOURCE from ~/.localrc).
-# Usage: claude-profiles.zsh [--check] [--skip-foundry]
-# Exit: 0 ready, 1 hard error, 2 incomplete (missing resource, conflicts, stale state).
 set -euo pipefail
 
 root="${DOTFILES:-$HOME/.dotfiles/main}"
@@ -37,7 +32,6 @@ die() { print -u2 "$*"; exit 1 }
 problem() { print "$*"; incomplete=1 }
 mode_of() { command stat -c %a "$1" 2>/dev/null || command stat -f %Lp "$1" }
 
-# ~/.localrc must link to the OneDrive copy so ANTHROPIC_FOUNDRY_RESOURCE follows the user.
 typeset -a drives=("$HOME"/OneDrive*(N))
 [[ "${#drives}" -le 1 ]] || die "Expected at most one ~/OneDrive* directory, found ${#drives}."
 localrc_target="${drives[1]:-}/Personal/.localrc"
@@ -106,7 +100,6 @@ link_item() {
     fi
 }
 
-# skillctl installs subagents from the skills repository; remove the agents link this script used to own.
 unlink_legacy_agents() {
     local dest="$1/agents"
     [[ -L "$dest" && "$(readlink "$dest")" == "$claude_dir/agents" ]] || return 0

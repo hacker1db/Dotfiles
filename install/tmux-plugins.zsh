@@ -1,5 +1,4 @@
 #!/usr/bin/env zsh
-# Bootstrap TPM so tmux can install its configured plugins.
 set -euo pipefail
 
 plugins_dir="$HOME/.local/share/tmux/plugins"

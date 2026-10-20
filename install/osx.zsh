@@ -1,5 +1,4 @@
 #!/usr/bin/env zsh
-# macOS preferences, standard folders, NvimTmux.app, and duti file associations.
 set -uo pipefail
 source "${0:A:h}/lib.zsh"
 
