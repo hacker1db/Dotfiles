@@ -1,6 +1,7 @@
-# Github Issue Number
+## Linked GitHub issue (required)
 
-#<IssueNumber>
+<!-- Use Closes/Fixes/Resolves when this PR completes the issue. Use Refs and describe remaining work when it is partial. -->
+Closes #<issue-number>
 
 # What is changing?
 

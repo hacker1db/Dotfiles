@@ -13,7 +13,13 @@ If unauthenticated: `gh auth login`
 
 ## Pull Request Workflow
 
+Every pull request must reference a GitHub issue. Search for a matching issue first and reuse it; create one before the pull request only when no suitable issue exists. Use `Closes #<number>`, `Fixes #<number>`, or `Resolves #<number>` when the pull request completes the issue. Use `Refs #<number>` and describe the remaining work when it is partial. Verify the final body with `gh pr view --json body`.
+
 ```bash
+# Find or create the required issue before opening the PR
+gh issue list --state all --search "relevant terms"
+gh issue create --title "Feature: describe the work" --body "Problem, outcome, and acceptance criteria"
+
 # Create PR (infers title/body from commits)
 gh pr create --fill
 gh pr create --title "feat: add timeout" --body "Closes #42" --draft

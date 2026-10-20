@@ -51,6 +51,15 @@ Do not change the model setting for plan operations.
 
 Native `/plan` features remain available. Before returning a durable plan or visualization created through native planning, persist or capture it through the central CLI.
 
+## Pull requests and issues
+
+For every pull request:
+
+1. Search the target repository for an existing GitHub issue that matches the work.
+2. Reuse that issue, or create one before opening the pull request when no suitable issue exists.
+3. Reference the issue in the pull request body. Use `Closes #<number>`, `Fixes #<number>`, or `Resolves #<number>` when the pull request fully completes the issue; use `Refs #<number>` and state the remaining work when it is only partial.
+4. Verify the final pull request body contains the issue reference. Never create an unlinked pull request.
+
 ## Bug fixes and response status
 
 When fixing a bug, find and fix the root cause, then verify with relevant checks. End the response with one short line stating what changed and a status light:

@@ -7,7 +7,7 @@
 1. View the [Issues]() page to see a To-Do list of things to be implemented.
 2. Raise an issue or comment on an existing issue with what you want to contribute if one does not already exist.
 3. When you get the go ahead, follow the coding guidelines and raise a pull request.
-4. Include a link to the issue in your pull request.
+4. Reference the issue in the pull request body. Use a closing keyword when the pull request completes it, or `Refs #<number>` when it is partial. Pull requests without an issue reference are incomplete.
 
 # Coding Guidelines
 

@@ -78,6 +78,21 @@ const settings = JSON.parse(read('claude/settings.base.json'))
 assert.equal(settings.plansDirectory, '~/notes/SecondBrain/4.Resources/plans')
 assert.match(read('claude/output-styles/plan-browser.md'), /Do not generate adjacent HTML files/)
 
+const globalPolicy = read('global/AGENTS.md')
+assert.match(globalPolicy, /For every pull request:/)
+assert.match(globalPolicy, /Search the target repository for an existing GitHub issue/)
+assert.match(globalPolicy, /Never create an unlinked pull request/)
+assert.match(globalPolicy, /Closes #<number>/)
+assert.match(globalPolicy, /Refs #<number>/)
+
+const githubCommand = read('claude/commands/github-cli.md')
+assert.match(githubCommand, /Every pull request must reference a GitHub issue/)
+assert.match(githubCommand, /gh pr view --json body/)
+
+const pullRequestTemplate = read('.github/pull_request_template.md')
+assert.match(pullRequestTemplate, /Linked GitHub issue \(required\)/)
+assert.match(pullRequestTemplate, /Closes #<issue-number>/)
+
 const bootstrap = read('install/plan-manager-bootstrap.sh')
 for (const target of [
   '$HOME/.copilot/copilot-instructions.md',
