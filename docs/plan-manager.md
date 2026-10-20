@@ -159,6 +159,12 @@ http://plans.localhost:4173/plans/<id>
 
 The ID is immutable across title changes, renames, status changes, and archive moves.
 
+## Default publication behavior
+
+After each successful user-facing plan mutation, harnesses run `plan push <id> --json` and return the hosted URL confirmed by the response from `https://planmanager.hacker1db.dev`. The local dashboard remains available for local use, but agents do not return or prefer its URL unless the user explicitly requests local-only handling.
+
+If a push fails, the canonical vault plan remains intact. Report its absolute path and the push failure without inventing a hosted URL or substituting the localhost route.
+
 ## Per-tool invocation
 
 | Tool | Command | Notes |

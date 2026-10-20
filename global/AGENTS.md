@@ -26,9 +26,10 @@ For every in-scope plan:
 1. Use `~/notes/SecondBrain/4.Resources/plans` as the canonical library. Do not create tool-specific copies.
 2. Delegate all operations to the `plan` executable in non-interactive JSON mode (`--json`).
 3. Before opening or reviewing a plan, run `plan serve` and `plan doctor --json`. Report failures without inventing a dashboard URL.
-4. Return the plan ID and stable local dashboard URL (`http://plans.localhost:4173/plans/<id>`) after every mutation.
-5. Run `plan push` only after an explicit publish request.
-6. Before the final response, verify that every durable plan artifact has a successful plan-manager JSON result. Capture Markdown or HTML artifacts with `plan capture <artifact> --json` if needed, and report the artifact path and failure if capture fails.
+4. After every successful plan mutation, run `plan push <id> --json` unless the user explicitly requests local-only handling.
+5. Return the plan ID and the hosted URL confirmed by the successful push to the configured site (`https://planmanager.hacker1db.dev`). Do not return or prefer a `plans.localhost` URL unless the user explicitly requests the local dashboard.
+6. If the push fails, preserve the canonical local plan, report its absolute path and the push failure, and do not invent a hosted URL or substitute a localhost URL.
+7. Before the final response, verify that every durable plan artifact has a successful plan-manager JSON result. Capture Markdown or HTML artifacts with `plan capture <artifact> --json` if needed, and report the artifact path and failure if capture fails.
 
 ## Adapter
 
