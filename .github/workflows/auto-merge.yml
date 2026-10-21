@@ -10,8 +10,13 @@ permissions:
 
 jobs:
   enable-auto-merge:
-    # Only arm auto-merge for non-draft PRs opened by the repo owner
-    if: github.event.pull_request.user.login == github.repository_owner && !github.event.pull_request.draft
+    # Only arm auto-merge for non-draft PRs from the owner, members,
+    # collaborators, or prior contributors. The merge itself still waits
+    # for the ruleset's required status checks and reviews.
+    if: >-
+      !github.event.pull_request.draft &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR", "CONTRIBUTOR"]'),
+        github.event.pull_request.author_association)
     runs-on: ubuntu-latest
     steps:
       - name: Enable auto-merge
