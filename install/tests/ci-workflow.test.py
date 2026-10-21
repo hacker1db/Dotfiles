@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / '.github/workflows'
 CI = (WORKFLOWS / 'ci.yml').read_text()
 CODEQL = (WORKFLOWS / 'codeql.yml').read_text()
+AUTO_MERGE = (WORKFLOWS / 'auto-merge.yml').read_text()
 DEPENDABOT = (ROOT / '.github/dependabot.yml').read_text()
 
 
@@ -40,6 +41,10 @@ class CiWorkflowTest(unittest.TestCase):
         self.assertIn('schedule:', CODEQL)
         self.assertRegex(CODEQL, r'github/codeql-action/init@[0-9a-f]{40} # v\d+\.\d+\.\d+')
         self.assertRegex(CODEQL, r'github/codeql-action/analyze@[0-9a-f]{40} # v\d+\.\d+\.\d+')
+
+    def test_auto_merge_is_limited_to_the_repository_owner(self):
+        self.assertIn('github.event.pull_request.user.login == github.repository_owner', AUTO_MERGE)
+        self.assertNotIn('author_association', AUTO_MERGE)
 
     def test_dependabot_tracks_actions_and_npm(self):
         self.assertIn('package-ecosystem: "github-actions"', DEPENDABOT)
