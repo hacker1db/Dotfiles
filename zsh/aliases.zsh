@@ -41,7 +41,7 @@ alias notes='cd $HOME/notes/SecondBrain'
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
 alias du='du -h -c' # calculate disk usage for a folder
-alias dotfiles="cd ~/.dotfiles/main"
+alias dotfiles='cd "$DOTFILES"'
 alias tfd="terraform apply --destroy --auto-approve"
 alias tfp="terraform plan"
 alias tfa="terraform apply --auto-approve"
