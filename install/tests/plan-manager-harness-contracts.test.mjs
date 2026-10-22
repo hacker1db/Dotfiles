@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
@@ -11,7 +11,6 @@ function read(path) {
   return readFileSync(join(root, path), 'utf8')
 }
 
-const stableUrl = 'http://plans.localhost:4173/plans/<id>'
 for (const path of [
   'codex/AGENTS.md',
   'config/opencode/AGENTS.md',
@@ -24,64 +23,71 @@ for (const path of [
 const harnesses = [
   {
     name: 'Claude Code',
-    policy: [
-      'claude/commands/plans.md',
-      'claude/output-styles/plan-browser.md',
-    ],
     mockAdapter(artifact) {
-      assert.match(read('claude/commands/plans.md'), /Use the `plans` skill/)
       return ['capture', artifact, '--json']
     },
   },
   {
     name: 'Codex desktop/CLI',
-    policy: ['global/AGENTS.md'],
     mockAdapter(artifact) {
-      assert.match(read('global/AGENTS.md'), /Codex uses `\$plans`/)
       return ['capture', artifact, '--json']
     },
   },
   {
     name: 'OpenCode',
-    policy: [
-      'global/AGENTS.md',
-      'config/opencode/command/plans.md',
-    ],
     mockAdapter(artifact) {
-      assert.match(read('config/opencode/command/plans.md'), /Delegate to the `plan` CLI/)
-      assert.match(read('global/AGENTS.md'), /OpenCode and Copilot use `\/plans`/)
       return ['capture', artifact, '--json']
     },
   },
   {
     name: 'Copilot',
-    policy: ['global/AGENTS.md'],
     mockAdapter(artifact) {
-      assert.match(read('global/AGENTS.md'), /OpenCode and Copilot use `\/plans`/)
       return ['capture', artifact, '--json']
     },
   },
 ]
 
-for (const harness of harnesses) {
-  const contract = harness.policy.map(read).join('\n')
-  assert.match(contract, /plan capture <artifact> --json/, `${harness.name} lacks artifact capture`)
-  assert.match(contract, /Before the final response/i, `${harness.name} lacks finalization guard`)
-  assert.match(contract, /durable plan/i, `${harness.name} lacks durable-plan boundary`)
-  assert.ok(contract.includes(stableUrl), `${harness.name} lacks the stable dashboard URL`)
-  assert.match(contract, /native|built-in|Plan agent/i, `${harness.name} does not preserve native planning`)
-}
-
 const settings = JSON.parse(read('claude/settings.base.json'))
 assert.equal(settings.plansDirectory, '~/notes/SecondBrain/4.Resources/plans')
-assert.match(read('claude/output-styles/plan-browser.md'), /Do not generate adjacent HTML files/)
+const planBrowser = read('claude/output-styles/plan-browser.md')
+assert.match(planBrowser, /use the `plans` skill/i)
+assert.match(planBrowser, /Do not generate adjacent HTML files/)
+assert.doesNotMatch(planBrowser, /plan push/)
+assert.equal(existsSync(join(root, 'claude/commands/plans.md')), false)
+assert.equal(existsSync(join(root, 'config/opencode/command/plans.md')), false)
+
+const globalPolicy = read('global/AGENTS.md')
+assert.match(globalPolicy, /canonical source of operational instructions/)
+assert.match(globalPolicy, /publish every successful plan mutation/)
+assert.match(globalPolicy, /local-only handling/)
+assert.doesNotMatch(globalPolicy, /plan push/)
+assert.match(globalPolicy, /For every pull request:/)
+assert.match(globalPolicy, /Search the target repository for an existing GitHub issue/)
+assert.match(globalPolicy, /Never create an unlinked pull request/)
+assert.match(globalPolicy, /Closes #<number>/)
+assert.match(globalPolicy, /Refs #<number>/)
+
+const githubCommand = read('claude/commands/github-cli.md')
+assert.match(githubCommand, /Every pull request must reference a GitHub issue/)
+assert.match(githubCommand, /gh pr view --json body/)
+
+const pullRequestTemplate = read('.github/pull_request_template.md')
+assert.match(pullRequestTemplate, /Linked GitHub issue \(required\)/)
+assert.match(pullRequestTemplate, /Closes #<issue-number>/)
+assert.match(pullRequestTemplate, /## Validation/)
+assert.match(pullRequestTemplate, /## Evidence/)
+assert.match(pullRequestTemplate, /## Rollback/)
+
+const reviewGuidance = read('REVIEW.md')
+assert.match(reviewGuidance, /concrete defect, violated requirement, or meaningful maintenance problem/)
+assert.match(reviewGuidance, /Do not invent a minimum number of findings/)
+assert.match(reviewGuidance, /Stop when no evidence-backed findings remain/)
 
 const bootstrap = read('install/plan-manager-bootstrap.sh')
 for (const target of [
   '$HOME/.copilot/copilot-instructions.md',
   '$HOME/.codex/AGENTS.md',
   '$HOME/.config/opencode/AGENTS.md',
-  '$HOME/.config/opencode/command/plans.md',
 ]) {
   assert.ok(bootstrap.includes(target), `installer does not manage ${target}`)
 }

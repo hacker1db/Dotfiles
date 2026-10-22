@@ -151,7 +151,7 @@ install-caido-skills /path/to/project
 
 ### Plan-manager integration
 
-[Plan-manager setup and troubleshooting](docs/plan-manager.md) documents the separate application checkout, `~/.local/bin/plan`, LaunchAgent, and Codex writable-root reconciliation. Dotfiles policy uses `~/notes/SecondBrain/4.Resources/plans` as the canonical library and `http://plans.localhost:4173/` as its local dashboard. The linker builds and validates the Go package `cli/cmd/plan`, atomically installs it at `~/.local/lib/plan-manager/plan`, and checks its service; application source and plan data are not stored here. Publishing requires an explicit request.
+[Plan-manager setup and troubleshooting](docs/plan-manager.md) documents the separate application checkout, `~/.local/bin/plan`, LaunchAgent, and Codex writable-root reconciliation. Dotfiles policy uses `~/notes/SecondBrain/4.Resources/plans` as the canonical library and publishes successful mutations unless local-only handling is requested. The linker builds and validates the Go package `cli/cmd/plan`, atomically installs it at `~/.local/lib/plan-manager/plan`, and checks its service; application source and plan data are not stored here.
 
 ## Symlinks and themes
 

@@ -1,8 +1,21 @@
-# Github Issue Number
+## Linked GitHub issue (required)
 
-#<IssueNumber>
+<!-- Use Closes/Fixes/Resolves when this PR completes the issue. Use Refs and describe remaining work when it is partial. -->
+Closes #<issue-number>
 
 # What is changing?
+
+## Validation
+
+<!-- Identify who tested the change (human or agent), the commands and scenarios they ran, the actual results, and anything not tested. -->
+
+## Evidence
+
+<!-- Add screenshots for UI changes. For other changes, include the relevant test output, logs, or API responses that support the validation claims. -->
+
+## Rollback
+
+<!-- Give the exact rollback steps, including deployment, configuration, database, or data-recovery considerations. State whether reverting the commit is sufficient. -->
 
 Describe what has changed as a part of this pull request.
 
