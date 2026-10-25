@@ -12,43 +12,23 @@ fi
 
 export HOMEBREW_NO_ASK=1
 
-# Backup installation for when brew bundle is unreliable; the Brewfile is the
-# single source of truth for taps, formulas, casks, and MAS apps.
 BREWFILE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/brewfile"
-[ -f "$BREWFILE" ] || { echo "Brewfile not found at $BREWFILE" >&2; exit 1; }
+[[ -s "$BREWFILE" ]] || { echo "Brewfile missing or empty at $BREWFILE" >&2; exit 1; }
 
-while IFS=$'\t' read -r tap url; do
-  if [[ -n "$url" ]]; then
-    brew tap "$tap" "$url" || true
-  else
-    brew tap "$tap" || true
+if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 && "$(uname -s)" == Darwin ]]; then
+  deferred="$(deferred_installs_file)"
+  mkdir -p "$(dirname "$deferred")"
+  printf '%s\n' brew-bundle > "$deferred"
+  mas_ids="$(sed -nE 's/^mas .*id: ([0-9]+).*/\1/p' "$BREWFILE" | tr '\n' ' ')"
+  if ! SUDO_ASKPASS=/usr/bin/false HOMEBREW_BUNDLE_MAS_SKIP="$mas_ids" brew bundle install --file="$BREWFILE"; then
+    casks="$(brew bundle list --file="$BREWFILE" --cask | tr '\n' ' ')"
+    HOMEBREW_BUNDLE_MAS_SKIP="$mas_ids" HOMEBREW_BUNDLE_CASK_SKIP="$casks" \
+      brew bundle check --file="$BREWFILE" --no-upgrade
   fi
-  brew trust --tap "$tap" || true
-done < <(sed -nE 's/^tap "([^"]+)"(, "([^"]+)")?.*/\1'$'\t''\3/p' "$BREWFILE")
-
-while IFS= read -r f; do
-  brew install --formula "$f" || true
-done < <(sed -nE 's/^brew "([^"]+)".*/\1/p' "$BREWFILE")
-
-CASKS=()
-while IFS= read -r c; do
-  CASKS+=("$c")
-done < <(sed -nE 's/^cask "([^"]+)".*/\1/p' "$BREWFILE")
-
-if [[ "$(uname -s)" == Darwin ]]; then
-  if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
-    deferred="$(deferred_installs_file)"
-    mkdir -p "$(dirname "$deferred")"
-    : > "$deferred"
-    for c in "${CASKS[@]}"; do
-      SUDO_ASKPASS=/usr/bin/false brew install --cask "$c" || echo "$c" >> "$deferred"
-    done
-    [[ -s "$deferred" ]] && echo "Deferred installs that need a password: $(tr '\n' ' ' < "$deferred")"
-  else
-    for c in "${CASKS[@]}"; do
-      brew install --cask "$c" || true
-    done
-  fi
+  echo "Bundle will finish installation and cleanup in the deferred step."
+else
+  brew bundle install --file="$BREWFILE"
+  brew bundle cleanup --file="$BREWFILE" --brews --cask --tap --mas --force
 fi
 
 # Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
@@ -95,19 +75,6 @@ if command -v gh >/dev/null 2>&1; then
   gh extension install github/gh-stack || true
 fi
 
-# MAS apps
-if [[ "$(uname -s)" == Darwin ]] && command -v mas >/dev/null 2>&1; then
-  while IFS= read -r app; do
-    if [[ "${DOTFILES_DEFER_PROMPTS:-0}" == 1 ]]; then
-      deferred="$(deferred_installs_file)"
-      mkdir -p "$(dirname "$deferred")"
-      echo "mas:$app" >> "$deferred"
-    else
-      mas install "$app" || true
-    fi
-  done < <(sed -nE 's/^mas .*id: ([0-9]+).*/\1/p' "$BREWFILE")
-fi
-
-echo Backup install complete
+echo Tool install complete
 
 bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/verify.sh"

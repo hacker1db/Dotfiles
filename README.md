@@ -22,14 +22,14 @@ The first clone uses HTTPS because 1Password and its SSH agent are not installed
 
 `all` installs the tools first, right after `backup`. `install/verify.sh` then checks for git, gh, Node.js 20+, pnpm, and Pandoc, runs `gh auth login` if GitHub is not logged in, and tests SSH to GitHub. If SSH fails, it opens 1Password and waits while you sign in and turn on the SSH agent. If any check fails, `all` stops before linking; later steps prompt for their own logins. Run `bash install/verify.sh` to recheck, and set `DOTFILES_NONINTERACTIVE=1` to report problems instead of prompting. The scripts also change macOS preferences and configure applications, so review them before a full run.
 
-Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/install_tools.sh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. `install_tools.sh` also trusts each tap it adds, because Homebrew 7 ignores formulae from untrusted taps. Remove the export from `zsh/brew.zsh` to get the prompts back.
+Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/install_tools.sh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. Bundle applies the trust declarations in `install/brewfile`. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
 | Command | Purpose |
 | --- | --- |
 | `./install.sh backup` | Copy selected existing dotfiles into `~/dotfiles-backup` |
 | `./install.sh link` | Link configuration, generate Claude settings/profiles, and bootstrap plan-manager |
 | `./install.sh terminfo` | Install terminal capability entries |
-| `./install.sh homebrew` | Run the explicit package lists and tool setup in `install/install_tools.sh` |
+| `./install.sh homebrew` | Install tools declared in `install/brewfile`, then remove undeclared Homebrew and App Store packages |
 | `./install.sh node-tools` | Install pnpm global tools; run Readwise and Codex Security login setup |
 | `./install.sh shell` | Configure Zsh |
 | `./install.sh git` | Configure Git identity and optional account profiles |
@@ -42,7 +42,22 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 
 `all` runs backup, link (files), homebrew, link (integrations), terminfo, node-tools, git, macos, extras, nvimtmux, dotnet, dotnet-tools, theme, deferred, and shell, in that order. The first link pass makes the plain symlinks (`~/.config/*`, Zsh, Vim, ack, `~/.gitignore_global`, agent instructions, `~/.mcp.json`) before the long package install. The second pass, after Homebrew and `verify.sh`, links `~/.gitconfig` and `~/.ssh/config` (their GitHub-over-SSH settings need the 1Password agent), clones clitools, and generates the Claude profiles and plan-manager, which need the installed tools. `./install.sh link` on its own runs both passes; set `DOTFILES_LINK_PHASE=files` or `integrations` to run one. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
-`DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; that catalog and the explicit lists in `install/install_tools.sh` are separate sources.
+`DOTFILES_NONINTERACTIVE=1 ./install.sh git` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt.
+
+### Homebrew tools
+
+`install/brewfile` is the source of truth for Homebrew formulas, casks, taps, and Mac App Store apps. `./install.sh homebrew` uses Bundle directly:
+
+```sh
+brew bundle install --file=install/brewfile
+brew bundle cleanup --file=install/brewfile --brews --cask --tap --mas --force
+```
+
+Cleanup runs only after installation succeeds. During `./install.sh all`, the deferred step finishes Bundle installation before cleanup. Removal is scoped to the same package types captured in the Brewfile; separately installed npm/pnpm globals, Go tools, and native installers are not removed.
+
+`brew-cleanup` keeps its original capture behavior: dump installed packages into the Brewfile, validate the formula list, replace the file, then run `brew cleanup` and `brew doctor`. It records this machine's inventory, so review the diff before committing; declarations for tools absent from this machine may disappear. `brew doctor` warnings can return a failure after capture succeeded.
+
+To retire a tool, remove its Brewfile declaration and run the installer on each machine. Do not run capture first, because it would record the still-installed tool again. To preview removal without accepting prompts, run `brew bundle cleanup --file=install/brewfile --brews --cask --tap --mas < /dev/null`.
 
 ## Shell and terminal workflow
 
