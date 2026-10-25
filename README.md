@@ -122,6 +122,10 @@ New repositories can inherit `git/templates/hooks/`. The dispatcher runs matchin
 
 `.github/workflows/codeql.yml` runs CodeQL `security-extended` queries for GitHub Actions, JavaScript/TypeScript, and Python on pushes to `main`, on pull requests, and weekly. `.github/dependabot.yml` opens update pull requests for npm, NuGet, Docker, and pinned GitHub Actions. The workflow check is `python3 install/tests/ci-workflow.test.py`; it also requires every action to be pinned to a commit SHA.
 
+## T3 Code
+
+Portable preferences, keybindings, and selected provider settings are managed with `python3 bin/t3-config export` and `python3 bin/t3-config apply`. Credentials and machine-specific state stay local. See [T3 Code configuration](docs/t3code.md) for capture, restore, and backup behavior.
+
 ## AI tools and shared instructions
 
 | Tool | Source | Installed instruction file |
