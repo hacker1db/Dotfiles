@@ -3,6 +3,8 @@ import argparse
 import copy
 import json
 import os
+import re
+import shutil
 from pathlib import Path
 import tempfile
 
@@ -35,7 +37,7 @@ def portable(data):
     client = select(data['client-settings.json'], CLIENT_KEYS)
     server = select(data['settings.json'], SERVER_KEYS)
     model = data['settings.json'].get('defaultModelSelection')
-    if model and model.get('instanceId') in {'codex', 'claude-code', 'antigravity'}:
+    if model and model.get('instanceId') in {'codex', 'claudeAgent', 'antigravity'}:
         server['defaultModelSelection'] = select(model, {'instanceId', 'model'})
         server['defaultModelSelection']['options'] = [
             select(option, {'id', 'value'}) for option in model.get('options', [])
@@ -43,7 +45,7 @@ def portable(data):
         ]
     providers = {}
     for name, provider in data['settings.json'].get('providerInstances', {}).items():
-        if name not in {'codex', 'claude-code', 'antigravity'}:
+        if name not in {'codex', 'claudeAgent', 'antigravity'}:
             continue
         providers[name] = select(provider, {'driver', 'enabled'})
         config = select(provider.get('config', {}), {'authMethod'})
@@ -87,13 +89,118 @@ def write_json(path, data):
             os.unlink(temporary)
 
 
+def provider_profiles(root):
+    home = Path.home()
+    providers = {}
+    incomplete = []
+    claude_binary = home / '.local/bin/claude'
+    codex_binary = shutil.which('codex')
+
+    def register(instance_id, driver, label, directory, config_file, binary, unavailable=None):
+        if instance_id in providers:
+            raise ValueError(f'profile names produce a duplicate instance ID: {instance_id}')
+        ready = not unavailable and config_file.is_file() and bool(binary) and os.access(binary, os.X_OK)
+        config = {'binaryPath': str(binary or 'codex'), 'homePath': str(directory),
+                  'launchArgs': ''}
+        if driver == 'codex':
+            config.update(setupMode='existing', shadowHomePath='')
+        providers[instance_id] = {'driver': driver, 'displayName': label,
+                                  'enabled': ready, 'config': config}
+        if unavailable:
+            incomplete.append(f'{label}: disabled; {unavailable}')
+        elif not ready:
+            incomplete.append(f'{label}: disabled; requires {config_file} and an executable {binary or "codex"}')
+
+    def slug(name):
+        value = re.sub(r'[^a-z0-9-]', '-', name.lower()).strip('-')
+        if not value:
+            raise ValueError(f'profile name cannot form a T3 instance ID: {name}')
+        return value
+
+    for definition in sorted((root / 'claude/profiles').glob('*/settings.json')):
+        name = definition.parent.name
+        directory = home / f'.claude-{name}'
+        instance_id = 'claudeAgent' if name == 'personal' else f'dotfiles-claude-{slug(name)}'
+        register(instance_id, 'claudeAgent', f'Claude · {name}', directory,
+                 directory / 'settings.json', claude_binary)
+
+    homes = {'default': home / '.codex'}
+    declared = read_json(root / 'config/t3code/profiles.json', {'codexHomes': {}})
+    for name, path in declared['codexHomes'].items():
+        if name == 'default':
+            raise ValueError('default is reserved for ~/.codex')
+        directory = Path(path).expanduser()
+        if not directory.is_absolute():
+            raise ValueError(f'Codex home must be absolute or start with ~/: {name}')
+        homes[name] = directory
+    for pattern in ('.codex-*', '.codex_*'):
+        for directory in sorted(home.glob(pattern)):
+            if (directory / 'config.toml').is_file() and directory not in homes.values():
+                name = directory.name[7:]
+                if name in homes:
+                    raise ValueError(f'duplicate Codex home name: {name}')
+                homes[name] = directory
+    for name, directory in sorted(homes.items()):
+        instance_id = 'codex' if name == 'default' else f'dotfiles-codex-home-{slug(name)}'
+        register(instance_id, 'codex', f'Codex · {name}', directory,
+                 directory / 'config.toml', codex_binary)
+        for profile in sorted(directory.glob('*.config.toml')):
+            profile_name = profile.name[:-len('.config.toml')]
+            if not re.fullmatch(r'[A-Za-z0-9_-]+', profile_name):
+                raise ValueError(f'unsupported Codex profile name: {profile_name}')
+            register(f'dotfiles-codex-profile-{slug(name)}-{slug(profile_name)}',
+                     'codex', f'Codex · {name} / {profile_name}', directory,
+                     profile, codex_binary, 'Codex app-server does not support --profile; configure a separate Codex home')
+    return providers, incomplete
+
+
+def configure_providers(args):
+    path = args.userdata / 'settings.json'
+    if path.is_symlink():
+        raise ValueError(f'refusing to replace symlink: {path}')
+    current = read_json(path, {})
+    providers, incomplete = provider_profiles(args.dotfiles_root)
+    existing = current.get('providerInstances', {})
+    for name, provider in providers.items():
+        if name in existing and existing[name].get('driver') != provider['driver']:
+            raise ValueError(f'provider driver mismatch: {name}')
+    updated = merge(current, {'providerInstances': providers})
+    for name, provider in providers.items():
+        status = 'enabled' if provider['enabled'] else 'disabled'
+        print(f'{name}: {status}; {provider["config"]["homePath"]}')
+    if current != updated:
+        if args.check:
+            incomplete.append('T3 provider configuration needs reconciliation')
+        elif args.dry_run:
+            print(f'Would update: {path}')
+        else:
+            if path.exists():
+                fd, backup = tempfile.mkstemp(prefix=path.name + '.backup-', dir=path.parent)
+                with os.fdopen(fd, 'wb') as stream:
+                    stream.write(path.read_bytes())
+                print(f'Backup: {backup}')
+            write_json(path, updated)
+            print(f'Updated: {path}')
+    else:
+        print('T3 provider profiles already match.')
+    for message in incomplete:
+        print(message)
+    return 2 if incomplete else 0
+
+
 def main():
     parser = argparse.ArgumentParser(description='Export or apply portable T3 Code preferences. Quit T3 before applying.')
-    parser.add_argument('action', choices=('export', 'apply'))
+    parser.add_argument('action', choices=('export', 'apply', 'providers'))
     parser.add_argument('--userdata', type=Path, default=Path.home() / '.t3/userdata')
     parser.add_argument('--config', type=Path, default=Path(__file__).resolve().parents[1] / 'config/t3code/preferences.json')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--check', action='store_true')
+    parser.add_argument('--dotfiles-root', type=Path, default=Path(__file__).resolve().parents[1])
     args = parser.parse_args()
+    if args.action == 'providers':
+        return configure_providers(args)
+    if args.check:
+        parser.error('--check is only supported for providers')
     data = {name: read_json(args.userdata / name, [] if name == 'keybindings.json' else {}) for name in FILES}
     if args.action == 'export':
         if any(not (args.userdata / name).is_file() for name in FILES):
@@ -136,6 +243,6 @@ def main():
 
 if __name__ == '__main__':
     try:
-        main()
+        raise SystemExit(main())
     except (OSError, ValueError, TypeError, KeyError, AttributeError) as error:
         raise SystemExit(str(error))

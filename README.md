@@ -27,7 +27,8 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | Command | Purpose |
 | --- | --- |
 | `./install.sh backup` | Copy selected existing dotfiles into `~/dotfiles-backup` |
-| `./install.sh link` | Link configuration, generate Claude settings/profiles, and bootstrap plan-manager |
+| `./install.sh link` | Link configuration, generate Claude/T3 provider profiles, and bootstrap plan-manager |
+| `./install.sh t3-config` | Reconcile T3 provider profiles; use `--check` to audit or `--dry-run` to preview |
 | `./install.sh terminfo` | Install terminal capability entries |
 | `./install.sh homebrew` | Run the explicit package lists and tool setup in `install/install_tools.sh` |
 | `./install.sh node-tools` | Install pnpm global tools; run Readwise and Codex Security login setup |
@@ -124,7 +125,7 @@ New repositories can inherit `git/templates/hooks/`. The dispatcher runs matchin
 
 ## T3 Code
 
-Portable preferences, keybindings, and selected provider settings are managed with `python3 bin/t3-config export` and `python3 bin/t3-config apply`. Credentials and machine-specific state stay local. See [T3 Code configuration](docs/t3code.md) for capture, restore, and backup behavior.
+Installation registers T3 providers for Claude personal, work subscription, and Foundry, plus default Codex and a Codex Foundry placeholder. It discovers additional Codex homes and reports missing profile settings as disabled entries. Run `./install.sh t3-config --check` to audit alignment. UI preferences and keybindings remain managed with `python3 bin/t3-config export` and `python3 bin/t3-config apply`. Credentials stay local. See [T3 Code configuration](docs/t3code.md) for setup, capture, restore, and backup behavior.
 
 ## AI tools and shared instructions
 
