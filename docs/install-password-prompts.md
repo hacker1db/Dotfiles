@@ -5,12 +5,12 @@ Steps that ask for the macOS login password run at the end of `./install.sh all`
 ## How prompts are deferred
 
 - `install.sh all` exports `DOTFILES_DEFER_PROMPTS=1`.
-- `install/install_tools.sh` installs casks with `SUDO_ASKPASS=/usr/bin/false`. Homebrew passes `SUDO_ASKPASS` through to its own `sudo -A` calls, so a cask that needs a password fails immediately instead of prompting. Its name is written to `${XDG_STATE_HOME:-~/.local/state}/dotfiles/deferred-installs`.
-- Mac App Store installs (`mas install`) run through `sudo` in mas 7, so they are not attempted in the main pass; their IDs are recorded in the same file as `mas:<id>`.
-- The `deferred` step (`install/deferred.sh`) retries those casks with a plain `brew install --cask` and runs the recorded `mas install` commands, where the normal password prompts appear. Anything that still fails stays in the file; rerun `./install.sh deferred`.
+- `install/install_tools.sh` runs `brew bundle install` with `SUDO_ASKPASS=/usr/bin/false` so casks that need a password fail without stopping for input. Mac App Store IDs are passed through `HOMEBREW_BUNDLE_MAS_SKIP` for this pass because their installs require a password.
+- If Bundle fails, a Bundle check excluding casks and App Store apps must pass before the remaining install steps can continue.
+- `${XDG_STATE_HOME:-~/.local/state}/dotfiles/deferred-installs` records that Bundle needs a final pass. The `deferred` step reruns `brew bundle install` with normal password prompts, then `brew bundle cleanup` for formulas, casks, taps, and App Store apps. It removes the pending file only after both commands succeed; retry failures with `./install.sh deferred`.
 - `shell` runs last because `chsh` and the `/etc/shells` update ask for a password.
 
-Running `./install.sh homebrew` on its own installs casks without deferring. A cask that fails for another reason, such as a download error, is also retried in the `deferred` step.
+Running `./install.sh homebrew` on its own runs Bundle installation and cleanup immediately, with normal password prompts. Failed installation prevents cleanup.
 
 ## Observed prompts
 
