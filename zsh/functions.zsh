@@ -399,6 +399,19 @@ function update-node-tools(){
     mkdir -p "$PNPM_HOME" || return 1
     packages="$(pnpm list --global --depth -1)" || return 1
 
+    local -a unmanaged=(plan-manager "@anthropic-ai/claude-code" "@openai/codex" "@openai/codex-security")
+    local package removed=0
+    for package in $unmanaged; do
+        if print -r -- "$packages" | grep -qF -- "── ${package}@"; then
+            echo "Removing $package from global pnpm (not updatable from the registry)..."
+            pnpm remove --global "$package" || return 1
+            removed=1
+        fi
+    done
+    if (( removed )); then
+        packages="$(pnpm list --global --depth -1)" || return 1
+    fi
+
     if ! print -r -- "$packages" | grep -Eq '^[├└]── '; then
         echo "No global pnpm packages found."
         if command -v npm >/dev/null 2>&1; then
@@ -415,15 +428,6 @@ function update-node-tools(){
     if ! pnpm update --global --latest; then
         echo "Global pnpm update failed."
         return 1
-    fi
-
-    if [[ "$packages" == *'@anthropic-ai/claude-code@'* ]]; then
-        local pnpm_bin
-        pnpm_bin="$(pnpm bin --global)" || return 1
-        if ! "$pnpm_bin/claude" --version; then
-            echo "Claude Code verification failed. Check its pnpm build approval and optional dependencies."
-            return 1
-        fi
     fi
     echo "All global pnpm packages updated!"
 }
