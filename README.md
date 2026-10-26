@@ -40,11 +40,11 @@ dotfiles-use
 
 `dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer.
 
-Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/tools.zsh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. `tools.zsh` also trusts each tap it adds, because Homebrew 7 ignores formulae from untrusted taps. Remove the export from `zsh/brew.zsh` to get the prompts back.
+Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/tools.zsh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. Bundle applies the trust declarations in `install/brewfile`. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
 | Command | Purpose |
 | --- | --- |
-| `./install.sh tools` | Install Homebrew, the brewfile packages, and developer tools; finish with the deferred installs and `chsh` |
+| `./install.sh tools` | Install Homebrew, the tools declared in `install/brewfile` (removing undeclared Homebrew and App Store packages), and developer tools; finish with the deferred installs and `chsh` |
 | `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, configure Git identity/profiles, and install the Go `plan` CLI |
 | `./install.sh node` | Install pnpm global tools; run Readwise and Codex Security login setup |
 | `./install.sh dotnet` | Install .NET SDKs, runtimes, and global tools |
@@ -52,11 +52,26 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | `./install.sh theme list` | List theme candidates (`apply <name>`, `current`, and `sync` also work) |
 | `./install.sh tmux-plugins` | Bootstrap TPM at `~/.local/share/tmux/plugins/tpm` |
 | `./install.sh claude-profiles` | Generate and link the Claude Code profiles (`--check`, `--skip-foundry`) |
-| `./install.sh deferred` | Run the cask and App Store installs that were skipped because they need a password, then `chsh` |
+| `./install.sh deferred` | Finish the Brewfile installation and cleanup that were skipped because they need a password, then `chsh` |
 
 `all` runs tools, link, node, dotnet, osx, theme, tmux-plugins, and claude-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` and `~/.ssh/config` (their GitHub-over-SSH settings need the 1Password agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
-`DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt. The alternative Brewfile installation is `brew bundle --file=install/brewfile`; the brewfile is the single catalog `tools.zsh` reads.
+`DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt.
+
+### Homebrew tools
+
+`install/brewfile` is the source of truth for Homebrew formulas, casks, taps, and Mac App Store apps. `./install.sh tools` uses Bundle directly:
+
+```zsh
+brew bundle install --file=install/brewfile
+brew bundle cleanup --file=install/brewfile --brews --cask --tap --mas --force
+```
+
+Cleanup runs only after installation succeeds. During `./install.sh all`, the deferred pass finishes Bundle installation before cleanup. Removal is scoped to the same package types captured in the Brewfile; separately installed npm/pnpm globals, Go tools, and native installers are not removed.
+
+`brew-cleanup` keeps its original capture behavior: dump installed packages into the Brewfile, validate the formula list, replace the file, then run `brew cleanup` and `brew doctor`. It records this machine's inventory, so review the diff before committing; declarations for tools absent from this machine may disappear. `brew doctor` warnings can return a failure after capture succeeded.
+
+To retire a tool, remove its Brewfile declaration and run the installer on each machine. Do not run capture first, because it would record the still-installed tool again. To preview removal without accepting prompts, run `brew bundle cleanup --file=install/brewfile --brews --cask --tap --mas < /dev/null`.
 
 ## Shell and terminal workflow
 

@@ -5,35 +5,20 @@ source "${0:A:h}/lib.zsh"
 BREWFILE="${0:A:h}/brewfile"
 defer="${DOTFILES_DEFER_PROMPTS:-0}"
 
-brewfile_items() { sed -nE "s/^$1 \"([^\"]+)\".*/\\1/p" "$BREWFILE" }
-
-defer_item() {
-    local deferred
-    deferred="$(deferred_installs_file)"
-    mkdir -p "${deferred:h}"
-    print "$1" >> "$deferred"
+bundle_sync() {
+    brew bundle install --file="$BREWFILE" || return 1
+    brew bundle cleanup --file="$BREWFILE" --brews --cask --tap --mas --force
 }
 
 run_deferred() {
-    local deferred item
-    local -a items remaining
+    local deferred
     deferred="$(deferred_installs_file)"
     [[ -s "$deferred" ]] || { print "No deferred installs"; return 0 }
     load_brew_env || { error "brew not found"; return 1 }
-    items=(${(f)"$(<"$deferred")"})
-    print "Running installs that need a password: $items"
-    remaining=()
-    for item in $items; do
-        case "$item" in
-            mas:*) mas install "${item#mas:}" || remaining+=("$item") ;;
-            *) brew install --cask "$item" || remaining+=("$item") ;;
-        esac
-    done
-    if [[ "${#remaining}" -gt 0 ]]; then
-        print -l -- $remaining > "$deferred"
-        print -u2 "Still not installed: $remaining; rerun with ./install.sh deferred"
-        return 1
-    fi
+    [[ -s "$BREWFILE" ]] || { error "Brewfile missing or empty: $BREWFILE"; return 1 }
+    export HOMEBREW_NO_ASK=1
+    print "Finishing Brewfile installation and cleanup"
+    bundle_sync || { print -u2 "Bundle did not finish; rerun with ./install.sh deferred"; return 1 }
     rm -f "$deferred"
     print "Deferred installs complete"
 }
@@ -75,39 +60,23 @@ if ! load_brew_env; then
     load_brew_env || { error "Homebrew installed but brew is not on PATH"; exit 1 }
 fi
 export HOMEBREW_NO_ASK=1
-[[ -f "$BREWFILE" ]] || { error "Brewfile not found at $BREWFILE"; exit 1 }
+[[ -s "$BREWFILE" ]] || { error "Brewfile missing or empty at $BREWFILE"; exit 1 }
 
-typeset line tap url formula cask app deferred
-for line in ${(f)"$(sed -nE 's/^tap "([^"]+)"(, "([^"]+)")?.*/\1'$'\t''\3/p' "$BREWFILE")"}; do
-    tap="${line%%$'\t'*}"
-    url="${line#*$'\t'}"
-    [[ "$url" == "$line" ]] && url=""
-    brew tap "$tap" ${url:+"$url"} || true
-    brew trust --tap "$tap" || true
-done
-
-for formula in ${(f)"$(brewfile_items brew)"}; do
-    brew install --formula "$formula" || true
-done
-
-if [[ "$OSTYPE" == darwin* ]]; then
-    if [[ "$defer" == 1 ]]; then
-        deferred="$(deferred_installs_file)"; mkdir -p "${deferred:h}"; : > "$deferred"
+if [[ "$defer" == 1 && "$OSTYPE" == darwin* ]]; then
+    typeset deferred mas_ids casks
+    deferred="$(deferred_installs_file)"
+    mkdir -p "${deferred:h}"
+    print brew-bundle > "$deferred"
+    mas_ids="$(sed -nE 's/^mas .*id: ([0-9]+).*/\1/p' "$BREWFILE" | tr '\n' ' ')"
+    if ! SUDO_ASKPASS=/usr/bin/false HOMEBREW_BUNDLE_MAS_SKIP="$mas_ids" brew bundle install --file="$BREWFILE"; then
+        casks="$(brew bundle list --file="$BREWFILE" --cask | tr '\n' ' ')"
+        HOMEBREW_BUNDLE_MAS_SKIP="$mas_ids" HOMEBREW_BUNDLE_CASK_SKIP="$casks" \
+            brew bundle check --file="$BREWFILE" --no-upgrade ||
+            { error "Brewfile formulas and taps are not installed"; exit 1 }
     fi
-    for cask in ${(f)"$(brewfile_items cask)"}; do
-        if [[ "$defer" == 1 ]]; then
-            SUDO_ASKPASS=/usr/bin/false brew install --cask "$cask" || defer_item "$cask"
-        else
-            brew install --cask "$cask" || true
-        fi
-    done
-    if command -v mas >/dev/null 2>&1; then
-        for app in ${(f)"$(sed -nE 's/^mas .*id: ([0-9]+).*/\1/p' "$BREWFILE")"}; do
-            [[ "$defer" == 1 ]] && defer_item "mas:$app" || mas install "$app" || true
-        done
-    fi
-    [[ "$defer" == 1 && -s "$(deferred_installs_file)" ]] &&
-        print "Deferred installs that need a password: $(tr '\n' ' ' < "$(deferred_installs_file)")"
+    print "Bundle will finish installation and cleanup in the deferred pass."
+else
+    bundle_sync || { error "Brewfile installation failed"; exit 1 }
 fi
 
 [[ -x "$HOME/.local/bin/claude" ]] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
