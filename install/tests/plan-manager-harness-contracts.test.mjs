@@ -72,7 +72,8 @@ for (const harness of harnesses) {
   assert.match(contract, /durable plan/i, `${harness.name} lacks durable-plan boundary`)
   const policyUrls = contract.match(/https?:\/\/[^\s`<>"')\]]+/g) ?? []
   assert.ok(policyUrls.some(url => url === hostedUrl), `${harness.name} lacks the hosted plan URL`)
-  assert.match(contract, /After every successful plan mutation, run `plan push <id> --json`/, `${harness.name} lacks automatic plan publication`)
+  assert.match(contract, /`plan push <id> --json` only when the user explicitly requests publishing or hosted synchronization/, `${harness.name} lacks explicit publication consent`)
+  assert.match(contract, /return a hosted URL only when a successful explicit push confirms it/, `${harness.name} lacks verified hosted URL reporting`)
   assert.match(contract, /native|built-in|Plan agent/i, `${harness.name} does not preserve native planning`)
 }
 
