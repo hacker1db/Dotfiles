@@ -13,7 +13,7 @@ mkdir -p "$PNPM_HOME"
 export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 
 typeset -a tools=(
-    "@azure/static-web-apps-cli" "@github/copilot" "@openai/codex-security" "@readwise/cli"
+    "@azure/static-web-apps-cli" "@github/copilot" "@readwise/cli"
     bmad-method eslint markdownlint-cli2 md-to-pdf
     obsidian-headless # ob CLI: Obsidian Sync without the desktop app (servers)
     prettier typescript typescript-language-server vercel
@@ -29,14 +29,6 @@ if command -v readwise >/dev/null 2>&1; then
         readwise login || warning "Readwise login failed; run 'readwise login' manually"
     else
         print "Skipping Readwise login: no TTY. Run 'readwise login' manually"
-    fi
-fi
-
-if command -v codex-security >/dev/null 2>&1 && ! codex-security login status >/dev/null 2>&1; then
-    if [[ -t 0 ]]; then
-        codex-security login || warning "Codex Security login failed; run 'codex-security login' manually"
-    else
-        print "Skipping Codex Security login: no TTY. Run 'codex-security login' manually"
     fi
 fi
 

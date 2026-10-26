@@ -112,6 +112,8 @@ fi
 
 [[ -x "$HOME/.local/bin/claude" ]] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
 
+[[ -x "$HOME/.local/bin/codex" ]] || curl --proto "=https" --tlsv1.2 -fsSL https://chatgpt.com/codex/install.sh | sh || true
+
 if command -v tfenv >/dev/null 2>&1; then
     tfenv install latest || true
     tfenv use latest || true
