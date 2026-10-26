@@ -141,12 +141,12 @@ New repositories can inherit `git/templates/hooks/`. The dispatcher runs matchin
 
 | Tool | Source | Installed instruction file |
 | --- | --- | --- |
-| Claude Code | `claude/CLAUDE.md` | `~/.claude-{personal,subscription,foundry}/CLAUDE.md` |
+| Claude Code | `claude/CLAUDE.md` → `global/AGENTS.md` | `~/.claude-{personal,subscription,foundry}/CLAUDE.md` |
 | Codex | `codex/AGENTS.md` → `global/AGENTS.md` | `~/.codex/AGENTS.md` |
 | OpenCode | `config/opencode/AGENTS.md` → `global/AGENTS.md` | `~/.config/opencode/AGENTS.md` |
 | Copilot CLI | `config/copilot/copilot-instructions.md` → `global/AGENTS.md` | `~/.copilot/copilot-instructions.md` |
 
-Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for shared policy. `bash install/agent-instructions.sh` installs just the instruction links with backups. Start a new tool session to reload them.
+Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for the single shared policy. `claude/CLAUDE.md` and the other tool instruction sources are symlinks to it. `bash install/agent-instructions.sh` installs just the instruction links with backups. Start a new tool session to reload them.
 
 Claude installation links instructions, agents, commands, output styles, and the statusline script into each profile directory, and generates each profile's settings from layered fragments. MCP configuration is linked to `~/.mcp.json`.
 

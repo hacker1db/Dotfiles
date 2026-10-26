@@ -11,8 +11,9 @@ function read(path) {
   return readFileSync(join(root, path), 'utf8')
 }
 
-const stableUrl = 'http://plans.localhost:4173/plans/<id>'
+const hostedUrl = 'https://planmanager.hacker1db.dev'
 for (const path of [
+  'claude/CLAUDE.md',
   'codex/AGENTS.md',
   'config/opencode/AGENTS.md',
   'config/copilot/copilot-instructions.md',
@@ -25,6 +26,7 @@ const harnesses = [
   {
     name: 'Claude Code',
     policy: [
+      'claude/CLAUDE.md',
       'claude/commands/plans.md',
       'claude/output-styles/plan-browser.md',
     ],
@@ -68,7 +70,10 @@ for (const harness of harnesses) {
   assert.match(contract, /plan capture <artifact> --json/, `${harness.name} lacks artifact capture`)
   assert.match(contract, /Before the final response/i, `${harness.name} lacks finalization guard`)
   assert.match(contract, /durable plan/i, `${harness.name} lacks durable-plan boundary`)
-  assert.ok(contract.includes(stableUrl), `${harness.name} lacks the stable dashboard URL`)
+  const policyUrls = contract.match(/https?:\/\/[^\s`<>"')\]]+/g) ?? []
+  assert.ok(policyUrls.some(url => url === hostedUrl), `${harness.name} lacks the hosted plan URL`)
+  assert.match(contract, /`plan push <id> --json` only when the user explicitly requests publishing or hosted synchronization/, `${harness.name} lacks explicit publication consent`)
+  assert.match(contract, /return a hosted URL only when a successful explicit push confirms it/, `${harness.name} lacks verified hosted URL reporting`)
   assert.match(contract, /native|built-in|Plan agent/i, `${harness.name} does not preserve native planning`)
 }
 
