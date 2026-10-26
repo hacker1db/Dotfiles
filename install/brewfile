@@ -343,8 +343,6 @@ cask "caido"
 cask "chatgpt"
 # Anthropic's official Claude AI desktop app
 cask "claude"
-# OpenAI's coding agent that runs in your terminal
-cask "codex"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
 # Utilities designed to make common development tasks easier
