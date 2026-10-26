@@ -243,6 +243,8 @@ brew "rustscan"
 brew "scc"
 # Smart session manager for the terminal
 brew "sesh"
+# Window border system for macOS
+brew "FelixKratz/formulae/borders"
 # Highly customizable macOS status bar replacement
 brew "FelixKratz/formulae/sketchybar"
 # Static analysis and lint tool, for (ba)sh scripts
