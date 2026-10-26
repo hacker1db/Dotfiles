@@ -426,8 +426,6 @@ cask "todoist-app"
 cask "unetbootin"
 # Voice-to-text dictation with AI-powered auto-editing
 cask "wispr-flow"
-# Gecko based web browser
-cask "zen"
 # Video communication and virtual meeting platform
 cask "zoom"
 cask "grok-bot"
