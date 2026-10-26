@@ -10,7 +10,7 @@ home="$temp/home"
 stubs="$temp/bin"
 log="$temp/calls.log"
 mkdir -p "$repo/install" "$home/OneDrive - Fixture/Personal" "$stubs"
-rsync -a --exclude .local --exclude skills --exclude plugins "$root/claude" "$repo/"
+rsync -a --exclude .local --exclude skills --exclude plugins "$root/claude" "$root/global" "$repo/"
 cp "$root/install/claude-profiles.sh" "$repo/install/"
 # Fixture subscription layer so hook scoping is tested independently of the real file's contents.
 cat > "$repo/claude/profiles/subscription/settings.json" << 'EOF'
@@ -50,6 +50,7 @@ for p in personal subscription foundry; do
     for item in CLAUDE.md commands output-styles statusline-command.sh; do
         [ "$(readlink "$d/$item")" = "$repo/claude/$item" ] || fail "$p link $item"
     done
+    [ "$d/CLAUDE.md" -ef "$repo/global/AGENTS.md" ] || fail "$p shared global policy"
     [ ! -e "$d/agents" ] && [ ! -L "$d/agents" ] || fail "$p agents must be left to skillctl"
     [ "$(readlink "$d/hooks")" = "$repo/claude/profiles/$p/hooks" ] || fail "$p hooks link"
     grep -qx "skillctl .claude-$p sync --global" "$log" || fail "$p skillctl sync"
