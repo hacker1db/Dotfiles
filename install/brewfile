@@ -9,6 +9,7 @@ tap "brandonskerritt/rustscan", trusted: true
 tap "caffix/amass", trusted: true
 tap "clerk/stable"
 tap "derailed/k9s", trusted: true
+tap "felixkratz/formulae"
 tap "fsouza/prettierd"
 tap "gitguardian/tap", trusted: true
 tap "hashicorp/tap", trusted: true
@@ -303,6 +304,8 @@ brew "aquasecurity/trivy/trivy"
 brew "azure/functions/azure-functions-core-tools@4"
 # Command-line interface for Clerk
 brew "clerk/stable/clerk", trusted: true
+# Window border system for macOS
+brew "felixkratz/formulae/borders"
 # Packer
 brew "hashicorp/tap/packer"
 # Terraform
