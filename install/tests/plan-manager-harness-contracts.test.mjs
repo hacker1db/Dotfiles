@@ -70,7 +70,8 @@ for (const harness of harnesses) {
   assert.match(contract, /plan capture <artifact> --json/, `${harness.name} lacks artifact capture`)
   assert.match(contract, /Before the final response/i, `${harness.name} lacks finalization guard`)
   assert.match(contract, /durable plan/i, `${harness.name} lacks durable-plan boundary`)
-  assert.ok(contract.includes(hostedUrl), `${harness.name} lacks the hosted plan URL`)
+  const policyUrls = contract.match(/https?:\/\/[^\s`<>"')\]]+/g) ?? []
+  assert.ok(policyUrls.some(url => url === hostedUrl), `${harness.name} lacks the hosted plan URL`)
   assert.match(contract, /After every successful plan mutation, run `plan push <id> --json`/, `${harness.name} lacks automatic plan publication`)
   assert.match(contract, /native|built-in|Plan agent/i, `${harness.name} does not preserve native planning`)
 }
