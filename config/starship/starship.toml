@@ -1,6 +1,6 @@
 add_newline = false
 # A minimal left prompt
-palette = "eldritch"
+palette = "nisi"
 # A minimal left prompt
 format = """$directory$python$golang$rust$nodejs$fill
 $character"""

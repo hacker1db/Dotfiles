@@ -24,6 +24,11 @@ apply_tmux() {
     local theme="$1" tmux_dir="$DOTFILES/config/tmux/themes"
     [[ -f "$tmux_dir/${theme}.conf" ]] || { warning "tmux theme not found: $theme"; return }
     ln -sfn "${theme}.conf" "$tmux_dir/current.conf"
+    if [[ -f "$tmux_dir/${theme}-layout.conf" ]]; then
+        ln -sfn "${theme}-layout.conf" "$tmux_dir/current-layout.conf"
+    else
+        rm -f "$tmux_dir/current-layout.conf"
+    fi
     if grep -q 'themes/eldritch.conf' "$DOTFILES/config/tmux/tmux.conf"; then
         sed_inplace 's/themes\/eldritch.conf/themes\/current.conf/' "$DOTFILES/config/tmux/tmux.conf" || true
     fi
