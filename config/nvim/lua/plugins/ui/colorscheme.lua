@@ -3,6 +3,9 @@ return {
     name = "eldritch",
     lazy = false,
     priority = 1000,
+    cond = function()
+        return require("core.theme").current() ~= "nisi"
+    end,
 
     config = function()
         local c = require("core.colors").colors

@@ -9,6 +9,7 @@ tap "brandonskerritt/rustscan", trusted: true
 tap "caffix/amass", trusted: true
 tap "clerk/stable"
 tap "derailed/k9s", trusted: true
+tap "FelixKratz/formulae", trusted: true
 tap "fsouza/prettierd"
 tap "gitguardian/tap", trusted: true
 tap "hashicorp/tap", trusted: true
@@ -187,6 +188,8 @@ brew "neovim"
 brew "nikto"
 # Port scanning utility for large networks
 brew "nmap"
+# Send commands to the macOS Now Playing media session
+brew "nowplaying-cli"
 # Modern shell for the GitHub era
 brew "nushell"
 # Manage multiple Node.js versions
@@ -237,6 +240,8 @@ brew "rustscan"
 brew "scc"
 # Smart session manager for the terminal
 brew "sesh"
+# Highly customizable macOS status bar replacement
+brew "FelixKratz/formulae/sketchybar"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Penetration testing for SQL injection and database servers

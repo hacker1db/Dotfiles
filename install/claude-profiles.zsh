@@ -5,7 +5,7 @@ root="${DOTFILES:-$HOME/.dotfiles/main}"
 claude_dir="$root/claude"
 profiles_dir="$claude_dir/profiles"
 generated="$claude_dir/.local/profiles"
-typeset -a linked_items=(CLAUDE.md commands output-styles statusline-command.sh)
+typeset -a linked_items=(CLAUDE.md commands output-styles statusline-command.sh themes)
 credential_keys='["ANTHROPIC_API_KEY","ANTHROPIC_AUTH_TOKEN","ANTHROPIC_FOUNDRY_API_KEY","ANTHROPIC_FOUNDRY_AUTH_TOKEN","CLAUDE_CODE_OAUTH_TOKEN"]'
 
 check=0

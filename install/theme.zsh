@@ -54,6 +54,16 @@ apply_starship() {
         '^palette[[:space:]]*=[[:space:]]*".*"' "palette = \"$1\"" "Starship palette: $1"
 }
 
+apply_sketchybar() {
+    local theme="$1" sb_dir="$DOTFILES/config/sketchybar/themes"
+    [[ -f "$sb_dir/${theme}.sh" ]] || { warning "sketchybar theme not found: $theme"; return }
+    ln -sfn "${theme}.sh" "$sb_dir/current.sh"
+    if command -v sketchybar &> /dev/null; then
+        sketchybar --reload 2>/dev/null || true
+    fi
+    info "Applied sketchybar theme: $theme"
+}
+
 apply_all() {
     local theme="$1"
     mkdir -p "${THEME_FILE:h}"
@@ -62,6 +72,7 @@ apply_all() {
     apply_tmux "$theme"
     apply_ghostty "$theme"
     apply_starship "$theme"
+    apply_sketchybar "$theme"
     success "Theme applied: $theme"
 }
 

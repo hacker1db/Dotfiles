@@ -1,94 +1,301 @@
 #!/usr/bin/env bash
-# Claude Code status line — model, context bar, tokens remaining
+#
+# Claude Code status line. Reads the session JSON on stdin and prints one
+# line: an identity cluster on the left (branch, model, agent) and a
+# resources cluster on the right (lines, cost, context, usage, style), with
+# the gap between them sized so the line spans the pane. Segments inside a
+# cluster are separated by whitespace, matching the tmux bar.
 
+# Colors (real escapes so widths can be measured after stripping them)
+ESC=$(printf '\033')
+RED="${ESC}[0;31m"
+GREEN="${ESC}[0;32m"
+YELLOW="${ESC}[0;33m"
+BLUE="${ESC}[0;34m"
+MAGENTA="${ESC}[0;35m"
+CYAN="${ESC}[0;36m"
+WHITE="${ESC}[0;37m"
+DIM="${ESC}[2m"
+RESET="${ESC}[0m"
+
+# Gap between segments inside a cluster (same air as the tmux bar).
+GAP="   "
+# Cells Claude Code indents the line by on the left; mirrored on the right so
+# the line sits centred with equal margins. `statusLine.padding` in
+# settings.json changes the left value.
+EDGE=2
+
+# Nerd font icons (colorized).
+# macOS ships bash 3.2 whose printf does not interpret \u / \U escapes; it
+# emits them as literal text. Use UTF-8 byte sequences (\xHH) instead, which
+# bash 3.2 printf does support.
+ICON_PROJECT="${BLUE}$(printf '\xee\x97\xbf')${RESET}"          # nf-md-folder      U+E5FF
+ICON_BRANCH="${GREEN}$(printf '\xee\x9c\xa5')${RESET}"          # nf-dev-git_branch U+E725
+ICON_CONTEXT="${MAGENTA}$(printf '\xf3\xb0\xa7\x91')${RESET}"   # nf-md-brain       U+F09D1
+ICON_COST="${GREEN}$(printf '\xef\x85\x95')${RESET}"            # nf-fa-dollar      U+F155
+ICON_STYLE="${CYAN}$(printf '\xf3\xb0\x8f\x98')${RESET}"        # nf-md-palette     U+F03D8
+ICON_USAGE="${YELLOW}$(printf '\xf3\xb0\x89\x81')${RESET}"      # nf-md-gauge       U+F0241
+ICON_LINES="${CYAN}$(printf '\xef\x91\x80')${RESET}"            # nf-fa-file_text   U+F440
+ICON_AGENT="${DIM}$(printf '\xf3\xb0\x9a\xa9')${RESET}"         # nf-md-robot       U+F06A9
+
+# Feature flags (set env vars to 0 to disable)
+SHOW_CONTEXT_TOKENS="${CLAUDE_STATUSLINE_TOKENS:-1}"
+SHOW_USAGE="${CLAUDE_STATUSLINE_USAGE:-1}"
+
+# Read JSON input from stdin
 input=$(cat)
 
-# Directory (just the current folder name)
-cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd')
-short_dir=$(basename "$cwd")
+# Tee rate_limits to a cache for sketchybar's usage pill (push, no polling
+# on the bar side). Writes atomically and only fires the trigger when the
+# payload actually changed, so most statusline refreshes cost one jq.
+# Enterprise billing omits rate_limits entirely, so this is a no-op there.
+tee_usage_cache() {
+  local cache="$HOME/.cache/claude-usage.json" limits
+  limits=$(echo "$input" | jq -c '.rate_limits // empty' 2>/dev/null)
+  [ -n "$limits" ] || return 0
+  [ "$limits" = "$(cat "$cache" 2>/dev/null)" ] && return 0
+  printf '%s' "$limits" >"${cache}.tmp" && mv "${cache}.tmp" "$cache"
+  command -v sketchybar >/dev/null 2>&1 && sketchybar --trigger claude_usage_update &
+}
+tee_usage_cache
 
-# Git branch
-branch=""
-if git -C "$cwd" rev-parse --is-inside-work-tree --no-optional-locks 2>/dev/null | grep -q true; then
-  branch=$(git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
-fi
+# Helper functions for extracting data
+get_model_name() { echo "$input" | jq -r '.model.display_name // "Unknown Model"' | sed 's/ (.*)//'; }
 
-# Git status summary
-git_status=""
-if [ -n "$branch" ]; then
-  status_flags=$(git -C "$cwd" status --porcelain --no-optional-locks 2>/dev/null)
-  modified=$(echo "$status_flags" | grep -c '^ M\|^M ' 2>/dev/null || true)
-  untracked=$(echo "$status_flags" | grep -c '^??' 2>/dev/null || true)
-  staged=$(echo "$status_flags" | grep -c '^[MADRCU]' 2>/dev/null || true)
+# Get model-specific icon based on model name
+get_model_icon() {
+  local model_name=$(get_model_name)
+  case "$model_name" in
+  *[Ff]able* | *[Mm]ythos*) printf "${MAGENTA}\xf3\xb0\x97\x9a${RESET}" ;; # nf-md-book_open_page_variant U+F05DA
+  *[Oo]pus*) printf "${MAGENTA}\xf3\xb0\x87\xa5${RESET}" ;;   # nf-md-brain_freeze U+F01E5
+  *[Ss]onnet*) printf "${CYAN}\xf3\xb0\x9d\x9a${RESET}" ;;    # nf-md-music_note   U+F075A
+  *[Hh]aiku*) printf "${GREEN}\xf3\xb0\x9c\xb5${RESET}" ;;    # nf-md-leaf         U+F0735
+  *) printf "${DIM}\xf3\xb0\x9a\xa9${RESET}" ;;               # nf-md-robot        U+F06A9
+  esac
+}
+get_output_style() { echo "$input" | jq -r '.output_style.name // "default"'; }
+get_current_dir() { echo "$input" | jq -r '.workspace.current_dir // "."'; }
+get_project_dir() { echo "$input" | jq -r '.workspace.project_dir // "."'; }
+get_cost() {
+  local cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
+  printf "${DIM}\$%.2f${RESET}" "$cost"
+}
 
-  flags=""
-  [ "$staged" -gt 0 ]    && flags="${flags}+"
-  [ "$modified" -gt 0 ]  && flags="${flags}!"
-  [ "$untracked" -gt 0 ] && flags="${flags}?"
+get_lines_changed() {
+  local added=$(echo "$input" | jq -r '.cost.total_lines_added // 0')
+  local removed=$(echo "$input" | jq -r '.cost.total_lines_removed // 0')
+  [ "$added" = "0" ] && [ "$removed" = "0" ] && return
+  printf "${GREEN}+%d${RESET}/${RED}-%d${RESET}" "$added" "$removed"
+}
 
-  git_status=" ${branch}${flags:+ [${flags}]}"
-fi
+get_agent_name() {
+  echo "$input" | jq -r '.agent.name // empty'
+}
 
-# Model
-model=$(echo "$input" | jq -r '.model.display_name // .model.id // ""' | sed 's/ *([^)]*context[^)]*)//i')
+get_context_percent() {
+  # Use pre-calculated percentage from Claude Code (recommended approach)
+  local percent=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
+  # Round to integer for display
+  printf "%.0f" "$percent"
+}
 
-# Context usage bar and tokens remaining
-used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
-ctx_size=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
-
-ctx_part=""
-if [ "$ctx_size" -gt 0 ] 2>/dev/null; then
-  # Calculate used/remaining tokens from current_usage (accurate context state)
-  used_tokens=$(echo "$input" | jq -r '
-    (.context_window.current_usage.input_tokens // 0)
-    + (.context_window.current_usage.cache_creation_input_tokens // 0)
-    + (.context_window.current_usage.cache_read_input_tokens // 0)')
-  remaining_tokens=$((ctx_size - used_tokens))
-
-  # Format token count (e.g. 920K, 1.0M)
-  if [ "$remaining_tokens" -ge 1000000 ]; then
-    tokens_fmt=$(awk "BEGIN { printf \"%.1fM\", $remaining_tokens/1000000 }")
-  elif [ "$remaining_tokens" -ge 1000 ]; then
-    tokens_fmt=$(awk "BEGIN { printf \"%.0fK\", $remaining_tokens/1000 }")
+get_context_used() {
+  # Calculate tokens from percentage and window size (most accurate)
+  local percent=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
+  local window=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
+  local used=$(echo "$percent * $window / 100" | bc)
+  if [ "$used" -ge 1000 ]; then
+    printf "%.0fK" "$(echo "scale=0; $used / 1000" | bc)"
   else
-    tokens_fmt="${remaining_tokens}"
+    printf "%d" "$used"
+  fi
+}
+
+# Build a progress bar with color based on percentage
+build_context_bar() {
+  local used=$(get_context_percent)
+  local remaining=$((100 - used))
+  local bar_width=5
+  local filled=$((remaining * bar_width / 100))
+  local empty=$((bar_width - filled))
+
+  [ "$filled" -gt "$bar_width" ] && filled=$bar_width && empty=0
+  [ "$filled" -lt 0 ] && filled=0 && empty=$bar_width
+
+  local bar_color
+  if [ "$remaining" -gt 50 ]; then
+    bar_color="$GREEN"
+  elif [ "$remaining" -gt 20 ]; then
+    bar_color="$YELLOW"
+  else
+    bar_color="$RED"
   fi
 
-  # Build loading bar (20 chars wide)
-  bar_width=20
-  used_int=${used_pct%.*}
-  [ -z "$used_int" ] && used_int=0
-  filled=$(( (used_int * bar_width + 50) / 100 ))
-  [ "$filled" -gt "$bar_width" ] && filled=$bar_width
+  local bar=""
+  for ((i = 0; i < filled; i++)); do bar+="━"; done
+  for ((i = 0; i < empty; i++)); do bar+="╌"; done
 
-  bar=""
-  i=0
-  while [ "$i" -lt "$filled" ]; do
-    bar="${bar}#"
-    i=$((i + 1))
-  done
-  while [ "$i" -lt "$bar_width" ]; do
-    bar="${bar}-"
-    i=$((i + 1))
-  done
-
-  # Color: green <50%, yellow 50-80%, red >80%
-  if [ "$used_int" -le 50 ]; then
-    bar_color="\033[32m"  # green
-  elif [ "$used_int" -le 80 ]; then
-    bar_color="\033[33m"  # yellow
+  if [ "$SHOW_CONTEXT_TOKENS" = "1" ]; then
+    local tokens=$(get_context_used)
+    printf "%s%s%s %d%% ${DIM}(%s)${RESET}" "$bar_color" "$bar" "$RESET" "$remaining" "$tokens"
   else
-    bar_color="\033[31m"  # red
+    printf "%s%s%s %d%%" "$bar_color" "$bar" "$RESET" "$remaining"
+  fi
+}
+
+# ── Usage limits ──────────────────────────────────────────────────────────────
+#
+# Source: the `rate_limits` field Claude Code passes in on stdin. This is
+# normalized per-session, so it reflects the CURRENT account (Max subscription
+# vs. enterprise) — no keychain/token guessing. Enterprise billing omits the
+# field entirely, so nothing renders. `resets_at` is epoch seconds.
+
+# Format an epoch-seconds timestamp to a human-readable time-until string
+format_time_until() {
+  local reset_epoch="$1"
+  [ -z "$reset_epoch" ] && { echo "?"; return; }
+
+  local now
+  now=$(date "+%s")
+  if [ "$now" -ge "$reset_epoch" ]; then
+    echo "now"
+    return
   fi
 
-  used_pct_fmt=$(awk "BEGIN { printf \"%.1f\", $used_pct }")
+  local secs=$((reset_epoch - now))
+  local mins=$((secs / 60))
+  local hours=$((mins / 60))
+  local days=$((hours / 24))
 
-  ctx_part=$(printf " | %b[%s]\033[0m %s%% of context used | ~%s tokens left" \
-    "$bar_color" "$bar" "$used_pct_fmt" "$tokens_fmt")
+  if [ "$days" -gt 0 ]; then
+    printf "%dd%dh" "$days" $((hours % 24))
+  elif [ "$hours" -gt 0 ]; then
+    printf "%dh%dm" "$hours" $((mins % 60))
+  else
+    printf "%dm" "$mins"
+  fi
+}
+
+# Build a mini usage bar for a single window
+# Args: $1=remaining_pct (0-100), $2=label ("5h"/"7d"), $3=time_until
+build_usage_bar() {
+  local remaining="$1" label="$2" time_until="$3"
+  local bar_width=5
+  local filled=$((remaining * bar_width / 100))
+  local empty=$((bar_width - filled))
+
+  [ "$filled" -gt "$bar_width" ] && filled=$bar_width && empty=0
+  [ "$filled" -lt 0 ] && filled=0 && empty=$bar_width
+
+  local bar_color
+  if [ "$remaining" -gt 50 ]; then
+    bar_color="$GREEN"
+  elif [ "$remaining" -gt 20 ]; then
+    bar_color="$YELLOW"
+  else
+    bar_color="$RED"
+  fi
+
+  local bar=""
+  for ((i = 0; i < filled; i++)); do bar+="━"; done
+  for ((i = 0; i < empty; i++)); do bar+="╌"; done
+
+  printf "${DIM}%s${RESET} %s%s%s %d%% ${DIM}↻%s${RESET}" \
+    "$label" "$bar_color" "$bar" "$RESET" "$remaining" "$time_until"
+}
+
+# Render one rate-limit window from stdin, or nothing if it's absent.
+# Args: $1=json key (five_hour/seven_day), $2=label (5h/7d)
+render_usage_window() {
+  local key="$1" label="$2"
+  local used reset
+  used=$(echo "$input" | jq -r ".rate_limits.${key}.used_percentage // empty")
+  reset=$(echo "$input" | jq -r ".rate_limits.${key}.resets_at // empty")
+  [ -z "$reset" ] && return
+  used=$(printf "%.0f" "${used:-0}")
+  build_usage_bar "$((100 - used))" "$label" "$(format_time_until "$reset")"
+}
+
+# Build usage display string from stdin rate_limits
+build_usage_display() {
+  [ "$SHOW_USAGE" = "1" ] || return
+
+  local five seven
+  five=$(render_usage_window five_hour "5h")
+  seven=$(render_usage_window seven_day "7d")
+
+  # No active rate windows (e.g., enterprise billing) — nothing to show
+  if [ -n "$five" ] && [ -n "$seven" ]; then
+    printf "%s ${DIM}╱${RESET} %s" "$five" "$seven"
+  else
+    printf "%s%s" "$five" "$seven"
+  fi
+}
+
+# ── Layout helpers ────────────────────────────────────────────────────────────
+
+# Visible width of a string: strip SGR escapes, count code points. Every glyph
+# used here (nerd icons, box drawing, arrows) is one cell wide.
+width() {
+  printf '%s' "$1" | jq -Rr --arg esc "$ESC" 'gsub($esc + "\\[[0-9;]*m"; "") | length'
+}
+
+# Join non-empty arguments with GAP.
+join() {
+  local out="" s
+  for s in "$@"; do
+    [ -n "$s" ] || continue
+    out+="${out:+$GAP}$s"
+  done
+  printf '%s' "$out"
+}
+
+# Terminal width. Claude Code exports COLUMNS to status line commands (2.1.153+).
+# Asking tmux for #{pane_width} from here answers for the client's *active*
+# pane, not the one Claude runs in, so it is only a fallback.
+term_width="${COLUMNS:-0}"
+case "$term_width" in *[!0-9]* | '') term_width=0 ;; esac
+if [ "$term_width" -lt 40 ] && [ -n "$TMUX" ]; then
+  term_width=$(tmux display-message -p '#{pane_width}' 2>/dev/null || echo 0)
+fi
+if [ "$term_width" -lt 40 ]; then
+  term_width=$(tput cols 2>/dev/null || echo 200)
 fi
 
-printf "\033[36m%s\033[0m\033[90m%s\033[0m\033[33m%s\033[0m%s" \
-  "$short_dir" \
-  "$git_status" \
-  "${model:+ [$model]}" \
-  "$ctx_part"
+# ── Extract values ────────────────────────────────────────────────────────────
+model=$(get_model_name)
+model_icon=$(get_model_icon)
+output_style=$(get_output_style)
+cost_display=$(get_cost)
+context_bar=$(build_context_bar)
+usage_display=$(build_usage_display)
+lines_display=$(get_lines_changed)
+agent_name=$(get_agent_name)
+git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "no-git")
+
+# ── Left cluster: identity ────────────────────────────────────────────────────
+branch_seg=""
+[ "$term_width" -ge 80 ] && branch_seg="${ICON_BRANCH} ${GREEN}${git_branch}${RESET}"
+model_seg="${model_icon} ${MAGENTA}${model}${RESET}"
+[ -n "$agent_name" ] && model_seg+=" ${DIM}(${agent_name})${RESET}"
+left=$(join "$branch_seg" "$model_seg")
+
+# ── Right cluster: impact, gauges, meta ───────────────────────────────────────
+lines_seg=""; [ -n "$lines_display" ] && lines_seg="${ICON_LINES} ${lines_display}"
+cost_seg=""; [ "$cost_display" != "${DIM}\$0.00${RESET}" ] && cost_seg="${ICON_COST} ${cost_display}"
+context_seg="${ICON_CONTEXT} ${context_bar}"
+usage_seg=""; [ -n "$usage_display" ] && usage_seg="${ICON_USAGE} ${usage_display}"
+style_seg=""; [ "$output_style" != "default" ] && style_seg="${ICON_STYLE} ${DIM}${output_style}${RESET}"
+right=$(join "$lines_seg" "$cost_seg" "$context_seg" "$usage_seg" "$style_seg")
+
+# ── Spread ────────────────────────────────────────────────────────────────────
+# Fill between the clusters so the right one ends EDGE cells from the pane
+# edge. If the pane is too narrow for both, fall back to one gap and let
+# Claude Code truncate.
+avail=$((term_width - 2 * EDGE))
+fill=$((avail - $(width "$left") - $(width "$right")))
+if [ "$fill" -lt "${#GAP}" ]; then
+  printf '%s%s%s\n' "$left" "$GAP" "$right"
+else
+  printf '%s%*s%s\n' "$left" "$fill" "" "$right"
+fi

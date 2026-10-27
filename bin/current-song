@@ -1,0 +1,23 @@
+#!/bin/bash
+# Reports macOS system Now Playing, including browser media.
+# Default: "Title - Artist" while playing, empty when paused or silent.
+# --json: {app,song,state,artwork} for playing or paused media.
+# Artwork is base64 from the same snapshot, not a separate player query.
+
+np=$(nowplaying-cli get --json title artist playbackRate clientBundleIdentifier artworkData 2>/dev/null) || exit 0
+np=$(jq -c '
+  select((.title // "") != "") |
+  {
+    app: (.clientBundleIdentifier // ""),
+    song: ([.title, .artist] | map(select(. != null and . != "")) | join(" - ") | .[0:50]),
+    state: (if (.playbackRate // 0) > 0 then "playing" else "paused" end),
+    artwork: (.artworkData // "")
+  }
+' <<<"$np" 2>/dev/null) || exit 0
+[ -n "$np" ] || exit 0
+
+if [ "${1:-}" = "--json" ]; then
+  printf '%s\n' "$np"
+else
+  jq -r 'select(.state == "playing").song // empty' <<<"$np"
+fi
