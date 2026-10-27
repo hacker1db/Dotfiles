@@ -49,7 +49,7 @@ sketchybar --bar \
   shadow=on \
   padding_left=12 \
   padding_right=12 \
-  display=all
+  display=main
 
 sketchybar --hotload true
 
