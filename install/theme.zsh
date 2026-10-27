@@ -28,7 +28,7 @@ apply_tmux() {
         sed_inplace 's/themes\/eldritch.conf/themes\/current.conf/' "$DOTFILES/config/tmux/tmux.conf" || true
     fi
     if [[ -n "${TMUX:-}" ]]; then
-        tmux source-file "$HOME/.dotfiles/main/config/tmux/tmux.conf" || warning "tmux reload failed"
+        tmux source-file "$HOME/.config/tmux/tmux.conf" || warning "tmux reload failed"
     fi
     info "Applied tmux theme: $theme"
 }

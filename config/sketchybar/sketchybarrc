@@ -19,7 +19,9 @@
 
 CONFIG_DIR="${CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/sketchybar}"
 PLUGIN_DIR="$CONFIG_DIR/plugins"
-DOTFILES_BIN="$HOME/.dotfiles/main/bin"
+# Addressed through the ~/.config/sketchybar symlink so helpers come from
+# whichever checkout install.sh use has made active.
+DOTFILES_BIN="$CONFIG_DIR/../../bin"
 # colors.sh itself sources the active named theme (themes/current.sh) at the end
 source "$CONFIG_DIR/colors.sh"
 source "$PLUGIN_DIR/wm.sh"

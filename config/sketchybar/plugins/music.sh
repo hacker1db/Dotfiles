@@ -8,7 +8,7 @@
 
 source "$CONFIG_DIR/colors.sh"
 
-NP=$("$HOME/.dotfiles/main/bin/current-song" --json 2>/dev/null)
+NP=$("$CONFIG_DIR/../../bin/current-song" --json 2>/dev/null)
 SONG=$(jq -r '.song // empty' <<<"$NP" 2>/dev/null)
 STATE=$(jq -r '.state // empty' <<<"$NP" 2>/dev/null)
 
@@ -21,7 +21,7 @@ fi
 LABEL_COLOR="$FG" NOTE_COLOR="$MAGENTA"
 [ "$STATE" = "paused" ] && LABEL_COLOR="$FG_DIM" NOTE_COLOR="$GREY"
 
-ART=$("$HOME/.dotfiles/main/bin/album-art" <<<"$NP" 2>/dev/null)
+ART=$("$CONFIG_DIR/../../bin/album-art" <<<"$NP" 2>/dev/null)
 if [ -n "$ART" ]; then
   sketchybar --animate tanh 30 --set "$NAME" drawing=on \
     label="$SONG" label.color="$LABEL_COLOR" \
