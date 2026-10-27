@@ -262,7 +262,7 @@ Template hooks in `git/templates/hooks/`:
 
 ## Configuration boundaries
 
-- The general linker skips existing configuration paths; selected managed integrations reconcile their own links.
+- The general linker refreshes existing symlinks to the current checkout and only skips non-symlink paths; selected managed integrations reconcile their own links.
 - Personal skills are maintained outside dotfiles in the skills repository.
 - lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories. Specs directly under `lua/plugins/` are not imported by this setup.
 - Use [README.md](README.md), [Claude profiles](claude/PROFILES.md) and [plan-manager integration](docs/plan-manager.md) for current setup details.

@@ -4,28 +4,17 @@ source "${0:A:h}/lib.zsh"
 
 LINK_FAILURE=0
 
-link_new() {
-    local src="$1" dest="$2"
-    [[ -L "$dest" && ! -e "$dest" ]] && rm "$dest"
-    if [[ -e "$dest" ]]; then
-        print "~${dest#$HOME} already exists... Skipping."
-    else
-        print "Creating symlink for $src"
-        ln -s "$src" "$dest"
-    fi
-}
-
 title "Creating symlinks"
 typeset file config entry destination backup
 for file in "$DOTFILES"/*.symlink(N) "$DOTFILES"/*/*.symlink(N) "$DOTFILES"/*/*/*.symlink(N); do
-    link_new "$file" "$HOME/.${${file:t}%.symlink}"
+    link_file "$file" "$HOME/.${${file:t}%.symlink}"
 done
 
 title "Installing to ~/.config"
 mkdir -p "$HOME/.config"
 for config in "$DOTFILES"/config/*(N); do
     [[ "${config:t}" == opencode ]] && continue  # linked per entry below
-    link_new "$config" "$HOME/.config/${config:t}"
+    link_file "$config" "$HOME/.config/${config:t}"
 done
 
 title "Linking OpenCode configuration"
