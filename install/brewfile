@@ -59,6 +59,8 @@ brew "cloc"
 brew "cocoapods"
 # Tool for interacting with remote images and registries
 brew "crane"
+# Command-line tool for getting & setting the default browser
+brew "defaultbrowser"
 # Debugger for the Go programming language
 brew "delve"
 # Tool for exploring each layer in a docker image
@@ -361,6 +363,8 @@ cask "gcloud-cli"
 cask "ghostty"
 # Client for the Google Drive storage service
 cask "google-drive"
+# Chromium based web browser
+cask "helium-browser"
 # Utility to hide menu bar items
 cask "hiddenbar"
 # Free and open-source media player

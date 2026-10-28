@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+
+function browser() {
+	"${DOTFILES:-$HOME/.dotfiles/main}/install.sh" browser "$@"
+}
