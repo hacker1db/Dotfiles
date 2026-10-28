@@ -18,6 +18,7 @@ tap "homebrew/cask-fonts"
 tap "jesseduffield/lazygit", trusted: true
 tap "majd/repo", trusted: true
 tap "mondoohq/mondoo", trusted: true
+tap "nicknisi/formulae", trusted: true
 tap "noahgorstein/tap", trusted: true
 tap "oven-sh/bun"
 tap "owasp-amass/amass", "https://github.com/owasp-amass/homebrew-amass.git"
@@ -86,8 +87,12 @@ brew "fd"
 brew "feroxbuster"
 # Fast web fuzzer written in Go
 brew "ffuf"
+# Terminal dashboard for managing AI agent sessions in tmux
+brew "nicknisi/formulae/fleet"
 # Fast and simple Node.js version manager
 brew "fnm"
+# File system event watcher (pushes fleet state to sketchybar)
+brew "fswatch"
 # Command-line fuzzy finder written in Go
 brew "fzf"
 # Scanner for secrets and sensitive data in code
@@ -198,8 +203,6 @@ brew "nvm"
 brew "ollama", restart_service: :changed
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
-# AI coding agent, built for the terminal
-brew "opencode"
 # Library to simplify the interaction with PKCS#11
 brew "pkcs11-helper"
 # SSL/TLS VPN implementing OSI layer 2 or 3 secure network extension
@@ -330,16 +333,12 @@ cask "azure-data-studio"
 cask "basictex"
 # Virtual Audio Driver
 cask "blackhole-2ch"
-# Web security testing toolkit
-cask "burp-suite"
 # Web security auditing toolkit
 cask "caido"
 # OpenAI's official ChatGPT desktop app
 cask "chatgpt"
 # Anthropic's official Claude AI desktop app
 cask "claude"
-# Terminal-based AI coding assistant
-cask "claude-code"
 # OpenAI's coding agent that runs in your terminal
 cask "codex"
 # OpenAI's Codex desktop app for managing coding agents
@@ -416,8 +415,6 @@ cask "t3-code"
 cask "todoist-app"
 # Tool to install Linux/BSD distributions to a partition or USB drive
 cask "unetbootin"
-# Open-source code editor
-cask "visual-studio-code@insiders"
 # Voice-to-text dictation with AI-powered auto-editing
 cask "wispr-flow"
 # Gecko based web browser

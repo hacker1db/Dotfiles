@@ -5,7 +5,7 @@ root="${DOTFILES:-$HOME/.dotfiles/main}"
 claude_dir="$root/claude"
 profiles_dir="$claude_dir/profiles"
 generated="$claude_dir/.local/profiles"
-typeset -a linked_items=(CLAUDE.md commands output-styles statusline-command.sh)
+typeset -a linked_items=(CLAUDE.md output-styles statusline-command.sh)
 credential_keys='["ANTHROPIC_API_KEY","ANTHROPIC_AUTH_TOKEN","ANTHROPIC_FOUNDRY_API_KEY","ANTHROPIC_FOUNDRY_AUTH_TOKEN","CLAUDE_CODE_OAUTH_TOKEN"]'
 
 check=0
@@ -81,9 +81,10 @@ auto='{}'
 
 build() {
     local -a layers=("$claude_dir/settings.base.json" "$profiles_dir/$1/settings.json")
-    jq -S -s --arg profile "$1" --arg resource "$resource" --argjson auto "$auto" '
+    jq -S -s --arg profile "$1" --arg resource "$resource" --arg home "$HOME" --argjson auto "$auto" '
         reduce .[] as $layer ({}; . * $layer)
         | .env += {CLAUDE_CODE_USE_BEDROCK: "0", CLAUDE_CODE_USE_VERTEX: "0"}
+        | .extraKnownMarketplaces."fleet-local" = {source: {source: "directory", path: ($home + "/.local/share/fleet-marketplace")}}
         | if $profile == "foundry" then . * $auto | .env.ANTHROPIC_FOUNDRY_RESOURCE = $resource
           else .env.CLAUDE_CODE_USE_FOUNDRY = "0" | .forceLoginMethod = "claudeai" end' "${layers[@]}"
 }
@@ -117,12 +118,18 @@ install_plugins() {
     while IFS=$'\t' read -r name src; do
         jq -e --arg n "$name" 'any(.[]; .name == $n)' <<< "$have" >/dev/null ||
             CLAUDE_CONFIG_DIR="$dir" claude plugin marketplace add "$src" || problem "Failed to add marketplace $name to $dir"
-    done < <(jq -r '.extraKnownMarketplaces // {} | to_entries[] | [.key, (.value.source.repo // .value.source.url)] | @tsv' <<< "$settings")
+    done < <(jq -r '.extraKnownMarketplaces // {} | to_entries[] | [.key, (.value.source.repo // .value.source.url // .value.source.path)] | @tsv' <<< "$settings")
     have="$(CLAUDE_CONFIG_DIR="$dir" claude plugin list --json)"
     while read -r id; do
         jq -e --arg id "$id" 'any(.[]; .id == $id)' <<< "$have" >/dev/null ||
             CLAUDE_CONFIG_DIR="$dir" claude plugin install "$id" || problem "Failed to install plugin $id in $dir"
     done < <(jq -r '.enabledPlugins // {} | to_entries[] | select(.value) | .key' <<< "$settings")
+}
+
+install_fleet() {
+    local dir="$1"
+    command -v fleet >/dev/null || return 0
+    CLAUDE_CONFIG_DIR="$dir" fleet install </dev/null >/dev/null || problem "fleet install failed for $dir"
 }
 
 [[ ! -L "$generated" && ! -L "${generated:h}" ]] || die "Refusing symlinked generated directory: $generated"
@@ -180,7 +187,19 @@ for profile in personal subscription foundry; do
         problem "skillctl is not installed; $dir/skills left empty"
     fi
     install_plugins "$dir" "$want"
+    install_fleet "$dir"
     print "Profile ready: $profile ($dir)"
 done
+
+if [[ "$check" -eq 0 ]]; then
+    if command -v fleet >/dev/null; then
+        if command -v codex >/dev/null || [[ -d "$HOME/.codex" ]]; then
+            fleet install codex </dev/null >/dev/null || problem "fleet install codex failed"
+        fi
+        print "Fleet hooks wired for Claude profiles and Codex; Copilot is tracked by process discovery."
+    else
+        problem "fleet is not installed; agent hooks skipped (brew bundle installs it)"
+    fi
+fi
 
 exit $(( incomplete ? 2 : 0 ))
