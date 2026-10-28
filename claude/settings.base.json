@@ -42,6 +42,7 @@
     ]
   },
   "enabledPlugins": {
+    "fleet@fleet-local": true,
     "cli-anything@cli-anything": true,
     "typescript-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
