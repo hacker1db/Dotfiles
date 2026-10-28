@@ -116,9 +116,7 @@ alias cf='claude-foundry'
 alias cfc='claude-foundry --continue'
 alias cw='claude-subscription'
 alias cwc='claude-subscription --continue'
-alias oc='opencode'
 alias occ='copilot'
-alias ocr='opencode run'
 
 # applications
 alias devtoy='open /Applications/DevToy.app'

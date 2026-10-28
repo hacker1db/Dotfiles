@@ -13,24 +13,13 @@ done
 title "Installing to ~/.config"
 mkdir -p "$HOME/.config"
 for config in "$DOTFILES"/config/*(N); do
-    [[ "${config:t}" == opencode ]] && continue  # linked per entry below
     link_file "$config" "$HOME/.config/${config:t}"
-done
-
-title "Linking OpenCode configuration"
-typeset -a opencode_unmanaged=(agent node_modules package.json package-lock.json bun.lock service.json)
-opencode_dest="$HOME/.config/opencode"
-[[ -L "$opencode_dest" ]] && rm "$opencode_dest" && print "Replaced the $opencode_dest symlink with a directory"
-mkdir -p "$opencode_dest"
-for entry in "$DOTFILES"/config/opencode/*(ND); do
-    [[ ${opencode_unmanaged[(Ie)${entry:t}]} -gt 0 ]] && continue
-    link_file "$entry" "$opencode_dest/${entry:t}"
 done
 
 title "Linking agent instructions"
 typeset instructions="$DOTFILES/global/AGENTS.md"
 [[ -f "$instructions" ]] || { error "Missing instruction source: $instructions"; exit 1 }
-for destination in "$HOME/.codex/AGENTS.md" "$HOME/.copilot/copilot-instructions.md" "$HOME/.config/opencode/AGENTS.md"; do
+for destination in "$HOME/.codex/AGENTS.md" "$HOME/.copilot/copilot-instructions.md"; do
     if [[ -e "$destination" && "$instructions" -ef "$destination" ]]; then
         print "Instruction file already linked: $destination"
         continue

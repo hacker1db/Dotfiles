@@ -1,6 +1,6 @@
 # Plan Manager
 
-A tool-neutral local plan library backed by `~/notes/SecondBrain/4.Resources/plans`, published to the hosted site, and accessible from Claude Code, OpenCode, Copilot, and Codex through the shared `plans` skill. `plan serve` still runs the local dashboard at `http://plans.localhost:4173/` by hand; no service is installed.
+A tool-neutral local plan library backed by `~/notes/SecondBrain/4.Resources/plans`, published to the hosted site, and accessible from Claude Code, Copilot, and Codex through the shared `plans` skill. `plan serve` still runs the local dashboard at `http://plans.localhost:4173/` by hand; no service is installed.
 
 ## Application repository
 
@@ -147,7 +147,6 @@ The ID is immutable across title changes, renames, status changes, and archive m
 | Tool | Command | Notes |
 | --- | --- | --- |
 | Claude Code | `/plans` | Delegates to the `plans` skill |
-| OpenCode | `/plans` | Delegates to the `plans` skill |
 | Copilot CLI | `/plans` | Delegates to the `plans` skill |
 | Codex desktop | `$plans` or `/skills` → plans | Preserves native `/plan` mode |
 | Codex CLI | `$plans` | Preserves native `/plan` mode |
@@ -157,7 +156,7 @@ The ID is immutable across title changes, renames, status changes, and archive m
 
 After `./install.sh link` completes:
 
-- **Claude Code, OpenCode, Copilot**: start a new session to pick up updated instructions and command adapters; ensure the shared skill is installed separately.
+- **Claude Code, Copilot**: start a new session to pick up updated instructions and command adapters; ensure the shared skill is installed separately.
 - **Codex desktop**: global guidance loads once at the beginning of a run; start a new desktop task after linking.
 - **Codex CLI**: start a new CLI session after linking.
 
@@ -177,7 +176,7 @@ for f in ~/.claude/plans/*.md; do plan import "$f"; done
 
 The source file is never modified or deleted. The imported copy appears in the dashboard at its stable ID-based URL.
 
-Standalone Markdown or HTML artifacts created by Claude Code, Codex, OpenCode, or Copilot can be registered explicitly:
+Standalone Markdown or HTML artifacts created by Claude Code, Codex, or Copilot can be registered explicitly:
 
 ```bash
 plan capture ~/.codex/visualizations/<task>/implementation-plan.html --json

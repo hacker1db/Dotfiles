@@ -44,7 +44,6 @@ Detect the platform with `[[ $OSTYPE == darwin* ]]`; the installer scripts are z
 | `config/tmux/themes/tmuxlayout.conf:21` | `osascript` "now playing" segment | Show it only on macOS. |
 | `config/ghostty/config:9` | `macos-titlebar-style` | Ghostty ignores it on Linux, so no change is needed. |
 | `bin/login-shell` | Uses `reattach-to-user-namespace`, but falls back to `exec "$shell" -l` | Works on Linux with this branch's fix. |
-| `config/opencode/package-lock.json` | Only pins the darwin `msgpackr-extract` optional dependencies | Regenerate it on Linux or let npm pick the platform optional dependency. Verify `opencode` plugins load. |
 | `install/brewfile` | Contains `cask`/`mas` entries | `brew bundle` on Linux skips casks with warnings. Consider `if OS.mac?` blocks. |
 
 ## Linux gaps (no equivalent yet)

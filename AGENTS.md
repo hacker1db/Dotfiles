@@ -80,13 +80,13 @@ for f in install.sh install/*.zsh; do zsh -n "$f" || exit 1; done
 zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
 zsh -n bin/tmux-reload-all
 
-# Audit The Claude Profiles (read-only)
+# Audit The Claude Profiles (Read-Only)
 zsh ~/.dotfiles/main/install/claude-profiles.zsh --check
 
 # Manual Testing: Source Configuration In New Shell
 source ~/.zshrc
 
-# Install links and integrations (changes configuration)
+# Install Links And Integrations (Changes Configuration)
 ~/.dotfiles/main/install.sh link
 ```
 
@@ -199,13 +199,13 @@ All directories under `config/` are symlinked to `~/.config/<name>`. When adding
 - The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out at `$HOME/Developer/skills/main` by default.
 - That repository provides `skillctl`, the skill manager for Codex, Claude Code, and GitHub Copilot CLI. Read its README before changing skill sources, selections, or installation behavior.
 - Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/claude-profiles.zsh` runs `skillctl sync --global` for each Claude profile.
-- The project-scoped Caido installer and the OpenCode skill under `config/opencode/skills/` are separate from the current `skillctl` global adapters.
+- The project-scoped Caido installer is separate from the current `skillctl` global adapters.
 
 ## Important Files & Patterns
 
 ### Neovim Keymaps
 
-- **Leader key**: Space
+- **Leader key**: semicolon (`;`)
 - **Local leader**: `\`
 - **File operations**: `<leader>e` (Snacks explorer), `<leader>ff` (files), `<leader>fr` (recent)
 - **Search**: `<leader>/` (grep), `<leader>sh` (help)
@@ -260,7 +260,7 @@ Template hooks in `git/templates/hooks/`:
 - **Terminal**: Ghostty
 - **Package manager**: Homebrew
 
-## Configuration boundaries
+## Configuration Boundaries
 
 - The general linker refreshes existing symlinks to the current checkout and only skips non-symlink paths; selected managed integrations reconcile their own links.
 - Personal skills are maintained outside dotfiles in the skills repository.
