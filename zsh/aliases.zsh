@@ -123,3 +123,8 @@ alias ocr='opencode run'
 # applications
 alias devtoy='open /Applications/DevToy.app'
 alias scan='ggshield secret scan path --recursive --yes ./'
+
+# SketchyBar
+alias sb='sketchybar --bar hidden=toggle'
+alias sbon='brew services start sketchybar'
+alias sboff='brew services stop sketchybar'
