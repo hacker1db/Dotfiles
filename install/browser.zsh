@@ -37,14 +37,17 @@ write_browser_file() {
 apply_browser() {
     local browser="$1"
     require_defaultbrowser || return 1
-    if ! defaultbrowser 2>/dev/null | tr -d '* ' | grep -qx "$browser"; then
+    if ! defaultbrowser 2>/dev/null | tr -d '* ' | grep -Fqx -- "$browser"; then
         warning "Browser not registered with macOS: $browser"
         info "Registered browsers:"
         defaultbrowser
         return 1
     fi
+    if ! defaultbrowser "$browser"; then
+        error "Failed to set default browser: $browser"
+        return 1
+    fi
     write_browser_file "$browser"
-    defaultbrowser "$browser" || true
     success "Default browser applied: $browser"
 }
 
