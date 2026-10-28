@@ -3,7 +3,7 @@ set -uo pipefail
 ROOT="${0:A:h}"
 source "$ROOT/install/lib.zsh"
 
-typeset -a steps=(tools link node dotnet osx theme tmux-plugins claude-profiles)
+typeset -a steps=(tools link node dotnet osx theme browser tmux-plugins claude-profiles)
 
 usage() { print -u2 "Usage: ${0:t} {all|${(j:|:)steps}|deferred|use} [args]"; exit 1 }
 
