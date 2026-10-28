@@ -18,6 +18,7 @@ previous="${previous:A:h:h}"
 typeset -a destinations=() sources=()
 typeset -a candidates=(
     "$HOME"/.*(ND@)
+    "$HOME"/.claude-*/*(N@)
     "$HOME"/.config/*(ND@)
     "$HOME"/.config/opencode/*(ND@)
     "$HOME"/.codex/AGENTS.md(N@)
@@ -28,6 +29,7 @@ for destination in "${candidates[@]}"; do
     [[ -L "${destination:h}" || -L "${destination:h:h}" ]] && continue
     source_path="${destination:A}"
     [[ "$source_path" == "$previous/"* ]] || continue
+    [[ "$source_path" == */claude/.local/* ]] && continue
     replacement="$target/${source_path#$previous/}"
     [[ -e "$replacement" ]] || { print -u2 "Missing replacement: $replacement"; exit 1; }
     destinations+=("$destination")

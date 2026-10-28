@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# Claude Code status line. Reads the session JSON on stdin and prints one
-# line: an identity cluster on the left (branch, model, agent) and a
-# resources cluster on the right (lines, cost, context, usage, style), with
-# the gap between them sized so the line spans the pane. Segments inside a
-# cluster are separated by whitespace, matching the tmux bar.
+# Claude Code status line — nicknisi/dotfiles (MIT), April 2026 layout on the
+# current script's internals. One left-aligned line with dim │ separators:
+#   branch │ model │ $ cost │ lines │ 󰧑 context bar (tokens) │ 󰉁 5h ╱ 7d │ style
+# Usage comes from the rate_limits field Claude Code passes on stdin (never
+# from the keychain), and icons are spelled as UTF-8 bytes because macOS
+# ships bash 3.2, whose printf does not interpret \u / \U escapes.
 
-# Colors (real escapes so widths can be measured after stripping them)
 ESC=$(printf '\033')
 RED="${ESC}[0;31m"
 GREEN="${ESC}[0;32m"
@@ -18,25 +18,16 @@ WHITE="${ESC}[0;37m"
 DIM="${ESC}[2m"
 RESET="${ESC}[0m"
 
-# Gap between segments inside a cluster (same air as the tmux bar).
-GAP="   "
-# Cells Claude Code indents the line by on the left; mirrored on the right so
-# the line sits centred with equal margins. `statusLine.padding` in
-# settings.json changes the left value.
-EDGE=2
+# Separator (minimal style)
+SEP="${DIM}│${RESET}"
 
-# Nerd font icons (colorized).
-# macOS ships bash 3.2 whose printf does not interpret \u / \U escapes; it
-# emits them as literal text. Use UTF-8 byte sequences (\xHH) instead, which
-# bash 3.2 printf does support.
-ICON_PROJECT="${BLUE}$(printf '\xee\x97\xbf')${RESET}"          # nf-md-folder      U+E5FF
+# Nerd font icons (colorized)
 ICON_BRANCH="${GREEN}$(printf '\xee\x9c\xa5')${RESET}"          # nf-dev-git_branch U+E725
 ICON_CONTEXT="${MAGENTA}$(printf '\xf3\xb0\xa7\x91')${RESET}"   # nf-md-brain       U+F09D1
 ICON_COST="${GREEN}$(printf '\xef\x85\x95')${RESET}"            # nf-fa-dollar      U+F155
 ICON_STYLE="${CYAN}$(printf '\xf3\xb0\x8f\x98')${RESET}"        # nf-md-palette     U+F03D8
 ICON_USAGE="${YELLOW}$(printf '\xf3\xb0\x89\x81')${RESET}"      # nf-md-gauge       U+F0241
 ICON_LINES="${CYAN}$(printf '\xef\x91\x80')${RESET}"            # nf-fa-file_text   U+F440
-ICON_AGENT="${DIM}$(printf '\xf3\xb0\x9a\xa9')${RESET}"         # nf-md-robot       U+F06A9
 
 # Feature flags (set env vars to 0 to disable)
 SHOW_CONTEXT_TOKENS="${CLAUDE_STATUSLINE_TOKENS:-1}"
@@ -74,8 +65,6 @@ get_model_icon() {
   esac
 }
 get_output_style() { echo "$input" | jq -r '.output_style.name // "default"'; }
-get_current_dir() { echo "$input" | jq -r '.workspace.current_dir // "."'; }
-get_project_dir() { echo "$input" | jq -r '.workspace.project_dir // "."'; }
 get_cost() {
   local cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
   printf "${DIM}\$%.2f${RESET}" "$cost"
@@ -93,14 +82,11 @@ get_agent_name() {
 }
 
 get_context_percent() {
-  # Use pre-calculated percentage from Claude Code (recommended approach)
   local percent=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
-  # Round to integer for display
   printf "%.0f" "$percent"
 }
 
 get_context_used() {
-  # Calculate tokens from percentage and window size (most accurate)
   local percent=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
   local window=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
   local used=$(echo "$percent * $window / 100" | bc)
@@ -150,7 +136,6 @@ build_context_bar() {
 # vs. enterprise) — no keychain/token guessing. Enterprise billing omits the
 # field entirely, so nothing renders. `resets_at` is epoch seconds.
 
-# Format an epoch-seconds timestamp to a human-readable time-until string
 format_time_until() {
   local reset_epoch="$1"
   [ -z "$reset_epoch" ] && { echo "?"; return; }
@@ -224,43 +209,12 @@ build_usage_display() {
   five=$(render_usage_window five_hour "5h")
   seven=$(render_usage_window seven_day "7d")
 
-  # No active rate windows (e.g., enterprise billing) — nothing to show
   if [ -n "$five" ] && [ -n "$seven" ]; then
     printf "%s ${DIM}╱${RESET} %s" "$five" "$seven"
   else
     printf "%s%s" "$five" "$seven"
   fi
 }
-
-# ── Layout helpers ────────────────────────────────────────────────────────────
-
-# Visible width of a string: strip SGR escapes, count code points. Every glyph
-# used here (nerd icons, box drawing, arrows) is one cell wide.
-width() {
-  printf '%s' "$1" | jq -Rr --arg esc "$ESC" 'gsub($esc + "\\[[0-9;]*m"; "") | length'
-}
-
-# Join non-empty arguments with GAP.
-join() {
-  local out="" s
-  for s in "$@"; do
-    [ -n "$s" ] || continue
-    out+="${out:+$GAP}$s"
-  done
-  printf '%s' "$out"
-}
-
-# Terminal width. Claude Code exports COLUMNS to status line commands (2.1.153+).
-# Asking tmux for #{pane_width} from here answers for the client's *active*
-# pane, not the one Claude runs in, so it is only a fallback.
-term_width="${COLUMNS:-0}"
-case "$term_width" in *[!0-9]* | '') term_width=0 ;; esac
-if [ "$term_width" -lt 40 ] && [ -n "$TMUX" ]; then
-  term_width=$(tmux display-message -p '#{pane_width}' 2>/dev/null || echo 0)
-fi
-if [ "$term_width" -lt 40 ]; then
-  term_width=$(tput cols 2>/dev/null || echo 200)
-fi
 
 # ── Extract values ────────────────────────────────────────────────────────────
 model=$(get_model_name)
@@ -273,29 +227,56 @@ lines_display=$(get_lines_changed)
 agent_name=$(get_agent_name)
 git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "no-git")
 
-# ── Left cluster: identity ────────────────────────────────────────────────────
-branch_seg=""
-[ "$term_width" -ge 80 ] && branch_seg="${ICON_BRANCH} ${GREEN}${git_branch}${RESET}"
-model_seg="${model_icon} ${MAGENTA}${model}${RESET}"
-[ -n "$agent_name" ] && model_seg+=" ${DIM}(${agent_name})${RESET}"
-left=$(join "$branch_seg" "$model_seg")
-
-# ── Right cluster: impact, gauges, meta ───────────────────────────────────────
-lines_seg=""; [ -n "$lines_display" ] && lines_seg="${ICON_LINES} ${lines_display}"
-cost_seg=""; [ "$cost_display" != "${DIM}\$0.00${RESET}" ] && cost_seg="${ICON_COST} ${cost_display}"
-context_seg="${ICON_CONTEXT} ${context_bar}"
-usage_seg=""; [ -n "$usage_display" ] && usage_seg="${ICON_USAGE} ${usage_display}"
-style_seg=""; [ "$output_style" != "default" ] && style_seg="${ICON_STYLE} ${DIM}${output_style}${RESET}"
-right=$(join "$lines_seg" "$cost_seg" "$context_seg" "$usage_seg" "$style_seg")
-
-# ── Spread ────────────────────────────────────────────────────────────────────
-# Fill between the clusters so the right one ends EDGE cells from the pane
-# edge. If the pane is too narrow for both, fall back to one gap and let
-# Claude Code truncate.
-avail=$((term_width - 2 * EDGE))
-fill=$((avail - $(width "$left") - $(width "$right")))
-if [ "$fill" -lt "${#GAP}" ]; then
-  printf '%s%s%s\n' "$left" "$GAP" "$right"
-else
-  printf '%s%*s%s\n' "$left" "$fill" "" "$right"
+# Terminal width for adaptive display. Claude Code exports COLUMNS (2.1.153+);
+# tmux's #{pane_width} answers for the client's active pane, so it is only a
+# fallback.
+term_width="${COLUMNS:-0}"
+case "$term_width" in *[!0-9]* | '') term_width=0 ;; esac
+if [ "$term_width" -lt 40 ] && [ -n "$TMUX" ]; then
+  term_width=$(tmux display-message -p '#{pane_width}' 2>/dev/null || echo 0)
 fi
+if [ "$term_width" -lt 40 ]; then
+  term_width=$(tput cols 2>/dev/null || echo 200)
+fi
+
+# ── Build segments — order: identity → impact → resources → meta ─────────────
+seg_add() {
+  if [ -n "$statusline" ]; then
+    statusline+=" ${SEP} "
+  fi
+  statusline+="$1"
+}
+
+statusline=""
+
+# Identity (only show model if not Opus)
+if [[ "$model" != *[Oo]pus* ]]; then
+  statusline+="${model_icon} ${MAGENTA}${model}${RESET}"
+fi
+if [ -n "$agent_name" ]; then
+  statusline+=" ${DIM}(${agent_name})${RESET}"
+fi
+
+# Session impact
+seg_add "${ICON_COST} ${cost_display}"
+if [ -n "$lines_display" ]; then
+  seg_add "${ICON_LINES} ${lines_display}"
+fi
+
+# Resource gauges
+seg_add "${ICON_CONTEXT} ${context_bar}"
+if [ -n "$usage_display" ]; then
+  seg_add "${ICON_USAGE} ${usage_display}"
+fi
+
+# Meta (collapsible)
+if [ "$term_width" -gt 160 ] && [ "$output_style" != "default" ]; then
+  seg_add "${ICON_STYLE} ${DIM}${output_style}${RESET}"
+fi
+
+# Prepend branch on wide terminals
+if [ "$term_width" -gt 120 ]; then
+  statusline="${ICON_BRANCH} ${GREEN}${git_branch}${RESET} ${SEP} ${statusline}"
+fi
+
+printf '%s\n' "$statusline"
