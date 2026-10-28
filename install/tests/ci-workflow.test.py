@@ -43,7 +43,8 @@ class CiWorkflowTest(unittest.TestCase):
 
     def test_dependabot_tracks_actions_and_npm(self):
         self.assertIn('package-ecosystem: "github-actions"', DEPENDABOT)
-        self.assertIn('directory: "/claude/drawio-scripts"', DEPENDABOT)
+        self.assertIn('package-ecosystem: "npm"', DEPENDABOT)
+        self.assertNotIn('drawio-scripts', DEPENDABOT)
 
     def test_actions_are_pinned_to_commit_shas(self):
         for workflow in WORKFLOWS.glob('*.yml'):
