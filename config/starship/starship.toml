@@ -5,7 +5,7 @@ palette = "eldritch"
 format = """$directory$python$golang$rust$nodejs$fill
 $character"""
 # move the rest of the prompt to the right
-right_format = """$git_branch$git_state$git_status"""
+right_format = """$git_status$git_state$git_branch"""
 command_timeout = 1000
 continuation_prompt = '▷'
 
@@ -18,17 +18,20 @@ format = '[ ](bold cyan)'
 version_format = '[$symbol$version ]($style)'
 
 [git_status]
-conflicted = '🏳'
-ahead = '🏎💨'
-behind = '😰'
-diverged = '😵'
-up_to_date = '✓'
-untracked = '🤷'
-stashed = '📦'
-modified = '📝'
-staged = '[++\($count\)](green)'
-renamed = '👅'
-deleted = '🗑'
+# nicknisi/dotfiles (MIT) April 2026 zsh-prompt glyphs
+format = '([$all_status$ahead_behind]($style))'
+style = ""
+conflicted = '[󰧁 ](bold red)'
+ahead = '[ ](bright-blue)'
+behind = '[ ](bright-yellow)'
+diverged = '[󰧈 ](bright-blue)'
+up_to_date = '[ ](bold green)'
+untracked = '[ ](bright-red)'
+stashed = '[ ](yellow)'
+modified = '[ ](yellow)'
+staged = '[ ](green)'
+renamed = '[ ](bright-yellow)'
+deleted = '[󰮉 ](red)'
 ## --- GIT
 [kubernetes]
 symbol = '☸ '
