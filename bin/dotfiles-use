@@ -20,7 +20,6 @@ typeset -a candidates=(
     "$HOME"/.*(ND@)
     "$HOME"/.claude-*/*(N@)
     "$HOME"/.config/*(ND@)
-    "$HOME"/.config/opencode/*(ND@)
     "$HOME"/.codex/AGENTS.md(N@)
     "$HOME"/.copilot/copilot-instructions.md(N@)
     "$HOME"/.ssh/config(N@)
