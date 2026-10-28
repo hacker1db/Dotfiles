@@ -174,6 +174,17 @@ brew bundle --file=~/.dotfiles/main/install/brewfile
 
 - **Avoid duplicates**: Check for existing functionality before adding
 
+### Branches & Worktrees
+
+- `main` is what is released to production — it must always work. Never commit
+  to or edit a `main` checkout directly.
+- All work happens on a feature branch; a feature lives on a single branch
+  until it is ready to merge to `main`.
+- If the current worktree is already on a feature branch, make the changes
+  there. Do not create another worktree or stack a new branch for follow-up
+  tasks — this overrides any global rule that asks for a new worktree per task.
+- Create a new worktree and branch only when starting work from `main`.
+
 ### Git Commits
 
 - **Format**: `type(scope): description`
