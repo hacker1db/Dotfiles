@@ -24,3 +24,6 @@ codex/.local/
 
 # hunk writes its release-check timestamp here on every run; machine-local cache
 config/hunk/state.json
+
+# fleet registers machine-local status dirs here when ~/.config/fleet is a repo link
+config/fleet/agents.json

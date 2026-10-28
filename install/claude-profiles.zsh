@@ -196,7 +196,11 @@ if [[ "$check" -eq 0 ]]; then
         if command -v codex >/dev/null || [[ -d "$HOME/.codex" ]]; then
             fleet install codex </dev/null >/dev/null || problem "fleet install codex failed"
         fi
-        print "Fleet hooks wired for Claude profiles and Codex; Copilot is tracked by process discovery."
+        fleet_detection_src="$root/config/fleet/detection"
+        fleet_detection_dest="$HOME/.config/fleet/detection"
+        mkdir -p "$HOME/.config/fleet"
+        [[ "$fleet_detection_dest" -ef "$fleet_detection_src" ]] || link_item "$fleet_detection_src" "$fleet_detection_dest"
+        print "Fleet hooks wired for Claude profiles and Codex; Copilot is discovered via @fleet_discover_agents plus the linked detection manifest."
     else
         problem "fleet is not installed; agent hooks skipped (brew bundle installs it)"
     fi

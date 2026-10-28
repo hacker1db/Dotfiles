@@ -38,8 +38,13 @@ Then wire the agent hooks. `install/claude-profiles.zsh` (run via
   plugin and hooks fire in new sessions.
 - **Codex** — runs `fleet install codex`, which adds fleet hooks to
   `~/.codex/hooks.json` (your own hooks survive).
-- **Copilot** — nothing to install: fleet's 5-second process-table discovery
-  labels Copilot panes and infers waiting/working/ready from the screen.
+- **Copilot** — no hooks exist, and fleet 0.28 does not include `copilot` in
+  its built-in discovery allowlist. Two pieces in this repo wire it up:
+  `config/tmux/tmux.conf` sets `@fleet_discover_agents` (the option *replaces*
+  fleet's default list, so it repeats the defaults and appends `copilot`), and
+  the installer links `~/.config/fleet/detection` to
+  `config/fleet/detection/`, whose `copilot.json` manifest gives the screen
+  scraper Copilot's PERMIT/QUESTION/BUSY prompts.
 
 Re-run the step after a brew upgrade to re-point the hook paths. The manual
 equivalent, for a one-off machine:
@@ -111,6 +116,10 @@ Left-click the pill for the fleet popup, right-click for `fleet next`.
 
 - Chips never appear: `fleet doctor`, then confirm hooks fired by checking
   `~/.cache/claude-status/` for `.status` files while a Claude session runs.
+- Copilot panes missing from the sidebar/dashboard: confirm
+  `tmux show -gv @fleet_discover_agents` lists `copilot` and that
+  `~/.config/fleet/detection` links to the checkout's `config/fleet/detection`
+  (fleet caches the discovery options for 60 seconds, so give it a minute).
 - Stale chips for dead panes: `fleet reconcile --verbose`.
 - Chips stopped being clickable after an upgrade:
   `fleet statusline --inject --force`.
