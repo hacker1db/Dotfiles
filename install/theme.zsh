@@ -15,8 +15,8 @@ resolve_theme() {
 
 list_themes() {
     local tmux_themes ghostty_themes
-    tmux_themes="$(find "$DOTFILES/config/tmux/themes" -maxdepth 1 -name '*.conf' -exec basename {} .conf \; 2>/dev/null | tr '[:upper:]' '[:lower:]')" || true
-    ghostty_themes="$(find "$DOTFILES/config/ghostty/themes" -maxdepth 1 -type f -exec basename {} \; 2>/dev/null | tr '[:upper:]' '[:lower:]')" || true
+    tmux_themes="$(find "$DOTFILES/config/tmux/themes" -maxdepth 1 -name '*.conf' ! -name 'current*' ! -name '*-layout.conf' ! -name tmuxlayout.conf -exec basename {} .conf \; 2>/dev/null | tr '[:upper:]' '[:lower:]')" || true
+    ghostty_themes="$(find "$DOTFILES/config/ghostty/themes" -maxdepth 1 -type f ! -name 'current*' -exec basename {} \; 2>/dev/null | tr '[:upper:]' '[:lower:]')" || true
     printf "%s\n%s" "$tmux_themes" "$ghostty_themes" | awk 'NF' | sort -u
 }
 

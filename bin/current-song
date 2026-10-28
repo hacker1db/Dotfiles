@@ -10,7 +10,7 @@ np=$(jq -c '
   {
     app: (.clientBundleIdentifier // ""),
     song: ([.title, .artist] | map(select(. != null and . != "")) | join(" - ") | .[0:50]),
-    state: (if (.playbackRate // 0) > 0 then "playing" else "paused" end),
+    state: (if .playbackRate == null or .playbackRate > 0 then "playing" else "paused" end),
     artwork: (.artworkData // "")
   }
 ' <<<"$np" 2>/dev/null) || exit 0

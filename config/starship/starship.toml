@@ -1,6 +1,6 @@
 add_newline = false
 # A minimal left prompt
-palette = "nisi"
+palette = "eldritch"
 # A minimal left prompt
 format = """$directory$python$golang$rust$nodejs$fill
 $character"""
@@ -79,38 +79,6 @@ bright_green = "#00FA82"
 dark_green = "#33C57F"
 red = "#f16c75"
 bright_red = "#f0313e"
-
-[palettes.nisi]
-# Tokyo Night palette ported from nicknisi/dotfiles (MIT)
-bg_dark = "#13141c"
-bg = "#1a1b26"
-bg_highlight = "#24283b"
-terminal_black = "#414868"
-fg = "#a9b1d6"
-fg_dark = "#565f89"
-fg_gutter = "#3b4261"
-fg_gutter_light = "#737aa2"
-dark3 = "#545c7e"
-comment = "#565f89"
-dark5 = "#737aa2"
-bright_cyan = "#0db9d7"
-visual = "#292e42"
-bg_visual = "#292e42"
-cyan = "#449dab"
-dark_cyan = "#366f7a"
-magenta = "#ad8ee6"
-magenta2 = "#bb9af7"
-magenta3 = "#9d7cd8"
-pink = "#bb9af7"
-purple = "#ad8ee6"
-orange = "#eb927b"
-yellow = "#e0af68"
-dark_yellow = "#a8834e"
-green = "#9ece6a"
-bright_green = "#b9f27c"
-dark_green = "#769a4f"
-red = "#f7768e"
-bright_red = "#ff7a93"
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
