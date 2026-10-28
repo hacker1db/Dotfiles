@@ -132,7 +132,7 @@
     editor = vim
     whitespace = cr-at-eol
 	autocrlf = input
-	hooksPath = /Users/David.Walters@alaskaair.com/Library/Application Support/ggshield/git-hooks
+	hooksPath = ~/.sonar/sonarqube-cli/hooks
 
 [interactive]
     diffFilter = delta --color-only
