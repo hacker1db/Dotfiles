@@ -16,7 +16,9 @@ branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exac
 
 # Get git status indicators
 git_status=""
-INDEX=$(git --no-optional-locks status --porcelain -b 2>/dev/null)
+# The pane may sit in an untrusted clone, whose local config git would
+# honor; fsmonitor and untrackedCache can execute repo-controlled commands.
+INDEX=$(git -c core.fsmonitor=false -c core.untrackedCache=false --no-optional-locks status --porcelain -b 2>/dev/null)
 
 GIT_ADDED=''
 GIT_MODIFIED=''
