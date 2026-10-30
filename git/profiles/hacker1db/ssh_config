@@ -1,4 +1,4 @@
-Host hb1 github-hacker1db github-cyberdso
+Host hb1 github-hacker1db
 	HostName ssh.github.com
 	Port 443
 	HostKeyAlias github.com

@@ -24,34 +24,16 @@
     insteadOf = git@github.com:zerobitconsulting/
     insteadOf = https://github.com/zerobitconsulting/
 
-[agentkey]
-    automation = op://automation/ay3jayregkyfvdis6q7kuxgena
 [agentkey "hb1"]
     title = Github personal
 [agentkey "github-hacker1db"]
     title = Github personal
-[agentkey "github-cyberdso"]
-    title = Github Work
 [agentkey "6212228+hacker1db@users.noreply.github.com"]
     title = Github personal
 [agentkey "hacker1db@hacker1db.dev"]
     title = Github personal
-[agentkey "177144687+CyberDSO@users.noreply.github.com"]
-    title = Github Work
 
-[includeIf "hasconfig:remote.*.url:git@github-hacker1db:*/**"]
-    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
-[includeIf "hasconfig:remote.*.url:git@hb1:*/**"]
-    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
-[includeIf "hasconfig:remote.*.url:git@github.com:hacker1db/**"]
-    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
-[includeIf "hasconfig:remote.*.url:https://github.com/hacker1db/**"]
-    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
-[includeIf "hasconfig:remote.*.url:ssh://git@github.com/hacker1db/**"]
-    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
-[includeIf "hasconfig:remote.*.url:git@github.com:zerobitconsulting/**"]
-    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
-[includeIf "hasconfig:remote.*.url:https://github.com/zerobitconsulting/**"]
-    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/hacker1db.gitconfig
-[includeIf "hasconfig:remote.*.url:git@github-cyberdso:*/**"]
-    path = ~/.dotfiles/main/git/profiles/hacker1db/identities/cyberdso.gitconfig
+# One identity for every repository; included after ~/.gitconfig-local, so it wins.
+[user]
+    name = hacker1db
+    email = 6212228+hacker1db@users.noreply.github.com

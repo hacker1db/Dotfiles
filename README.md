@@ -127,7 +127,7 @@ These expose each machine's port 3000 at `http://127.0.0.1:13000` and `http://12
 DOTFILES_GIT_PROFILE=hacker1db ./install.sh git
 ```
 
-The optional profile links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`. It supplies remote-specific identities, SSH host aliases, and 1Password agent-backed authentication/signing through `bin/git-agent-key`, `bin/git-agent-ssh`, and `bin/git-agent-signing-key`. Keys are selected by configured agent item titles; private key files are not installed. Profile setup removes a local `user.signingkey` override. Review profile-specific account mappings before enabling it.
+The optional profile links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`. It supplies the single hacker1db identity, SSH host aliases, and 1Password agent-backed authentication/signing through `bin/git-agent-key`, `bin/git-agent-ssh`, and `bin/git-agent-signing-key`. Keys are selected by configured agent item titles; private key files are not installed. Profile setup removes a local `user.signingkey` override.
 
 New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a gitleaks secret scan of staged changes. The gitleaks hook blocks the commit when it finds a secret, and also when `gitleaks` is not installed. The hacker1db account profile sets `core.hooksPath` to `git/templates/hooks`, so the dispatcher runs for every repository. These Git hooks are separate from Claude's work-profile GitGuardian hook.
 
