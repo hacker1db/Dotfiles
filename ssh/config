@@ -9,8 +9,7 @@ Host github.com
 Host stronghold
     HostName stronghold-2.local
 
-# One identity per machine, installed from 1Password by bin/ssh-key-from-vault
+# One identity per machine, held only in memory: bin/ssh-key-from-vault loads it
+# from 1Password into this agent. No private key file exists on disk.
 Host *
-    IdentityFile ~/.ssh/id_ed25519
-    IdentitiesOnly yes
-    IdentityAgent none
+    IdentityAgent ~/.ssh/agent.sock

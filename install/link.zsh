@@ -90,10 +90,10 @@ else
     print "$LOCAL_FILE exists (no clitools source found); leaving as-is."
 fi
 
-title "Installing SSH key from 1Password"
+title "Loading SSH key from 1Password into the agent"
 if [[ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]]; then
     "$DOTFILES/bin/ssh-key-from-vault"
-elif [[ ! -f "$HOME/.ssh/id_ed25519" ]]; then
+else
     print "OP_SERVICE_ACCOUNT_TOKEN is not set; run bin/ssh-key-from-vault once it is."
 fi
 

@@ -130,7 +130,7 @@ Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not 
 
 Each machine has one identity: hacker1db. `git/gitconfig.symlink` sets it last, so it wins over `~/.gitconfig-local`, and signs every commit and tag with SSH. It also provides `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls.
 
-The only SSH key is `~/.ssh/id_ed25519`, pulled from 1Password by `bin/ssh-key-from-vault` with the service account (`OP_SERVICE_ACCOUNT_TOKEN`). `./install.sh link` runs it when the token is set; re-run it to rotate the key. It also writes `~/.ssh/allowed_signers`. `ssh/config` uses that key for every host and never asks the 1Password agent, so Git operations and signing never prompt. It names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
+The SSH key lives only in 1Password; no private key file is ever written to disk. `bin/ssh-key-from-vault` uses the service account (`OP_SERVICE_ACCOUNT_TOKEN`) to pipe it into a memory-only `ssh-agent` at `~/.ssh/agent.sock`, which `zsh/zshenv.symlink` exports as `SSH_AUTH_SOCK` and `ssh/config` uses for every host. Interactive shells reload it when the agent is empty (after a reboot), and `./install.sh link` runs it too; pass `--force` to pick up a rotated key. It also writes the public key to `~/.ssh/allowed_signers`. Git operations and signing never prompt. It names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
 
 SSH connections do not reserve development ports automatically. Open a tunnel only for the service you need, choosing an unused local port:
 

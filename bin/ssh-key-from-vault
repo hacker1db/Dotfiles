@@ -1,10 +1,15 @@
 #!/bin/sh
-# Install this machine's single SSH key from 1Password via the service account.
-# The key is used for GitHub auth, SSH logins, and Git commit signing.
+# Load this machine's single SSH key from 1Password into a memory-only ssh-agent.
+# The private key is piped from `op` to `ssh-add` and never written to disk.
+# Usage: ssh-key-from-vault [--force]   (--force reloads even if a key is loaded)
 set -eu
 
 item=${DOTFILES_SSH_KEY_ITEM:-op://Automation/verw7g3kpg7xb54fv33cmvq7e4}
-key=${DOTFILES_SSH_KEY:-$HOME/.ssh/id_ed25519}
+SSH_AUTH_SOCK=${DOTFILES_SSH_AGENT_SOCK:-$HOME/.ssh/agent.sock}
+export SSH_AUTH_SOCK
+
+ssh-add -l >/dev/null 2>&1 && rc=0 || rc=$?
+[ "$rc" -eq 0 ] && [ "${1:-}" != --force ] && exit 0
 
 [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || {
     echo 'ssh-key-from-vault: OP_SERVICE_ACCOUNT_TOKEN is not set' >&2
@@ -12,16 +17,17 @@ key=${DOTFILES_SSH_KEY:-$HOME/.ssh/id_ed25519}
 }
 command -v op >/dev/null || { echo 'ssh-key-from-vault: op is not installed' >&2; exit 1; }
 
-mkdir -p "${key%/*}" && chmod 700 "${key%/*}"
-umask 077
-tmp=$(mktemp "$key.XXXXXX")
-trap 'rm -f "$tmp"' EXIT
-op read --force --out-file "$tmp" "$item/private key?ssh-format=openssh" </dev/null >/dev/null
-mv "$tmp" "$key"
-pub=$(op read "$item/public key" </dev/null)
-printf '%s\n' "$pub" > "$key.pub"
-chmod 644 "$key.pub"
+# 2 means no agent is listening on the socket
+if [ "$rc" -eq 2 ]; then
+    mkdir -p "${SSH_AUTH_SOCK%/*}" && chmod 700 "${SSH_AUTH_SOCK%/*}"
+    rm -f "$SSH_AUTH_SOCK"
+    eval "$(ssh-agent -s -a "$SSH_AUTH_SOCK")" >/dev/null
+fi
 
+ssh-add -q -D 2>/dev/null || true
+op read "$item/private key?ssh-format=openssh" </dev/null | ssh-add -q -
+
+# Public half only, for verifying signatures
 email=$(git config --get user.email || true)
-[ -n "$email" ] && printf '%s %s\n' "$email" "$pub" > "$HOME/.ssh/allowed_signers"
-echo "Installed $key from $item"
+[ -n "$email" ] && printf '%s %s\n' "$email" "$(op read "$item/public key" </dev/null)" > "$HOME/.ssh/allowed_signers"
+echo "Loaded $item into $SSH_AUTH_SOCK"

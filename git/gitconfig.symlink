@@ -170,12 +170,12 @@
 [pull]
 	ff = only
 
-# One identity per machine; the key comes from bin/ssh-key-from-vault.
+# One identity per machine; bin/ssh-key-from-vault loads its key into the agent.
 # Kept last so it wins over ~/.gitconfig-local.
 [user]
     name = hacker1db
     email = 6212228+hacker1db@users.noreply.github.com
-    signingkey = ~/.ssh/id_ed25519.pub
+    signingkey = key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHfhf9ktvvn5ulxNQnZMUf7dc8TW2OP+uo6/zz3pLYdz
 [gpg]
     format = ssh
 [gpg "ssh"]

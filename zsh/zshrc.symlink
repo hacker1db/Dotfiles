@@ -48,6 +48,9 @@ if [[ -a ~/.localrc ]]; then
     source ~/.localrc
 fi
 
+# Load the vault SSH key into the memory-only agent if it is empty (e.g. after a reboot)
+[[ -n $OP_SERVICE_ACCOUNT_TOKEN ]] && "$DOTFILES/bin/ssh-key-from-vault" >/dev/null
+
 # adding path directory for custom scripts
 export PATH=$DOTFILES/bin:$PATH
 
