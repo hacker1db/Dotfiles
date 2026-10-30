@@ -42,12 +42,12 @@ return {
 
                 -- Render-markdown
                 hl.RenderMarkdownCode = { bg = c["linkarzu_color07"] }
-                hl.RenderMarkdownCodeInline = { fg = c["linkarzu_color10"], bg = c["linkarzu_color02"] }
+                hl.RenderMarkdownCodeInline = { fg = c["linkarzu_color16"], bg = c["linkarzu_color25"] }
                 hl.RenderMarkdownQuote = { fg = c["linkarzu_color12"] }
 
                 -- Markup
                 hl["@markup.strong"] = { fg = c["linkarzu_color24"], bold = true }
-                hl["@markup.raw.markdown_inline"] = { fg = c["linkarzu_color01"] }
+                hl["@markup.raw.markdown_inline"] = { fg = c["linkarzu_color16"] }
 
                 -- Diagnostics
                 hl.DiagnosticError = { fg = c["linkarzu_color11"] }

@@ -74,25 +74,25 @@ Configured LSP servers include:
 
 ### Shell/Dotfiles
 
-```bash
-# Isolated installer checks
-bash install/tests/claude-profiles.test.sh
-bash install/tests/plan-manager-bootstrap.test.sh
-node install/tests/plan-manager-harness-contracts.test.mjs
+```zsh
+# Check Installer And Zsh Syntax
+for f in install.sh install/*.zsh; do zsh -n "$f" || exit 1; done
+zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
+zsh -n bin/tmux-reload-all
+
+# Audit The Claude Profiles (Read-Only)
+zsh ~/.dotfiles/main/install/claude-profiles.zsh --check
 
 # Manual Testing: Source Configuration In New Shell
 source ~/.zshrc
 
-# Check For Zsh Syntax Errors
-zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
-
-# Install links and integrations (changes configuration and starts services)
-~/.dotfiles/main/install/link.sh
+# Install Links And Integrations (Changes Configuration)
+~/.dotfiles/main/install.sh link
 ```
 
 ### Neovim
 
-```bash
+```zsh
 # No Automated Tests For Nvim Config
 # Manual Testing: Open Neovim And Check For Errors
 nvim +checkhealth
@@ -106,7 +106,7 @@ nvim --headless "+Lazy! sync" +qa
 
 ### Installation
 
-```bash
+```zsh
 # Install All Packages From Brewfile
 brew bundle --file=~/.dotfiles/main/install/brewfile
 
@@ -114,8 +114,8 @@ brew bundle --file=~/.dotfiles/main/install/brewfile
 ~/.dotfiles/main/install.sh all
 
 # Install Tools And Create Symlinks
-~/.dotfiles/main/install/install_tools.sh
-~/.dotfiles/main/install/link.sh
+~/.dotfiles/main/install.sh tools
+~/.dotfiles/main/install.sh link
 ```
 
 ## Code Style & Conventions
@@ -158,6 +158,9 @@ brew bundle --file=~/.dotfiles/main/install/brewfile
 
 ### Shell Scripts (Zsh)
 
+- **Command execution**: Run shell commands and scripts with Zsh, not Bash. Set the command runner's shell to `/bin/zsh` explicitly.
+- **Syntax checks**: Use `zsh -n <script>`, including for `bin/tmux-reload-all`; do not use `bash -n`.
+- **Examples**: Label shell command code blocks as `zsh`.
 - **Indentation**: 4 spaces
 - **Conditionals**: Use `[[ ]]` for tests
 - **Functions**: Define in `zsh/functions/` or `zsh/functions.zsh`
@@ -170,6 +173,17 @@ brew bundle --file=~/.dotfiles/main/install/brewfile
   ```
 
 - **Avoid duplicates**: Check for existing functionality before adding
+
+### Branches & Worktrees
+
+- `main` is what is released to production — it must always work. Never commit
+  to or edit a `main` checkout directly.
+- All work happens on a feature branch; a feature lives on a single branch
+  until it is ready to merge to `main`.
+- If the current worktree is already on a feature branch, make the changes
+  there. Do not create another worktree or stack a new branch for follow-up
+  tasks — this overrides any global rule that asks for a new worktree per task.
+- Create a new worktree and branch only when starting work from `main`.
 
 ### Git Commits
 
@@ -195,14 +209,14 @@ All directories under `config/` are symlinked to `~/.config/<name>`. When adding
 
 - The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out at `$HOME/Developer/skills/main` by default.
 - That repository provides `skillctl`, the skill manager for Codex, Claude Code, and GitHub Copilot CLI. Read its README before changing skill sources, selections, or installation behavior.
-- Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/claude-profiles.sh` runs `skillctl sync --global` for each Claude profile.
-- The project-scoped Caido installer and the OpenCode skill under `config/opencode/skills/` are separate from the current `skillctl` global adapters.
+- Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/claude-profiles.zsh` runs `skillctl sync --global` for each Claude profile.
+- The project-scoped Caido installer is separate from the current `skillctl` global adapters.
 
 ## Important Files & Patterns
 
 ### Neovim Keymaps
 
-- **Leader key**: Space
+- **Leader key**: semicolon (`;`)
 - **Local leader**: `\`
 - **File operations**: `<leader>e` (Snacks explorer), `<leader>ff` (files), `<leader>fr` (recent)
 - **Search**: `<leader>/` (grep), `<leader>sh` (help)
@@ -253,13 +267,13 @@ Template hooks in `git/templates/hooks/`:
 ### Compatibility
 
 - **Platform**: macOS (darwin)
-- **Shell**: Zsh interactively; installer scripts use Bash
+- **Shell**: Zsh, interactively and for the installer scripts
 - **Terminal**: Ghostty
 - **Package manager**: Homebrew
 
-## Configuration boundaries
+## Configuration Boundaries
 
-- The general linker skips existing configuration paths; selected managed integrations reconcile their own links.
+- The general linker refreshes existing symlinks to the current checkout and only skips non-symlink paths; selected managed integrations reconcile their own links.
 - Personal skills are maintained outside dotfiles in the skills repository.
 - lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories. Specs directly under `lua/plugins/` are not imported by this setup.
 - Use [README.md](README.md), [Claude profiles](claude/PROFILES.md) and [plan-manager integration](docs/plan-manager.md) for current setup details.

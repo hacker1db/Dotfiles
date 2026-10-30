@@ -9,6 +9,7 @@ tap "brandonskerritt/rustscan", trusted: true
 tap "caffix/amass", trusted: true
 tap "clerk/stable"
 tap "derailed/k9s", trusted: true
+tap "FelixKratz/formulae", trusted: true
 tap "fsouza/prettierd"
 tap "gitguardian/tap", trusted: true
 tap "hashicorp/tap", trusted: true
@@ -17,6 +18,7 @@ tap "homebrew/cask-fonts"
 tap "jesseduffield/lazygit", trusted: true
 tap "majd/repo", trusted: true
 tap "mondoohq/mondoo", trusted: true
+tap "nicknisi/formulae", trusted: true
 tap "noahgorstein/tap", trusted: true
 tap "oven-sh/bun"
 tap "owasp-amass/amass", "https://github.com/owasp-amass/homebrew-amass.git"
@@ -59,6 +61,8 @@ brew "cloc"
 brew "cocoapods"
 # Tool for interacting with remote images and registries
 brew "crane"
+# Command-line tool for getting & setting the default browser
+brew "defaultbrowser"
 # Debugger for the Go programming language
 brew "delve"
 # Tool for exploring each layer in a docker image
@@ -85,8 +89,12 @@ brew "fd"
 brew "feroxbuster"
 # Fast web fuzzer written in Go
 brew "ffuf"
+# Terminal dashboard for managing AI agent sessions in tmux
+brew "nicknisi/formulae/fleet"
 # Fast and simple Node.js version manager
 brew "fnm"
+# File system event watcher (pushes fleet state to sketchybar)
+brew "fswatch"
 # Command-line fuzzy finder written in Go
 brew "fzf"
 # Scanner for secrets and sensitive data in code
@@ -187,6 +195,8 @@ brew "neovim"
 brew "nikto"
 # Port scanning utility for large networks
 brew "nmap"
+# Send commands to the macOS Now Playing media session
+brew "nowplaying-cli"
 # Modern shell for the GitHub era
 brew "nushell"
 # Manage multiple Node.js versions
@@ -195,8 +205,6 @@ brew "nvm"
 brew "ollama", restart_service: :changed
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
-# AI coding agent, built for the terminal
-brew "opencode"
 # Library to simplify the interaction with PKCS#11
 brew "pkcs11-helper"
 # SSL/TLS VPN implementing OSI layer 2 or 3 secure network extension
@@ -237,6 +245,10 @@ brew "rustscan"
 brew "scc"
 # Smart session manager for the terminal
 brew "sesh"
+# Window border system for macOS
+brew "FelixKratz/formulae/borders"
+# Highly customizable macOS status bar replacement
+brew "FelixKratz/formulae/sketchybar"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Penetration testing for SQL injection and database servers
@@ -325,18 +337,12 @@ cask "azure-data-studio"
 cask "basictex"
 # Virtual Audio Driver
 cask "blackhole-2ch"
-# Web security testing toolkit
-cask "burp-suite"
 # Web security auditing toolkit
 cask "caido"
 # OpenAI's official ChatGPT desktop app
 cask "chatgpt"
 # Anthropic's official Claude AI desktop app
 cask "claude"
-# Terminal-based AI coding assistant
-cask "claude-code"
-# OpenAI's coding agent that runs in your terminal
-cask "codex"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
 # Utilities designed to make common development tasks easier
@@ -361,6 +367,8 @@ cask "gcloud-cli"
 cask "ghostty"
 # Client for the Google Drive storage service
 cask "google-drive"
+# Chromium based web browser
+cask "helium-browser"
 # Utility to hide menu bar items
 cask "hiddenbar"
 # Free and open-source media player
@@ -411,8 +419,6 @@ cask "t3-code"
 cask "todoist-app"
 # Tool to install Linux/BSD distributions to a partition or USB drive
 cask "unetbootin"
-# Open-source code editor
-cask "visual-studio-code@insiders"
 # Voice-to-text dictation with AI-powered auto-editing
 cask "wispr-flow"
 # Gecko based web browser

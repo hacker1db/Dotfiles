@@ -1,5 +1,4 @@
 Include ~/.ssh/config.local
-Include ~/.ssh/config-accounts
 
 Host github.com
 	HostName ssh.github.com
@@ -10,7 +9,7 @@ Host github.com
 Host stronghold
     HostName stronghold-2.local
 
-Host aiserver
-    # Lend the Mac's 1Password agent so no key ever lives on the server
-    ForwardAgent yes
-    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+# One identity per machine, held only in memory: bin/ssh-key-from-vault loads it
+# from 1Password into this agent. No private key file exists on disk.
+Host *
+    IdentityAgent ~/.ssh/agent.sock

@@ -4,9 +4,45 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.dotfiles/main/claude/statusline-command.sh"
+    "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/statusline-command.sh\""
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude-notify waiting \"$(tmux display-message -t \"$TMUX_PANE\" -p '#{session_name}' 2>/dev/null)\" \"$TMUX_PANE\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude-notify completed \"$(tmux display-message -t \"$TMUX_PANE\" -p '#{session_name}' 2>/dev/null)\" \"$TMUX_PANE\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude-tmux-cleanup",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
   },
   "enabledPlugins": {
+    "fleet@fleet-local": true,
     "cli-anything@cli-anything": true,
     "typescript-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,

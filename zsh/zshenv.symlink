@@ -1,24 +1,19 @@
-export DOTFILES="$(dirname "$(dirname "$(readlink "${(%):-%N}")")")"
+export DOTFILES="${${(%):-%N}:A:h:h}"
 export CACHEDIR="$HOME/.local/share"
 export VIM_TMP="$HOME/.vim-tmp"
 # add a config file for ripgrep
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/config"
 # Default Claude Code profile; bin/claude-foundry and bin/claude-subscription override it per launch.
 export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
+# Memory-only agent holding the vault SSH key (bin/ssh-key-from-vault)
+export SSH_AUTH_SOCK="$HOME/.ssh/agent.sock"
 
 [[ -d "$CACHEDIR" ]] || mkdir -p "$CACHEDIR"
 [[ -d "$VIM_TMP" ]] || mkdir -p "$VIM_TMP"
 
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
 
-fpath=(
-    $DOTFILES/zsh/functions
-    /usr/local/share/zsh/site-functions
-    $fpath
-    /opt/homebrew/share/zsh/functions
-)
-typeset -U fpath
-fpath=(${^fpath}(N-/))
+source "$DOTFILES/zsh/fpath"
 
 typeset -aU path
 

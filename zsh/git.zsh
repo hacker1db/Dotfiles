@@ -107,10 +107,5 @@ function gitinit(){
 #
 # }
 # Run for me in the background  
-# Use a local 1Password agent if present; otherwise keep the forwarded one (headless Linux)
-for _op_sock in ~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock ~/.1password/agent.sock; do
-    [[ -S $_op_sock ]] && { export SSH_AUTH_SOCK=$_op_sock; break; }
-done
-unset _op_sock
 
 

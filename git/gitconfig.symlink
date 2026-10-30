@@ -132,7 +132,7 @@
     editor = vim
     whitespace = cr-at-eol
 	autocrlf = input
-	hooksPath = /Users/David.Walters@alaskaair.com/Library/Application Support/ggshield/git-hooks
+	hooksPath = ~/.sonar/sonarqube-cli/hooks
 
 [interactive]
     diffFilter = delta --color-only
@@ -170,6 +170,17 @@
 [pull]
 	ff = only
 
-[include]
-    # Optional account profile linked by install/git.sh; ignored when missing
-    path = ~/.gitconfig-accounts
+# One identity per machine; bin/ssh-key-from-vault loads its key into the agent.
+# Kept last so it wins over ~/.gitconfig-local.
+[user]
+    name = hacker1db
+    email = 6212228+hacker1db@users.noreply.github.com
+    signingkey = key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHfhf9ktvvn5ulxNQnZMUf7dc8TW2OP+uo6/zz3pLYdz
+[gpg]
+    format = ssh
+[gpg "ssh"]
+    allowedSignersFile = ~/.ssh/allowed_signers
+[commit]
+    gpgsign = true
+[tag]
+    gpgsign = true

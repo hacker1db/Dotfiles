@@ -1,0 +1,44 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+[[ $# -le 1 ]] || { print -u2 'Usage: dotfiles-use [checkout]'; exit 1; }
+target="${1:-$PWD}"
+target="${target:A}"
+for required in zsh/zshrc.symlink zsh/zshenv.symlink install.sh; do
+    [[ -f "$target/$required" ]] || { print -u2 "Missing $required in $target"; exit 1; }
+done
+[[ -L "$HOME/.zshrc" ]] || { print -u2 '~/.zshrc must already be a dotfiles symlink'; exit 1; }
+previous="${HOME}/.zshrc"
+previous="${previous:A:h:h}"
+[[ -f "$previous/install.sh" && -f "$previous/zsh/zshenv.symlink" ]] || {
+    print -u2 'The current ~/.zshrc does not point into a dotfiles checkout'
+    exit 1
+}
+
+typeset -a destinations=() sources=()
+typeset -a candidates=(
+    "$HOME"/.*(ND@)
+    "$HOME"/.claude-*/*(N@)
+    "$HOME"/.config/*(ND@)
+    "$HOME"/.codex/AGENTS.md(N@)
+    "$HOME"/.copilot/copilot-instructions.md(N@)
+    "$HOME"/.ssh/config(N@)
+)
+for destination in "${candidates[@]}"; do
+    [[ -L "${destination:h}" || -L "${destination:h:h}" ]] && continue
+    source_path="${destination:A}"
+    [[ "$source_path" == "$previous/"* ]] || continue
+    [[ "$source_path" == */claude/.local/* ]] && continue
+    replacement="$target/${source_path#$previous/}"
+    [[ -e "$replacement" ]] || { print -u2 "Missing replacement: $replacement"; exit 1; }
+    destinations+=("$destination")
+    sources+=("$replacement")
+done
+
+for (( index = 1; index <= ${#destinations}; index++ )); do
+    ln -sfn "${sources[index]}" "${destinations[index]}"
+done
+print -r -- "Dotfiles now point to $target"
+if [[ -t 0 && -t 1 ]]; then
+    exec zsh -i
+fi
