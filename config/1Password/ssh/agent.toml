@@ -1,18 +1,6 @@
 [[ssh-keys]]
-item = "rhzyv3646qyctexiftyrxmb2qe"
-vault = "Work"
-
-[[ssh-keys]]
-item = "7eovs2pfievqgbo6ey4mnl4ome"
-vault = "Private"
-[[ssh-keys]]
-item = "4ajcxlcdqaphtejqaxugga6e3m"
+item = "verw7g3kpg7xb54fv33cmvq7e4"
 vault = "automation"
-
-[[ssh-keys]]
-item = "ay3jayregkyfvdis6q7kuxgena"
-vault = "automation"
-
 
 [[ssh-keys]]
 item = "d6gsj3axc6v54vnlg5imtb6nqy"
