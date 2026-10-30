@@ -45,7 +45,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | Command | Purpose |
 | --- | --- |
 | `./install.sh tools` | Install Homebrew, the tools declared in `install/brewfile` (removing undeclared Homebrew and App Store packages), and developer tools; finish with the deferred installs and `chsh` |
-| `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, configure Git identity/profiles, and install the Go `plan` CLI |
+| `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, install the SSH key from 1Password, and install the Go `plan` CLI |
 | `./install.sh node` | Install pnpm global tools; run Readwise and Codex Security login setup |
 | `./install.sh dotnet` | Install .NET SDKs, runtimes, and global tools |
 | `./install.sh osx` | Apply macOS preferences, create standard folders, and install NvimTmux.app with `duti` associations |
@@ -56,7 +56,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 
 `all` runs tools, link, node, dotnet, osx, theme, tmux-plugins, and claude-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` and `~/.ssh/config` (their GitHub-over-SSH settings need the 1Password agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
-`DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity/profile prompts; it does not suppress every authentication prompt.
+`DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses interactive prompts; it does not suppress every authentication prompt.
 
 ### Homebrew tools
 
@@ -128,7 +128,9 @@ Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not 
 
 ## Git identities and hooks
 
-`git/gitconfig.symlink` provides account-neutral defaults, `~/.gitconfig-local` overrides, `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls. `ssh/config` includes local and optional account configuration. It names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
+Each machine has one identity: hacker1db. `git/gitconfig.symlink` sets it last, so it wins over `~/.gitconfig-local`, and signs every commit and tag with SSH. It also provides `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls.
+
+The only SSH key is `~/.ssh/id_ed25519`, pulled from 1Password by `bin/ssh-key-from-vault` with the service account (`OP_SERVICE_ACCOUNT_TOKEN`). `./install.sh link` runs it when the token is set; re-run it to rotate the key. It also writes `~/.ssh/allowed_signers`. `ssh/config` uses that key for every host and never asks the 1Password agent, so Git operations and signing never prompt. It names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
 
 SSH connections do not reserve development ports automatically. Open a tunnel only for the service you need, choosing an unused local port:
 
@@ -139,13 +141,8 @@ ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:23000:127.0.0.1:3000 aiserver
 
 These expose each machine's port 3000 at `http://127.0.0.1:13000` and `http://127.0.0.1:23000`, while local port 3000 remains available. Choose another local port if one is occupied. Stop a tunnel with Ctrl+c. Existing SSH sessions retain their forwards until disconnected; remove any duplicate automatic `LocalForward` entries from `~/.ssh/config.local` as well.
 
-```sh
-DOTFILES_GIT_PROFILE=hacker1db ./install.sh tools
-```
 
-The optional profile links `~/.gitconfig-accounts` and `~/.ssh/config-accounts`. It supplies remote-specific identities, SSH host aliases, and 1Password agent-backed authentication/signing through `bin/git-agent-key`, `bin/git-agent-ssh`, and `bin/git-agent-signing-key`. Keys are selected by configured agent item titles; private key files are not installed. Profile setup removes a local `user.signingkey` override. Review profile-specific account mappings before enabling it.
-
-New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a gitleaks secret scan of staged changes. The gitleaks hook blocks the commit when it finds a secret, and also when `gitleaks` is not installed. The hacker1db account profile sets `core.hooksPath` to `git/templates/hooks`, so the dispatcher runs for every repository. These Git hooks are separate from Claude's work-profile GitGuardian hook.
+New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a gitleaks secret scan of staged changes. The gitleaks hook blocks the commit when it finds a secret, and also when `gitleaks` is not installed. These Git hooks are separate from Claude's work-profile GitGuardian hook.
 
 ## CI and security scanning
 

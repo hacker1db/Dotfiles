@@ -17,12 +17,7 @@ Detect the platform with `[[ $OSTYPE == darwin* ]]`; the installer scripts are z
 
 | Location | Problem | Suggested fix |
 |---|---|---|
-| `zsh/git.zsh:110` | Always exports `SSH_AUTH_SOCK` to the 1Password socket under `~/Library`. On Linux this socket path doesn't exist, so every shell loses its real or forwarded agent. Confirmed: `zsh -i` prints the bogus path. | Export it only when the socket exists (`[[ -S $sock ]]`), or use `~/.1password/agent.sock` on Linux. |
-| `ssh/config:11` | `IdentityAgent` for `192.168.1.157` points to the macOS socket. | Use `Match exec` on the OS, or move it to a per-host `config-accounts` include. |
 | `git/gitconfig.symlink:151` | `credential.helper = osxkeychain`. Linux git errors with `'credential-osxkeychain' is not a git command`. | Move it to `~/.gitconfig-local`, or use `[includeIf]` with a macOS-only file. Linux can use `!gh auth git-credential` or `libsecret`. |
-| `git/profiles/hacker1db/gitconfig:7` | `gpg.ssh.program` is set to `/Applications/1Password.app/.../op-ssh-sign`, so commit signing fails on Linux. | On Linux, use `/opt/1Password/op-ssh-sign` and pick the path per OS. |
-| `git/profiles/hacker1db/gitconfig:20` | Hardcodes `/opt/homebrew/bin/gh`. | Use `!gh auth git-credential`, as line 17 already does. |
-| `bin/git-agent-key:16`, `bin/git-agent-ssh:23` | Hardcode the macOS 1Password socket. | Share one socket-resolver helper that also handles the Linux path. |
 | `bin/e`, `bin/tm` | They use the `#!/bin/sh` shebang but contain bash syntax (`==`, arrays, `select`). On Linux, `/bin/sh` is dash, so they fail. | Change the shebang to `#!/usr/bin/env bash`. |
 | `config/tmux/tmux.conf:113-114` | `C-c`/`C-v` use `reattach-to-user-namespace pbcopy/pbpaste`. | tmux-yank is already loaded, so drop the bindings or switch per OS with `if-shell 'uname \| grep -q Darwin'`. |
 | `zsh/zshrc.symlink:116` | Always prepends `/opt/homebrew/bin`. This is harmless on Linux but it puts a nonexistent directory first in PATH. | Guard it with `[[ -d /opt/homebrew/bin ]]`. `zsh/brew.zsh` already does the shellenv part. |

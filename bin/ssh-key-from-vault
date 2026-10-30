@@ -1,0 +1,27 @@
+#!/bin/sh
+# Install this machine's single SSH key from 1Password via the service account.
+# The key is used for GitHub auth, SSH logins, and Git commit signing.
+set -eu
+
+item=${DOTFILES_SSH_KEY_ITEM:-op://Automation/verw7g3kpg7xb54fv33cmvq7e4}
+key=${DOTFILES_SSH_KEY:-$HOME/.ssh/id_ed25519}
+
+[ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || {
+    echo 'ssh-key-from-vault: OP_SERVICE_ACCOUNT_TOKEN is not set' >&2
+    exit 1
+}
+command -v op >/dev/null || { echo 'ssh-key-from-vault: op is not installed' >&2; exit 1; }
+
+mkdir -p "${key%/*}" && chmod 700 "${key%/*}"
+umask 077
+tmp=$(mktemp "$key.XXXXXX")
+trap 'rm -f "$tmp"' EXIT
+op read --force --out-file "$tmp" "$item/private key?ssh-format=openssh" </dev/null >/dev/null
+mv "$tmp" "$key"
+pub=$(op read "$item/public key" </dev/null)
+printf '%s\n' "$pub" > "$key.pub"
+chmod 644 "$key.pub"
+
+email=$(git config --get user.email || true)
+[ -n "$email" ] && printf '%s %s\n' "$email" "$pub" > "$HOME/.ssh/allowed_signers"
+echo "Installed $key from $item"
