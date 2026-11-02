@@ -6,7 +6,7 @@
     # If the file doesn't exist it is silently ignored
     path = ~/.gitconfig-local
 [init]
-    templatedir = ~/.dotfiles/main/git/templates
+    templatedir = ~/.git-templates
 	defaultBranch = main
 [alias]
     # list all aliases

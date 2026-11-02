@@ -140,7 +140,7 @@ ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:23000:127.0.0.1:3000 aiserver
 These expose each machine's port 3000 at `http://127.0.0.1:13000` and `http://127.0.0.1:23000`, while local port 3000 remains available. Choose another local port if one is occupied. Stop a tunnel with Ctrl+c. Existing SSH sessions retain their forwards until disconnected; remove any duplicate automatic `LocalForward` entries from `~/.ssh/config` as well.
 
 
-New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a gitleaks secret scan of staged changes. The gitleaks hook blocks the commit when it finds a secret, and also when `gitleaks` is not installed. These Git hooks are separate from Claude's work-profile GitGuardian hook.
+New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, which `install.sh link` creates and `install.sh use` repoints at the selected checkout. The dispatcher resolves `git/hooks/` from the checkout `~/.gitconfig` links to, falling back to `~/.dotfiles/main`. It runs matching files there and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a gitleaks secret scan of staged changes. The gitleaks hook blocks the commit when it finds a secret, and also when `gitleaks` is not installed. These Git hooks are separate from Claude's work-profile GitGuardian hook.
 
 ## CI and security scanning
 

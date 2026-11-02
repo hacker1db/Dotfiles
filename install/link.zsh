@@ -38,6 +38,9 @@ for destination in "$HOME/.codex/AGENTS.md" "$HOME/.copilot/copilot-instructions
     print "Linked $destination -> $instructions"
 done
 
+title "Linking Git templates"
+link_file "$DOTFILES/git/templates" "$HOME/.git-templates"
+
 title "Linking Claude Code MCP servers"
 link_file "$DOTFILES/claude/mcp.json" "$HOME/.mcp.json"
 
