@@ -54,7 +54,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | `./install.sh claude-profiles` | Generate and link the Claude Code profiles (`--check`, `--skip-foundry`) |
 | `./install.sh deferred` | Finish the Brewfile installation and cleanup that were skipped because they need a password, then `chsh` |
 
-`all` runs tools, link, node, dotnet, osx, theme, tmux-plugins, and claude-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` and `~/.ssh/config` (their GitHub-over-SSH settings need the 1Password agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs tools, link, node, dotnet, osx, theme, tmux-plugins, and claude-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` (its GitHub-over-SSH settings need the 1Password agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity and signing-key prompts; it does not suppress every authentication prompt.
 
@@ -128,16 +128,16 @@ Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not 
 
 ## Git identities and hooks
 
-Each machine uses one GitHub user exclusively. `git/gitconfig.symlink` provides account-neutral defaults, `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls; the machine's `user.name`, `user.email`, and `user.signingkey` live in the untracked `~/.gitconfig-local`. `./install.sh link` prompts for any that are unset and enables commit and tag signing once a signing key is set. Signing uses SSH: the signing key is the public key of a 1Password SSH item, and `ssh-keygen` signs through the agent at `SSH_AUTH_SOCK`, so no private key file is written. `ssh/config` names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
+Each machine uses one GitHub user exclusively. `git/gitconfig.symlink` provides account-neutral defaults, `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls; the machine's `user.name`, `user.email`, and `user.signingkey` live in the untracked `~/.gitconfig-local`. `./install.sh link` prompts for any that are unset and enables commit and tag signing once a signing key is set. Signing uses SSH: the signing key is the public key of a 1Password SSH item, and `ssh-keygen` signs through the agent at `SSH_AUTH_SOCK`, so no private key file is written. Dotfiles does not manage `~/.ssh/config`; each machine owns it. Let 1Password's SSH agent setup add its `IdentityAgent` block, and add host aliases there. `./install.sh link` replaces an older dotfiles-linked `~/.ssh/config` with a machine-owned copy.
 
-SSH connections do not reserve development ports automatically. Open a tunnel only for the service you need, choosing an unused local port:
+SSH connections do not reserve development ports automatically. Using host aliases from the machine's `~/.ssh/config`, open a tunnel only for the service you need, choosing an unused local port:
 
 ```sh
 ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:13000:127.0.0.1:3000 stronghold
 ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:23000:127.0.0.1:3000 aiserver
 ```
 
-These expose each machine's port 3000 at `http://127.0.0.1:13000` and `http://127.0.0.1:23000`, while local port 3000 remains available. Choose another local port if one is occupied. Stop a tunnel with Ctrl+c. Existing SSH sessions retain their forwards until disconnected; remove any duplicate automatic `LocalForward` entries from `~/.ssh/config.local` as well.
+These expose each machine's port 3000 at `http://127.0.0.1:13000` and `http://127.0.0.1:23000`, while local port 3000 remains available. Choose another local port if one is occupied. Stop a tunnel with Ctrl+c. Existing SSH sessions retain their forwards until disconnected; remove any duplicate automatic `LocalForward` entries from `~/.ssh/config` as well.
 
 
 New repositories can inherit `git/templates/hooks/`. The dispatcher runs matching files in `git/hooks/` and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a gitleaks secret scan of staged changes. The gitleaks hook blocks the commit when it finds a secret, and also when `gitleaks` is not installed. These Git hooks are separate from Claude's work-profile GitGuardian hook.

@@ -41,11 +41,17 @@ done
 title "Linking Claude Code MCP servers"
 link_file "$DOTFILES/claude/mcp.json" "$HOME/.mcp.json"
 
-title "Installing SSH config"
-if [[ -e "$DOTFILES/ssh/config" ]]; then
-    mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
-    chmod 600 "$DOTFILES/ssh/config"
-    link_file "$DOTFILES/ssh/config" "$HOME/.ssh/config"
+title "Detaching SSH config"
+SSH_CONFIG="$HOME/.ssh/config"
+if [[ -L "$SSH_CONFIG" && "${SSH_CONFIG:A}" == "${DOTFILES:h}/"*/ssh/config ]]; then
+    if [[ -f "${SSH_CONFIG:A}" ]]; then
+        cp "${SSH_CONFIG:A}" "$SSH_CONFIG.tmp" && chmod 600 "$SSH_CONFIG.tmp" && mv -f "$SSH_CONFIG.tmp" "$SSH_CONFIG" || exit 1
+        print "Replaced the dotfiles link with a machine-owned copy: $SSH_CONFIG"
+    else
+        warning "$SSH_CONFIG links to a missing dotfiles file; create a machine-owned one"
+    fi
+else
+    print "$SSH_CONFIG is machine-managed; leaving as-is."
 fi
 
 github_ssh_preflight >&2 || true

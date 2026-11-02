@@ -22,7 +22,6 @@ typeset -a candidates=(
     "$HOME"/.config/*(ND@)
     "$HOME"/.codex/AGENTS.md(N@)
     "$HOME"/.copilot/copilot-instructions.md(N@)
-    "$HOME"/.ssh/config(N@)
 )
 for destination in "${candidates[@]}"; do
     [[ -L "${destination:h}" || -L "${destination:h:h}" ]] && continue
