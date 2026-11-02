@@ -45,7 +45,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | Command | Purpose |
 | --- | --- |
 | `./install.sh tools` | Install Homebrew, the tools declared in `install/brewfile` (removing undeclared Homebrew and App Store packages), and developer tools; finish with the deferred installs and `chsh` |
-| `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, install the SSH key from 1Password, and install the Go `plan` CLI |
+| `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, configure the Git identity and signing key, and install the Go `plan` CLI |
 | `./install.sh node` | Install pnpm global tools; run Readwise and Codex Security login setup |
 | `./install.sh dotnet` | Install .NET SDKs, runtimes, and global tools |
 | `./install.sh osx` | Apply macOS preferences, create standard folders, and install NvimTmux.app with `duti` associations |
@@ -56,7 +56,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 
 `all` runs tools, link, node, dotnet, osx, theme, tmux-plugins, and claude-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` and `~/.ssh/config` (their GitHub-over-SSH settings need the 1Password agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
-`DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses interactive prompts; it does not suppress every authentication prompt.
+`DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity and signing-key prompts; it does not suppress every authentication prompt.
 
 ### Homebrew tools
 
@@ -128,9 +128,7 @@ Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not 
 
 ## Git identities and hooks
 
-Each machine has one identity: hacker1db. `git/gitconfig.symlink` sets it last, so it wins over `~/.gitconfig-local`, and signs every commit and tag with SSH. It also provides `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls.
-
-The SSH key lives only in 1Password; no private key file is ever written to disk. `bin/ssh-key-from-vault` uses the service account (`OP_SERVICE_ACCOUNT_TOKEN`) to pipe it into a memory-only `ssh-agent` at `~/.ssh/agent.sock`, which `zsh/zshenv.symlink` exports as `SSH_AUTH_SOCK` and `ssh/config` uses for every host. Interactive shells reload it when the agent is empty (after a reboot), and `./install.sh link` runs it too; pass `--force` to pick up a rotated key. It also writes the public key to `~/.ssh/allowed_signers`. Git operations and signing never prompt. It names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
+Each machine uses one GitHub user exclusively. `git/gitconfig.symlink` provides account-neutral defaults, `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls; the machine's `user.name`, `user.email`, and `user.signingkey` live in the untracked `~/.gitconfig-local`. `./install.sh link` prompts for any that are unset and enables commit and tag signing once a signing key is set. Signing uses SSH: the signing key is the public key of a 1Password SSH item, and `ssh-keygen` signs through the agent at `SSH_AUTH_SOCK`, so no private key file is written. `ssh/config` names hosts only; per-host usernames go in the untracked `~/.ssh/config.local`, which it includes first.
 
 SSH connections do not reserve development ports automatically. Open a tunnel only for the service you need, choosing an unused local port:
 
