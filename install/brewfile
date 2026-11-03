@@ -24,6 +24,7 @@ tap "oven-sh/bun"
 tap "owasp-amass/amass", "https://github.com/owasp-amass/homebrew-amass.git"
 tap "rcmdnk/file", trusted: true
 tap "robscott/tap", trusted: true
+tap "rtk-ai/tap", trusted: true
 tap "rustscan/rustscan", "https://github.com/RustScan/homebrew-rustscan.git"
 tap "slp/krunkit"
 tap "sst/tap", "https://github.com/anomalyco/homebrew-tap.git", trusted: true
@@ -237,6 +238,8 @@ brew "python@3.8"
 brew "python@3.9"
 # Reattach process (e.g., tmux) to background
 brew "reattach-to-user-namespace"
+# Token-saving proxy that compacts shell command output for AI agents
+brew "rtk-ai/tap/rtk"
 # Persistent key-value database, with built-in net interface
 brew "redis"
 # Modern Day Portscanner
