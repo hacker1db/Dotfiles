@@ -59,26 +59,6 @@ for hook_src destination in "${(@kv)agent_hooks}"; do
     print "Linked $destination -> $hook_src"
 done
 
-title "Linking agent hooks"
-typeset -A agent_hooks=(
-    "$DOTFILES/codex/hooks.json" "$HOME/.codex/hooks.json"
-    "$DOTFILES/copilot/hooks/rtk-rewrite.json" "$HOME/.copilot/hooks/rtk-rewrite.json"
-)
-for file destination in "${(@kv)agent_hooks}"; do
-    if [[ -L "$destination" && "$(readlink "$destination")" == "$file" ]]; then
-        print "Hook file already linked: $destination"
-        continue
-    fi
-    mkdir -p "${destination:h}"
-    if [[ -e "$destination" && ! -L "$destination" ]]; then
-        backup="$(backup_path "$destination")"
-        mv "$destination" "$backup"
-        print "Preserved existing hook file: $backup"
-    fi
-    ln -sfn "$file" "$destination"
-    print "Linked $destination -> $file"
-done
-
 title "Linking Git templates"
 link_file "$DOTFILES/git/templates" "$HOME/.git-templates"
 
