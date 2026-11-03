@@ -43,7 +43,7 @@ find_github_checkout() {
     for dir in "$HOME/Developer/${slug#*/}" "$HOME"/Developer/*/"${slug#*/}"(N); do
         [[ -d "$dir" ]] || continue
         url="$(git -C "$dir" config --get remote.origin.url 2>/dev/null)" || continue
-        [[ "${(L)url}" == *"github.com"[:/]"$slug"(|.git) ]] && { print "$dir"; return 0 }
+        [[ "${(L)url}" == *github(.com|-*)[:/]"$slug"(|.git) ]] && { print "$dir"; return 0 }
     done
     return 1
 }
@@ -108,7 +108,13 @@ clitools_dir() {
 }
 
 update_clean_checkout() {
-    local dir="$1"
+    local dir="$1" url slug
+    url="$(git -C "$dir" config --get remote.origin.url 2>/dev/null)"
+    slug="$(print -r -- "$url" | sed -nE 's#^(ssh://)?(git@)?github-[^:/]+[:/](.+)$#\3#p')"
+    if [[ -n "$slug" ]]; then
+        git -C "$dir" remote set-url origin "git@github.com:${slug%.git}.git"
+        print "Rewrote ${dir:t} origin $url -> git@github.com:${slug%.git}.git"
+    fi
     if [[ -n "$(git -C "$dir" status --porcelain --untracked-files=normal 2>/dev/null)" ]]; then
         warning "$dir has local changes; preserving it without fetching or updating."
     else
