@@ -57,7 +57,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "rtk hook codex | jq -c 'del(.hookSpecificOutput.permissionDecision?)'"
+            "command": "out=$(rtk hook codex) || exit $?; [ -z \"$out\" ] || printf %s \"$out\" | jq -c 'if .hookSpecificOutput.permissionDecision? == \"allow\" then del(.hookSpecificOutput.permissionDecision) else . end'"
           }
         ]
       }
