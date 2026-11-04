@@ -410,8 +410,6 @@ cask "raycast"
 cask "reader"
 # Instant messaging application focusing on security
 cask "signal"
-# Code quality and security for terminal workflows, scripts, and AI agents
-cask "sonarqube-cli"
 # Music streaming service
 cask "spotify"
 # Video game digital distribution service

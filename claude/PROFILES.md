@@ -71,8 +71,10 @@ Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout,
 
 - `settings.base.json`: shared plugins, `enabledMcpjsonServers` (github, playwright from `~/.mcp.json`), `permissions.defaultMode: auto`, deny rules, statusline.
 - `profiles/personal/settings.json`: personal-only plugins (vercel, todoist).
-- `profiles/subscription/settings.json`: settings for the work subscription only. GitGuardian runs as a git hook (`core.hooksPath`), not a Claude hook.
+- `profiles/subscription/settings.json`: settings for the work subscription only.
 - `profiles/foundry/settings.json`: Foundry provider and deployment model defaults. Uses `opus` (the configured Opus 4.8 deployment) for auto mode compatibility; `opusplan` would select the unsupported Sonnet 4.6 deployment during execution.
+
+Work security tooling is never configured in this repository. Its hooks, MCP servers, and git `core.hooksPath` entries live in machine-local config outside version control (for example `~/.gitconfig-local`, `~/.copilot/hooks/`, or a profile's local settings).
 
 Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`.
 
