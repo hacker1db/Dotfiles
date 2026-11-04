@@ -82,7 +82,10 @@ auto='{}'
 build() {
     local -a layers=("$claude_dir/settings.base.json" "$profiles_dir/$1/settings.json")
     jq -S -s --arg profile "$1" --arg resource "$resource" --arg home "$HOME" --argjson auto "$auto" '
-        reduce .[] as $layer ({}; . * $layer)
+        reduce .[] as $layer ({};
+            (reduce (($layer.hooks // {}) | to_entries[]) as $e (.hooks // {}; .[$e.key] += $e.value)) as $hooks
+            | ((.enabledMcpjsonServers // []) + ($layer.enabledMcpjsonServers // []) | unique) as $mcp
+            | . * $layer | .hooks = $hooks | .enabledMcpjsonServers = $mcp)
         | .env += {CLAUDE_CODE_USE_BEDROCK: "0", CLAUDE_CODE_USE_VERTEX: "0"}
         | .extraKnownMarketplaces."fleet-local" = {source: {source: "directory", path: ($home + "/.local/share/fleet-marketplace")}}
         | if $profile == "foundry" then . * $auto | .env.ANTHROPIC_FOUNDRY_RESOURCE = $resource

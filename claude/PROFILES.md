@@ -76,7 +76,7 @@ Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout,
 
 Work security tooling is never configured in this repository. Its hooks, MCP servers, and git `core.hooksPath` entries live in machine-local config outside version control (for example `~/.gitconfig-local`, `~/.copilot/hooks/`, or a profile's local settings).
 
-Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`.
+Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`. When layers merge, `hooks` arrays concatenate per event and `enabledMcpjsonServers` arrays union, so a profile layer adds to the base instead of replacing it.
 
 The generated files also pin the provider: Foundry sets `CLAUDE_CODE_USE_FOUNDRY=1`, while personal and subscription set it to `0` and add `forceLoginMethod: claudeai`. All three set Bedrock and Vertex to `0`.
 
