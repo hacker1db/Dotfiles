@@ -7,6 +7,3 @@ git fetch --all --prune && wt step for-each -- 'git rev-parse --verify -q @{u} >
 
 [commit.generation]
 command = "ocr -c \"write a commit message and push\""
-
-[post-switch]
-tmux = "[ -n \"$TMUX\" ] && tmux rename-window \"$(basename $(dirname {{ repo_path }}))/{{ branch | sanitize }}\""

@@ -388,30 +388,48 @@ function brew-cleanup(){
 }
 
 function update-node-tools(){
-if ! command -v pnpm >/dev/null 2>&1; then
-  echo "pnpm not found."
-  return 1
-fi
-
-export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
-mkdir -p "$PNPM_HOME"
-export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
-
-if ! pnpm list --global --depth -1 2>/dev/null | grep -Eq '^[├└]── '; then
-  echo "No global pnpm packages found."
-  if command -v npm >/dev/null 2>&1; then
-    local npm_global_count
-    npm_global_count="$(npm list -g --depth=0 2>/dev/null | grep -Ec '^[├└]── ' || true)"
-    if [[ "${npm_global_count:-0}" -gt 0 ]]; then
-      echo "Found ${npm_global_count} npm global package(s). Run: npm update -g"
+    if ! command -v pnpm >/dev/null 2>&1; then
+        echo "pnpm not found."
+        return 1
     fi
-  fi
-  return 0
-fi
 
-echo "Updating global pnpm packages..."
-pnpm update --global --latest
-echo "All global pnpm packages updated!"
+    local -x PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+    local -x PATH="$PATH:$PNPM_HOME/bin:$PNPM_HOME"
+    local packages
+    mkdir -p "$PNPM_HOME" || return 1
+    packages="$(pnpm list --global --depth -1)" || return 1
+
+    local -a unmanaged=(plan-manager "@anthropic-ai/claude-code" "@openai/codex" "@openai/codex-security")
+    local package removed=0
+    for package in $unmanaged; do
+        if print -r -- "$packages" | grep -qF -- "── ${package}@"; then
+            echo "Removing $package from global pnpm (not updatable from the registry)..."
+            pnpm remove --global "$package" || return 1
+            removed=1
+        fi
+    done
+    if (( removed )); then
+        packages="$(pnpm list --global --depth -1)" || return 1
+    fi
+
+    if ! print -r -- "$packages" | grep -Eq '^[├└]── '; then
+        echo "No global pnpm packages found."
+        if command -v npm >/dev/null 2>&1; then
+            local npm_global_count
+            npm_global_count="$(npm list -g --depth=0 2>/dev/null | grep -Ec '^[├└]── ' || true)"
+            if [[ "${npm_global_count:-0}" -gt 0 ]]; then
+                echo "Found ${npm_global_count} npm global package(s). Run: npm update -g"
+            fi
+        fi
+        return 0
+    fi
+
+    echo "Updating global pnpm packages..."
+    if ! pnpm update --global --latest; then
+        echo "Global pnpm update failed."
+        return 1
+    fi
+    echo "All global pnpm packages updated!"
 }
 
 function get-azsubcount(){

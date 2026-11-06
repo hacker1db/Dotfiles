@@ -27,7 +27,7 @@ Use these absolute paths from GUI apps and other tools (such as T3 Code) that do
 | Foundry resource | `ANTHROPIC_FOUNDRY_RESOURCE` in `~/.localrc` → `~/OneDrive*/Personal/.localrc`; without a `~/OneDrive*` directory and the variable, Foundry is skipped without failing the install |
 | Local autoMode input | `~/.config/claude-code/automode.json` (falls back to `foundry-automode.json`) |
 | MCP servers (all profiles) | `~/.mcp.json` → `~/.dotfiles/main/claude/mcp.json` |
-| Installer and test | `~/.dotfiles/main/install/claude-profiles.sh`, `install/tests/claude-profiles.test.sh` |
+| Installer | `~/.dotfiles/main/install/claude-profiles.zsh` |
 
 Each profile dir contains:
 
@@ -49,7 +49,7 @@ The Foundry profile also needs a working `az login`. Its resource and model come
 
 ## Install
 
-`./install.sh link` runs `install/claude-profiles.sh`, which:
+`./install.sh claude-profiles` runs `install/claude-profiles.zsh`, which:
 
 - links `~/.localrc` to `~/OneDrive*/Personal/.localrc` when a OneDrive dir exists (fails on two dirs or an unsynced file); without OneDrive, the existing `~/.localrc` is used as is
 - merges the layers with jq into ignored `claude/.local/profiles/<profile>.json` (mode 600), linked as `~/.claude-<profile>/settings.json` (dir mode 700), and backs up an unmanaged `settings.json` once
@@ -61,8 +61,8 @@ The Foundry profile also needs a working `az login`. Its resource and model come
 Foundry reads `ANTHROPIC_FOUNDRY_RESOURCE` from the environment, or from `~/.localrc`. Rerun the installer after changing it. `~/.config/claude-code/automode.json` (or `foundry-automode.json`) contributes only `autoMode.environment`. Layers that contain `apiKeyHelper` or API keys or tokens are rejected.
 
 ```sh
-install/claude-profiles.sh --check         # read-only audit
-install/claude-profiles.sh --skip-foundry  # leave Foundry untouched
+zsh install/claude-profiles.zsh --check         # read-only audit
+zsh install/claude-profiles.zsh --skip-foundry  # leave Foundry untouched
 ```
 
 Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout, symlinked dirs), and 2 means incomplete (no Foundry resource, stale state, or inherited `ANTHROPIC_*`/`CLAUDE_CODE_USE_*` variables, which are reported by name only). A `CLAUDE_CODE_USE_*` flag set to `0`, `false`, `no` or `off` is ignored, except `CLAUDE_CODE_USE_FOUNDRY` while Foundry is managed, because it would turn off the Foundry profile's provider.
@@ -71,10 +71,12 @@ Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout,
 
 - `settings.base.json`: shared plugins, `enabledMcpjsonServers` (github, playwright from `~/.mcp.json`), `permissions.defaultMode: auto`, deny rules, statusline.
 - `profiles/personal/settings.json`: personal-only plugins (vercel, todoist).
-- `profiles/subscription/settings.json`: settings for the work subscription only. GitGuardian runs as a git hook (`core.hooksPath`), not a Claude hook.
+- `profiles/subscription/settings.json`: settings for the work subscription only.
 - `profiles/foundry/settings.json`: Foundry provider and deployment model defaults. Uses `opus` (the configured Opus 4.8 deployment) for auto mode compatibility; `opusplan` would select the unsupported Sonnet 4.6 deployment during execution.
 
-Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`.
+Work security tooling is never configured in this repository. Its hooks, MCP servers, and git `core.hooksPath` entries live in machine-local config outside version control (for example `~/.gitconfig-local`, `~/.copilot/hooks/`, or a profile's local settings).
+
+Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`. When layers merge, `hooks` arrays concatenate per event and `enabledMcpjsonServers` arrays union, so a profile layer adds to the base instead of replacing it.
 
 The generated files also pin the provider: Foundry sets `CLAUDE_CODE_USE_FOUNDRY=1`, while personal and subscription set it to `0` and add `forceLoginMethod: claudeai`. All three set Bedrock and Vertex to `0`.
 
@@ -86,12 +88,13 @@ The generated files also pin the provider: Foundry sets `CLAUDE_CODE_USE_FOUNDRY
 
 Claude Console (API-key) logins are stored outside `CLAUDE_CONFIG_DIR`, so they are not isolated. Profiles isolate config and auth, not the filesystem, so use separate worktrees when concurrent sessions edit one repo.
 
-## Tests
+## Checks
 
 ```sh
-bash install/tests/claude-profiles.test.sh
+zsh -n install/claude-profiles.zsh
+zsh install/claude-profiles.zsh --check
 ```
 
 ## Rollback
 
-Revert the dotfiles commits, rerun `./install.sh link`, and launch plain `claude` with `CLAUDE_CONFIG_DIR` unset. `~/.claude` stays intact until the profiles are verified.
+Revert the dotfiles commits, rerun `./install.sh claude-profiles`, and launch plain `claude` with `CLAUDE_CONFIG_DIR` unset. `~/.claude` stays intact until the profiles are verified.

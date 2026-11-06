@@ -1,0 +1,18 @@
+#!/usr/bin/env zsh
+# Reset tmux pane state after Claude agent teams modify it
+# Hook: SessionEnd — adapted from nicknisi/dotfiles (MIT)
+
+if [[ -n "$TMUX" ]]; then
+    tmux set-window-option -u pane-border-status 2>/dev/null
+    tmux set-window-option -u pane-border-style 2>/dev/null
+    tmux set-window-option -u pane-active-border-style 2>/dev/null
+    tmux set-window-option -u pane-border-format 2>/dev/null
+    tmux set-window-option -u pane-border-lines 2>/dev/null
+
+    tmux set-option -g -u pane-border-status 2>/dev/null
+
+    tmux source-file "$HOME/.config/tmux/themes/current.conf" 2>/dev/null
+    tmux source-file -q "$HOME/.config/tmux/themes/current-layout.conf" 2>/dev/null
+fi
+
+exit 0

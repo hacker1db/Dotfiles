@@ -42,7 +42,7 @@ For every in-scope plan:
 
 ## Adapter
 
-Use the tool's plan adapter: Codex uses `$plans`; OpenCode and Copilot use `/plans`. Delegate operations to the `plan` CLI rather than reimplementing its storage or service behavior.
+Use the tool's plan adapter: Codex uses `$plans`; Copilot uses `/plans`. Delegate operations to the `plan` CLI rather than reimplementing its storage or service behavior.
 
 ## Plan-manager source code
 

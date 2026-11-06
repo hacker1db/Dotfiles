@@ -6,7 +6,7 @@
     # If the file doesn't exist it is silently ignored
     path = ~/.gitconfig-local
 [init]
-    templatedir = ~/.dotfiles/main/git/templates
+    templatedir = ~/.git-templates
 	defaultBranch = main
 [alias]
     # list all aliases
@@ -132,7 +132,6 @@
     editor = vim
     whitespace = cr-at-eol
 	autocrlf = input
-	hooksPath = /Users/David.Walters@alaskaair.com/Library/Application Support/ggshield/git-hooks
 
 [interactive]
     diffFilter = delta --color-only
@@ -170,6 +169,5 @@
 [pull]
 	ff = only
 
-[include]
-    # Optional account profile linked by install/git.sh; ignored when missing
-    path = ~/.gitconfig-accounts
+[gpg]
+    format = ssh

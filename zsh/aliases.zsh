@@ -41,7 +41,7 @@ alias notes='cd $HOME/notes/SecondBrain'
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
 alias du='du -h -c' # calculate disk usage for a folder
-alias dotfiles="cd ~/.dotfiles/main"
+alias dotfiles='cd "$DOTFILES"'
 alias tfd="terraform apply --destroy --auto-approve"
 alias tfp="terraform plan"
 alias tfa="terraform apply --auto-approve"
@@ -116,10 +116,13 @@ alias cf='claude-foundry'
 alias cfc='claude-foundry --continue'
 alias cw='claude-subscription'
 alias cwc='claude-subscription --continue'
-alias oc='opencode'
 alias occ='copilot'
-alias ocr='opencode run'
 
 # applications
 alias devtoy='open /Applications/DevToy.app'
 alias scan='ggshield secret scan path --recursive --yes ./'
+
+# SketchyBar
+alias sb='sketchybar --bar hidden=toggle'
+alias sbon='brew services start sketchybar'
+alias sboff='brew services stop sketchybar'

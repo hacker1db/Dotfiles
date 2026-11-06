@@ -1,0 +1,39 @@
+{
+  "linesFromBottom": 20,
+  "promptMarker": "",
+  "rules": [
+    {
+      "id": "permit.do-you-want",
+      "pattern": "Do you want to",
+      "flags": "i",
+      "state": "PERMIT"
+    },
+    {
+      "id": "permit.yn",
+      "pattern": "\\[y/n\\]",
+      "flags": "i",
+      "state": "PERMIT",
+      "approveKeys": ["y"],
+      "denyKeys": ["n"]
+    },
+    {
+      "id": "question.menu-select",
+      "pattern": "enter to select \u00b7 esc to cancel",
+      "flags": "i",
+      "state": "QUESTION"
+    },
+    {
+      "id": "busy.esc-interrupt",
+      "pattern": "esc to interrupt",
+      "flags": "i",
+      "state": "BUSY"
+    },
+    {
+      "id": "busy.spinner-glyph",
+      "pattern": "[\\u2800-\\u28FF]",
+      "state": "BUSY"
+    }
+  ],
+  "approveKeys": ["1"],
+  "denyKeys": ["Escape"]
+}
