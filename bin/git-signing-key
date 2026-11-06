@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+sockets = [Path.home() / "Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock", Path.home() / ".1password/agent.sock"]
+socket = next((p for p in sockets if p.is_socket()), None)
+if socket is None:
+    sys.exit("1Password SSH agent socket unavailable")
+result = subprocess.run(["ssh-add", "-L"], env={**os.environ, "SSH_AUTH_SOCK": str(socket)}, capture_output=True, text=True)
+if result.returncode:
+    sys.exit("Cannot list keys from the 1Password SSH agent")
+label = subprocess.run(["git", "config", "--get", "dotfiles.signingKeyLabel"], capture_output=True, text=True).stdout.strip()
+keys = [line.split(None, 2) for line in result.stdout.splitlines() if line.strip()]
+keys = [parts for parts in keys if len(parts) >= 2 and (not label or (len(parts) == 3 and parts[2] == label))]
+if len(keys) != 1:
+    sys.exit("Select exactly one 1Password key using dotfiles.signingKeyLabel; no key selected")
+print("key::" + " ".join(keys[0][:2]))

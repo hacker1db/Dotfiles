@@ -169,5 +169,19 @@
 [pull]
 	ff = only
 
+# A human uses this repo: hacker1db is the GitHub identity, and signing goes
+# through the 1Password desktop agent. Kept last so it wins over ~/.gitconfig-local.
+# Unattended access lives in the fleet-manager repository (ssh-key-from-vault).
+[user]
+    name = hacker1db
+    email = 6212228+hacker1db@users.noreply.github.com
 [gpg]
     format = ssh
+[gpg "ssh"]
+    allowedSignersFile = ~/.ssh/allowed_signers
+[commit]
+    gpgsign = true
+[tag]
+    gpgsign = true
+[include]
+    path = ~/.config/git/onepassword.conf

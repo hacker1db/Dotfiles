@@ -1,0 +1,40 @@
+#!/usr/bin/env zsh
+# Run git with signing and SSH served by the 1Password service account instead
+# of the desktop agent, for unattended use (AI agents, scripts).
+# The private key is piped from `op` into a memory-only ssh-agent and never
+# touches disk; the signing public key is read back from that agent.
+# Usage: git-vault <git args...>     e.g. git-vault commit -m msg; git-vault push
+# Env: GIT_VAULT_KEY_ITEM (default op://Automation/Github personal),
+#      GIT_VAULT_AGENT_SOCK, OP_SERVICE_ACCOUNT_TOKEN (falls back to ~/.localrc).
+set -euo pipefail
+
+item=${GIT_VAULT_KEY_ITEM:-"op://Automation/Github personal"}
+sock=${GIT_VAULT_AGENT_SOCK:-$HOME/.ssh/vault-agent.sock}
+export SSH_AUTH_SOCK=$sock
+
+rc=0; ssh-add -l >/dev/null 2>&1 || rc=$?
+if (( rc != 0 )); then
+    if [[ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" && -r ~/.localrc ]]; then
+        source ~/.localrc
+    fi
+    [[ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]] || { print -u2 "git-vault: OP_SERVICE_ACCOUNT_TOKEN not set"; exit 1; }
+    if (( rc == 2 )); then  # no agent listening
+        mkdir -p "${sock:h}" && chmod 700 "${sock:h}"
+        rm -f "$sock"
+        ssh-agent -a "$sock" >/dev/null
+    fi
+    # op reads the desktop app's settings under ~/Library/Group Containers;
+    # macOS app-data protection blocks that open for unapproved hosts and op
+    # hangs. A throwaway HOME skips it; the service account needs no app.
+    ophome=$(mktemp -d)
+    HOME=$ophome op read "$item/private key?ssh-format=openssh" </dev/null | ssh-add -q - && loaded=1 || loaded=0
+    rm -rf "$ophome"
+    (( loaded )) || { print -u2 "git-vault: could not load $item"; exit 1; }
+fi
+
+exec git \
+    -c gpg.format=ssh \
+    -c gpg.ssh.program=ssh-keygen \
+    -c "gpg.ssh.defaultKeyCommand=ssh-add -L" \
+    -c "core.sshCommand=ssh -o IdentityAgent=$sock" \
+    "$@"

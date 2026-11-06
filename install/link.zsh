@@ -141,20 +141,15 @@ fi
 title "Configuring Git identity"
 typeset key value
 if [[ "${DOTFILES_NONINTERACTIVE:-0}" != 1 && -t 0 ]]; then
-    for key in user.name user.email user.signingkey; do
+    for key in user.name user.email; do
         [[ -n "$(git config --get "$key")" ]] && continue
-        if [[ "$key" == user.signingkey ]]; then
-            read -r "value?Git signing key (SSH public key from 1Password, blank to skip): "
-        else
-            read -r "value?Git $key: "
-        fi
+        read -r "value?Git $key: "
         [[ -n "$value" ]] && git config -f "$LOCAL_FILE" "$key" "$value"
     done
 fi
-if [[ -n "$(git config --get user.signingkey)" ]]; then
-    for key in commit.gpgsign tag.gpgsign; do
-        [[ -n "$(git config --get "$key")" ]] || git config -f "$LOCAL_FILE" "$key" true
-    done
+if ! "$DOTFILES/install/git-signing.zsh"; then
+    warning "1Password Git signing setup needs attention"
+    LINK_FAILURE=1
 fi
 
 title "Checking Codex plan-library access"
