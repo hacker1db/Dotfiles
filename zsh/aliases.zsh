@@ -122,4 +122,3 @@ alias ocr='opencode run'
 
 # applications
 alias devtoy='open /Applications/DevToy.app'
-alias scan='ggshield secret scan path --recursive --yes ./'
