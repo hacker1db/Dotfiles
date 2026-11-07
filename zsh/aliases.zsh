@@ -120,6 +120,7 @@ alias occ='copilot'
 
 # applications
 alias devtoy='open /Applications/DevToy.app'
+
 # SketchyBar
 alias sb='sketchybar --bar hidden=toggle'
 alias sbon='brew services start sketchybar'
