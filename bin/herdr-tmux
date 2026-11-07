@@ -17,6 +17,8 @@ const fs = require("fs");
 let doc;
 try { doc = JSON.parse(fs.readFileSync(process.argv[1], "utf8"))["herdr-app"].value; } catch { process.exit(3); }
 const live = new Set(process.argv[2].split(" ").filter(Boolean));
+let shown = {};
+try { shown = JSON.parse(process.argv[3] || "{}"); } catch {}
 function prune(n) {
   if (n.type === "block") return n.content?.terminal && live.has(n.content.terminal) ? { t: n.content.terminal } : null;
   const children = (n.children ?? []).map(prune).filter(Boolean);
@@ -34,7 +36,7 @@ function ops(n, out) {
 const leaves = (n) => n.t ? [n.t] : n.children.flatMap(leaves);
 const spaces = (doc.spaces ?? []).filter((s) => !s.machine).map((s) => ({
   id: s.id,
-  name: s.name || (s.folder ?? "").split("/").filter(Boolean).pop() || "home",
+  name: shown[s.id] || s.name || (s.folder ?? "").split("/").filter(Boolean).pop() || "home",
   tabs: (s.tabs ?? []).map((t, i) => {
     const tree = t.root ? prune(t.root) : null;
     return tree && { id: t.id, name: t.name || String(i + 1), first: first(tree), ops: ops(tree, []), terminals: leaves(tree).sort() };
@@ -76,7 +78,9 @@ sync_once() {
     [[ -f "$DOCS" ]] || return 0
     local live plan
     live="$("$HC" ls --json 2>/dev/null | jq -r '[.terminals[]? | select(.state == "live") | .address] | join(" ")')" || return 1
-    plan="$(node -e "$PLAN" "$DOCS" "$live")" || return 1
+    local names="{}"
+    names="$(herdr-app ls 2>/dev/null | jq -c '[.spaces[]? | {key: .id, value: .name}] | from_entries' 2>/dev/null)"; [[ -n "$names" ]] || names="{}"
+    plan="$(node -e "$PLAN" "$DOCS" "$live" "$names")" || return 1
 
     tmux start-server 2>/dev/null
     local -A session_of=() owner=()
@@ -91,9 +95,12 @@ sync_once() {
         space_id="$(jq -r .id <<<"$space")"
         wanted_spaces+=("$space_id")
         session="${session_of[$space_id]:-}"
+        local wanted="${$(jq -r .name <<<"$space")//[.:]/-}"
+        [[ -n "${owner[$wanted]:-}" ]] && wanted="$wanted (herdr)"
         if [[ -z "$session" ]]; then
-            session="${$(jq -r .name <<<"$space")//[.:]/-}"
-            [[ -n "${owner[$session]:-}" ]] && session="$session (herdr)"
+            session="$wanted"
+        elif [[ "$session" != "$wanted" ]] && ! tmux has-session -t "=$wanted" 2>/dev/null; then
+            tmux rename-session -t "=$session" "$wanted" && session="$wanted"
         fi
         local -a wanted_tabs=()
         for tab in "${(@f)$(jq -c '.tabs[]' <<<"$space")}"; do

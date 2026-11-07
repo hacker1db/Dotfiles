@@ -20,6 +20,8 @@ typeset -a candidates=(
     "$HOME"/.*(ND@)
     "$HOME"/.claude-*/*(N@)
     "$HOME"/.config/*(ND@)
+    "$HOME"/.config/herdr-app/*(N@)
+    "$HOME"/.config/herdr-app/*/*(N@)
     "$HOME"/.codex/AGENTS.md(N@)
     "$HOME"/.copilot/copilot-instructions.md(N@)
 )

@@ -25,6 +25,7 @@ This is a personal dotfiles repository for macOS development environment configu
 │   ├── starship/          # Shell prompt config
 │   └── tmux/              # Tmux config and themes
 ├── git/                   # Git configuration and templates
+├── herdr/                 # Herdr keys, layout, theme and mods (linked file by file into ~/.config/herdr-app)
 ├── install/               # Installation scripts and Brewfile
 ├── zsh/                   # Zsh configuration files
 └── docs/                  # Integration setup and troubleshooting

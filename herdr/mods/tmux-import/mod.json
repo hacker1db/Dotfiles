@@ -1,0 +1,5 @@
+{
+  "place": "none",
+  "title": "Bring tmux into Herdr",
+  "overlay": { "kind": "dialog", "width": 560, "height": 460 }
+}

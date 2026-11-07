@@ -167,6 +167,10 @@ Claude installation links instructions, output styles, and the statusline script
 
 Agent sessions across Claude Code, Codex, and Copilot are monitored with [Fleet](https://github.com/nicknisi/fleet), Nick Nisi's tmux agent dashboard, installed from his `nicknisi/formulae` Homebrew tap via the Brewfile. The tmux chips, keybindings, and sketchybar wiring here (`bin/tmux-fleet-chips`, `bin/sketchybar-fleet-watch`, the fleet block in `config/tmux/tmux.conf`) are adapted from [nicknisi/dotfiles](https://github.com/nicknisi/dotfiles) (MIT). `./install.sh claude-profiles` wires the fleet hooks into each Claude profile and Codex; Copilot is tracked by process discovery. See [Fleet integration](docs/fleet.md).
 
+### Herdr
+
+[Herdr](https://herdr.dev) is installed by `./install.sh tools` with its own installer. `./install.sh link` links the `herdr/` key map, layout, theme, and mods into `~/.config/herdr-app` one by one, since Herdr writes its own files there too. The `dotfiles` layout adds a tmux-style `ctrl-a` prefix, a status bar with the playing song, agent counts, review requests, and active plans, panels for pull requests and plans, a new-branch dialog that creates a Worktrunk worktree and copies ignored `.env` files with `bin/wt-new`, a Fleet panel, and a two-way tmux mirror (`bin/herdr-tmux`, `bin/tmux-to-herdr`). See [Herdr integration](docs/herdr.md).
+
 ### Personal skills
 
 Personal skill sources live in [hacker1db/skills](https://github.com/hacker1db/skills). `bin/skillctl` resolves a normal checkout at `~/Developer/skills` or its `main/` worktree, rebuilds the Go CLI for normal invocations, and reuses the last build for completion. Set `SKILLCTL_REPO_DIR` for another checkout. Follow that repository's README for selections and installation.

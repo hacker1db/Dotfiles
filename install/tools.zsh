@@ -83,6 +83,10 @@ fi
 
 [[ -x "$HOME/.local/bin/codex" ]] || curl --proto "=https" --tlsv1.2 -fsSL https://chatgpt.com/codex/install.sh | sh || true
 
+if [[ "$OSTYPE" == darwin* && ! -d "$HOME/Applications/Herdr.app" && ! -d /Applications/Herdr.app ]]; then
+    curl --proto "=https" --tlsv1.2 -fsSL https://releases.herdr.dev/app/install.sh | sh || true
+fi
+
 if command -v tfenv >/dev/null 2>&1; then
     tfenv install latest || true
     tfenv use latest || true

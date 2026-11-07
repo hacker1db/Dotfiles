@@ -27,3 +27,6 @@ config/hunk/state.json
 
 # fleet registers machine-local status dirs here when ~/.config/fleet is a repo link
 config/fleet/agents.json
+
+# Herdr-generated type definitions, copied into every mod (editor IntelliSense only)
+herdr/mods/*/gpui-kit.d.ts
