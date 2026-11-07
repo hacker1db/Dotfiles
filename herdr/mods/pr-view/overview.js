@@ -3,6 +3,17 @@ import { v_flex, h_flex, TextView } from "gpui-base";
 import { exec } from "herdr";
 import { TIERS, TIER_DEFS, TIER_ICON } from "./tier.js";
 
+// Check and status links are set by whoever reports the check, so only open https URLs,
+// and pass "--" so a value can never be read as an `open` option.
+export function safeUrl(url) {
+  return typeof url === "string" && /^https:\/\/[^\s]+$/i.test(url) ? url : null;
+}
+
+export function openUrl(url) {
+  const safe = safeUrl(url);
+  if (safe) exec("open", ["--", safe]);
+}
+
 const SEVERITIES = ["critical", "high", "medium", "low", "info"];
 
 function age(iso) {
@@ -134,7 +145,7 @@ function checksCard(t, pr) {
     v_flex().gap(2).children(checks.map((c, i) => {
       const [glyph, color] = icon[checkState(c)];
       return h_flex().id(`check-${i}`).gap(8).items_center().text_size(12).px(4).rounded(4)
-        .when(Boolean(c.detailsUrl || c.targetUrl), (e) => e.cursor_pointer().hover((s) => s.bg(t.hover)).on_click(() => exec("open", [c.detailsUrl || c.targetUrl])))
+        .when(Boolean(safeUrl(c.detailsUrl || c.targetUrl)), (e) => e.cursor_pointer().hover((s) => s.bg(t.hover)).on_click(() => openUrl(c.detailsUrl || c.targetUrl)))
         .child(div().w(14).text_color(color).child(glyph))
         .child(div().flex_1().min_w(0).truncate().child(c.name || c.context || "check"));
     })));

@@ -105,7 +105,7 @@ export default class PdfView extends View {
     else if (k === "+" || k === "=") this.zoom = Math.min(ZOOMS.length - 1, this.zoom + 1);
     else if (k === "-") this.zoom = Math.max(0, this.zoom - 1);
     else if (k === "0") this.zoom = 3;
-    else if (k === "o") exec("open", [this.path]);
+    else if (k === "o") exec("open", ["--", this.path]);
     else return;
     cx.stop_propagation();
     cx.notify();
@@ -136,7 +136,7 @@ export default class PdfView extends View {
         .child(button("pdf-zoom-out", "−", () => { this.zoom = Math.max(0, this.zoom - 1); }))
         .child(div().flex_none().w(40).text_center().text_size(11.5).text_color(t.muted).child(`${Math.round(ZOOMS[this.zoom] * 100)}%`))
         .child(button("pdf-zoom-in", "+", () => { this.zoom = Math.min(ZOOMS.length - 1, this.zoom + 1); }))
-        .child(button("pdf-open", "Open in Preview ↗", () => exec("open", [this.path]))))
+        .child(button("pdf-open", "Open in Preview ↗", () => exec("open", ["--", this.path]))))
       .when(Boolean(this.error), (el) => el.child(div().px(14).py(8).text_color(t.blocked).child(this.error)))
       .child(div().flex_1().min_h(0).relative()
         .child(v_virtual_list("pdf-pages", this.pages.length, this.sizes(), (i) => String(i), (range) => {

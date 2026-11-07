@@ -2,7 +2,7 @@ import { View, div } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input, Scrollbar, TextView, v_virtual_list, VirtualListScrollHandle } from "gpui-base";
 import { appHome, exec, nextCommand, notify, props, readTextFile, setShared, settings, shared, theme, writeTextFile } from "herdr";
 import { classifyPr } from "./tier.js";
-import { overviewSections, tierBadge } from "./overview.js";
+import { overviewSections, tierBadge, openUrl } from "./overview.js";
 import { agentsFor, launchReview, reviewFile } from "./agents.js";
 
 const FIELDS = "number,title,body,author,state,isDraft,baseRefName,headRefName,additions,deletions,changedFiles,reviewDecision,latestReviews,comments,statusCheckRollup,url,labels,createdAt,files";
@@ -252,7 +252,7 @@ export default class PrView extends View {
           .on_click((_e, cx) => { this.choosing = !this.choosing; cx.notify(); })
           .child(this.reviewing ? `${this.reviewing} reviewing…` : "Review with agent ▾"))
         .child(div().id("pr-browser").px(8).py(2).rounded(5).cursor_pointer().text_color(t.muted).hover((s) => s.bg(t.hover))
-          .on_click(() => exec("open", [pr.url])).child("Open in browser ↗"))
+          .on_click(() => openUrl(pr.url)).child("Open in browser ↗"))
         .child(div().id("pr-reload").px(6).py(2).rounded(5).cursor_pointer().text_color(t.muted).hover((s) => s.bg(t.hover))
           .on_click((_e, cx) => this.load(cx)).child(this.loading ? "…" : "↻")))
       .child(h_flex().gap(8).items_center().text_size(11.5).text_color(t.muted)
