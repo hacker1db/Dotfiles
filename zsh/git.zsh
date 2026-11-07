@@ -56,6 +56,14 @@ function cob() {
   wt switch --create "$@"
 }
 
+function cobc() {
+    if [[ $# -lt 1 ]]; then
+        print -u2 "usage: cobc <branch> [wt switch options]"
+        return 2
+    fi
+    wt switch --create "$1" --base @ "${@:2}"
+}
+
 function git-clean-merged() {
   git fetch --prune
   git worktree prune
