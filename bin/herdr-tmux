@@ -1,0 +1,203 @@
+#!/usr/bin/env zsh
+set -uo pipefail
+
+usage() {
+    print -u2 "Usage: ${0:t} sync | split <right|down> <pane> | new-window <session> | kill <pane> | kill-window <window>"
+    print -u2 "  Mirrors each Herdr space as a tmux session whose panes attach to the same herdr-core"
+    print -u2 "  terminals, so closing a pane in either closes it in both."
+    exit 2
+}
+
+DOCS="${HERDR_CORE_STATE:-$HOME/.local/state/herdr-core/default}/docs.json"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/herdr-tmux"
+HC="${commands[hc]:-$HOME/.local/bin/hc}"
+
+PLAN='
+const fs = require("fs");
+let doc;
+try { doc = JSON.parse(fs.readFileSync(process.argv[1], "utf8"))["herdr-app"].value; } catch { process.exit(3); }
+const live = new Set(process.argv[2].split(" ").filter(Boolean));
+function prune(n) {
+  if (n.type === "block") return n.content?.terminal && live.has(n.content.terminal) ? { t: n.content.terminal } : null;
+  const children = (n.children ?? []).map(prune).filter(Boolean);
+  if (!children.length) return null;
+  if (children.length === 1) return children[0];
+  return { dir: n.type === "row" ? "right" : "down", children };
+}
+const first = (n) => n.t ?? first(n.children[0]);
+function ops(n, out) {
+  if (n.t) return out;
+  for (let k = 1; k < n.children.length; k++) out.push([first(n.children[k - 1]), n.dir, first(n.children[k])]);
+  n.children.forEach((c) => ops(c, out));
+  return out;
+}
+const leaves = (n) => n.t ? [n.t] : n.children.flatMap(leaves);
+const spaces = (doc.spaces ?? []).filter((s) => !s.machine).map((s) => ({
+  id: s.id,
+  name: s.name || (s.folder ?? "").split("/").filter(Boolean).pop() || "home",
+  tabs: (s.tabs ?? []).map((t, i) => {
+    const tree = t.root ? prune(t.root) : null;
+    return tree && { id: t.id, name: t.name || String(i + 1), first: first(tree), ops: ops(tree, []), terminals: leaves(tree).sort() };
+  }).filter(Boolean),
+})).filter((s) => s.tabs.length);
+console.log(JSON.stringify(spaces));
+'
+
+attach_cmd() { print -r -- "exec ${(q)HC} attach $1" }
+
+mark_pane() { tmux set-option -p -t "$1" @hc_terminal "$2" }
+
+build_window() {
+    local session="$1" tab="$2" target="$3" pane from direction to
+    local -A pane_of
+    local tab_name first
+    tab_name="$(jq -r .name <<<"$tab")"
+    first="$(jq -r .first <<<"$tab")"
+    if [[ "$target" == new-session ]]; then
+        pane="$(tmux new-session -d -s "$session" -n "$tab_name" -P -F '#{pane_id}' "$(attach_cmd "$first")")" || return 1
+    else
+        pane="$(tmux new-window -d -t "$target" -n "$tab_name" -P -F '#{pane_id}' "$(attach_cmd "$first")")" || return 1
+    fi
+    tmux set-option -w -t "$pane" @herdr_tab "$(jq -r .id <<<"$tab")"
+    tmux set-option -w -t "$pane" automatic-rename off
+    mark_pane "$pane" "$first"
+    pane_of[$first]="$pane"
+    while IFS=$'\t' read -r from direction to; do
+        [[ -n "$from" ]] || continue
+        pane="$(tmux split-window -d -t "${pane_of[$from]}" "$([[ "$direction" == right ]] && print -- -h || print -- -v)" \
+            -P -F '#{pane_id}' "$(attach_cmd "$to")")" || continue
+        mark_pane "$pane" "$to"
+        pane_of[$to]="$pane"
+    done < <(jq -r '.ops[] | @tsv' <<<"$tab")
+}
+
+sync_once() {
+    command -v tmux >/dev/null 2>&1 || return 0
+    [[ -f "$DOCS" ]] || return 0
+    local live plan
+    live="$("$HC" ls --json 2>/dev/null | jq -r '[.terminals[]? | select(.state == "live") | .address] | join(" ")')" || return 1
+    plan="$(node -e "$PLAN" "$DOCS" "$live")" || return 1
+
+    tmux start-server 2>/dev/null
+    local -A session_of=() owner=()
+    local name space_id
+    while IFS=$'\t' read -r name space_id; do
+        [[ -n "$space_id" ]] && session_of[$space_id]="$name" || owner[$name]=1
+    done < <(tmux list-sessions -F '#{session_name}	#{@herdr_space}' 2>/dev/null)
+
+    local -a wanted_spaces=()
+    local space session tab tab_id window windows desired current
+    for space in "${(@f)$(jq -c '.[]' <<<"$plan")}"; do
+        space_id="$(jq -r .id <<<"$space")"
+        wanted_spaces+=("$space_id")
+        session="${session_of[$space_id]:-}"
+        if [[ -z "$session" ]]; then
+            session="${$(jq -r .name <<<"$space")//[.:]/-}"
+            [[ -n "${owner[$session]:-}" ]] && session="$session (herdr)"
+        fi
+        local -a wanted_tabs=()
+        for tab in "${(@f)$(jq -c '.tabs[]' <<<"$space")}"; do
+            tab_id="$(jq -r .id <<<"$tab")"
+            wanted_tabs+=("$tab_id")
+            desired="$(jq -r '.terminals | join(" ")' <<<"$tab")"
+            window=""
+            if tmux has-session -t "=$session" 2>/dev/null; then
+                window="$(tmux list-windows -t "=$session" -F '#{window_id}	#{@herdr_tab}' | awk -F'\t' -v t="$tab_id" '$2 == t { print $1; exit }')"
+            fi
+            if [[ -n "$window" ]]; then
+                current="$(tmux list-panes -t "$window" -F '#{@hc_terminal}' | sort | tr '\n' ' ' | sed 's/ $//')"
+                tmux rename-window -t "$window" "$(jq -r .name <<<"$tab")"
+                [[ "$current" == "$desired" ]] && continue
+                build_window "$session" "$tab" "=$session:" && tmux kill-window -t "$window"
+            elif tmux has-session -t "=$session" 2>/dev/null; then
+                build_window "$session" "$tab" "=$session:"
+            else
+                build_window "$session" "$tab" new-session || continue
+                tmux set-option -t "=$session:" @herdr_space "$space_id"
+            fi
+        done
+        tmux has-session -t "=$session" 2>/dev/null || continue
+        base="${session%" (herdr)"}"
+        if [[ "$base" != "$session" && -z "${owner[$base]:-}" ]] && ! tmux has-session -t "=$base" 2>/dev/null; then
+            tmux rename-session -t "=$session" "$base" && session="$base"
+        fi
+        while IFS=$'\t' read -r window tab_id; do
+            (( ${wanted_tabs[(Ie)$tab_id]} )) || tmux kill-window -t "$window"
+        done < <(tmux list-windows -t "=$session" -F '#{window_id}	#{@herdr_tab}')
+    done
+
+    for space_id session in "${(@kv)session_of}"; do
+        (( ${wanted_spaces[(Ie)$space_id]} )) || tmux kill-session -t "=$session"
+    done
+}
+
+sync() {
+    mkdir -p "$STATE"
+    if ! mkdir "$STATE/lock" 2>/dev/null; then
+        local holder
+        holder="$(cat "$STATE/lock/pid" 2>/dev/null)"
+        if [[ -n "$holder" ]] && kill -0 "$holder" 2>/dev/null; then
+            touch "$STATE/dirty"
+            return 0
+        fi
+        rm -rf "$STATE/lock"
+        mkdir "$STATE/lock" 2>/dev/null || return 0
+    fi
+    print $$ > "$STATE/lock/pid"
+    trap 'rm -rf "$STATE/lock"' EXIT
+    local -i round=0
+    while (( round++ < 3 )); do
+        rm -f "$STATE/dirty"
+        sync_once
+        [[ -e "$STATE/dirty" ]] || break
+    done
+}
+
+labels_of() {
+    tmux display-message -p -t "$1" '#{@herdr_space}	#{@herdr_tab}	#{pane_current_path}'
+}
+
+new_terminal() {
+    "$HC" run --bg --json --keep --no-parent --cwd "$3" --label "herdr.space=$1" --label "herdr.tab=$2" | jq -r '.address // empty'
+}
+
+case "${1:-}" in
+    sync) sync ;;
+    split)
+        [[ $# -eq 3 && "$2" == (right|down) ]] || usage
+        IFS=$'\t' read -r space_id tab_id folder <<<"$(labels_of "$3")"
+        [[ -n "$space_id" && -n "$tab_id" ]] || { tmux split-window "$([[ "$2" == right ]] && print -- -h || print -- -v)" -t "$3" -c "$folder"; exit }
+        address="$(new_terminal "$space_id" "$tab_id" "$folder")"
+        [[ -n "$address" ]] || { tmux display-message "herdr-core could not start a terminal"; exit 1 }
+        pane="$(tmux split-window -t "$3" "$([[ "$2" == right ]] && print -- -h || print -- -v)" -P -F '#{pane_id}' "$(attach_cmd "$address")")"
+        mark_pane "$pane" "$address"
+        ;;
+    new-window)
+        [[ $# -eq 2 ]] || usage
+        IFS=$'\t' read -r space_id _ folder <<<"$(labels_of "$2")"
+        [[ -n "$space_id" ]] || { tmux new-window -t "$2" -c "$folder"; exit }
+        tab_id="tb$(openssl rand -hex 16)"
+        address="$(new_terminal "$space_id" "$tab_id" "$folder")"
+        [[ -n "$address" ]] || { tmux display-message "herdr-core could not start a terminal"; exit 1 }
+        pane="$(tmux new-window -t "$2" -P -F '#{pane_id}' "$(attach_cmd "$address")")"
+        tmux set-option -w -t "$pane" @herdr_tab "$tab_id"
+        tmux set-option -w -t "$pane" automatic-rename off
+        mark_pane "$pane" "$address"
+        ;;
+    kill)
+        [[ $# -eq 2 ]] || usage
+        terminal="$(tmux display-message -p -t "$2" '#{@hc_terminal}')"
+        if [[ -n "$terminal" ]]; then "$HC" kill "$terminal" >/dev/null; else tmux kill-pane -t "$2"; fi
+        ;;
+    kill-window)
+        [[ $# -eq 2 ]] || usage
+        typeset -a terminals=("${(@f)$(tmux list-panes -t "$2" -F '#{@hc_terminal}')}")
+        terminals=("${(@)terminals:#}")
+        if (( ${#terminals} )); then
+            for terminal in "${terminals[@]}"; do "$HC" kill "$terminal" >/dev/null; done
+        else
+            tmux kill-window -t "$2"
+        fi
+        ;;
+    *) usage ;;
+esac
