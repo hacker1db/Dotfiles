@@ -42,6 +42,7 @@ title "Linking agent hooks"
 typeset -A agent_hooks=(
     "$DOTFILES/codex/hooks.json" "$HOME/.codex/hooks.json"
     "$DOTFILES/copilot/hooks/rtk-rewrite.json" "$HOME/.copilot/hooks/rtk-rewrite.json"
+    "$DOTFILES/copilot/hooks/aqua-precommit.json" "$HOME/.copilot/hooks/aqua-precommit.json"
 )
 typeset hook_src
 for hook_src destination in "${(@kv)agent_hooks}"; do

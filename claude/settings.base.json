@@ -15,6 +15,11 @@
             "type": "command",
             "command": "if command -v rtk >/dev/null 2>&1; then rtk hook claude; fi",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "if command -v aqua-precommit-hook >/dev/null 2>&1; then aqua-precommit-hook claude; fi",
+            "timeout": 900
           }
         ]
       }
@@ -85,7 +90,10 @@
       }
     }
   },
-  "enabledMcpjsonServers": ["github", "playwright"],
+  "enabledMcpjsonServers": [
+    "github",
+    "playwright"
+  ],
   "plansDirectory": "~/notes/SecondBrain/4.Resources/plans",
   "effortLevel": "high",
   "theme": "dark-daltonized",

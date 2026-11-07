@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "if command -v aqua-precommit-hook >/dev/null 2>&1; then aqua-precommit-hook copilot; fi",
+        "cwd": ".",
+        "timeoutSec": 900
+      }
+    ]
+  }
+}
