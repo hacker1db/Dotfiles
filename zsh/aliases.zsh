@@ -117,6 +117,10 @@ alias cfc='claude-foundry --continue'
 alias cw='claude-subscription'
 alias cwc='claude-subscription --continue'
 alias occ='copilot'
+alias xp='codex'
+alias xpc='codex resume --last'
+alias xf='codex-foundry'
+alias xfc='codex-foundry resume --last'
 
 # applications
 alias devtoy='open /Applications/DevToy.app'

@@ -1,5 +1,7 @@
 # Claude Code profiles
 
+Codex CLI profiles (personal ChatGPT and Azure AI Foundry) are in `codex/PROFILES.md`.
+
 Three isolated profiles, each with its own `CLAUDE_CONFIG_DIR`, login, settings, skills, and plugins.
 
 | Profile | Config dir | Command | Aliases | Settings layers |
