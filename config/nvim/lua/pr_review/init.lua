@@ -10,7 +10,6 @@ local SECTIONS = {
 }
 local SEVERITIES = { "critical", "high", "medium", "low", "info" }
 local SEVERITY_HL = { critical = "DiagnosticError", high = "DiagnosticError", medium = "DiagnosticWarn", low = "DiagnosticInfo", info = "DiagnosticHint" }
-local PERSONAL = { "hacker1db", "zerobitconsult" }
 local AGENTS = {
   { id = "codex", label = "Codex", personal = true, skill = "$pr-review", argv = function(p) return { "codex", p } end },
   { id = "claude-personal", label = "Claude · personal", personal = true, skill = "/pr-review", argv = function(p) return { "claude-personal", p } end },
@@ -54,6 +53,17 @@ end
 local function parse_url(url)
   local owner, repo, number = (url or ""):match("github%.com/([^/]+)/([^/]+)/pull/(%d+)")
   if owner then return { owner = owner, repo = repo, number = number } end
+end
+
+local function personal_owners()
+  local owners = {}
+  local lines = vim.fn.systemlist({ "git", "config", "--get-regexp", "^github\\.(user|org)$" })
+  if vim.v.shell_error ~= 0 then return owners end
+  for _, line in ipairs(lines) do
+    local owner = line:match("^%S+%s+(%S+)")
+    if owner then owners[owner:lower()] = true end
+  end
+  return owners
 end
 
 local function age(iso)
@@ -391,10 +401,7 @@ function M.agent(arg)
   M.resolve_url(arg, function(url)
     local pr = parse_url(url)
     if not pr then return notify("Not a GitHub pull request: " .. url, vim.log.levels.ERROR) end
-    local personal = false
-    for _, p in ipairs(PERSONAL) do
-      if url:lower():find(p, 1, true) then personal = true end
-    end
+    local personal = personal_owners()[pr.owner:lower()] == true
     local allowed = vim.tbl_filter(function(a) return a.personal == personal end, AGENTS)
     vim.ui.select(allowed, {
       prompt = ("Which agent should review #%s?"):format(pr.number),

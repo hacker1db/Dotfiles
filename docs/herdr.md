@@ -220,10 +220,17 @@ correct the tier; the header then shows the agent's tier.
 **Review with agent ▾** in the PR header asks which agent to use. The choices
 depend on the repository URL:
 
-| Repository URL contains | Agents offered |
+| Repository owner | Agents offered |
 |---|---|
-| `hacker1db` or `zerobitconsult` | Codex, Claude personal (`claude-personal`) |
+| Your `github.user`, or any `github.org` value | Codex, Claude personal (`claude-personal`) |
 | anything else | GitHub Copilot (`copilot -i`), Claude work (`claude-subscription`), Claude Foundry (`claude-foundry`) |
+
+`install.sh link` asks for `github.user` and writes it to `~/.gitconfig-local`.
+To treat an organization's repositories as personal too, add it there:
+
+```zsh
+git config -f ~/.gitconfig-local --add github.org <org>
+```
 
 The other agents are shown but disabled. The agent starts in a split beside the
 PR, in `~/.local/state/herdr-pr-reviews/<owner>/<repo>/<number>`, with the

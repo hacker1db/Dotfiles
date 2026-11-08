@@ -90,6 +90,8 @@ github_owner() {
         return
     fi
     local owner
+    owner="$(git config --get github.user 2>/dev/null)"
+    [[ -n "$owner" ]] && { print "$owner"; return }
     owner="$(git -C "$DOTFILES" remote get-url origin 2>/dev/null |
         sed -nE 's#^(git@github\.com:|ssh://git@github\.com/|https?://github\.com/)([^/]+)/.*#\2#p')"
     [[ -n "$owner" ]] || return 1

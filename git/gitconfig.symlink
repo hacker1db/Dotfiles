@@ -1,10 +1,6 @@
 # vim:ft=gitconfig
-[github]
-    # @hacker1db on twitter/X :D
-[include]
-    # A local gitconfig, outside of version control.
-    # If the file doesn't exist it is silently ignored
-    path = ~/.gitconfig-local
+# Identity, signing, and anything machine-specific live in ~/.gitconfig-local,
+# written by `install.sh link`. It is included last so it overrides these defaults.
 [init]
     templatedir = ~/.git-templates
 	defaultBranch = main
@@ -171,3 +167,6 @@
 
 [gpg]
     format = ssh
+
+[include]
+    path = ~/.gitconfig-local

@@ -1,7 +1,14 @@
 import { exec, focused, home, run } from "herdr";
 import { TIER_DEFS } from "./tier.js";
 
-const PERSONAL = /hacker1db|zerobitconsult/i;
+let personalOwners = new Set();
+
+export const ownersReady = exec("git", ["config", "--get-regexp", "^github\\.(user|org)$"])
+  .then((r) => {
+    if (r.code !== 0) return;
+    personalOwners = new Set(r.stdout.split("\n").map((line) => line.split(/\s+/)[1]?.toLowerCase()).filter(Boolean));
+  })
+  .catch(() => {});
 
 export const AGENTS = [
   { id: "codex", label: "Codex", personal: true, skill: "$pr-review", argv: (prompt) => ["codex", prompt] },
@@ -17,7 +24,8 @@ export function parsePrUrl(url) {
 }
 
 export function isPersonalRepo(url) {
-  return PERSONAL.test(url ?? "");
+  const pr = parsePrUrl(url);
+  return !!pr && personalOwners.has(pr.owner.toLowerCase());
 }
 
 export function agentsFor(url) {
@@ -59,6 +67,7 @@ export async function launchReview(agentId, url, tier, title) {
   const agent = AGENTS.find((a) => a.id === agentId);
   const dir = reviewDir(url);
   if (!agent || !dir) throw new Error("Unknown agent or pull request");
+  await ownersReady;
   if (!agentsFor(url).find((a) => a.id === agentId)?.allowed) throw new Error(`${agent.label} is not allowed for this repository`);
   const made = await exec("mkdir", ["-p", dir]);
   if (made.code !== 0) throw new Error(made.stderr.trim());

@@ -134,44 +134,66 @@ else
     github_clone "$CLITOOLS_REPO_URL" "$CLITOOLS_DIR" || print "Failed to clone clitools; continuing without it"
 fi
 
-title "Ensuring ~/.gitconfig-local link"
+title "Ensuring a machine-owned ~/.gitconfig-local"
 LOCAL_FILE="$HOME/.gitconfig-local"
-SOURCE_CANDIDATE=""
-typeset f
-for f in gitconfig-local .gitconfig-local gitconfig.local; do
-    [[ -f "$CLITOOLS_DIR/$f" ]] && SOURCE_CANDIDATE="$CLITOOLS_DIR/$f" && break
-done
-if [[ -n "$SOURCE_CANDIDATE" ]]; then
-    if [[ ! -L "$LOCAL_FILE" && -e "$LOCAL_FILE" ]]; then
-        backup="$(backup_path "$LOCAL_FILE")"
-        mv "$LOCAL_FILE" "$backup" || exit 1
-        print "Preserved existing $LOCAL_FILE: $backup"
+if [[ -L "$LOCAL_FILE" ]]; then
+    if [[ -f "${LOCAL_FILE:A}" ]]; then
+        cp "${LOCAL_FILE:A}" "$LOCAL_FILE.tmp" && mv -f "$LOCAL_FILE.tmp" "$LOCAL_FILE" || exit 1
+        print "Replaced the $LOCAL_FILE link with a machine-owned copy; review its identity below"
+    else
+        rm "$LOCAL_FILE" && touch "$LOCAL_FILE" || exit 1
+        print "Replaced a dangling $LOCAL_FILE link with an empty file"
     fi
-    link_file "$SOURCE_CANDIDATE" "$LOCAL_FILE"
 elif [[ ! -e "$LOCAL_FILE" ]]; then
     touch "$LOCAL_FILE"
-    print "Created empty $LOCAL_FILE (no clitools source found)"
+    print "Created empty $LOCAL_FILE"
 else
-    print "$LOCAL_FILE exists (no clitools source found); leaving as-is."
+    print "$LOCAL_FILE is machine-owned; leaving as-is."
 fi
 
-title "Configuring Git identity"
-typeset key value
+title "Configuring Git identity in $LOCAL_FILE"
+typeset key label value current
+typeset -a git_prompts=(
+    user.name "Name"
+    user.email "Email"
+    github.user "GitHub username (the one account this machine uses)"
+    user.signingkey "SSH signing public key from your password manager (blank to skip)"
+    gpg.ssh.program "SSH signing program (blank for ssh-keygen)"
+)
 if [[ "${DOTFILES_NONINTERACTIVE:-0}" != 1 && -t 0 ]]; then
-    for key in user.name user.email user.signingkey; do
-        [[ -n "$(git config --get "$key")" ]] && continue
-        if [[ "$key" == user.signingkey ]]; then
-            read -r "value?Git signing key (SSH public key from 1Password, blank to skip): "
-        else
-            read -r "value?Git $key: "
-        fi
-        [[ -n "$value" ]] && git config -f "$LOCAL_FILE" "$key" "$value"
+    for key label in $git_prompts; do
+        current="$(git config --get "$key" 2>/dev/null)"
+        value=""
+        read -r "value?$label [$current]: "
+        value="${value:-$current}"
+        [[ -z "$value" ]] && continue
+        [[ "$key" == user.signingkey && "$value" == ssh-* ]] && value="key::$value"
+        git config -f "$LOCAL_FILE" "$key" "$value"
     done
+    for key in user.name user.email github.user; do
+        [[ -n "$(git config --get "$key")" ]] || warning "Git $key is not set; re-run '${DOTFILES}/install.sh link' to set it"
+    done
+else
+    print "Non-interactive run; leaving $LOCAL_FILE as-is."
 fi
-if [[ -n "$(git config --get user.signingkey)" ]]; then
+typeset signing_key="$(git config --get user.signingkey)" signers signer_email
+if [[ -n "$signing_key" ]]; then
     for key in commit.gpgsign tag.gpgsign; do
         [[ -n "$(git config --get "$key")" ]] || git config -f "$LOCAL_FILE" "$key" true
     done
+    signers="$(git config --get gpg.ssh.allowedSignersFile)"
+    if [[ -z "$signers" ]]; then
+        signers="~/.ssh/allowed_signers"
+        git config -f "$LOCAL_FILE" gpg.ssh.allowedSignersFile "$signers"
+    fi
+    signers="${signers/#\~/$HOME}"
+    signer_email="$(git config --get user.email)"
+    signing_key="${signing_key#key::}"
+    if [[ -n "$signer_email" ]] && ! grep -qF "$signing_key" "$signers" 2>/dev/null; then
+        mkdir -p "${signers:h}"
+        print -r -- "$signer_email $signing_key" >> "$signers"
+        print "Trusted $signer_email's signing key in $signers"
+    fi
 fi
 
 title "Checking Codex plan-library access"
@@ -208,7 +230,7 @@ if [[ ! -d "$PLAN_REPO_DIR" ]]; then
     PLAN_URL="${PLAN_MANAGER_REPO_URL:-}"
     if [[ -z "$PLAN_URL" && -n "$GH_USER" ]]; then
         PLAN_URL="$(github_repo_url "$GH_USER/plan-manager")"
-        [[ "$GH_USER" == hacker1db ]] || github_repo_accessible "$PLAN_URL" || PLAN_URL=""
+        github_repo_accessible "$PLAN_URL" || PLAN_URL=""
     fi
     PLAN_URL="${PLAN_URL:-https://github.com/hacker1db/plan-manager.git}"
     print "Cloning $PLAN_URL"
