@@ -335,8 +335,9 @@ function azdlogin(){
        fi
     az acr login -n "$@" --expose-token --query 'accessToken' -o tsv | podman login -u 00000000-0000-0000-0000-000000000000 --password-stdin "$@.azurecr.io"
 }
+# Add an issue/PR URL to a GitHub project; GHA_OWNER and GHA_PROJECT are set in the private ~/.localrc.
 function gha(){
-       gh project item-add 16 --owner Alaska-ITS --url "$@"
+       gh project item-add "${GHA_PROJECT:?set GHA_PROJECT in ~/.localrc}" --owner "${GHA_OWNER:?set GHA_OWNER in ~/.localrc}" --url "$@"
 }
 function brew-cleanup(){
     local brewfile="${DOTFILES:-$HOME/.dotfiles/main}/install/brewfile"
