@@ -338,8 +338,6 @@ cask "alfred"
 cask "android-ndk"
 # Android SDK component
 cask "android-platform-tools"
-# Data management tool that enables working with SQL Server
-cask "azure-data-studio"
 # Compact TeX distribution as alternative to the full TeX Live / MacTeX
 cask "basictex"
 # Virtual Audio Driver
