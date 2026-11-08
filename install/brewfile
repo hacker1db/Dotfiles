@@ -28,6 +28,7 @@ tap "rtk-ai/tap", trusted: true
 tap "rustscan/rustscan", "https://github.com/RustScan/homebrew-rustscan.git"
 tap "slp/krunkit"
 tap "sst/tap", "https://github.com/anomalyco/homebrew-tap.git", trusted: true
+tap "workos/tap", trusted: true
 # Search tool like grep, but optimized for programmers
 brew "ack"
 # Run your GitHub Actions locally
@@ -328,6 +329,8 @@ brew "hashicorp/tap/packer"
 brew "hashicorp/tap/terraform", link: false
 # Vault
 brew "hashicorp/tap/vault"
+# Install AuthKit integrations and manage WorkOS resources
+brew "workos/tap/workos"
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
