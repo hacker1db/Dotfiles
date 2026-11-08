@@ -81,8 +81,8 @@ for f in install.sh install/*.zsh; do zsh -n "$f" || exit 1; done
 zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
 zsh -n bin/tmux-reload-all
 
-# Audit The Claude Profiles (Read-Only)
-zsh ~/.dotfiles/main/install/claude-profiles.zsh --check
+# Audit The Claude And Codex Profiles (Read-Only)
+zsh ~/.dotfiles/main/install/agent-profiles.zsh --check
 
 # Manual Testing: Source Configuration In New Shell
 source ~/.zshrc
@@ -210,7 +210,7 @@ All directories under `config/` are symlinked to `~/.config/<name>`. When adding
 
 - The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out at `$HOME/Developer/skills/main` by default.
 - That repository provides `skillctl`, the skill manager for Codex, Claude Code, and GitHub Copilot CLI. Read its README before changing skill sources, selections, or installation behavior.
-- Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/claude-profiles.zsh` runs `skillctl sync --global` for each Claude profile.
+- Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/agent-profiles.zsh` runs `skillctl sync --global` for each Claude profile and the Codex Foundry home.
 - The project-scoped Caido installer is separate from the current `skillctl` global adapters.
 
 ## Important Files & Patterns
@@ -277,7 +277,7 @@ Template hooks in `git/templates/hooks/`:
 - The general linker refreshes existing symlinks to the current checkout and only skips non-symlink paths; selected managed integrations reconcile their own links.
 - Personal skills are maintained outside dotfiles in the skills repository.
 - lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories. Specs directly under `lua/plugins/` are not imported by this setup.
-- Use [README.md](README.md), [Claude profiles](claude/PROFILES.md) and [plan-manager integration](docs/plan-manager.md) for current setup details.
+- Use [README.md](README.md), [Claude profiles](claude/PROFILES.md), [Codex profiles](codex/PROFILES.md) and [plan-manager integration](docs/plan-manager.md) for current setup details.
 
 ## Working With This Repository
 

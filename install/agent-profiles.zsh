@@ -6,6 +6,17 @@ claude_dir="$root/claude"
 profiles_dir="$claude_dir/profiles"
 generated="$claude_dir/.local/profiles"
 typeset -a linked_items=(CLAUDE.md output-styles statusline-command.sh)
+codex_dir="$root/codex"
+codex_profiles="$codex_dir/profiles"
+codex_generated="$codex_dir/.local/profiles"
+key_file="${FOUNDRY_PROXY_KEY_FILE:-$HOME/.config/foundry-entra-proxy/client.key}"
+plan_root="${PLAN_HOME:-$HOME/notes/SecondBrain/4.Resources/plans}"
+marker="# Codex-managed state below this line is kept when the installer regenerates the profile."
+t3_settings="$HOME/.t3/userdata/settings.json"
+typeset -A codex_links=(
+    AGENTS.md "$root/global/AGENTS.md"
+    hooks.json "$codex_dir/hooks.json"
+)
 credential_keys='["ANTHROPIC_API_KEY","ANTHROPIC_AUTH_TOKEN","ANTHROPIC_FOUNDRY_API_KEY","ANTHROPIC_FOUNDRY_AUTH_TOKEN","CLAUDE_CODE_OAUTH_TOKEN"]'
 
 check=0
@@ -68,10 +79,24 @@ for env_name in ${(k)parameters[(R)*export*]}; do
 done
 [[ -z "$conflicts" ]] || problem "Inherited variables override profile settings; unset before launching: $conflicts"
 
-resource="${ANTHROPIC_FOUNDRY_RESOURCE:-}"
-if [[ -z "$resource" ]]; then
-    resource="$(zsh -c 'source ~/.localrc >/dev/null 2>&1; print -r -- "${ANTHROPIC_FOUNDRY_RESOURCE:-}"' 2>/dev/null || true)"
+localrc_json='{}'
+if [[ -e "$HOME/.localrc" ]]; then
+    localrc_json="$(zsh -c 'source ~/.localrc >/dev/null 2>&1; jq -n --arg resource "${ANTHROPIC_FOUNDRY_RESOURCE:-}" --arg all "${CLAUDE_SETTINGS_JSON:-}" --arg personal "${CLAUDE_SETTINGS_JSON_PERSONAL:-}" --arg subscription "${CLAUDE_SETTINGS_JSON_SUBSCRIPTION:-}" --arg foundry "${CLAUDE_SETTINGS_JSON_FOUNDRY:-}" "\$ARGS.named"' 2>/dev/null)" || die "Could not read ~/.localrc."
 fi
+typeset -A local_layers
+typeset local_key local_raw local_var
+for local_key in all personal subscription foundry; do
+    local_var="CLAUDE_SETTINGS_JSON${${local_key:#all}:+_${(U)local_key}}"
+    local_raw="$(jq -r --arg k "$local_key" '.[$k] // ""' <<< "$localrc_json")"
+    if [[ -z "$local_raw" ]]; then
+        local_layers[$local_key]='{}'
+    else
+        local_layers[$local_key]="$(jq -ce 'if type == "object" then . else error("not an object") end' <<< "$local_raw" 2>/dev/null)" ||
+            die "~/.localrc: $local_var must be a JSON object."
+        print "Merging $local_var from ~/.localrc"
+    fi
+done
+resource="${ANTHROPIC_FOUNDRY_RESOURCE:-$(jq -r '.resource // ""' <<< "$localrc_json")}"
 [[ -z "$resource" ]] || [[ "$resource" =~ ^[a-zA-Z0-9][a-zA-Z0-9-]*$ ]] || die "ANTHROPIC_FOUNDRY_RESOURCE must be a resource name, not a URL."
 
 automode="$HOME/.config/claude-code/automode.json"
@@ -81,9 +106,11 @@ auto='{}'
 
 build() {
     local -a layers=("$claude_dir/settings.base.json" "$profiles_dir/$1/settings.json")
-    jq -S -s --arg profile "$1" --arg resource "$resource" --arg home "$HOME" --argjson auto "$auto" '
-        reduce .[] as $layer ({};
-            (reduce (($layer.hooks // {}) | to_entries[]) as $e (.hooks // {}; .[$e.key] += $e.value)) as $hooks
+    jq -S -s --arg profile "$1" --arg resource "$resource" --arg home "$HOME" --argjson auto "$auto" \
+        --argjson local_all "${local_layers[all]}" --argjson local_profile "${local_layers[$1]}" '
+        reduce (.[], $local_all, $local_profile) as $layer ({};
+            (reduce (($layer.hooks // {}) | to_entries[]) as $e (.hooks // {};
+                .[$e.key] = reduce $e.value[] as $h (.[$e.key] // []; if any(.[]; . == $h) then . else . + [$h] end))) as $hooks
             | ((.enabledMcpjsonServers // []) + ($layer.enabledMcpjsonServers // []) | unique) as $mcp
             | . * $layer | .hooks = $hooks | .enabledMcpjsonServers = $mcp)
         | .env += {CLAUDE_CODE_USE_BEDROCK: "0", CLAUDE_CODE_USE_VERTEX: "0"}
@@ -143,10 +170,10 @@ for profile in personal subscription foundry; do
     if [[ "$profile" == foundry ]]; then
         [[ "$skip_foundry" -eq 0 ]] || continue
         if [[ -z "$resource" && "${#drives}" -eq 0 ]]; then
-            print "Foundry skipped: no ~/OneDrive* directory and ANTHROPIC_FOUNDRY_RESOURCE is unset."
+            print "Claude Foundry skipped: no ~/OneDrive* directory and ANTHROPIC_FOUNDRY_RESOURCE is unset."
             continue
         elif [[ -z "$resource" ]]; then
-            problem "Foundry skipped: ANTHROPIC_FOUNDRY_RESOURCE is unset (export it from ~/.localrc)."
+            problem "Claude Foundry skipped: ANTHROPIC_FOUNDRY_RESOURCE is unset (export it from ~/.localrc)."
             continue
         fi
     fi
@@ -191,7 +218,112 @@ for profile in personal subscription foundry; do
     fi
     install_plugins "$dir" "$want"
     install_fleet "$dir"
-    print "Profile ready: $profile ($dir)"
+    print "Profile ready: claude $profile ($dir)"
+done
+
+unlink_legacy_overlay() {
+    local dest="$HOME/.codex/foundry.config.toml"
+    [[ -L "$dest" && "$(readlink "$dest")" == */codex/foundry.config.toml ]] || return 0
+    if [[ "$check" -eq 1 ]]; then
+        problem "$dest is a stale overlay link; Foundry now uses its own CODEX_HOME"
+    else
+        rm "$dest" && print "Removed stale $dest"
+    fi
+}
+
+build_codex() {
+    print -r -- "$(<"$codex_profiles/$1/config.toml")"
+    print
+    print "[sandbox_workspace_write]"
+    print -r -- "writable_roots = [\"$plan_root\"]"
+}
+
+managed_part() {
+    [[ -f "$1" ]] || return 0
+    awk -v m="$marker" '$0 == m { exit } { print }' "$1"
+}
+
+state_part() {
+    [[ -f "$1" ]] || return 0
+    awk -v m="$marker" 'found { print } $0 == m { found = 1 }' "$1"
+}
+
+sync_t3_codex() {
+    [[ -f "$t3_settings" ]] || return 0
+    local want
+    want="$(jq --arg bin "$root/bin/codex-foundry" --arg home "~/.codex-$1" --arg name ".codex-$1" '
+        if (.providerInstances | type) == "object" then
+            .providerInstances |= with_entries(
+                if .value.driver == "codex" and (((.value.config.homePath // "") + " " + (.value.config.shadowHomePath // "")) | contains($name))
+                then .value.config += {homePath: $home, shadowHomePath: "", binaryPath: $bin}
+                else . end)
+        else . end' "$t3_settings" 2>/dev/null)" || { problem "Could not parse $t3_settings"; return }
+    [[ "$want" != "$(jq . "$t3_settings")" ]] || return 0
+    if [[ "$check" -eq 1 ]]; then
+        problem "T3 Code: a Codex instance for $1 has the wrong home, shadow home or binary in $t3_settings"
+    else
+        print -r -- "$want" > "$t3_settings.tmp" && cat "$t3_settings.tmp" > "$t3_settings" && rm "$t3_settings.tmp" &&
+            print "Pointed the T3 Code Codex $1 instance at ~/.codex-$1 (restart T3 Code to apply)"
+    fi
+}
+
+unlink_legacy_overlay
+[[ ! -L "$codex_generated" && ! -L "${codex_generated:h}" ]] || die "Refusing symlinked generated directory: $codex_generated"
+[[ "$check" -eq 1 ]] || { mkdir -p "$codex_generated"; chmod 700 "$codex_generated" }
+
+typeset state item
+for profile in foundry; do
+    [[ "$skip_foundry" -eq 0 ]] || continue
+    if [[ ! -r "$key_file" ]]; then
+        if [[ "${#drives}" -eq 0 ]]; then
+            print "Codex Foundry skipped: no foundry-entra-proxy client key at $key_file."
+        else
+            problem "Codex Foundry skipped: no client key at $key_file (run foundry-entra-proxy/install.sh in clitools)."
+        fi
+        continue
+    fi
+    dir="$HOME/.codex-$profile"
+    dest="$dir/config.toml"
+    target="$codex_generated/$profile.toml"
+    [[ ! -L "$dir" ]] || die "Refusing symlinked profile directory: $dir"
+    want="$(build_codex "$profile")"
+
+    if [[ "$check" -eq 1 ]]; then
+        [[ -d "$dir" && "$(mode_of "$dir")" == 700 ]] || problem "codex $profile: $dir must exist with mode 700"
+        [[ -L "$dest" && "$(readlink "$dest")" == "$target" ]] || problem "codex $profile: $dest is not linked to $target"
+        [[ -f "$target" && "$(mode_of "$target")" == 600 ]] || problem "codex $profile: $target must exist with mode 600"
+        [[ "$(managed_part "$target")" == "$want" ]] || problem "codex $profile: generated config is stale"
+        [[ ! -e "$dir/auth.json" ]] || problem "codex $profile: $dir/auth.json holds a ChatGPT login; remove it, Foundry uses the proxy key"
+        for item in ${(k)codex_links}; do link_item "${codex_links[$item]}" "$dir/$item"; done
+        sync_t3_codex "$profile"
+        continue
+    fi
+
+    mkdir -p "$dir"
+    chmod 700 "$dir"
+    if [[ "$(managed_part "$target")" != "$want" ]]; then
+        state="$(state_part "$target")"
+        { print -r -- "$want"; print; print -r -- "$marker"; [[ -z "$state" ]] || print -r -- "$state" } > "$target.tmp"
+        mv "$target.tmp" "$target" && print "Generated $target"
+    fi
+    chmod 600 "$target"
+    if [[ ! -L "$dest" || "$(readlink "$dest")" != "$target" ]]; then
+        if [[ -e "$dest" || -L "$dest" ]]; then
+            mv "$dest" "$dest.backup.$(date +%Y%m%d%H%M%S)" && print "Backed up existing $dest"
+        fi
+        ln -s "$target" "$dest" && print "Linked $dest -> $target"
+    fi
+    for item in ${(k)codex_links}; do link_item "${codex_links[$item]}" "$dir/$item"; done
+    [[ ! -e "$dir/auth.json" ]] || problem "codex $profile: $dir/auth.json holds a ChatGPT login; remove it, Foundry uses the proxy key"
+    [[ ! -L "$dir/skills" ]] || die "Refusing symlinked skills directory: $dir/skills"
+    mkdir -p "$dir/skills"
+    if command -v skillctl >/dev/null; then
+        CODEX_HOME="$dir" skillctl sync --global >/dev/null || problem "skillctl sync failed for $dir"
+    else
+        problem "skillctl is not installed; $dir/skills left empty"
+    fi
+    sync_t3_codex "$profile"
+    print "Profile ready: codex $profile ($dir)"
 done
 
 if [[ "$check" -eq 0 ]]; then

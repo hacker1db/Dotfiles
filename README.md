@@ -51,10 +51,10 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | `./install.sh osx` | Apply macOS preferences, create standard folders, and install NvimTmux.app with `duti` associations |
 | `./install.sh theme list` | List theme candidates (`apply <name>`, `current`, and `sync` also work) |
 | `./install.sh tmux-plugins` | Bootstrap TPM at `~/.local/share/tmux/plugins/tpm` |
-| `./install.sh claude-profiles` | Generate and link the Claude Code profiles (`--check`, `--skip-foundry`) |
+| `./install.sh agent-profiles` | Generate and link the Claude Code profiles and the Codex Foundry home (`--check`, `--skip-foundry`) |
 | `./install.sh deferred` | Finish the Brewfile installation and cleanup that were skipped because they need a password, then `chsh` |
 
-`all` runs tools, link, node, dotnet, osx, theme, tmux-plugins, and claude-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` (its GitHub-over-SSH settings need the 1Password agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs tools, link, node, dotnet, osx, theme, browser, tmux-plugins, and agent-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` (its GitHub-over-SSH settings need the 1Password agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity and signing-key prompts; it does not suppress every authentication prompt.
 
@@ -160,12 +160,13 @@ Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for the sin
 
 Claude installation links instructions, output styles, and the statusline script into each profile directory, and generates each profile's settings from layered fragments. MCP configuration is linked to `~/.mcp.json`.
 
-- [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh claude-profiles` generates and installs all three.
+- [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh agent-profiles` generates and installs all three.
+- [Codex profiles](codex/PROFILES.md): `xp` (personal, `~/.codex`) and `xf` (Foundry, `~/.codex-foundry`) use separate `CODEX_HOME` directories, so the Foundry profile never sees the personal ChatGPT login. The same `./install.sh agent-profiles` step generates and links the Foundry home.
 - Workflow slash commands (reviews, GitHub/Azure DevOps, security, notes, reading, writing) come from the skills repository through skillctl, not from command files here. gitleaks runs as a Git hook, not a Claude hook.
 
 ### Fleet agent orchestration
 
-Agent sessions across Claude Code, Codex, and Copilot are monitored with [Fleet](https://github.com/nicknisi/fleet), Nick Nisi's tmux agent dashboard, installed from his `nicknisi/formulae` Homebrew tap via the Brewfile. The tmux chips, keybindings, and sketchybar wiring here (`bin/tmux-fleet-chips`, `bin/sketchybar-fleet-watch`, the fleet block in `config/tmux/tmux.conf`) are adapted from [nicknisi/dotfiles](https://github.com/nicknisi/dotfiles) (MIT). `./install.sh claude-profiles` wires the fleet hooks into each Claude profile and Codex; Copilot is tracked by process discovery. See [Fleet integration](docs/fleet.md).
+Agent sessions across Claude Code, Codex, and Copilot are monitored with [Fleet](https://github.com/nicknisi/fleet), Nick Nisi's tmux agent dashboard, installed from his `nicknisi/formulae` Homebrew tap via the Brewfile. The tmux chips, keybindings, and sketchybar wiring here (`bin/tmux-fleet-chips`, `bin/sketchybar-fleet-watch`, the fleet block in `config/tmux/tmux.conf`) are adapted from [nicknisi/dotfiles](https://github.com/nicknisi/dotfiles) (MIT). `./install.sh agent-profiles` wires the fleet hooks into each Claude profile and Codex; Copilot is tracked by process discovery. See [Fleet integration](docs/fleet.md).
 
 ### Herdr
 
@@ -204,7 +205,7 @@ The theme script writes Neovim, Starship, Ghostty, and tmux settings. Candidate 
 for f in install.sh install/*.zsh; do zsh -n "$f" || exit 1; done
 zsh -n zsh/zshrc.symlink
 zsh -n zsh/functions.zsh
-zsh install/claude-profiles.zsh --check
+zsh install/agent-profiles.zsh --check
 git diff --check
 ```
 

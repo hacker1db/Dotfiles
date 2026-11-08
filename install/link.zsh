@@ -76,29 +76,6 @@ for hook_src destination in "${(@kv)agent_hooks}"; do
     print "Linked $destination -> $hook_src"
 done
 
-title "Linking Codex profile overlays"
-# `codex -p <name>` layers ~/.codex/<name>.config.toml over config.toml; see codex/PROFILES.md.
-typeset overlay_src
-for overlay_src in "$DOTFILES"/codex/*.config.toml(N); do
-    destination="$HOME/.codex/${overlay_src:t}"
-    if [[ -L "$destination" && "$(readlink "$destination")" == "$overlay_src" ]]; then
-        print "Codex overlay already linked: $destination"
-        continue
-    fi
-    mkdir -p "${destination:h}"
-    if [[ -e "$destination" && ! -L "$destination" ]]; then
-        backup="$(backup_path "$destination")"
-        mv "$destination" "$backup" || { LINK_FAILURE=1; continue }
-        print "Preserved existing Codex overlay: $backup"
-    fi
-    ln -sfn "$overlay_src" "$destination"
-    print "Linked $destination -> $overlay_src"
-done
-if grep -qE '^[[:space:]]*(profile[[:space:]]*=|\[profiles\.)' "$HOME/.codex/config.toml" 2>/dev/null; then
-    warning "Remove legacy profile/[profiles.*] entries from ~/.codex/config.toml; Codex rejects -p while they exist"
-    LINK_FAILURE=1
-fi
-
 title "Linking Git templates"
 link_file "$DOTFILES/git/templates" "$HOME/.git-templates"
 

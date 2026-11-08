@@ -1,9 +1,8 @@
-# Codex profile overlay: GPT deployments on Azure AI Foundry through foundry-entra-proxy.
+# Codex Foundry profile: GPT deployments on Azure AI Foundry through foundry-entra-proxy.
 #
-# Loaded only by `codex -p foundry` (use bin/codex-foundry, which also supplies the key). It layers
-# on top of ~/.codex/config.toml, so plain `codex` keeps the personal ChatGPT login untouched.
-# install/link.zsh links it to ~/.codex/foundry.config.toml. Don't add a [profiles.foundry] table
-# or `profile = "foundry"` to config.toml: Codex 0.166 then refuses `-p foundry`. See codex/PROFILES.md.
+# Template only. install/agent-profiles.zsh renders it to codex/.local/profiles/foundry.toml
+# (ignored by Git) and links that to ~/.codex-foundry/config.toml, so trust and project state
+# Codex writes back never lands in this file. Launch with bin/codex-foundry. See codex/PROFILES.md.
 model          = "gpt-6.1-sol"   # or gpt-6-luna, gpt-6-astra (must be on the proxy allowlist)
 model_provider = "foundry"
 

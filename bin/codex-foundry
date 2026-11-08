@@ -1,17 +1,16 @@
-#!/usr/bin/env bash
-# Codex on Azure AI Foundry GPT deployments via foundry-entra-proxy. Plain `codex` stays personal.
-# Setup: ~/Developer/clitools/foundry-entra-proxy/install.sh, then install/link.zsh. See codex/PROFILES.md.
+#!/usr/bin/env zsh
 set -euo pipefail
 
+path=($path /opt/homebrew/bin "$HOME/.local/bin")
+export CODEX_HOME="${CODEX_FOUNDRY_HOME:-$HOME/.codex-foundry}"
 key_file="${FOUNDRY_PROXY_KEY_FILE:-$HOME/.config/foundry-entra-proxy/client.key}"
-overlay="${CODEX_HOME:-$HOME/.codex}/foundry.config.toml"
 proxy="${FOUNDRY_PROXY_URL:-http://127.0.0.1:8787}"
 
-die() { printf 'codex-foundry: %s\n' "$*" >&2; exit 1; }
+die() { print -u2 -r -- "codex-foundry: $*"; exit 1 }
 
-[[ -e "$overlay" ]] || die "$overlay is missing; run install/link.zsh from dotfiles."
+[[ -e "$CODEX_HOME/config.toml" ]] || die "$CODEX_HOME/config.toml is missing; run ./install.sh agent-profiles from dotfiles."
 [[ -r "$key_file" ]] || die "no proxy client key at $key_file; run foundry-entra-proxy/install.sh in clitools."
 curl -fsS --max-time 2 "$proxy/healthz" >/dev/null 2>&1 ||
     die "foundry-entra-proxy is not answering at $proxy; check with foundry-entra-proxy/install.sh --check."
 
-FOUNDRY_PROXY_KEY="$(<"$key_file")" exec codex -p foundry "$@"
+FOUNDRY_PROXY_KEY="$(<"$key_file")" exec codex "$@"
