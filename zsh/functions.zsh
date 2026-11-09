@@ -400,7 +400,7 @@ function update-node-tools(){
     mkdir -p "$PNPM_HOME" || return 1
     packages="$(pnpm list --global --depth -1)" || return 1
 
-    local -a unmanaged=(plan-manager "@anthropic-ai/claude-code" "@openai/codex" "@openai/codex-security")
+    local -a unmanaged=("@openai/codex-security")
     local package removed=0
     for package in $unmanaged; do
         if print -r -- "$packages" | grep -qF -- "── ${package}@"; then
