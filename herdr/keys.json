@@ -62,8 +62,7 @@
     "ctrl-h": "status-bar.nav-left",
     "ctrl-j": "status-bar.nav-down",
     "ctrl-k": "status-bar.nav-up",
-    "ctrl-l": "status-bar.nav-right",
-    "cmd-shift-i": "mod.open:tmux-import"
+    "ctrl-l": "status-bar.nav-right"
   },
   "terminal": {
     "cmd-f": "terminal.search",

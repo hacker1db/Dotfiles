@@ -29,7 +29,6 @@ const BINDINGS = [
   ["f", "Fleet agents", "@panel", "fleet"],
   ["O", "Fleet dashboard", "@popup", ["fleet"]],
   ["b", "Toggle sidebar", "layout.toggle", { id: "sidebar" }],
-  ["I", "Bring tmux into Herdr", "mod.open", { name: "tmux-import" }],
   ["V", "Open a PDF", "mod.open", { name: "pdf-picker" }],
   ["o", "Find space", "mod.open", { name: "picker" }],
   ["s", "Find space", "mod.open", { name: "picker" }],

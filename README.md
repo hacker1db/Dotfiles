@@ -171,7 +171,7 @@ Agent sessions across Claude Code, Codex, and Copilot are monitored with [Fleet]
 
 ### Herdr
 
-[Herdr](https://herdr.dev) is installed by `./install.sh tools` with its own installer. `./install.sh link` links the `herdr/` key map, layout, theme, and mods into `~/.config/herdr-app` one by one, since Herdr writes its own files there too. The `dotfiles` layout adds a tmux-style `ctrl-a` prefix, a status bar with the playing song, agent counts, review requests, and active plans, panels for pull requests and plans, a new-branch dialog that creates a Worktrunk worktree and copies ignored `.env` files with `bin/wt-new`, a Fleet panel, and a two-way tmux mirror (`bin/herdr-tmux`, `bin/tmux-to-herdr`). See [Herdr integration](docs/herdr.md).
+[Herdr](https://herdr.dev) is installed by `./install.sh tools` with its own installer. `./install.sh link` links the `herdr/` key map, layout, theme, and mods into `~/.config/herdr-app` one by one, since Herdr writes its own files there too. The `dotfiles` layout adds a tmux-style `ctrl-a` prefix, a status bar with the playing song, agent counts, review requests, and active plans, panels for pull requests and plans, a new-branch dialog that creates a Worktrunk worktree and copies ignored `.env` files with `bin/wt-new`, and a Fleet panel. See [Herdr integration](docs/herdr.md).
 
 ### Personal skills
 

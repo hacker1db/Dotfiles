@@ -7,7 +7,6 @@ const REVIEWS_MS = 300000;
 const PLANS_MS = 120000;
 const FLEET_MS = 20000;
 const WATCH_MS = 1500;
-const SYNC_MS = 60000;
 const RESOLVE_ROOT = 'cd -P "$1" && cd ../../.. && printf %s "$PWD"';
 const NAV = { "nav-left": ["left", "ctrl+h"], "nav-down": ["down", "ctrl+j"], "nav-up": ["up", "ctrl+k"], "nav-right": ["right", "ctrl+l"] };
 const PASS_THROUGH = ["nvim", "vim", "tmux"];
@@ -101,7 +100,6 @@ export default class StatusBar extends View {
         if (r.code === 0) this.root = r.stdout;
       } catch {}
       this.refreshSong(cx);
-      this.syncTmux(cx);
     });
     cx.spawn(async () => {
       for (;;) await navigate(await nextCommand());
@@ -120,11 +118,8 @@ export default class StatusBar extends View {
           followChanges();
         });
       }
-      if (signature === this.signature) return;
       this.signature = signature;
-      this.syncTmux(cx);
     });
-    cx.timer.every(SYNC_MS, (cx) => this.syncTmux(cx));
     this.refreshReviews(cx);
     this.refreshPlans(cx);
     cx.timer.every(SONG_MS, (cx) => {
@@ -139,18 +134,6 @@ export default class StatusBar extends View {
   now() {
     const d = new Date();
     return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-  }
-
-  syncTmux(cx) {
-    if (!this.root) return;
-    cx.spawn(async () => {
-      try {
-        const r = await exec(`${this.root}/bin/herdr-tmux`, ["sync"], { timeout: 60000 });
-        if (r.code !== 0) console.log(`herdr-tmux: ${r.stderr}`);
-      } catch (e) {
-        console.log(`herdr-tmux: ${e}`);
-      }
-    });
   }
 
   refreshFleet(cx) {

@@ -65,7 +65,7 @@ upstream, compare it with `dotfiles.json` and port what is useful.
 - `ctrl-a` opens the `prefix` popup, as the tmux prefix does. Ctrl-A no longer
   reaches the shell directly; press `ctrl-a a` to send it.
 - `ctrl-a ctrl-a` focuses the next pane, as `bind ^A select-pane -t:.+` does.
-- `cmd-shift-n` opens the new-branch dialog, and `cmd-shift-i` the tmux import dialog.
+- `cmd-shift-n` opens the new-branch dialog.
 - `cmd-1` to `cmd-9` switch to space 1 to 9, numbered in the status bar, and
   `ctrl-1` to `ctrl-9` select tabs. This swaps Herdr's defaults.
 - `ctrl-h`, `ctrl-j`, `ctrl-k`, `ctrl-l` move focus between panes and the
@@ -96,7 +96,6 @@ After `ctrl-a`:
 | `f` | Toggle the Fleet panel | `fleet sidebar` |
 | `O` | Fleet dashboard popup | `display-popup fleet` |
 | `b` | Toggle sidebar | |
-| `I` | Bring tmux into Herdr | |
 | `V` | Open a PDF | |
 | `o`, `s` | Space picker | sesh |
 | `J`, `K` | Next or previous space (repeatable) | |
@@ -270,53 +269,6 @@ to the front. Herdr never runs tmux inside a tab: a second client would shrink
 the window to fit both. ▤ opens the Fleet dashboard (`fleet`) in a popup, as does `ctrl-a O`.
 Fleet watches agents through tmux, so agents started directly in Herdr are in
 Herdr's own agents list instead.
-
-## tmux sync
-
-Herdr owns the running programs, and tmux mirrors them. Each local Herdr
-space is a tmux session with the same name, each tab a window, and each
-terminal pane a tmux pane that runs `hc attach <terminal>` on the same
-herdr-core terminal. Mod panes such as plans and pull requests have no tmux
-pane.
-
-`bin/herdr-tmux sync` builds and updates the mirror. The status bar mod runs
-it when spaces, tabs, or panes change, and every minute. Closing works both
-ways:
-
-- A program that exits, or a pane closed in Herdr, ends the terminal, and its
-  `hc attach` pane closes in tmux.
-- In a mirror session, `ctrl-a x` and `ctrl-a &` end the terminals with
-  `hc kill`, which closes them in Herdr too. `ctrl-a \`, `|`, `-`, `N` and
-  `c` start new herdr-core terminals labeled for that space and tab, so they
-  appear in Herdr. Outside mirror sessions these keys behave as before.
-- Closing a Herdr space ends its tmux session.
-
-Both views share one terminal size, so the larger window shows unused space.
-`ctrl+\` detaches `hc attach` without ending the program. A tmux session with
-the space's name that is not a mirror makes the mirror `<name> (herdr)`.
-
-### Bringing tmux work into Herdr
-
-`bin/tmux-to-herdr` recreates tmux sessions as Herdr spaces, replaying each
-window's split tree from `#{window_layout}`, in the same folders:
-
-- Claude Code panes restart with `claude --continue`, keeping the pane's
-  `CLAUDE_CONFIG_DIR` profile. Codex restarts with `codex resume --last`.
-  Neovim, lazygit, and yazi start again. Other panes start a shell.
-- Without `--replace`, the original tmux session stays and the mirror is named
-  `<name> (herdr)`.
-- With `--replace`, clients attached to the original switch to the mirror,
-  the original session ends, and the mirror takes its name.
-
-From tmux, `ctrl-a T` moves the current session after confirming. From Herdr,
-`ctrl-a I` or `cmd-shift-i` opens a dialog with **Copy** and **Move** for each
-session.
-
-```zsh
-tmux-to-herdr --list
-tmux-to-herdr "AppSec items"
-tmux-to-herdr --replace work
-```
 
 ## PDF viewer
 
