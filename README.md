@@ -68,6 +68,7 @@ To retire a tool, remove its Brewfile declaration and run the installer on each 
 - `daily` opens a dated SecondBrain note, `yy` changes directory through Yazi, `ts` and Alt+s select sesh sessions, and `gh-rate-limit` inspects GitHub limits.
 - Ghostty uses `config/ghostty/config`: JetBrains Mono italic at 14pt, 78% opacity, blur, linkarzu colors, and clipboard copy-on-select. The old WezTerm configuration has been removed.
 - tmux lives in `config/tmux/tmux.conf`, uses Ctrl+a as its prefix, and includes vi copy mode, mouse support, undercurl colors, session persistence through resurrect/continuum, and Neovim pane navigation. Prefix+o opens sesh; prefix+g opens lazygit; prefix+G opens gh-dash; prefix+O opens OpenCode; prefix+u uses the fzf URL picker.
+- ai-usage reads `config/ai-usage/projects.yaml`, linked at `~/.config/ai-usage/`, for its ownership rules. By default GitHub user-owned repos are labeled personal and org-owned repos org; the file holds exceptions.
 - The link integration phase bootstraps TPM over SSH at `~/.config/tmux/plugins/tpm`. Existing installations are preserved, and incomplete ones fail with a diagnostic. Reload tmux, then press Ctrl+a followed by Shift+i to install the configured plugins. To bootstrap TPM alone, run `bash install/tmux-plugins.sh`.
 
 ### Worktrunk and Git worktrees
