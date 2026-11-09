@@ -1,0 +1,175 @@
+#!/usr/bin/env zsh
+set -uo pipefail
+
+usage() {
+    print -u2 "Usage: ${0:t} [--replace | --list] [session ...]"
+    print -u2 "  Recreates tmux sessions as Herdr spaces: windows become tabs, panes become splits"
+    print -u2 "  in the same folders, and Claude Code, Codex and Neovim panes are relaunched."
+    print -u2 "  herdr-tmux then mirrors each space back into tmux."
+    print -u2 "  --replace  move attached clients to the mirror and end the original session"
+    print -u2 "  --list     print the tmux sessions that are not Herdr mirrors as JSON"
+    exit 2
+}
+
+mode=recreate replace=0
+case "${1:-}" in
+    --replace) replace=1; shift ;;
+    --list) mode=list; shift ;;
+    -h|--help) usage ;;
+esac
+
+command -v tmux >/dev/null 2>&1 || { print -u2 "tmux is not installed"; exit 1 }
+tmux list-sessions >/dev/null 2>&1 || { print -u2 "No tmux server is running"; exit 1 }
+
+if [[ "$mode" == list ]]; then
+    tmux list-sessions -F '#{session_name}	#{session_windows}	#{session_attached}	#{@herdr_space}' |
+        while IFS=$'\t' read -r name windows attached mirror; do
+            [[ -n "$mirror" ]] && continue
+            panes="$(tmux list-panes -s -t "=$name" 2>/dev/null | wc -l | tr -d ' ')"
+            jq -cn --arg name "$name" --argjson windows "$windows" --argjson panes "$panes" --argjson attached "$attached" \
+                '{name: $name, windows: $windows, panes: $panes, attached: ($attached > 0)}'
+        done | jq -cs .
+    exit 0
+fi
+
+command -v herdr-app >/dev/null 2>&1 || { print -u2 "herdr-app is not installed"; exit 1 }
+herdr-app status >/dev/null 2>&1 || { print -u2 "Herdr is not running"; exit 1 }
+
+typeset -a sessions=("$@")
+if (( ! ${#sessions} )); then
+    if [[ -n "${TMUX:-}" ]]; then
+        sessions=("$(tmux display-message -p '#{session_name}')")
+    else
+        sessions=("${(@f)$(tmux list-sessions -F '#{session_name}	#{@herdr_space}' | awk -F'\t' '$2 == "" { print $1 }')}")
+    fi
+fi
+
+LAYOUT_PLAN='
+const s = process.argv[1].replace(/^[0-9a-f]+,/, "");
+let i = 0;
+const num = () => { const m = /^\d+/.exec(s.slice(i)); i += m[0].length; return +m[0]; };
+function node() {
+  num(); i++; num(); i++; num(); i++; num();
+  if (s[i] === ",") { i++; return { id: num() }; }
+  const close = s[i] === "{" ? "}" : "]", dir = s[i] === "{" ? "right" : "down", children = [];
+  i++;
+  for (;;) { children.push(node()); if (s[i] === ",") { i++; continue; } i++; break; }
+  return { dir, children };
+}
+const first = (n) => n.id ?? first(n.children[0]);
+const out = [];
+const walk = (n) => {
+  if (n.id !== undefined) return;
+  for (let k = 1; k < n.children.length; k++) out.push(`${first(n.children[k - 1])} ${n.dir} ${first(n.children[k])}`);
+  n.children.forEach(walk);
+};
+const root = node();
+console.log(first(root));
+walk(root);
+console.log(out.join("\n"));
+'
+
+herdr() {
+    local out
+    out="$(herdr-app do "$@" 2>&1)" || { print -u2 "herdr-app do $1 failed: $out"; return 1 }
+    print -r -- "$out"
+}
+
+typeset -A agent_types
+if command -v fleet >/dev/null 2>&1; then
+    typeset pane_id agent_type
+    while IFS=$'\t' read -r pane_id agent_type; do
+        [[ -n "$pane_id" ]] && agent_types[$pane_id]="$agent_type"
+    done < <(fleet list --json 2>/dev/null | jq -r '.agents[]? | [.pane, .agentType] | @tsv' 2>/dev/null)
+fi
+
+relaunch() {
+    local pane_id="$1" command="$2" pane_pid="$3" type="${agent_types[$1]:-}" child config
+    if [[ -z "$type" && ( "$command" == claude || "$command" == <->.<->.<-> ) ]]; then
+        type=claude
+    fi
+    case "$type:$command" in
+        claude:*)
+            for child in $(pgrep -P "$pane_pid" 2>/dev/null); do
+                config="$(ps -Eww -o command= -p "$child" 2>/dev/null | grep -o 'CLAUDE_CONFIG_DIR=[^ ]*' | head -1)"
+                [[ -n "$config" ]] && break
+            done
+            if [[ -n "$config" ]]; then
+                jq -cn --arg env "$config" '["env", $env, "claude", "--continue"]'
+            else
+                print '["claude","--continue"]'
+            fi
+            ;;
+        codex:*|*:codex) print '["codex","resume","--last"]' ;;
+        *:nvim) print '["nvim"]' ;;
+        *:lazygit) print '["lazygit"]' ;;
+        *:yazi) print '["yazi"]' ;;
+    esac
+}
+
+typeset -i created=0
+for session in "${sessions[@]}"; do
+    tmux has-session -t "=$session" 2>/dev/null || { print -u2 "No tmux session named $session"; continue }
+
+    if [[ -n "$(tmux display-message -p -t "=$session:" '#{@herdr_space}')" ]]; then
+        print -u2 "$session is already a Herdr mirror"
+        continue
+    fi
+
+    space=""
+    typeset -i window_count=0
+    while IFS=$'\t' read -r window_id window_name window_layout; do
+        typeset -A pane_line=() terminal_of=()
+        while IFS= read -r line; do
+            pane_line[${${line%%$'\t'*}#%}]="$line"
+        done < <(tmux list-panes -t "$window_id" -F '#{pane_id}	#{pane_current_command}	#{pane_pid}	#{pane_current_path}')
+        typeset -a plan=("${(@f)$(node -e "$LAYOUT_PLAN" "$window_layout")}")
+        (( ${#plan} )) || { print -u2 "Could not read the layout of $session:$window_name"; continue }
+
+        pane_args() {
+            local pane_id command pane_pid folder launch
+            IFS=$'\t' read -r pane_id command pane_pid folder <<<"${pane_line[$1]}"
+            launch="$(relaunch "$pane_id" "$command" "$pane_pid")"
+            reply=(--folder "$folder")
+            [[ -n "$launch" ]] && reply+=(--argv "$launch")
+        }
+
+        pane_args "${plan[1]}"
+        if [[ -z "$space" ]]; then
+            result="$(herdr space.new --name "$session" --tab "$window_name" "${reply[@]}")" || break
+            space="$(jq -r .space <<<"$result")"
+        else
+            result="$(herdr tab.new --space "$space" --name "$window_name" "${reply[@]}")" || continue
+        fi
+        terminal_of[${plan[1]}]="$(jq -r .terminal <<<"$result")"
+
+        for step in "${(@)plan[2,-1]}"; do
+            [[ -n "$step" ]] || continue
+            read -r from direction to <<<"$step"
+            pane_args "$to"
+            herdr pane.focus --terminal "${terminal_of[$from]}" >/dev/null || break
+            result="$(herdr terminal.open --place "$direction" "${reply[@]}")" || break
+            terminal_of[$to]="$(jq -r .terminal <<<"$result")"
+        done
+        window_count+=1
+    done < <(tmux list-windows -t "=$session" -F '#{window_id}	#{window_name}	#{window_layout}')
+    if [[ -n "$space" ]]; then
+        print "Recreated $session as a Herdr space with $window_count tabs"
+        created+=1
+        sleep 1
+        "${0:A:h}/herdr-tmux" sync
+        mirror="$(tmux list-sessions -F '#{session_name}	#{@herdr_space}' | awk -F'\t' -v s="$space" '$2 == s { print $1; exit }')"
+        if (( replace )) && [[ -n "$mirror" ]]; then
+            for client in "${(@f)$(tmux list-clients -t "=$session" -F '#{client_name}')}"; do
+                [[ -n "$client" ]] && tmux switch-client -c "$client" -t "=$mirror:"
+            done
+            tmux kill-session -t "=$session"
+            "${0:A:h}/herdr-tmux" sync
+            print "Ended the original tmux session; the Herdr mirror is now $session"
+        elif [[ -n "$mirror" ]]; then
+            print "Mirrored back to tmux as $mirror"
+        fi
+    fi
+done
+
+(( created )) || exit 1

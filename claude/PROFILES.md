@@ -1,12 +1,14 @@
 # Claude Code profiles
 
+Codex CLI profiles (personal ChatGPT and Azure AI Foundry) are in `codex/PROFILES.md`.
+
 Three isolated profiles, each with its own `CLAUDE_CONFIG_DIR`, login, settings, skills, and plugins.
 
 | Profile | Config dir | Command | Aliases | Settings layers |
 | --- | --- | --- | --- | --- |
-| personal (default) | `~/.claude-personal` | `claude-personal` | `cc`, `ccc` | base + personal |
-| work subscription | `~/.claude-subscription` | `claude-subscription` | `cw`, `cwc` | base + subscription |
-| Foundry | `~/.claude-foundry` | `claude-foundry` | `cf`, `cfc` | base + foundry + resource + local autoMode |
+| personal (default) | `~/.claude-personal` | `claude-personal` | `cc`, `ccc` | base + personal + `~/.localrc` |
+| work subscription | `~/.claude-subscription` | `claude-subscription` | `cw`, `cwc` | base + subscription + `~/.localrc` |
+| Foundry | `~/.claude-foundry` | `claude-foundry` | `cf`, `cfc` | base + foundry + `~/.localrc` + resource + local autoMode |
 
 `zsh/zshenv.symlink` exports `CLAUDE_CONFIG_DIR=~/.claude-personal`, so plain `claude` and `skillctl` use personal. The `bin/claude-*` wrappers override it for one launch and always run the native `~/.local/bin/claude`. GUI apps don't read `zshenv`; point them at a wrapper.
 
@@ -25,9 +27,10 @@ Use these absolute paths from GUI apps and other tools (such as T3 Code) that do
 | Shared settings layer (committed) | `~/.dotfiles/main/claude/settings.base.json` |
 | Profile settings and hooks (committed) | `~/.dotfiles/main/claude/profiles/{personal,subscription,foundry}/{settings.json,hooks/}` |
 | Foundry resource | `ANTHROPIC_FOUNDRY_RESOURCE` in `~/.localrc` → `~/OneDrive*/Personal/.localrc`; without a `~/OneDrive*` directory and the variable, Foundry is skipped without failing the install |
+| Machine-local settings (work hooks, MCP, plugins, model) | `CLAUDE_SETTINGS_JSON` and `CLAUDE_SETTINGS_JSON_{PERSONAL,SUBSCRIPTION,FOUNDRY}` in `~/.localrc`; see [Machine-local settings](#machine-local-settings) |
 | Local autoMode input | `~/.config/claude-code/automode.json` (falls back to `foundry-automode.json`) |
 | MCP servers (all profiles) | `~/.mcp.json` → `~/.dotfiles/main/claude/mcp.json` |
-| Installer and test | `~/.dotfiles/main/install/claude-profiles.sh`, `install/tests/claude-profiles.test.sh` |
+| Installer | `~/.dotfiles/main/install/agent-profiles.zsh` (also installs the Codex Foundry home) |
 
 Each profile dir contains:
 
@@ -49,7 +52,7 @@ The Foundry profile also needs a working `az login`. Its resource and model come
 
 ## Install
 
-`./install.sh link` runs `install/claude-profiles.sh`, which:
+`./install.sh agent-profiles` runs `install/agent-profiles.zsh`, which sets up the Codex Foundry home (see `codex/PROFILES.md`) as well and, for Claude:
 
 - links `~/.localrc` to `~/OneDrive*/Personal/.localrc` when a OneDrive dir exists (fails on two dirs or an unsynced file); without OneDrive, the existing `~/.localrc` is used as is
 - merges the layers with jq into ignored `claude/.local/profiles/<profile>.json` (mode 600), linked as `~/.claude-<profile>/settings.json` (dir mode 700), and backs up an unmanaged `settings.json` once
@@ -61,8 +64,8 @@ The Foundry profile also needs a working `az login`. Its resource and model come
 Foundry reads `ANTHROPIC_FOUNDRY_RESOURCE` from the environment, or from `~/.localrc`. Rerun the installer after changing it. `~/.config/claude-code/automode.json` (or `foundry-automode.json`) contributes only `autoMode.environment`. Layers that contain `apiKeyHelper` or API keys or tokens are rejected.
 
 ```sh
-install/claude-profiles.sh --check         # read-only audit
-install/claude-profiles.sh --skip-foundry  # leave Foundry untouched
+zsh install/agent-profiles.zsh --check         # read-only audit
+zsh install/agent-profiles.zsh --skip-foundry  # leave Claude and Codex Foundry untouched
 ```
 
 Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout, symlinked dirs), and 2 means incomplete (no Foundry resource, stale state, or inherited `ANTHROPIC_*`/`CLAUDE_CODE_USE_*` variables, which are reported by name only). A `CLAUDE_CODE_USE_*` flag set to `0`, `false`, `no` or `off` is ignored, except `CLAUDE_CODE_USE_FOUNDRY` while Foundry is managed, because it would turn off the Foundry profile's provider.
@@ -71,12 +74,40 @@ Exit codes: 0 means ready, 1 means a hard error (credentials, `.localrc` layout,
 
 - `settings.base.json`: shared plugins, `enabledMcpjsonServers` (github, playwright from `~/.mcp.json`), `permissions.defaultMode: auto`, deny rules, statusline.
 - `profiles/personal/settings.json`: personal-only plugins (vercel, todoist).
-- `profiles/subscription/settings.json`: settings for the work subscription only. GitGuardian runs as a git hook (`core.hooksPath`), not a Claude hook.
+- `profiles/subscription/settings.json`: settings for the work subscription only.
 - `profiles/foundry/settings.json`: Foundry provider and deployment model defaults. Uses `opus` (the configured Opus 4.8 deployment) for auto mode compatibility; `opusplan` would select the unsupported Sonnet 4.6 deployment during execution.
 
-Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`.
+Work security tooling is never configured in this repository. Its hooks, MCP servers, and git `core.hooksPath` entries live in machine-local config outside version control (for example `~/.gitconfig-local`, `~/.copilot/hooks/`, or the `~/.localrc` settings below).
+
+Hooks are per profile. Put the script in `claude/profiles/<profile>/hooks/` and register it in that profile's `settings.json` under `hooks`, with a command such as `~/.claude-<profile>/hooks/<script>.sh`. When layers merge, `hooks` arrays concatenate per event and `enabledMcpjsonServers` arrays union, so a profile layer adds to the base instead of replacing it.
 
 The generated files also pin the provider: Foundry sets `CLAUDE_CODE_USE_FOUNDRY=1`, while personal and subscription set it to `0` and add `forceLoginMethod: claudeai`. All three set Bedrock and Vertex to `0`.
+
+## Machine-local settings
+
+When `~/.localrc` exists, the installer sources it in a subshell and merges these optional variables over the committed layers, so the machine wins:
+
+| Variable | Applies to |
+| --- | --- |
+| `CLAUDE_SETTINGS_JSON` | every profile |
+| `CLAUDE_SETTINGS_JSON_PERSONAL`, `_SUBSCRIPTION`, `_FOUNDRY` | that profile, after `CLAUDE_SETTINGS_JSON` |
+
+Each value must be a JSON object in settings format. Scalars such as `model` replace the committed value, objects merge, `hooks` concatenate per event with duplicates dropped, and `enabledMcpjsonServers` arrays union. The provider pins below and the credential check still apply, so `~/.localrc` cannot switch a profile's provider or add API keys. Without `~/.localrc`, or without the variables, only the committed layers are used. Rerun `./install.sh agent-profiles` after changing them.
+
+```zsh
+IFS= read -r -d '' CLAUDE_SETTINGS_JSON <<'JSON' || true
+{
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [{ "type": "command", "command": "work-precommit-hook claude", "timeout": 300 }] }
+    ]
+  }
+}
+JSON
+IFS= read -r -d '' CLAUDE_SETTINGS_JSON_FOUNDRY <<'JSON' || true
+{ "enabledMcpjsonServers": ["work-mcp"], "model": "opus" }
+JSON
+```
 
 ## First use
 
@@ -86,12 +117,13 @@ The generated files also pin the provider: Foundry sets `CLAUDE_CODE_USE_FOUNDRY
 
 Claude Console (API-key) logins are stored outside `CLAUDE_CONFIG_DIR`, so they are not isolated. Profiles isolate config and auth, not the filesystem, so use separate worktrees when concurrent sessions edit one repo.
 
-## Tests
+## Checks
 
 ```sh
-bash install/tests/claude-profiles.test.sh
+zsh -n install/agent-profiles.zsh
+zsh install/agent-profiles.zsh --check
 ```
 
 ## Rollback
 
-Revert the dotfiles commits, rerun `./install.sh link`, and launch plain `claude` with `CLAUDE_CONFIG_DIR` unset. `~/.claude` stays intact until the profiles are verified.
+Revert the dotfiles commits, rerun `./install.sh agent-profiles`, and launch plain `claude` with `CLAUDE_CONFIG_DIR` unset. `~/.claude` stays intact until the profiles are verified.

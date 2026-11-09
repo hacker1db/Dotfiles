@@ -1,0 +1,5 @@
+{
+  "place": "none",
+  "title": "Open a PDF",
+  "overlay": { "kind": "dialog", "width": 640, "height": 480 }
+}

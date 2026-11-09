@@ -1,167 +1,64 @@
 # AI Agent Guidelines
 
-This document provides context for AI coding assistants working with this dotfiles repository.
+Personal macOS dotfiles: Zsh, Neovim, tmux, Ghostty, Git, Herdr, and AI coding tool profiles. [README.md](README.md) is the source of truth for installation and behavior; this file covers what agents need to work safely.
 
-## Repository Overview
-
-This is a personal dotfiles repository for macOS development environment configuration. It includes:
-
-- **Neovim config**: Lua-based configuration with mini.nvim plugins, LSP setup, and AI integration
-- **Zsh config**: Shell configuration with performance optimizations, completions, and custom functions
-- **Tmux config**: Terminal multiplexer with custom themes and layouts
-- **Git config**: Aliases, templates, and 1Password SSH signing
-- **Application configs**: Ghostty terminal, Starship prompt, 1Password SSH agent, and more
-
-## Project Structure
+## Layout
 
 ```text
-.dotfiles/
-├── bin/                    # Custom scripts and utilities
-├── config/                 # Application configurations (each dir is symlinked to ~/.config/<name>)
-│   ├── 1Password/         # SSH agent config
-│   ├── ghostty/           # Terminal emulator config
-│   ├── nvim/              # Neovim configuration (Lua)
-│   ├── sesh/              # Sesh session manager config (sesh.toml)
-│   ├── starship/          # Shell prompt config
-│   └── tmux/              # Tmux config and themes
-├── git/                   # Git configuration and templates
-├── install/               # Installation scripts and Brewfile
-├── zsh/                   # Zsh configuration files
-└── docs/                  # Integration setup and troubleshooting
+bin/          Scripts on PATH
+config/       One directory per app, each linked to ~/.config/<name>
+herdr/        Herdr config, linked file by file into ~/.config/herdr-app
+git/          gitconfig, hook dispatchers (templates/hooks/) and hooks (hooks/)
+zsh/          zshrc, zshenv, aliases, functions (functions/, functions.zsh, git.zsh)
+install/      One script per install.sh step, plus lib.zsh and brewfile
+global/       AGENTS.md: the global agent policy linked for Claude, Codex and Copilot
+claude/       Claude Code profiles (see claude/PROFILES.md)
+codex/        Codex profiles (see codex/PROFILES.md)
+docs/         Integration guides
 ```
 
-## Key Technologies & Tools
+## Checkouts and Worktrees
 
-### Development Tools
+`~/.dotfiles` is a bare repository with one worktree per branch; `~/.dotfiles/main` is the production checkout.
 
-- **Editor**: Neovim (lazy.nvim plugin manager)
-- **Shell**: Zsh with custom completions
-- **Terminal**: Ghostty
-- **Multiplexer**: Tmux
-- **Package Manager**: Homebrew
-- **Version Control**: Git with 1Password SSH signing
-- **Node Version**: fnm (Fast Node Manager)
-- **Prompt**: Starship
+- `main` must always work. Never edit or commit in the `main` checkout.
+- If the current worktree is on a feature branch, work there. Do not create another worktree or stack a branch for follow-up tasks; this overrides any global rule asking for a new worktree per task.
+- Starting from `main`, create a worktree and branch with `wt switch -c <branch>`.
+- Run every command from the worktree root with repo-relative paths. Paths under `~/.dotfiles/main` validate `main`, not your changes.
+- Installed links (`~/.zshrc`, `~/.config/*`, `~/.git-templates`, and others) point at the selected checkout, `main` by default. Anything that writes through them, such as `Lazy sync` updating `lazy-lock.json` or `install.sh theme apply`, changes that checkout. Edit files in the worktree, never through `~/.config`.
+- `./install.sh use` points the installed links at the current worktree for every terminal on the machine. Ask before running it, and switch back afterward with `dotfiles-use` from `~/.dotfiles/main`.
 
-### Neovim Stack
+## Validation
 
-- **Plugin Manager**: lazy.nvim
-- **Completion**: blink.cmp (NOT nvim-cmp)
-- **LSP**: Native LSP with mason.nvim for server management
-- **File Explorer**: Snacks explorer (replaced nvim-tree)
-- **Fuzzy Finder**: Snacks picker for files/buffers/help; Telescope remains for Git pickers
-- **AI Assistants**: Copilot and CopilotChat
-- **Git**: fugitive, gitsigns, neogit, octo.nvim
-- **Formatting**: conform.nvim
-- **Linting**: nvim-lint
-- **Treesitter**: Syntax highlighting and text objects
-- **UI**: snacks.nvim (notifier/indent/etc.), lualine
-
-### Languages & LSPs
-Configured LSP servers include:
-
-- TypeScript/JavaScript (typescript-tools, eslint)
-- Go (gopls)
-- Lua (lua_ls)
-- Python (pyright)
-- Terraform (terraformls)
-- Docker (dockerls)
-- YAML (yamlls)
-- JSON (jsonls)
-- Markdown (markdown_oxide, harper_ls)
-
-## Build, Test & Lint Commands
-
-### Shell/Dotfiles
-
-```bash
-# Isolated installer checks
-bash install/tests/claude-profiles.test.sh
-bash install/tests/plan-manager-bootstrap.test.sh
-node install/tests/plan-manager-harness-contracts.test.mjs
-
-# Manual Testing: Source Configuration In New Shell
-source ~/.zshrc
-
-# Check For Zsh Syntax Errors
-zsh -n ~/.dotfiles/main/zsh/zshrc.symlink
-
-# Install links and integrations (changes configuration and starts services)
-~/.dotfiles/main/install/link.sh
+```zsh
+for f in install.sh install/*.zsh zsh/*.zsh zsh/*.symlink zsh/functions/* bin/tmux-reload-all; do zsh -n "$f" || print -u2 "syntax error: $f"; done
+git diff --check
+luacheck config/nvim
+zsh install/agent-profiles.zsh --check
+time zsh -i -c exit
 ```
 
-### Neovim
+- `agent-profiles.zsh --check` is a read-only audit of the installed Claude and Codex profiles.
+- To rehearse linking without touching the real home: `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh`. It clones repositories and builds the plan CLI.
+- Neovim has no automated tests. Check it interactively with `nvim +checkhealth`.
+- `./install.sh {all|tools|link|...}` changes the live machine. Run it only when asked.
+- Report startup timings only after measuring them.
 
-```bash
-# No Automated Tests For Nvim Config
-# Manual Testing: Open Neovim And Check For Errors
-nvim +checkhealth
-
-# Check Lua Syntax
-luacheck ~/.dotfiles/main/config/nvim/
-
-# Update And Sync Plugins
-nvim --headless "+Lazy! sync" +qa
-```
-
-### Installation
-
-```bash
-# Install All Packages From Brewfile
-brew bundle --file=~/.dotfiles/main/install/brewfile
-
-# Run Full Installation Script
-~/.dotfiles/main/install.sh all
-
-# Install Tools And Create Symlinks
-~/.dotfiles/main/install/install_tools.sh
-~/.dotfiles/main/install/link.sh
-```
-
-## Code Style & Conventions
+## Conventions
 
 ### General
 
-- **NO COMMENTS** unless explicitly requested
-- Follow existing patterns in the codebase
-- Use existing libraries and utilities already installed
-- Check Brewfile before assuming a tool is available
+- Do not add code comments unless asked.
+- Follow existing patterns, and check for existing functionality before adding more.
+- Check `install/brewfile` and `install/tools.zsh` before assuming a tool is installed.
+- Indentation follows `.editorconfig`: 4 spaces, including Lua and Zsh.
 
-### Neovim Lua
+### Zsh
 
-- **Indentation**: 2 spaces
-- **Quotes**: Double quotes for strings
-- **Plugin structure**: Separate files per plugin in organized directories
-  - `lua/plugins/lsp/` - LSP-related plugins
-  - `lua/plugins/ui/` - UI/visual plugins
-  - `lua/plugins/git/` - Git integration plugins
-  - `lua/plugins/mini/` - mini.nvim ecosystem plugins
-  - `lua/plugins/extra/` - Miscellaneous plugins
-- **Keymaps**: Define in `lua/core/keymaps.lua` or plugin files
-- **Plugin format**: Return lazy.nvim spec table
-
-  ```lua
-  return {
-    "author/plugin-name",
-    event = "VeryLazy",
-    config = function()
-      require("plugin-name").setup({
-        -- config here
-      })
-    end,
-  }
-  ```
-
-- **DO NOT** use nvim-cmp (replaced with blink.cmp)
-- **DO NOT** use nvim-tree (replaced with Snacks explorer)
-- **Fuzzy finding**: Use Snacks picker for files/buffers; preserve existing Telescope Git operations
-
-### Shell Scripts (Zsh)
-
-- **Indentation**: 4 spaces
-- **Conditionals**: Use `[[ ]]` for tests
-- **Functions**: Define in `zsh/functions/` or `zsh/functions.zsh`
-- **Performance**: Always guard expensive commands (completions, evals) with existence checks
+- Run shell commands with `/bin/zsh`, not Bash. Check syntax with `zsh -n`, never `bash -n`. Label shell code blocks `zsh`.
+- Use `[[ ]]` for tests.
+- Define functions in `zsh/functions/` (autoloaded, one per file) or `zsh/functions.zsh`.
+- Guard external commands, completions, and evals with an existence check:
 
   ```zsh
   if command -v kubectl &> /dev/null; then
@@ -169,126 +66,46 @@ brew bundle --file=~/.dotfiles/main/install/brewfile
   fi
   ```
 
-- **Avoid duplicates**: Check for existing functionality before adding
+### Neovim
 
-### Git Commits
+- lazy.nvim imports `lua/plugins/` and its `extra`, `git`, `ui`, `lsp`, and `mini` subdirectories. Add one spec file per plugin in the matching subdirectory, returning a lazy.nvim spec table.
+- Leader and local leader are both `;`. Keymaps live in `lua/core/keymaps.lua` or the plugin's `keys`. Grep for a mapping before adding one.
+- Use double-quoted strings.
+- Use blink.cmp, not nvim-cmp. Use the Snacks explorer, not nvim-tree. Use the Snacks picker for files, buffers, grep, and help, and keep the existing Telescope Git pickers.
+- Prefer mini.nvim modules, and record new ones in `lua/plugins/mini/mini.md`.
+- LSP servers are configured in `lua/plugins/lsp/lspconfig.lua`, formatting in conform.nvim, and linting in nvim-lint.
 
-- **Format**: `type(scope): description`
-- **Types**: feat, fix, perf, refactor, docs, style, test, chore
-- **Scope**: nvim, zsh, tmux, git, install, etc.
-- **Examples**:
-  - `feat(nvim): configure Snacks picker`
-  - `perf(zsh): remove duplicate compinit calls`
-  - `fix(git): correct SSH signing configuration`
+### Config Directories
 
-## Config Symlinking Convention
+New app config goes in `config/<app>/` in the worktree. `install.sh link` links it to `~/.config/<app>`, and skips any existing path that is not a symlink. Move or back up existing configuration at that path before linking.
 
-All directories under `config/` are symlinked to `~/.config/<name>`. When adding a new app config:
+### Commits
 
-1. Create the directory at `~/.dotfiles/main/config/<appname>/`
-2. Preserve or back up existing configuration before replacing its path
-3. Symlink: `ln -s ~/.dotfiles/main/config/<appname> ~/.config/<appname>`
+- Format: `type(scope): description`.
+- Types: feat, fix, perf, refactor, docs, style, test, chore.
+- Scopes name the area: install, zsh, nvim, tmux, git, ssh, herdr, ghostty, claude, codex, agents.
 
-**Never create config files directly in `~/.config/`** — always source them from `~/.dotfiles/main/config/`.
+## Machine-Agnostic Dotfiles
 
-## Agent Skills
+The repository installs unchanged on many machines.
 
-- The canonical home for personal skills is [hacker1db/skills](https://github.com/hacker1db/skills), checked out at `$HOME/Developer/skills/main` by default.
-- That repository provides `skillctl`, the skill manager for Codex, Claude Code, and GitHub Copilot CLI. Read its README before changing skill sources, selections, or installation behavior.
-- Dotfiles does not hold or link personal skills. Do not add skills to this repository; `install/claude-profiles.sh` runs `skillctl sync --global` for each Claude profile.
-- The project-scoped Caido installer and the OpenCode skill under `config/opencode/skills/` are separate from the current `skillctl` global adapters.
+- Never put machine names, hostnames, local usernames, or absolute home paths (`/Users/<name>`) in tracked files or commit messages. Use `$HOME` or `~`.
+- Never edit tracked config to fix a problem on one machine. Find the machine-local cause.
+- Machine-specific settings belong in untracked files: `~/.gitconfig-local` or `~/.config/git/config` for Git, `git config --local` for one repository, `~/.localrc` for Zsh, and `~/.ssh/config` (machine-owned) for SSH.
+- Each machine signs in to exactly one GitHub account. Code that needs it reads `git config github.user`; never hardcode GitHub account or organization names. Extra personal organizations are `github.org` values in `~/.gitconfig-local`.
+- Before committing, search the diff for hostnames, usernames, and `/Users/` paths.
 
-## Important Files & Patterns
+## Security
 
-### Neovim Keymaps
+- Never commit, log, or expose secrets, API keys, or credentials. The gitleaks pre-commit hook blocks commits that contain them, and CI runs TruffleHog.
+- Never write SSH key files to disk, including public keys for `IdentityFile` pinning. Keys live only in a password manager and are served by its SSH agent. Fix key selection through the password manager, not through files in `~/.ssh`.
+- Git signs with SSH keys from that agent. The signing key is set in `~/.gitconfig-local`.
+- Unattended or service-account access belongs in the fleet-manager repository, not here.
+- Zsh runs `compinit -C`, which skips the security check on completion directories.
 
-- **Leader key**: Space
-- **Local leader**: `\`
-- **File operations**: `<leader>e` (Snacks explorer), `<leader>ff` (files), `<leader>fr` (recent)
-- **Search**: `<leader>/` (grep), `<leader>sh` (help)
-- **Buffers**: `<leader>,` (Snacks buffer picker)
-- **Git**: `<leader>gc` (commits), `<leader>gb` (branches)
-- **LSP**: `gd` (definition), `gr` (references), `K` (hover)
-- **AI**: `:CopilotChat` and `:Copilot`; see `lua/plugins/extra/ai.lua`
+## Boundaries
 
-### Zsh Functions
-Custom functions in `zsh/functions/`, `zsh/functions.zsh`, and `zsh/git.zsh`:
-
-- `wt-pull-all` - Fetch, add worktrees for unmerged remote branches, fast-forward every worktree, verify the default branch, and prune merged worktrees
-- `c` - Quick directory navigation
-- `h` - Command history search
-- `yy` - Yazi file manager with directory change
-- `zfetch` - Plugin fetcher
-
-### Git Hooks
-Template hooks in `git/templates/hooks/`:
-
-- `post-checkout` - Track recent branches
-- `post-merge` - Track recent merges
-- `pre-commit` - Dispatch the gitleaks secret scan and JSCS/JSHint checks
-- `pre-push` - Dispatch any `*.pre-push` hooks in `git/hooks/`
-
-## Hands Off
-
-- **NEVER** modify the Claude Code status line configuration (`~/.claude/settings.json` `statusLine` block) — the user manages this themselves
-
-## Security & Best Practices
-
-### Security
-
-- **NEVER** commit secrets or API keys
-- **NEVER** log or expose credentials
-- **NEVER** hardcode the username in paths (e.g. `/Users/username/...`) — always use `$HOME` or `~` instead
-- **Git signing**: Optional account profiles configure 1Password SSH agent signing
-- **SSH agent**: Configuration lives in `config/1Password/ssh/agent.toml`
-- **compinit**: Startup uses `-C`; do not assume it performs a daily security check
-
-### Performance
-
-- **Shell startup**: Measure locally; avoid unverified timing claims
-- **Lazy loading**: Plugins load on events, not at startup
-- **Completions**: Guard new external command invocations behind existence checks
-- **Caching**: Use caching where possible (compinit, plugin managers)
-
-### Compatibility
-
-- **Platform**: macOS (darwin)
-- **Shell**: Zsh interactively; installer scripts use Bash
-- **Terminal**: Ghostty
-- **Package manager**: Homebrew
-
-## Configuration boundaries
-
-- The general linker skips existing configuration paths; selected managed integrations reconcile their own links.
-- Personal skills are maintained outside dotfiles in the skills repository.
-- lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories. Specs directly under `lua/plugins/` are not imported by this setup.
-- Use [README.md](README.md), [Claude profiles](claude/PROFILES.md) and [plan-manager integration](docs/plan-manager.md) for current setup details.
-
-## Working With This Repository
-
-### Before Making Changes
-
-1. Read existing code and follow patterns
-2. Check if tools/libraries are already installed (see Brewfile)
-3. Review the relevant README and integration guide under `docs/`
-4. Test changes in a new shell/nvim instance before committing
-
-### Adding Neovim Plugins
-
-1. Check if functionality already exists
-2. Prefer mini.nvim ecosystem when possible
-3. Create new file in appropriate `lua/plugins/` subdirectory
-4. Update `lazy-lock.json` by syncing in nvim
-5. Document in `lua/plugins/mini/mini.md` if using mini plugin
-
-### Modifying Shell Config
-
-1. Guard expensive operations with command checks
-2. Avoid duplicating existing functionality
-3. Test startup time with `time zsh -i -c exit`
-4. Source changes before committing: `source ~/.zshrc`
-
-## Getting Help
-
-- Issues/Feedback: https://github.com/hacker1db/dotfiles/issues
-- This is a personal dotfiles repo - adapt patterns to your own use case
+- Never modify the Claude Code status line: the `statusLine` block in `claude/settings.base.json`, `claude/statusline-command.sh`, or the generated `settings.json` in any Claude profile. The user manages it.
+- Personal skills live in the [skills repository](https://github.com/hacker1db/skills), cloned to `$HOME/Developer/skills` and managed by `skillctl`. Read its README before changing skill behavior. Do not add skills here; `install/agent-profiles.zsh` runs `skillctl sync --global` for each Claude profile. `bin/install-caido-skills` is a separate, project-scoped installer.
+- `global/AGENTS.md` is the global agent policy for every repository. `claude/CLAUDE.md`, `codex/AGENTS.md`, and `copilot/copilot-instructions.md` are symlinks to it, so edit only `global/AGENTS.md`, and only when asked.
+- Plan-manager integration is described in [docs/plan-manager.md](docs/plan-manager.md).
