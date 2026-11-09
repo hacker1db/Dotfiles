@@ -51,6 +51,7 @@ function g() {
 }
 
 alias gcc='git-clean-merged'
+alias wtm='wt main'
 
 function cob() {
   wt switch --create "$@"
