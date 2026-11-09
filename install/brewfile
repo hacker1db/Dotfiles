@@ -355,6 +355,8 @@ cask "chatgpt"
 cask "claude"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
+# Brings the power of Copilot coding agent directly to your terminal
+cask "copilot-cli"
 # Utilities designed to make common development tasks easier
 cask "devtoys"
 # Provides developers secure tunnels to share local web services
