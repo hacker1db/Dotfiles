@@ -1,6 +1,6 @@
 # ai-usage ownership rules (see projects.example.yaml in the ai-usage repo).
 #
-# Built-in rule: a repo whose GitHub owner is a user account is "personal"; a repo owned by an
+# Built-in rule: a repo whose GitHub owner is a user account is "personal"; a repo owned by a
 # GitHub organization, or with no GitHub remote, is "org". Add labels below
 # only for exceptions; the most specific match wins (repos, then paths, then owners). Setting
 # default: turns the built-in rule off. Edits apply on the dashboard's next refresh.
