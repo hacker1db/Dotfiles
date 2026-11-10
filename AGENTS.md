@@ -225,7 +225,7 @@ Template hooks in `git/templates/hooks/`:
 
 - `post-checkout` - Track recent branches
 - `post-merge` - Track recent merges
-- `pre-commit` - Dispatch the gitleaks secret scan and JSCS/JSHint checks
+- `pre-commit` - Dispatch the JSCS/JSHint checks
 - `pre-push` - Dispatch any `*.pre-push` hooks in `git/hooks/`
 
 ## Hands Off

@@ -97,8 +97,6 @@ brew "gh"
 brew "git"
 # GitHub Model Context Protocol server for AI tools
 brew "github-mcp-server"
-# Audit git repos for secrets
-brew "gitleaks"
 # Render markdown on the CLI
 brew "glow"
 # Open source programming language to build simple/reliable/efficient software
