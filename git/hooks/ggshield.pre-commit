@@ -29,7 +29,7 @@ MSG
 	exit 1
 }
 
-ref="${GITGUARDIAN_PERSONAL_OP_REF:-op://Automation/GitGuardian Personal/credential}"
+ref="${GITGUARDIAN_PERSONAL_OP_REF:-op://Automation/GG Scan Token/credential}"
 case $ref in
 	op://*\?*) blocked "GITGUARDIAN_PERSONAL_OP_REF must not contain query parameters." ;;
 	op://*) ;;
