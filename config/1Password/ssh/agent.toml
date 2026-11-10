@@ -1,4 +1,8 @@
 [[ssh-keys]]
+item = "Github Work"
+vault = "Work"
+
+[[ssh-keys]]
 item = "Github personal"
 vault = "Automation"
 
@@ -9,7 +13,3 @@ vault = "Work"
 [[ssh-keys]]
 item = "Ai Server LAB"
 vault = "Automation"
-
-[[ssh-keys]]
-item = "Github Work"
-vault = "Work"
