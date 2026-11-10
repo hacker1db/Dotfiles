@@ -97,7 +97,7 @@ The repository installs unchanged on many machines.
 
 ## Security
 
-- Never commit, log, or expose secrets, API keys, or credentials. The gitleaks pre-commit hook blocks commits that contain them, and CI runs TruffleHog.
+- Never commit, log, or expose secrets, API keys, or credentials. The GitGuardian pre-commit hook blocks them in personal repos, and CI runs TruffleHog.
 - Never write SSH key files to disk, including public keys for `IdentityFile` pinning. Keys live only in a password manager and are served by its SSH agent. Fix key selection through the password manager, not through files in `~/.ssh`.
 - Git signs with SSH keys from that agent. The signing key is set in `~/.gitconfig-local`.
 - Unattended or service-account access belongs in the fleet-manager repository, not here.
