@@ -1,0 +1,24 @@
+#!/bin/sh
+# Scans staged changes with GitGuardian using the personal account only. The dispatcher runs this
+# for repos on the hacker1db profile; it never falls back to the machine's default (work) login.
+
+command -v ggshield >/dev/null 2>&1 || {
+	echo "ggshield not found; install it with: brew install gitguardian/tap/ggshield" >&2
+	exit 1
+}
+
+key="${GITGUARDIAN_PERSONAL_API_KEY:-}"
+if [ -z "$key" ] && command -v security >/dev/null 2>&1; then
+	key=$(security find-generic-password -s ggshield-personal -w 2>/dev/null) || key=""
+fi
+if [ -z "$key" ]; then
+	cat >&2 <<'MSG'
+No personal GitGuardian token. Create one with the "scan" scope in your personal workspace at
+https://dashboard.gitguardian.com, then store it:
+  security add-generic-password -U -a "$USER" -s ggshield-personal -w
+or export GITGUARDIAN_PERSONAL_API_KEY. The commit is blocked until then.
+MSG
+	exit 1
+fi
+
+GITGUARDIAN_API_KEY="$key" GITGUARDIAN_INSTANCE=https://dashboard.gitguardian.com exec ggshield secret scan pre-commit "$@"
