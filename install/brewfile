@@ -11,6 +11,7 @@ tap "clerk/stable"
 tap "derailed/k9s", trusted: true
 tap "fsouza/prettierd"
 tap "gitguardian/tap", trusted: true
+tap "hacker1db/tap", trusted: true
 tap "hashicorp/tap", trusted: true
 tap "homebrew/bundle"
 tap "homebrew/cask-fonts"
@@ -309,6 +310,10 @@ brew "hashicorp/tap/packer"
 brew "hashicorp/tap/terraform", link: false
 # Vault
 brew "hashicorp/tap/vault"
+# Local dashboard and reports for AI coding tool usage
+brew "hacker1db/tap/ai-usage"
+# Loopback proxy that signs Azure AI Foundry requests with an Entra token
+brew "hacker1db/tap/foundry-entra-proxy"
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
