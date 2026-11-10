@@ -1,6 +1,12 @@
 #!/bin/sh
-# Scans staged changes with GitGuardian using the personal account only. The dispatcher runs this
-# for repos on the hacker1db profile; it never falls back to the machine's default (work) login.
+# Scans staged changes with GitGuardian using the personal account only, and only for repos whose
+# origin is a personal owner. Every other repo (including work remotes) is skipped, so work code is
+# never sent to the personal workspace. It never falls back to the machine's default (work) login.
+# Override the owner match with GITGUARDIAN_PERSONAL_REMOTES (an extended regex).
+
+personal='github\.com[:/](hacker1db|zerobitconsulting)/|^git@(github-hacker1db|hb1):'
+origin=$(git remote get-url origin 2>/dev/null) || exit 0
+printf '%s\n' "$origin" | grep -qiE "${GITGUARDIAN_PERSONAL_REMOTES:-$personal}" || exit 0
 
 command -v ggshield >/dev/null 2>&1 || {
 	echo "ggshield not found; install it with: brew install gitguardian/tap/ggshield" >&2
