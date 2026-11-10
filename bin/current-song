@@ -1,0 +1,40 @@
+#!/bin/bash
+# Reports macOS system Now Playing, including browser media.
+# Default: "Title - Artist" while playing, empty when paused or silent.
+# --json: {app,song,state,artwork} for playing or paused media.
+# Artwork is base64 from the same snapshot, not a separate player query.
+# macOS keeps one media session, owned by the last app touched, so a paused
+# browser video can mask Spotify; a non-playing snapshot asks Spotify directly.
+
+np=$(nowplaying-cli get --json title artist playbackRate clientBundleIdentifier artworkData 2>/dev/null) || np=""
+np=$(jq -c '
+  select((.title // "") != "") |
+  {
+    app: (.clientBundleIdentifier // ""),
+    song: ([.title, .artist] | map(select(. != null and . != "")) | join(" - ") | .[0:50]),
+    state: (if .playbackRate == null or .playbackRate > 0 then "playing" else "paused" end),
+    artwork: (.artworkData // "")
+  }
+' <<<"$np" 2>/dev/null) || np=""
+
+state=""
+[ -n "$np" ] && state=$(jq -r '.state // empty' <<<"$np" 2>/dev/null)
+
+if [ "$state" != "playing" ]; then
+  spotify=$(osascript \
+    -e 'tell application "Spotify"' \
+    -e 'if running and player state is playing then return name of current track & " - " & artist of current track' \
+    -e 'end tell' 2>/dev/null)
+  if [ -n "$spotify" ]; then
+    np=$(jq -cn --arg song "${spotify:0:50}" \
+      '{app: "com.spotify.client", song: $song, state: "playing", artwork: ""}')
+  fi
+fi
+
+[ -n "$np" ] || exit 0
+
+if [ "${1:-}" = "--json" ]; then
+  printf '%s\n' "$np"
+else
+  jq -r 'select(.state == "playing").song // empty' <<<"$np"
+fi

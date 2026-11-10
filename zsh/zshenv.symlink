@@ -1,4 +1,4 @@
-export DOTFILES="$(dirname "$(dirname "$(readlink "${(%):-%N}")")")"
+export DOTFILES="${${(%):-%N}:A:h:h}"
 export CACHEDIR="$HOME/.local/share"
 export VIM_TMP="$HOME/.vim-tmp"
 # add a config file for ripgrep
@@ -11,14 +11,7 @@ export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
 
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
 
-fpath=(
-    $DOTFILES/zsh/functions
-    /usr/local/share/zsh/site-functions
-    $fpath
-    /opt/homebrew/share/zsh/functions
-)
-typeset -U fpath
-fpath=(${^fpath}(N-/))
+source "$DOTFILES/zsh/fpath"
 
 typeset -aU path
 

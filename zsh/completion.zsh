@@ -31,6 +31,12 @@ if command -v skillctl &> /dev/null; then
     unset _skillctl_completion
 fi
 
+# t3 completion
+if command -v t3 &> /dev/null; then
+    _t3_completion="$(t3 --completions zsh 2>/dev/null)" && [[ -n $_t3_completion ]] && eval "$_t3_completion"
+    unset _t3_completion
+fi
+
 # Moved auto help load stuff for me
 if [[ -n $HOMEBREW_PREFIX && -r "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
     source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"

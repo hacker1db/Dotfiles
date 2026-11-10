@@ -1,5 +1,15 @@
-export DOTFILES=$HOME/.dotfiles/main
+if [[ -o interactive ]]; then
+    for _zsh_module_dir in "${module_path[@]}"; do
+        if [[ $_zsh_module_dir == */Cellar/zsh/"$ZSH_VERSION"/* && ! -d $_zsh_module_dir ]]; then
+            exec "${_zsh_module_dir%%/Cellar/zsh/*}/bin/zsh" -i
+        fi
+    done
+    unset _zsh_module_dir
+fi
+
+export DOTFILES="${${(%):-%N}:A:h:h}"
 export ZSH=$DOTFILES/zsh
+source "$ZSH/fpath"
 
 if [[ -d $DOTFILES/zsh/functions ]]; then
     for func in $DOTFILES/zsh/functions/*(:t); autoload -U $func

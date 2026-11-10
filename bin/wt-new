@@ -1,0 +1,33 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+usage() { print -u2 "Usage: ${0:t} [--json] <branch> [base]"; exit 2 }
+
+json=0
+[[ "${1:-}" == --json ]] && { json=1; shift }
+(( $# >= 1 && $# <= 2 )) || usage
+branch="$1" base="${2:-}"
+
+src="$(git rev-parse --show-toplevel)"
+typeset -a args=(switch --create "$branch" --no-cd --format json)
+[[ -n "$base" ]] && args+=(--base "$base")
+result="$(wt -C "$src" "${args[@]}")"
+dest="$(jq -r '.path // empty' <<<"$result")"
+[[ -n "$dest" && -d "$dest" ]] || { print -u2 "wt did not report a worktree path"; exit 1 }
+
+typeset -a copied=()
+typeset file
+while IFS= read -r -d '' file; do
+    [[ "$file" == */ || "${file:t}" != .env* ]] && continue
+    [[ -e "$dest/$file" ]] && continue
+    mkdir -p "$dest/${file:h}"
+    cp -p "$src/$file" "$dest/$file"
+    copied+=("$file")
+done < <(git -C "$src" ls-files -z --others --ignored --exclude-standard --directory)
+
+if (( json )); then
+    jq -cn --arg path "$dest" --arg branch "$branch" '{path: $path, branch: $branch, copied: $ARGS.positional}' --args -- "${copied[@]}"
+else
+    print "Created $branch at $dest"
+    (( ${#copied} )) && print "Copied ignored env files: ${(j:, :)copied}"
+fi
