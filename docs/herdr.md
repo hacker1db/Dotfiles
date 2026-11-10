@@ -103,6 +103,7 @@ After `ctrl-a`:
 | `p` | Paste | `paste-buffer` |
 | `g` | lazygit popup | `display-popup lazygit` |
 | `G` | gh dash popup | `display-popup gh dash` |
+| `u` | Pick URLs from the pane and open them | tmux-fzf-url `u` |
 | `w`, `W` | New branch worktree | |
 | `P` | Toggle the pull requests panel | |
 | `T` | Toggle the plans panel | |
@@ -119,6 +120,11 @@ The `prefix` mod is adapted from Herdr's
 [tmux-prefix example](https://github.com/herdrdev/herdr-layout-examples/tree/master/tmux-prefix)
 (Apache-2.0). It runs `hc` to send literal keys and to start the lazygit and
 gh dash popups.
+
+`ctrl-a u` replaces the tmux-fzf-url plugin. It opens `bin/herdr-fzf-url` in a
+popup, which reads the focused terminal's screen and last 2000 lines of history
+with `hc read` (`HERDR_FZF_URL_LINES` changes the count), lists the URLs newest
+first in fzf, and opens each selected one with `open`. `tab` selects several.
 
 ## Right-hand panel
 

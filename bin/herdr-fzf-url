@@ -1,0 +1,23 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+(( $# == 1 )) || { print -u2 "Usage: ${0:t} <terminal>"; exit 2 }
+command -v hc >/dev/null 2>&1 || { print -u2 "hc is not installed"; exit 1 }
+command -v fzf >/dev/null 2>&1 || { print -u2 "fzf is not installed"; exit 1 }
+
+typeset -a urls picked
+urls=(${(f)"$(
+    hc read --lines "${HERDR_FZF_URL_LINES:-2000}" "$1" |
+        grep -oE '(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]*[-A-Za-z0-9+&@#/%=~_|]|www\.[-A-Za-z0-9+&@#/%?=~_|!:,.;]*[-A-Za-z0-9+&@#/%=~_|]' |
+        tail -r | awk '!seen[$0]++'
+)"})
+
+(( ${#urls} )) || { print "No URLs in $1"; sleep 1; exit 0 }
+
+picked=(${(f)"$(print -rl -- $urls | fzf --multi --exit-0 --no-preview --border-label=' URLs ' --prompt='URL> ')"}) || exit 0
+
+typeset url
+for url in $picked; do
+    [[ "$url" == www.* ]] && url="https://$url"
+    open "$url"
+done

@@ -1,8 +1,9 @@
 import { View, div } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
-import { closeOverlay, focused, hc, layout, nextCommand, notify, openOverlay, panes, props, run, shared, theme } from "herdr";
+import { appHome, closeOverlay, exec, focused, hc, layout, nextCommand, notify, openOverlay, panes, props, run, shared, theme } from "herdr";
 
 const REPEAT_MS = 500;
+const RESOLVE_BIN = 'cd -P "$1" && cd ../../.. && printf %s "$PWD/bin/herdr-fzf-url"';
 
 const BINDINGS = [
   ["c", "New tab", "tab.new"],
@@ -39,6 +40,7 @@ const BINDINGS = [
   ["p", "Paste", "terminal.paste"],
   ["g", "lazygit", "@popup", ["lazygit"]],
   ["G", "gh dash", "@popup", ["gh", "dash"]],
+  ["u", "Open a URL", "@urls"],
   ["w", "New branch worktree", "@worktree"],
   ["W", "New branch worktree", "@worktree"],
   ["P", "Pull requests", "@panel", "pulls"],
@@ -144,6 +146,21 @@ export default class Prefix extends View {
     });
   }
 
+  urls(cx) {
+    const terminal = focused()?.terminal;
+    if (!terminal) return this.dismiss();
+    this.busy = true;
+    cx.notify();
+    cx.spawn(async () => {
+      const bin = await exec("/bin/sh", ["-c", RESOLVE_BIN, "sh", `${appHome()}/mods/prefix`]);
+      if (bin.code !== 0) {
+        notify({ title: "Could not find herdr-fzf-url", body: bin.stderr.trim(), level: "error" });
+        return this.dismiss();
+      }
+      this.popup([bin.stdout, terminal], cx);
+    });
+  }
+
   act(binding, cx) {
     const [, , command, args = {}, repeatable = false] = binding;
     switch (command) {
@@ -152,6 +169,7 @@ export default class Prefix extends View {
       case "@panel": this.dismiss(); return togglePanel(args);
       case "@worktree": this.dismiss(); return run("mod.open", { name: "new-branch" });
       case "@popup": return this.popup(args, cx);
+      case "@urls": return this.urls(cx);
     }
     if (!repeatable) this.dismiss();
     run(command, args);
