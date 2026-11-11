@@ -162,6 +162,26 @@ install_fleet() {
     CLAUDE_CONFIG_DIR="$dir" fleet install </dev/null >/dev/null || problem "fleet install failed for $dir"
 }
 
+sync_t3_claude() {
+    [[ -f "$t3_settings" ]] || return 0
+    local want
+    want="$(jq --arg bin "claude-$1" --arg home "~/.claude-$1" --arg name ".claude-$1" --arg profile "$1" '
+        if (.providerInstances | type) == "object" then
+            .providerInstances |= with_entries(
+                (.value.config.homePath // "") as $h
+                | if .value.driver == "claudeAgent" and (($h | contains($name)) or ($profile == "personal" and ($h == "" or $h == "~/.claude")))
+                then .value.config += {homePath: $home, binaryPath: $bin}
+                else . end)
+        else . end' "$t3_settings" 2>/dev/null)" || { problem "Could not parse $t3_settings"; return }
+    [[ "$want" != "$(jq . "$t3_settings")" ]] || return 0
+    if [[ "$check" -eq 1 ]]; then
+        problem "T3 Code: a Claude instance for $1 has the wrong home or binary in $t3_settings"
+    else
+        print -r -- "$want" > "$t3_settings.tmp" && cat "$t3_settings.tmp" > "$t3_settings" && rm "$t3_settings.tmp" &&
+            print "Pointed the T3 Code Claude $1 instance at ~/.claude-$1 (restart T3 Code to apply)"
+    fi
+}
+
 [[ ! -L "$generated" && ! -L "${generated:h}" ]] || die "Refusing symlinked generated directory: $generated"
 [[ "$check" -eq 1 ]] || { mkdir -p "$generated"; chmod 700 "$generated" }
 
@@ -193,6 +213,7 @@ for profile in personal subscription foundry; do
         [[ -f "$target" && "$(jq -S . "$target")" == "$want" ]] || problem "$profile: generated settings are stale"
         [[ -d "$dir/skills" && ! -L "$dir/skills" ]] || problem "$profile: $dir/skills must be a real directory"
         link_profile_items "$dir" "$profile"
+        sync_t3_claude "$profile"
         continue
     fi
 
@@ -218,6 +239,7 @@ for profile in personal subscription foundry; do
     fi
     install_plugins "$dir" "$want"
     install_fleet "$dir"
+    sync_t3_claude "$profile"
     print "Profile ready: claude $profile ($dir)"
 done
 

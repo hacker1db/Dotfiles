@@ -46,6 +46,8 @@ There are two ways for a tool to select a profile:
 1. Run a launcher as the Claude binary. This is the simplest option and needs no environment setup.
 2. Run `~/.local/bin/claude` with `CLAUDE_CONFIG_DIR` set to the profile dir.
 
+When `~/.t3/userdata/settings.json` exists, the installer points each T3 Code Claude instance at its profile: an instance whose home mentions `.claude-<profile>` gets that home and the `bin/claude-<profile>` launcher, and the default instance with no home (or `~/.claude`) becomes personal, like `cc`. `--check` reports drift. Restart T3 Code afterwards.
+
 The Foundry profile also needs a working `az login`. Its resource and model come from its settings file, not from the environment.
 
 `~/.claude`, the legacy config dir, was removed on 2026-10-18. Dotfiles never writes there. If it reappears, a session was launched without `CLAUDE_CONFIG_DIR`.
