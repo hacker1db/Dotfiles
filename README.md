@@ -2,6 +2,10 @@
 
 Personal macOS development configuration for Zsh, Neovim, tmux, Ghostty, Git, and AI coding tools. Installation is split into scripts under `install/`; application settings live under `config/`.
 
+![Neovim, file tree, and Git log in tmux](docs/screenshot.png)
+
+![Dotfiles demo](docs/demo.gif)
+
 ## Installation
 
 On a new machine, nothing needs to be set up first. The repository is cloned bare with one worktree per branch, the same layout `bin/git-bare-clone` creates. That script is not on `PATH` yet, so clone by hand:
@@ -211,3 +215,14 @@ git diff --check
 ```
 
 Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh` (links target `~/.dotfiles/main` unless `DOTFILES` says otherwise). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` loops plus TruffleHog, which fails on any finding.
+
+## Screenshots
+
+`docs/screenshot.png` and `docs/demo.gif` are recorded with [VHS](https://github.com/charmbracelet/vhs) (`brew install vhs`), which is not in the Brewfile. Regenerate them from the worktree root:
+
+```zsh
+vhs docs/screenshot.tape
+vhs docs/demo.tape
+```
+
+The tapes need `tmux`, `nvim`, `eza`, `bat`, and the JetBrainsMono Nerd Font. Both record the current checkout, so the branch name and recent commits appear in the output; record from `main` for the published images.
