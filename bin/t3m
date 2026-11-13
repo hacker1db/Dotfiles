@@ -1,0 +1,359 @@
+#!/usr/bin/env bash
+# t3m - fzf menus and shortcuts for the T3 Code CLI (`t3`).
+#
+# Usage:
+#   t3m                              Main menu (pick an action)
+#   t3m projects|p                   Pick a project, then act on it
+#   t3m threads|ls [PROJECT]         Pick a thread (all projects, or one), then act on it
+#   t3m new|n [PROJECT] [MSG...]     Start a thread; prompts for anything missing
+#        [--model SLUG] [--provider ID] [--worktree REF] [--branch NAME] [--wait] [--pick-model]
+#   t3m send|s [THREAD] [MSG...]     Send a message to a thread [--wait]
+#   t3m show [THREAD]                Show a thread's state and latest messages
+#   t3m web [THREAD]                 Open a thread in the browser (works with the mobile/web app)
+#   t3m add [PATH] [--title T]       Add a project (default: current directory)
+#   t3m rename [PROJECT] [TITLE]     Rename a project
+#   t3m rm [PROJECT]                 Remove a project (asks first)
+#   t3m open [PROJECT]               Open a project in the desktop app
+#   t3m pair                         Show a QR code to pair a phone
+#   t3m help
+#
+# Anything else is passed straight to `t3` (e.g. `t3m status`, `t3m service restart`).
+# PROJECT is a project id, title, or a path inside a project. THREAD is a thread id.
+# Requires: t3, fzf, sqlite3, python3. Reads T3's state database read-only.
+
+set -euo pipefail
+
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/$(basename "${BASH_SOURCE[0]}")"
+T3_HOME="${T3CODE_HOME:-$HOME/.t3}"
+DB="$T3_HOME/userdata/statev2.sqlite"
+MANIFEST="$T3_HOME/userdata/model-manifest.json"
+FZF_OPTS=(--height=60% --reverse --border=rounded --info=inline)
+
+die() { printf 't3m: %s\n' "$*" >&2; exit 1; }
+info() { printf '\033[90m%s\033[0m\n' "$*" >&2; }
+need() { command -v "$1" >/dev/null 2>&1 || die "missing dependency: $1"; }
+usage() { sed -n '2,22p' "$SELF" | sed 's/^# \{0,1\}//'; }
+
+# --- data -------------------------------------------------------------------
+
+sql() {
+  [ -r "$DB" ] || die "T3 state database not found: $DB"
+  sqlite3 -separator $'\t' "file:$DB?mode=ro" "$1"
+}
+
+q() { printf "'%s'" "${1//\'/\'\'}"; }  # SQL string literal
+
+# id<TAB>title<TAB>workspace root, most recently updated first.
+data_projects() {
+  sql "SELECT project_id, title, workspace_root FROM projection_projects
+       WHERE deleted_at IS NULL AND archived_at IS NULL
+       ORDER BY coalesce(pinned_at, '') DESC, updated_at DESC"
+}
+
+# id<TAB>project<TAB>title<TAB>updated, top-level threads only. $1 = optional project id.
+data_threads() {
+  local where=""
+  [ -n "${1:-}" ] && where="AND t.project_id = $(q "$1")"
+  sql "SELECT t.thread_id, coalesce(p.title, '-'), replace(t.title, char(9), ' '),
+              substr(replace(t.updated_at, 'T', ' '), 1, 16)
+       FROM orchestration_v2_projection_threads t
+       LEFT JOIN projection_projects p USING (project_id)
+       WHERE t.deleted_at IS NULL AND t.archived_at IS NULL
+         AND json_extract(t.payload_json, '$.lineage.parentThreadId') IS NULL $where
+       ORDER BY t.updated_at DESC"
+}
+
+# provider<TAB>model for current models.
+data_models() {
+  [ -r "$MANIFEST" ] || return 0
+  python3 -I - "$MANIFEST" <<'PY'
+import json, sys
+m = json.load(open(sys.argv[1])).get("manifest", {})
+for provider, models in m.get("currentModels", {}).items():
+    for slug in models:
+        print(f"{provider}\t{slug}")
+PY
+}
+
+# Resolve a project id, title, or path to a project id.
+resolve_project() {
+  local arg="$1" abs id
+  id="$(data_projects | awk -F'\t' -v a="$arg" '$1 == a || $2 == a { print $1; exit }')"
+  if [ -z "$id" ] && [ -d "$arg" ]; then
+    abs="$(cd -- "$arg" && pwd -P)"
+    # Longest workspace root containing the path.
+    id="$(data_projects | awk -F'\t' -v p="$abs" '
+      index(p "/", $3 "/") == 1 && length($3) > best { best = length($3); id = $1 }
+      END { if (id != "") print id }')"
+  fi
+  [ -n "$id" ] || die "no T3 project matches '$arg'"
+  printf '%s\n' "$id"
+}
+
+project_field() {  # $1 = id, $2 = field number (2 title, 3 root)
+  data_projects | awk -F'\t' -v id="$1" -v f="$2" '$1 == id { print $f; exit }'
+}
+
+# --- pickers ----------------------------------------------------------------
+
+pick_project() {
+  local line
+  line="$(data_projects | fzf "${FZF_OPTS[@]}" --delimiter=$'\t' --with-nth=2,3 \
+    --prompt='project> ' --header='enter: select' \
+    --preview "$(printf '%q' "$SELF") _preview-project {1}" --preview-window=right,55%)" \
+    || die "no project selected"
+  cut -f1 <<<"$line"
+}
+
+pick_thread() {  # $1 = optional project id
+  local line
+  line="$(data_threads "${1:-}" | fzf "${FZF_OPTS[@]}" --delimiter=$'\t' --with-nth=4,2,3 \
+    --prompt='thread> ' --header='enter: select · ctrl-/: toggle preview' \
+    --bind 'ctrl-/:toggle-preview' \
+    --preview "t3 thread show {1} --messages 3 2>&1" --preview-window=right,60%,wrap)" \
+    || die "no thread selected"
+  cut -f1 <<<"$line"
+}
+
+pick_model() {  # prints "provider<TAB>model"
+  data_models | fzf "${FZF_OPTS[@]}" --delimiter=$'\t' --prompt='model> ' \
+    --header='enter: select · esc: project default' || true
+}
+
+menu() {  # $1 = prompt, rest = "key<TAB>label" lines; prints chosen key
+  local prompt="$1"; shift
+  printf '%s\n' "$@" | fzf "${FZF_OPTS[@]}" --height=~50% --delimiter=$'\t' --with-nth=2 \
+    --prompt="$prompt> " --no-sort | cut -f1
+}
+
+read_message() {  # prompt for a message; empty input opens $EDITOR
+  local msg tmp
+  read -r -e -p "Message (empty = open \$EDITOR): " msg </dev/tty || true
+  if [ -z "$msg" ]; then
+    tmp="$(mktemp "${TMPDIR:-/tmp}/t3m-msg.XXXXXX")"
+    "${EDITOR:-vi}" "$tmp" </dev/tty >/dev/tty
+    msg="$(cat "$tmp")"; rm -f "$tmp"
+  fi
+  [ -n "${msg//[[:space:]]/}" ] || die "empty message"
+  printf '%s' "$msg"
+}
+
+confirm() {
+  local ans
+  read -r -p "$1 [y/N] " ans </dev/tty || true
+  [[ "$ans" =~ ^[Yy] ]]
+}
+
+# --- commands ---------------------------------------------------------------
+
+cmd_new() {
+  local project="" provider="" model="" worktree="" branch="" pick_m=0 msg=""
+  local -a extra=() words=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --model) model="$2"; shift 2 ;;
+      --provider) provider="$2"; shift 2 ;;
+      --worktree) worktree="$2"; shift 2 ;;
+      --branch) branch="$2"; shift 2 ;;
+      --wait|--json) extra+=("$1"); shift ;;
+      --pick-model|-m) pick_m=1; shift ;;
+      --title) extra+=(--title "$2"); shift 2 ;;
+      *) words+=("$1"); shift ;;
+    esac
+  done
+  if [ ${#words[@]} -gt 0 ]; then
+    project="$(resolve_project "${words[0]}")"; words=("${words[@]:1}")
+  else
+    project="$(pick_project)"
+  fi
+  if [ "$pick_m" = 1 ] && [ -z "$model" ]; then
+    local sel; sel="$(pick_model)"
+    [ -n "$sel" ] && { provider="$(cut -f1 <<<"$sel")"; model="$(cut -f2 <<<"$sel")"; }
+  fi
+  if [ ${#words[@]} -gt 0 ]; then msg="${words[*]}"; else msg="$(read_message)"; fi
+  local -a args=(thread start)
+  [ -n "$provider" ] && args+=(--provider "$provider")
+  [ -n "$model" ] && args+=(--model "$model")
+  [ -n "$worktree" ] && args+=(--worktree "$worktree")
+  [ -n "$branch" ] && args+=(--branch "$branch")
+  args+=("${extra[@]+"${extra[@]}"}" "$project" -)
+  info "t3 ${args[*]}  ($(project_field "$project" 2))"
+  printf '%s' "$msg" | t3 "${args[@]}"
+}
+
+cmd_send() {
+  local thread="" msg="" ; local -a extra=() words=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --wait|--json) extra+=("$1"); shift ;;
+      *) words+=("$1"); shift ;;
+    esac
+  done
+  if [ ${#words[@]} -gt 0 ]; then thread="${words[0]}"; words=("${words[@]:1}"); else thread="$(pick_thread)"; fi
+  if [ ${#words[@]} -gt 0 ]; then msg="${words[*]}"; else msg="$(read_message)"; fi
+  printf '%s' "$msg" | t3 thread send "${extra[@]+"${extra[@]}"}" "$thread" -
+}
+
+cmd_show() {
+  local thread="${1:-}"; [ -n "$thread" ] || thread="$(pick_thread)"
+  t3 thread show --messages "${T3M_MESSAGES:-10}" "$thread" | "${PAGER:-less}" -R
+}
+
+thread_link() {
+  t3 thread show --messages 0 --json "$1" | python3 -I -c 'import json,sys; print(json.load(sys.stdin)["thread"]["link"])'
+}
+
+cmd_web() {
+  local thread="${1:-}"; [ -n "$thread" ] || thread="$(pick_thread)"
+  local link; link="$(thread_link "$thread")" || die "could not get link for $thread"
+  info "$link"
+  open "$link" 2>/dev/null || xdg-open "$link"
+}
+
+cmd_add() {
+  local path="." ; local -a extra=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --title) extra+=(--title "$2"); shift 2 ;;
+      *) path="$1"; shift ;;
+    esac
+  done
+  path="$(cd -- "$path" && pwd -P)" || die "no such directory: $path"
+  t3 project add "${extra[@]+"${extra[@]}"}" "$path"
+}
+
+cmd_rename() {
+  local project title
+  if [ $# -gt 0 ]; then project="$(resolve_project "$1")"; shift; else project="$(pick_project)"; fi
+  if [ $# -gt 0 ]; then title="$*"; else read -r -e -p "New title [$(project_field "$project" 2)]: " title </dev/tty; fi
+  [ -n "$title" ] || die "empty title"
+  t3 project rename "$project" "$title"
+}
+
+cmd_rm() {
+  local project; if [ $# -gt 0 ]; then project="$(resolve_project "$1")"; else project="$(pick_project)"; fi
+  local name; name="$(project_field "$project" 2) ($(project_field "$project" 3))"
+  confirm "Remove T3 project $name? Files on disk are not touched." || die "cancelled"
+  if ! t3 project remove "$project"; then
+    confirm "It still has threads. Delete the project AND all its threads?" || die "cancelled"
+    t3 project remove --force "$project"
+  fi
+}
+
+cmd_open() {
+  local project; if [ $# -gt 0 ]; then project="$(resolve_project "$1")"; else project="$(pick_project)"; fi
+  t3 app "$(project_field "$project" 3)"
+}
+
+thread_actions() {
+  local thread="$1" action
+  action="$(menu "thread" \
+    $'show\tShow messages' $'send\tSend a message' $'web\tOpen in browser / web app' \
+    $'copy\tCopy thread id')" || return 0
+  case "$action" in
+    show) cmd_show "$thread" ;;
+    send) cmd_send "$thread" ;;
+    web) cmd_web "$thread" ;;
+    copy) printf '%s' "$thread" | pbcopy 2>/dev/null && info "copied $thread" || printf '%s\n' "$thread" ;;
+  esac
+}
+
+cmd_threads() {
+  local project=""; [ $# -gt 0 ] && project="$(resolve_project "$1")"
+  thread_actions "$(pick_thread "$project")"
+}
+
+cmd_projects() {
+  local project action
+  project="$(pick_project)"
+  action="$(menu "$(project_field "$project" 2)" \
+    $'threads\tBrowse threads' $'new\tStart a thread' $'newwt\tStart a thread in a new worktree' \
+    $'open\tOpen in desktop app' $'rename\tRename' $'rm\tRemove')" || return 0
+  case "$action" in
+    threads) thread_actions "$(pick_thread "$project")" ;;
+    new) cmd_new --pick-model "$project" ;;
+    newwt)
+      local base branch
+      read -r -e -p "Base ref [main]: " base </dev/tty; base="${base:-main}"
+      read -r -e -p "New branch name: " branch </dev/tty
+      [ -n "$branch" ] || die "branch name required"
+      cmd_new --pick-model --worktree "$base" --branch "$branch" "$project" ;;
+    open) cmd_open "$project" ;;
+    rename) cmd_rename "$project" ;;
+    rm) cmd_rm "$project" ;;
+  esac
+}
+
+cmd_menu() {
+  local action
+  action="$(menu "t3" \
+    $'threads\tBrowse threads (all projects)' \
+    $'projects\tBrowse projects' \
+    $'new\tStart a new thread' \
+    $'send\tSend a message to a thread' \
+    $'add\tAdd current directory as a project' \
+    $'open\tOpen a project in the desktop app' \
+    $'web\tOpen a thread in the browser' \
+    $'pair\tPair a phone (QR code)' \
+    $'status\tService and remote access status' \
+    $'restart\tRestart background service' \
+    $'doctor\tCheck and repair T3 data' \
+    $'update\tUpdate t3')" || return 0
+  case "$action" in
+    threads) cmd_threads ;;
+    projects) cmd_projects ;;
+    new) cmd_new --pick-model ;;
+    send) cmd_send ;;
+    add) cmd_add . ;;
+    open) cmd_open ;;
+    web) cmd_web ;;
+    pair) t3 pair ;;
+    status) t3 status ;;
+    restart) t3 service restart ;;
+    doctor) t3 doctor ;;
+    update) t3 update ;;
+  esac
+}
+
+# Internal helpers used by fzf previews and zsh completion.
+internal() {
+  case "$1" in
+    _projects) data_projects ;;
+    _threads) data_threads "${2:+$(resolve_project "$2")}" ;;
+    _models) data_models ;;
+    _preview-project)
+      local root; root="$(project_field "$2" 3)"
+      printf '\033[1m%s\033[0m\n%s\n\n' "$(project_field "$2" 2)" "$root"
+      git -C "$root" branch --show-current 2>/dev/null | sed 's/^/branch: /' || true
+      printf '\nRecent threads:\n'
+      data_threads "$2" | head -15 | awk -F'\t' '{ printf "  %s  %s\n", $4, $3 }' ;;
+  esac
+}
+
+main() {
+  need t3
+  local cmd="${1:-}"; [ $# -gt 0 ] && shift
+  case "$cmd" in
+    _*) internal "$cmd" "$@"; return ;;
+    -h|--help|help) usage; return ;;
+  esac
+  case "$cmd" in
+    ""|menu|projects|p|threads|ls|t|new|n|send|s|show|web|rename|rm|open) need fzf; need sqlite3 ;;
+  esac
+  case "$cmd" in
+    ""|menu)      cmd_menu ;;
+    projects|p)   cmd_projects ;;
+    threads|ls|t) cmd_threads "$@" ;;
+    new|n)        cmd_new "$@" ;;
+    send|s)       cmd_send "$@" ;;
+    show)         cmd_show "$@" ;;
+    web)          cmd_web "$@" ;;
+    add)          cmd_add "$@" ;;
+    rename)       cmd_rename "$@" ;;
+    rm)           cmd_rm "$@" ;;
+    open)         cmd_open "$@" ;;
+    *)            exec t3 "$cmd" "$@" ;;
+  esac
+}
+
+main "$@"
