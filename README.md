@@ -172,6 +172,10 @@ New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, 
 
 `.github/workflows/codeql.yml` runs CodeQL `security-extended` queries for GitHub Actions and JavaScript/TypeScript on pushes to `main`, on pull requests, and weekly. `.github/dependabot.yml` opens update pull requests for npm, NuGet, Docker, and pinned GitHub Actions. Every action is pinned to a commit SHA.
 
+## T3 Code
+
+Installation registers T3 providers for Claude personal, work subscription, and Foundry, plus default Codex and a Codex Foundry placeholder. It discovers additional Codex homes and reports missing profile settings as disabled entries. Run `bin/t3-config providers --check` to audit alignment. `client-settings.json` and `keybindings.json` are symlinked from `config/t3code/`; `settings.json` stays local. Credentials stay local. See [T3 Code configuration](docs/t3code.md) for setup and backup behavior.
+
 ## AI tools and shared instructions
 
 | Tool | Source | Installed instruction file |

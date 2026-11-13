@@ -272,5 +272,28 @@ else
     fi
 fi
 
+title "Configuring T3 Code"
+if [[ -d "$HOME/.t3" ]]; then
+    T3_USERDATA="$HOME/.t3/userdata"
+    mkdir -p "$T3_USERDATA"
+    for file in client-settings.json keybindings.json; do
+        destination="$T3_USERDATA/$file"
+        if [[ -e "$destination" && ! -L "$destination" ]]; then
+            backup="$(backup_path "$destination")"
+            mv "$destination" "$backup" && print "Backup: $backup"
+        fi
+        link_file "$DOTFILES/config/t3code/$file" "$destination"
+    done
+    T3_STATUS=0
+    python3 "$DOTFILES/bin/t3-config" providers --dotfiles-root "$DOTFILES" || T3_STATUS=$?
+    case "$T3_STATUS" in
+        0) ;;
+        2) warning "Some T3 provider profiles are disabled until provisioned; see the diagnostics above." ;;
+        *) error "T3 provider configuration failed."; LINK_FAILURE=1 ;;
+    esac
+else
+    info "Skipping T3 Code; ~/.t3 not found."
+fi
+
 [[ "$LINK_FAILURE" -eq 0 ]] || { error "Dotfiles linking needs attention; see the diagnostics above."; exit 1 }
 success "Linking complete"

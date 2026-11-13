@@ -1,0 +1,12 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "T3 keyboard shortcuts in the linked keybindings"
+condition = "AND"
+paths = ['''^config/t3code/keybindings\.json$''']
+regexTarget = "match"
+regexes = ['''^key": "mod\+shift\+(enter|arrowup|arrowdown)"$''']
