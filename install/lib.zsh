@@ -124,3 +124,44 @@ update_clean_checkout() {
             print "Could not update ${dir:t}; using existing copy"
     fi
 }
+
+op_agent_first_key() {
+    [[ -f "$1" ]] || return 0
+    awk '
+        /^[[:space:]]*\[\[ssh-keys\]\][[:space:]]*$/ { if (seen++) exit; next }
+        seen && /^[[:space:]]*(item|vault)[[:space:]]*=/ {
+            key = $0; sub(/^[[:space:]]*/, "", key); sub(/[[:space:]]*=.*/, "", key)
+            v = $0; sub(/^[^"]*"/, "", v); sub(/"[[:space:]]*$/, "", v); val[key] = v
+        }
+        END { print val["item"]; print val["vault"] }
+    ' "$1"
+}
+
+op_agent_put_first() {
+    local file="$1" tmp="$1.tmp"
+    mkdir -p "${file:h}" && chmod 700 "${file:h}" || return 1
+    [[ -f "$file" ]] || : > "$file"
+    OP_ITEM="$2" OP_VAULT="$3" awk '
+        function value(line) { sub(/^[^"]*"/, "", line); sub(/"[[:space:]]*$/, "", line); return line }
+        function flush() {
+            if (!open) return
+            sub(/\n+$/, "", block)
+            if (item == ENVIRON["OP_ITEM"] && vault == ENVIRON["OP_VAULT"]) { if (first == "") first = block }
+            else rest = rest "\n\n" block
+            open = 0; block = item = vault = ""
+        }
+        /^[[:space:]]*\[\[ssh-keys\]\][[:space:]]*$/ { flush(); open = 1; block = "[[ssh-keys]]"; next }
+        !open { pre = pre $0 "\n"; next }
+        {
+            block = block "\n" $0
+            if ($0 ~ /^[[:space:]]*item[[:space:]]*=/) item = value($0)
+            if ($0 ~ /^[[:space:]]*vault[[:space:]]*=/) vault = value($0)
+        }
+        END {
+            flush()
+            if (first == "") first = "[[ssh-keys]]\nitem = \"" ENVIRON["OP_ITEM"] "\"\nvault = \"" ENVIRON["OP_VAULT"] "\""
+            sub(/^\n+/, "", pre); sub(/\n+$/, "", pre)
+            printf "%s%s%s\n", (pre == "" ? "" : pre "\n\n"), first, rest
+        }
+    ' "$file" > "$tmp" && chmod 600 "$tmp" && mv -f "$tmp" "$file"
+}

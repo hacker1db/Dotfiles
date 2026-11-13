@@ -141,8 +141,8 @@ fi
 title "Configuring Git identity in $LOCAL_FILE"
 typeset key label value current
 typeset -a git_prompts=(
-    user.name "Name"
-    user.email "Email"
+    user.name "Git user name for commits"
+    user.email "Git email address for commits"
     github.user "GitHub username (the one account this machine uses)"
     user.signingkey "SSH signing public key from your password manager (blank to skip)"
     gpg.ssh.program "SSH signing program (blank for ssh-keygen)"
@@ -181,6 +181,32 @@ if [[ -n "$signing_key" ]]; then
         print -r -- "$signer_email $signing_key" >> "$signers"
         print "Trusted $signer_email's signing key in $signers"
     fi
+fi
+
+title "Configuring the 1Password SSH agent"
+OP_AGENT_TOML="$HOME/.config/1Password/ssh/agent.toml"
+typeset op_item op_vault op_current
+if [[ -L "$HOME/.config/1Password" || -L "${OP_AGENT_TOML:h}" || -L "$OP_AGENT_TOML" ]]; then
+    warning "$OP_AGENT_TOML is linked into a checkout; make it machine-owned with 'fleet op-agent -item <item> -vault <vault>' from fleet-manager"
+elif [[ "${DOTFILES_NONINTERACTIVE:-0}" != 1 && -t 0 ]]; then
+    op_current=("${(@f)$(op_agent_first_key "$OP_AGENT_TOML")}")
+    read -r "op_item?1Password item name of this machine's GitHub SSH key (blank to skip) [${op_current[1]:-}]: "
+    op_item="${op_item:-${op_current[1]:-}}"
+    if [[ -n "$op_item" ]]; then
+        read -r "op_vault?1Password vault holding \"$op_item\" [${op_current[2]:-}]: "
+        op_vault="${op_vault:-${op_current[2]:-}}"
+    fi
+    if [[ -z "$op_item" ]]; then
+        print "No GitHub key chosen; leaving $OP_AGENT_TOML as-is."
+    elif [[ -z "$op_vault" || "$op_item$op_vault" == *[\"\\]* ]]; then
+        warning "Skipped $OP_AGENT_TOML: give a vault, and no quotes or backslashes in either name"
+    elif op_agent_put_first "$OP_AGENT_TOML" "$op_item" "$op_vault"; then
+        print "Listed \"$op_item\" from vault \"$op_vault\" first in $OP_AGENT_TOML"
+    else
+        warning "Could not update $OP_AGENT_TOML"
+    fi
+else
+    print "Non-interactive run; leaving $OP_AGENT_TOML as-is."
 fi
 
 title "Checking Codex plan-library access"
