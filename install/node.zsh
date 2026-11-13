@@ -10,7 +10,7 @@ fi
 
 typeset -a tools=(
     "@azure/static-web-apps-cli" "@github/copilot" "@readwise/cli"
-    bmad-method eslint markdownlint-cli2 md-to-pdf
+    eslint markdownlint-cli2 md-to-pdf
     obsidian-headless # ob CLI: Obsidian Sync without the desktop app (servers)
     prettier typescript typescript-language-server vercel
 )

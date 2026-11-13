@@ -21,13 +21,10 @@ Tools seen asking for a password during an install. Revisit each one to decide w
 | `discord` cask | tools | Upgrade removes the `com.discord.discord.ShipIt` launchctl service | 2026-10-18 |
 | `1password` cask | tools | Homebrew still records 1Password 7.9 (`/Applications/1Password 7.app`) while the installed app is a self-updated 1Password 8; the upgrade fails to find the old app, then prompts. Fix once with `brew uninstall --cask --force 1password && brew install --cask --adopt 1password` | 2026-10-18 |
 | `gcloud-cli` cask | tools | Upgrade (449.0.0 to 589.0.0) removes the old `Caskroom/gcloud-cli/latest` files | 2026-10-18 |
-| `karabiner-elements` cask | tools | Upgrade runs the DriverKit `remove_files.sh` uninstall script as root | 2026-10-18 |
 | `krisp` cask | tools | Upgrade runs `pkgutil --forget ai.krisp.krispMac.pkg` as root | 2026-10-18 |
 | `microsoft-auto-update` cask | tools | Upgrade removes the `com.microsoft.update.agent` launchctl service and package files as root | 2026-10-18 |
-| `microsoft-edge` cask | tools | Upgrade runs `pkgutil --forget com.microsoft.edgemac` as root | 2026-10-18 |
 | `microsoft-teams` cask | tools | Upgrade removes package files as root | 2026-10-18 |
 | `obs` cask | tools | Upgrade removes old files as root | 2026-10-18 |
-| `wireshark-app` cask | tools | Upgrade removes package files as root | 2026-10-18 |
 | `zoom` cask | tools | Upgrade removes the `us.zoom.ZoomDaemon` launchctl service as root | 2026-10-18 |
 | `gpg-suite-no-mail` cask | tools | Not a password prompt: Homebrew's 2023.3 record points to a missing uninstall script. Fix once with `brew uninstall --cask --force gpg-suite-no-mail` | 2026-10-18 |
 | `mas install` (5 App Store apps) | tools | mas 7 runs installs through `sudo` | 2026-10-18 |
