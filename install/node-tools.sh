@@ -17,7 +17,6 @@ tools=(
   "@github/copilot"
   "@openai/codex-security"
   "@readwise/cli"
-  "bmad-method"
   "eslint"
   "markdownlint-cli2"
   "md-to-pdf"

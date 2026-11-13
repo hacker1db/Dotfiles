@@ -19,28 +19,20 @@ TAPS=(
   anchore/grype
   anchore/syft
   aquasecurity/trivy
-  arl/arl
   azure/functions
   azure/kubelogin
   brandonskerritt/rustscan
   caffix/amass
-  cantino/mcfly
-  dapr/tap
-  dart-lang/dart
   derailed/k9s
-  felixkratz/formulae
   gitguardian/tap
   hashicorp/tap
-  iina/mpv-iina
   jesseduffield/lazygit
   majd/repo
   mondoohq/mondoo
   noahgorstein/tap
-  planetscale/tap
   rcmdnk/file
   robscott/tap
   sst/tap
-  trufflesecurity/trufflehog
 )
 
 for tap in "${TAPS[@]}"; do
@@ -126,18 +118,11 @@ CASKS=(
   burp-suite-professional
   claude
   codex
-  cursor
-  dbeaver-community
   devtoys
   devtunnel
   discord
   drawio
   figma
-  flutter
-  flux-app
-  font-cascadia-code
-  font-caskaydia-cove-nerd-font
-  font-dejavu-sans-mono-nerd-font
   font-hack-nerd-font
   font-jetbrains-mono
   font-jetbrains-mono-nerd-font
@@ -146,25 +131,15 @@ CASKS=(
   font-symbols-only-nerd-font
   gcloud-cli
   ghostty
-  gpg-suite-no-mail
-  handbrake-app
   hiddenbar
-  httpie-desktop
   iina
-  karabiner-elements
   keycastr
   krisp
   kubecontext
   losslesscut
   menumeters
   microsoft-auto-update
-  microsoft-azure-storage-explorer
-  microsoft-edge
-  microsoft-remote-desktop
   microsoft-teams
-  netnewswire
-  notion
-  notion-mail
   obs
   obsidian
   podman-desktop
@@ -176,7 +151,6 @@ CASKS=(
   spotify
   todoist-app
   unetbootin
-  wireshark-app
   zen
   zoom
 )
