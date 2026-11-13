@@ -5,12 +5,10 @@
 # drawn with 1px luminous strokes, not fills; Monaspace labels.
 #
 # Complements (never duplicates) the macOS menu bar OR the tmux statusline:
-# frontmost app title in the center, fleet-driven agent state with an
-# attention chip, PRs awaiting review, Claude usage when running hot,
-# now-playing.
+# fleet-driven agent state with an attention chip, PRs awaiting review,
+# Claude usage when running hot, now-playing.
 #
 # Event flow (all push, polling only where no push exists):
-#   front_app_switched -> title
 #   fleet hook status files -> bin/sketchybar-fleet-watch (fswatch)
 #     -> fleet_state_change -> plugins/agents.sh (agents pill + chip)
 #   bin/claude-statusline tee -> claude_usage_update -> plugins/usage.sh
@@ -75,20 +73,6 @@ sketchybar --default \
 # ── Events ───────────────────────────────────────────────────────
 sketchybar --add event fleet_state_change \
   --add event claude_usage_update
-
-# ── Center: ❯ frontmost app ─────────────────────────────────────
-# Title floats on the glass (no chip) — the calm center's anchor.
-sketchybar --add item title center \
-  --set title \
-  icon.font="Symbols Nerd Font Mono:Regular:13.0" \
-  icon.drawing=off \
-  label.color="$FG_DIM" \
-  label.max_chars=64 \
-  scroll_texts=on \
-  background.drawing=off \
-  drawing=off \
-  script='sketchybar --set "$NAME" drawing=on label="❯ $INFO"' \
-  --subscribe title front_app_switched
 
 # ── Right: agents · attention chip · reviews · usage · music ─────
 # agents: calm = dim green robot (fleet healthy); alerts light the edge
