@@ -22,8 +22,9 @@ docs/         Integration guides
 `~/Developer/dotfiles` is a bare repository with one worktree per branch; `~/Developer/dotfiles/main` is the production checkout.
 
 - `main` must always work. Never edit or commit in the `main` checkout.
-- If the current worktree is on a feature branch, work there. Do not create another worktree or stack a branch for follow-up tasks; this overrides any global rule asking for a new worktree per task.
-- Starting from `main`, create a worktree and branch with `wt switch -c <branch>`.
+- Exactly one feature branch and worktree exists besides `main`, and all work goes there. The current one is `refactor/install-cleanup` (`~/Developer/dotfiles/refactor-install-cleanup`). This overrides any global rule asking for a new worktree or branch per task.
+- Never create another worktree or branch, and never stack branches. `dotfiles-use` points the machine at one worktree for testing; extra worktrees break that.
+- Start a new feature branch (`wt switch -c <branch>`) only after the current one is merged and its worktree removed, and only when the user asks.
 - Run every command from the worktree root with repo-relative paths. Paths under `~/Developer/dotfiles/main` validate `main`, not your changes.
 - Installed links (`~/.zshrc`, `~/.config/*`, `~/.git-templates`, and others) point at the selected checkout, `main` by default. Anything that writes through them, such as `Lazy sync` updating `lazy-lock.json` or `install.sh theme apply`, changes that checkout. Edit files in the worktree, never through `~/.config`.
 - `./install.sh use` points the installed links at the current worktree for every terminal on the machine. Ask before running it, and switch back afterward with `dotfiles-use` from `~/Developer/dotfiles/main`.
@@ -48,6 +49,9 @@ time zsh -i -c exit
 
 ### General
 
+- Every install step must be idempotent: running it again produces the same result and changes nothing that is already correct. Check current state before acting, and never append, duplicate, or re-prompt for something already done.
+- Do not add new scripts. Extend or refactor the existing ones (`install/*.zsh`, `install/lib.zsh`, `bin/`, `zsh/`) to keep the code modular, and share helpers through `install/lib.zsh`.
+- Do not add tests or test files. Validation is the syntax and lint checks under Validation.
 - Do not add code comments unless asked.
 - Follow existing patterns, and check for existing functionality before adding more.
 - Check `install/brewfile` and `install/tools.zsh` before assuming a tool is installed.
