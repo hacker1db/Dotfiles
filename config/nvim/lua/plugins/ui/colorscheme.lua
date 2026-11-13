@@ -8,7 +8,7 @@ return {
         local c = require("core.colors").colors
 
         require("eldritch").setup({
-            transparent = true,
+            transparent = false,
             terminal_colors = true,
             styles = {
                 comments = { italic = true },

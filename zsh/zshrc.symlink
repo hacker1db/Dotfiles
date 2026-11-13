@@ -7,7 +7,17 @@ if [[ -o interactive ]]; then
     unset _zsh_module_dir
 fi
 
-export DOTFILES="${${(%):-%N}:A:h:h}"
+# Derive DOTFILES from this file's real path only when ~/.zshrc is still the
+# symlink. Installers like `pnpm setup` rewrite ~/.zshrc as a plain copy, which
+# would resolve to $HOME/.. — fall back to the value ~/.zshenv already exported.
+_zshrc_path="${${(%):-%N}:A}"
+if [[ ${_zshrc_path:t} == zshrc.symlink ]]; then
+    export DOTFILES="${_zshrc_path:h:h}"
+elif [[ ! -f ${DOTFILES:-}/zsh/zshrc.symlink ]]; then
+    export DOTFILES="$HOME/.dotfiles/main"
+fi
+[[ -L ~/.zshrc ]] || print -u2 "~/.zshrc is not a symlink; restore it: ln -sf $DOTFILES/zsh/zshrc.symlink ~/.zshrc"
+unset _zshrc_path
 export ZSH=$DOTFILES/zsh
 source "$ZSH/fpath"
 
@@ -113,9 +123,14 @@ if [[ -x "$(command -v zoxide)" ]]; then
     eval "$(zoxide init zsh --hook pwd --cmd cd)"
 fi
 
-if [[ -x "$(command -v pnpm)" ]]; then
-    export PNPM_HOME="$HOME/Library/pnpm"
+# pnpm may be self-installed under PNPM_HOME, so key off the directory rather
+# than `command -v pnpm` (which can't see it until PATH is set). This replaces
+# the block `pnpm setup` would otherwise append to ~/.zshrc — don't run it.
+if [[ -d "${PNPM_HOME:=$HOME/Library/pnpm}" ]] || command -v pnpm &>/dev/null; then
+    export PNPM_HOME
     export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
+else
+    unset PNPM_HOME
 fi
 
 # Prefer the Homebrew-native Claude Code binary over the stale pnpm launcher.

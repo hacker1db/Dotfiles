@@ -1,0 +1,24 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+zmodload zsh/stat zsh/datetime
+
+command -v gh &> /dev/null || exit 0
+
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/tmux-pr-chip"
+ttl="${TMUX_PR_CHIP_TTL:-300}"
+mkdir -p "${cache:h}"
+
+refresh() {
+    local count
+    count="$(gh search prs --review-requested @me --state open --json number --limit 100 --jq length 2>/dev/null)" || return
+    [[ "$count" == <-> ]] && print -r -- "$count" > "$cache.tmp" && mv -f "$cache.tmp" "$cache"
+}
+
+if [[ ! -f "$cache" ]] || (( EPOCHSECONDS - $(zstat +mtime "$cache") > ttl )); then
+    touch "$cache"
+    refresh &!
+fi
+
+count="$(< "$cache")"
+[[ "$count" == <-> ]] && (( count > 0 )) || exit 0
+print -rn -- "#[range=user|prs]#[fg=#f1fc79] ${count}#[norange]"

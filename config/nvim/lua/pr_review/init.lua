@@ -18,7 +18,10 @@ local AGENTS = {
   { id = "claude-foundry", label = "Claude · Foundry", personal = false, skill = "/pr-review", argv = function(p) return { "claude-foundry", p } end },
 }
 local TIER_CACHE = vim.fn.stdpath("state") .. "/pr-review-tiers.json"
-local REVIEW_ROOT = vim.fn.expand("~/.local/state/herdr-pr-reviews")
+local REVIEW_ROOT = vim.fn.expand("~/.local/state/pr-reviews")
+local LEGACY_REVIEW_ROOT = vim.fn.expand("~/.local/state/herdr-pr-reviews")
+local CHECK_ORDER = { fail = 0, cancel = 0, pending = 1, pass = 2, skipping = 3 }
+local CHECK_ICON = { fail = "✗", cancel = "✗", pending = "●", pass = "✓", skipping = "–" }
 
 local function notify(msg, level)
   vim.notify(msg, level or vim.log.levels.INFO, { title = "PR review" })
@@ -129,9 +132,17 @@ local function classify(prs, on_progress, on_done)
   pump()
 end
 
-function M.review_dir(url)
+function M.review_dir(url, root)
   local pr = parse_url(url)
-  if pr then return ("%s/%s/%s/%s"):format(REVIEW_ROOT, pr.owner, pr.repo, pr.number) end
+  if pr then return ("%s/%s/%s/%s"):format(root or REVIEW_ROOT, pr.owner, pr.repo, pr.number) end
+end
+
+local function read_review(url)
+  local dir = M.review_dir(url)
+  if not dir then return nil end
+  local file = dir .. "/review.json"
+  if not vim.uv.fs_stat(file) then file = M.review_dir(url, LEGACY_REVIEW_ROOT) .. "/review.json" end
+  return read_json(file)
 end
 
 function M.resolve_url(arg, cb)
@@ -143,6 +154,7 @@ function M.resolve_url(arg, cb)
     end
     return cb(arg)
   end
+  if vim.b.pr_review_url then return cb(vim.b.pr_review_url) end
   local repo, number = vim.api.nvim_buf_get_name(0):match("^octo://([^/]+/[^/]+)/pull/(%d+)")
   if repo then return cb(("https://github.com/%s/pull/%s"):format(repo, number)) end
   local ok, reviews = pcall(require, "octo.reviews")
@@ -241,6 +253,10 @@ function M.dashboard()
 
   picker = Snacks.picker({
     title = "Pull requests",
+    layout = {
+      preset = "default",
+      layout = { width = 0.96, height = 0.92, [2] = { width = 0.45 } },
+    },
     show_empty = true,
     finder = items,
     preview = "preview",
@@ -259,6 +275,7 @@ function M.dashboard()
     confirm = handoff(function(url) vim.cmd("Octo " .. url) end),
     actions = {
       pr_browser = function(_, item) if item then vim.ui.open(item.url) end end,
+      pr_overview = handoff(M.overview),
       pr_tiers = handoff(M.tiers),
       pr_agent = handoff(M.agent),
       pr_findings = handoff(M.findings),
@@ -267,7 +284,8 @@ function M.dashboard()
     win = {
       input = {
         keys = {
-          ["<a-o>"] = { "pr_browser", mode = { "n", "i" }, desc = "Open in browser" },
+          ["<a-o>"] = { "pr_overview", mode = { "n", "i" }, desc = "Overview" },
+          ["<a-b>"] = { "pr_browser", mode = { "n", "i" }, desc = "Open in browser" },
           ["<a-t>"] = { "pr_tiers", mode = { "n", "i" }, desc = "Files by tier" },
           ["<a-a>"] = { "pr_agent", mode = { "n", "i" }, desc = "Review with agent" },
           ["<a-v>"] = { "pr_findings", mode = { "n", "i" }, desc = "Agent findings" },
@@ -383,6 +401,20 @@ local function review_prompt(agent, url, t)
   }, "\n")
 end
 
+local function with_alert(argv, file, number)
+  local script = table.concat({
+    'file=$1; message=$2; shift 2',
+    'zmodload -F zsh/stat b:zstat',
+    'before=$(zstat +mtime "$file" 2> /dev/null)',
+    '"$@"; code=$?',
+    'after=$(zstat +mtime "$file" 2> /dev/null)',
+    'if [[ -n $after && $after != $before && -n $TMUX ]] && command -v tmux &> /dev/null; then tmux display-message "$message"; fi',
+    'exit $code',
+  }, "\n")
+  local message = ("PR #%s agent review ready"):format(number)
+  return vim.list_extend({ "/bin/zsh", "-c", script, "pr-review-agent", file, message }, argv)
+end
+
 local function watch_review(url, number)
   local file = M.review_dir(url) .. "/review.json"
   local before = (vim.uv.fs_stat(file) or {}).mtime
@@ -401,17 +433,28 @@ function M.agent(arg)
   M.resolve_url(arg, function(url)
     local pr = parse_url(url)
     if not pr then return notify("Not a GitHub pull request: " .. url, vim.log.levels.ERROR) end
-    local personal = personal_owners()[pr.owner:lower()] == true
+    local owners = personal_owners()
+    if next(owners) == nil then
+      return notify(table.concat({
+        "No personal GitHub account is configured, so no agent is offered.",
+        "Run: git config -f ~/.gitconfig-local github.user <login>",
+        "Extra personal owners: git config -f ~/.gitconfig-local --add github.org <org>",
+      }, "\n"), vim.log.levels.ERROR)
+    end
+    local personal = owners[pr.owner:lower()] == true
     local allowed = vim.tbl_filter(function(a) return a.personal == personal end, AGENTS)
     vim.ui.select(allowed, {
       prompt = ("Which agent should review #%s?"):format(pr.number),
       format_item = function(a) return a.label end,
     }, function(agent)
       if not agent then return end
+      if agent.personal ~= personal then
+        return notify(("%s is not allowed for %s/%s"):format(agent.label, pr.owner, pr.repo), vim.log.levels.ERROR)
+      end
       local function launch(t)
         local dir = M.review_dir(url)
         vim.fn.mkdir(dir, "p")
-        Snacks.terminal(agent.argv(review_prompt(agent, url, t)), {
+        Snacks.terminal(with_alert(agent.argv(review_prompt(agent, url, t)), dir .. "/review.json", pr.number), {
           cwd = dir,
           win = { position = "right", width = 0.45 },
           interactive = true,
@@ -445,10 +488,52 @@ local function finding_body(f)
   return table.concat(parts, "\n\n")
 end
 
+local function queue_comment(url, f, fallback)
+  local line = tonumber(f.line)
+  if not f.file or not line then return fallback("this finding has no file and line") end
+  local ok, reviews = pcall(require, "octo.reviews")
+  local review = ok and reviews.get_current_review() or nil
+  if not review or review.id == -1 then
+    return fallback("no Octo review is active in this tab; start one with <leader>pr")
+  end
+  local pr, target = parse_url(url), review.pull_request
+  local wanted = pr and ("%s/%s#%s"):format(pr.owner, pr.repo, pr.number):lower()
+  if wanted ~= ("%s#%s"):format(target.repo, target.number):lower() then
+    return fallback("the active Octo review is for another pull request")
+  end
+  local octo_gh = require("octo.gh")
+  octo_gh.api.graphql({
+    query = require("octo.gh.mutations").add_pull_request_review_thread,
+    F = {
+      input = {
+        pullRequestReviewId = review.id,
+        body = finding_body(f),
+        path = f.file,
+        side = "RIGHT",
+        line = math.floor(line),
+      },
+    },
+    opts = {
+      cb = octo_gh.create_callback({
+        failure = function(err) fallback("GitHub rejected the comment: " .. vim.trim(err)) end,
+        success = function(output)
+          local parsed, resp = pcall(vim.json.decode, output)
+          local data = parsed and type(resp) == "table" and resp.data
+          local added = type(data) == "table" and data.addPullRequestReviewThread
+          if type(added) ~= "table" or type(added.thread) ~= "table" then
+            return fallback("GitHub did not create the thread; the line may be outside the diff")
+          end
+          review:update_threads(added.thread.pullRequest.reviewThreads.nodes)
+          notify(("Added a pending comment on %s:%d; it is sent when you submit the review"):format(f.file, line))
+        end,
+      }),
+    },
+  })
+end
+
 function M.findings(arg)
   M.resolve_url(arg, function(url)
-    local dir = M.review_dir(url)
-    local review = dir and read_json(dir .. "/review.json")
+    local review = read_review(url)
     if not review then
       return notify("No agent review yet for this PR; start one with <leader>pa", vim.log.levels.WARN)
     end
@@ -507,6 +592,13 @@ function M.findings(arg)
           vim.fn.setreg("+", finding_body(item.finding))
           notify("Copied finding as a review comment; paste it into an Octo comment")
         end,
+        finding_comment = function(_, item)
+          if not item then return end
+          queue_comment(url, item.finding, function(why)
+            vim.fn.setreg("+", finding_body(item.finding))
+            notify(("Copied the finding instead: %s"):format(why), vim.log.levels.WARN)
+          end)
+        end,
         finding_summary = function()
           vim.fn.setreg("+", review.summary or "")
           notify("Copied review summary")
@@ -515,12 +607,213 @@ function M.findings(arg)
       win = {
         input = {
           keys = {
+            ["<a-c>"] = { "finding_comment", mode = { "n", "i" }, desc = "Add pending line comment" },
             ["<a-y>"] = { "finding_yank", mode = { "n", "i" }, desc = "Copy as comment" },
             ["<a-s>"] = { "finding_summary", mode = { "n", "i" }, desc = "Copy summary" },
           },
         },
       },
     })
+  end)
+end
+
+local function gh_lenient(args, cb)
+  vim.system(vim.list_extend({ "gh" }, args), { text = true, timeout = 120000 }, function(r)
+    vim.schedule(function() cb(decode(r.stdout or "")) end)
+  end)
+end
+
+local function open_target(target)
+  if not target then return end
+  if target.url then
+    if target.url:match("^https://%S+$") then vim.ui.open(target.url) end
+    return
+  end
+  if vim.fn.filereadable(target.file) ~= 1 then
+    return notify(target.file .. " is not in this checkout", vim.log.levels.WARN)
+  end
+  vim.cmd.edit(vim.fn.fnameescape(target.file))
+  pcall(vim.api.nvim_win_set_cursor, 0, { target.line or 1, 0 })
+end
+
+local function overview_lines(url, pr, checks, diffs)
+  local lines, targets = {}, {}
+  local function add(text, target)
+    for _, line in ipairs(vim.split((text or ""):gsub("\r", ""), "\n")) do
+      lines[#lines + 1] = line
+      targets[#lines] = target
+    end
+  end
+
+  local review = read_review(url)
+  local c = tier.classify_pr(pr.files)
+  local head = review and review.tier and tier.ICON[review.tier]
+    and { tier = review.tier, reason = review.tier_reason or c.reason } or c
+  local findings = sort_findings(review and review.findings or {})
+  local blocking = #vim.tbl_filter(function(f) return f.severity == "critical" or f.severity == "high" end, findings)
+  local failing = #vim.tbl_filter(function(k) return CHECK_ORDER[k.bucket] == 0 end, checks)
+
+  add(("# #%d %s"):format(pr.number, pr.title or ""))
+  local author = pr.author and pr.author.login or ""
+  add(("%s · %s · updated %s ago%s"):format(url, author, age(pr.updatedAt), pr.isDraft and " · draft" or ""))
+  add("")
+  add("## Headline")
+  add("")
+  add(("%s **%s**: %s"):format(tier.ICON[head.tier], head.tier, head.reason or ""))
+  add(("Review %s. %s"):format(tier.EFFORT[head.tier], tier.DEFS[head.tier]))
+  if head ~= c and head.tier ~= c.tier then add(("The path-based first pass said %s."):format(c.tier)) end
+  add("")
+  add(("- Files changed: %d"):format(pr.changedFiles or #c.files))
+  add(("- Lines: +%d −%d"):format(pr.additions or 0, pr.deletions or 0))
+  if failing > 0 then
+    add(("- Checks: %d failing of %d"):format(failing, #checks))
+  else
+    add(("- Checks: %d, none failing"):format(#checks))
+  end
+  if review then
+    add(("- Findings: %d, %d high or critical · verdict: %s"):format(#findings, blocking, review.verdict or "none"))
+  else
+    add("- Findings: no agent review yet; press a to start one")
+  end
+  add("")
+
+  add(("## All findings (%d)"):format(#findings))
+  add("")
+  if not review then
+    add("No agent review yet. Findings land here sorted trunk → branch → leaf.")
+  else
+    if review.summary and review.summary ~= "" then
+      add(review.summary)
+      add("")
+    end
+    for _, f in ipairs(findings) do
+      local where = f.file and (f.file .. (f.line and (":" .. f.line) or "")) or "general"
+      local target = f.file and { file = f.file, line = tonumber(f.line) } or nil
+      local icon = tier.ICON[f.tier or "branch"] or ""
+      add(("- %s **%s** %s %s · `%s`"):format(icon, f.severity or "info", f.id or "", f.title or "", where), target)
+      if f.detail then add("  " .. f.detail:gsub("\n", "\n  "), target) end
+      if f.suggestion then add("  Suggestion: " .. f.suggestion:gsub("\n", "\n  "), target) end
+    end
+    if #findings == 0 then add("The agent reported no findings.") end
+  end
+  add("")
+
+  add("## Look at these files first")
+  add("")
+  for i, f in ipairs(c.files) do
+    if i > 40 then
+      add(("- and %d more in :PrTiers"):format(#c.files - 40))
+      break
+    end
+    local stats = ("+%d −%d"):format(f.additions or 0, f.deletions or 0)
+    add(("- %s %s `%s` %s · %s"):format(tier.ICON[f.tier], f.tier, f.path, stats, f.reason),
+      { file = f.path, line = first_line(diffs[f.path]) })
+  end
+  if #c.files == 0 then add("No changed files.") end
+  add("")
+
+  add(("## Checks (%d)"):format(#checks))
+  add("")
+  table.sort(checks, function(a, b)
+    local ra, rb = CHECK_ORDER[a.bucket] or 1, CHECK_ORDER[b.bucket] or 1
+    if ra ~= rb then return ra < rb end
+    return (a.name or "") < (b.name or "")
+  end)
+  for _, k in ipairs(checks) do
+    local state = (k.state or ""):lower()
+    local icon = CHECK_ICON[k.bucket] or "●"
+    add(("- %s %s · %s"):format(icon, k.name or "check", state), k.link and { url = k.link } or nil)
+  end
+  if #checks == 0 then add("No checks reported.") end
+  add("")
+
+  add("## Description")
+  add("")
+  add(pr.body ~= nil and pr.body ~= "" and pr.body or "_No description_")
+  return lines, targets, c
+end
+
+function M.overview(arg)
+  M.resolve_url(arg, function(url)
+    local parsed = parse_url(url)
+    if not parsed then return notify("Not a GitHub pull request: " .. url, vim.log.levels.ERROR) end
+    local name = ("pr-overview://%s/%s/%s"):format(parsed.owner, parsed.repo, parsed.number)
+    local buf = vim.fn.bufnr(name)
+    local created = buf == -1
+    if created then
+      buf = vim.api.nvim_create_buf(false, true)
+      vim.api.nvim_buf_set_name(buf, name)
+      vim.bo[buf].bufhidden = "hide"
+      vim.bo[buf].swapfile = false
+      vim.bo[buf].filetype = "markdown"
+      vim.b[buf].pr_review_url = url
+    end
+    local targets = {}
+
+    local function set_lines(lines)
+      if not vim.api.nvim_buf_is_valid(buf) then return end
+      vim.bo[buf].modifiable = true
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+      vim.bo[buf].modifiable = false
+    end
+
+    local function load()
+      local pending, pr, pr_err, checks, diffs = 3, nil, nil, {}, {}
+      local function done()
+        pending = pending - 1
+        if pending > 0 then return end
+        if not pr then
+          pr_err = pr_err or "gh returned no pull request"
+          local failed = { "# Pull request overview", "", "Could not load " .. url, "" }
+          set_lines(vim.list_extend(failed, vim.split(pr_err, "\n")))
+          return notify(pr_err, vim.log.levels.ERROR)
+        end
+        local lines, line_targets, c = overview_lines(url, pr, checks, diffs)
+        targets = line_targets
+        if pr.updatedAt then
+          tiers[url] = { updatedAt = pr.updatedAt, tier = c.tier, reason = c.reason }
+          write_json(TIER_CACHE, tiers)
+        end
+        set_lines(lines)
+      end
+      local fields = "number,title,author,body,updatedAt,isDraft,files,additions,deletions,changedFiles"
+      gh_json({ "pr", "view", url, "--json", fields }, function(data, err)
+        pr, pr_err = data, err
+        done()
+      end)
+      gh_lenient({ "pr", "checks", url, "--json", "name,state,link,bucket" }, function(data)
+        checks = type(data) == "table" and data or {}
+        done()
+      end)
+      gh({ "pr", "diff", url, "--color", "never" }, function(out)
+        diffs = split_diff(out)
+        done()
+      end)
+    end
+
+    if created then
+      local function map(lhs, fn, desc)
+        vim.keymap.set("n", lhs, fn, { buffer = buf, nowait = true, silent = true, desc = desc })
+      end
+      map("q", function()
+        if #vim.api.nvim_list_tabpages() > 1 and #vim.api.nvim_tabpage_list_wins(0) == 1 then
+          vim.cmd.tabclose()
+        end
+        if vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_buf_delete(buf, { force = true }) end
+      end, "Close overview")
+      map("<CR>", function() open_target(targets[vim.api.nvim_win_get_cursor(0)[1]]) end, "Open file or check")
+      map("r", function() M.overview(url) end, "Reload overview")
+      map("a", function() M.agent(url) end, "Review with agent")
+    end
+
+    local win = vim.fn.bufwinid(buf)
+    if win ~= -1 then
+      vim.api.nvim_set_current_win(win)
+    else
+      vim.cmd("tab sbuffer " .. buf)
+    end
+    if created then set_lines({ "# Pull request overview", "", "Loading " .. url .. "…" }) end
+    load()
   end)
 end
 
@@ -532,6 +825,7 @@ function M.setup()
   cmd("PrTiers", M.tiers, "Changed files ranked trunk → branch → leaf")
   cmd("PrAgent", M.agent, "Run an agent review in a split")
   cmd("PrFindings", M.findings, "Agent review findings")
+  cmd("PrOverview", M.overview, "One overview: headline, findings, files, checks, description")
 end
 
 return M

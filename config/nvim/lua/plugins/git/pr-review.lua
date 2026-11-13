@@ -3,9 +3,10 @@ return {
   dir = vim.fn.stdpath("config"),
   virtual = true,
   dependencies = { "folke/snacks.nvim", "pwntester/octo.nvim" },
-  cmd = { "PrDashboard", "PrTiers", "PrAgent", "PrFindings" },
+  cmd = { "PrDashboard", "PrTiers", "PrAgent", "PrFindings", "PrOverview" },
   keys = {
     { "<leader>pp", "<cmd>PrDashboard<cr>", desc = "PR dashboard" },
+    { "<leader>po", "<cmd>PrOverview<cr>", desc = "PR overview" },
     { "<leader>pt", "<cmd>PrTiers<cr>", desc = "PR files by tier" },
     { "<leader>pa", "<cmd>PrAgent<cr>", desc = "PR agent review" },
     { "<leader>pv", "<cmd>PrFindings<cr>", desc = "PR agent findings" },

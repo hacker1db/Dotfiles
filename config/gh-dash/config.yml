@@ -5,8 +5,6 @@ prSections:
       filters: is:open author:@me
     - title: Involved
       filters: is:open involves:@me -author:@me -review-requested:@me
-    - title: 🌳 Trunk Reviews
-      filters: is:open review-requested:@me label:tier:trunk
 issuesSections:
     - title: My Issues
       filters: is:open author:@me
