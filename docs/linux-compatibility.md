@@ -17,7 +17,6 @@ Detect the platform with `[[ $OSTYPE == darwin* ]]`; the installer scripts are z
 
 | Location | Problem | Suggested fix |
 |---|---|---|
-| `git/gitconfig.symlink:151` | `credential.helper = osxkeychain`. Linux git errors with `'credential-osxkeychain' is not a git command`. | Move it to `~/.gitconfig-local`, or use `[includeIf]` with a macOS-only file. Linux can use `!gh auth git-credential` or `libsecret`. |
 | `bin/e`, `bin/tm` | They use the `#!/bin/sh` shebang but contain bash syntax (`==`, arrays, `select`). On Linux, `/bin/sh` is dash, so they fail. | Change the shebang to `#!/usr/bin/env bash`. |
 | `config/tmux/tmux.conf:113-114` | `C-c`/`C-v` use `reattach-to-user-namespace pbcopy/pbpaste`. | tmux-yank is already loaded, so drop the bindings or switch per OS with `if-shell 'uname \| grep -q Darwin'`. |
 | `zsh/zshrc.symlink:116` | Always prepends `/opt/homebrew/bin`. This is harmless on Linux but it puts a nonexistent directory first in PATH. | Guard it with `[[ -d /opt/homebrew/bin ]]`. `zsh/brew.zsh` already does the shellenv part. |

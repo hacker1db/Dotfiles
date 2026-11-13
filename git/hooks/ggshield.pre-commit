@@ -10,6 +10,9 @@
 # not set, op uses the desktop app integration so you approve the read with Touch ID; the account
 # is pinned to GITGUARDIAN_PERSONAL_OP_ACCOUNT (default my.1password.com) so it never reads from a
 # work account. Override the item with GITGUARDIAN_PERSONAL_OP_REF.
+# A name-based reference (op://Automation/GG Scan Token/credential) costs the service account
+# 3 API requests per read; an ID-based one (op://<vault-id>/<item-id>/credential) costs 1, which
+# matters when the account's request quota is tight. A rate-limited read is reported as such.
 
 personal='github\.com[:/](hacker1db|zerobitconsulting)/|^git@(github-hacker1db|hb1):'
 origin=$(git remote get-url origin 2>/dev/null) || exit 0
@@ -41,7 +44,18 @@ case $ref in
 esac
 command -v op >/dev/null 2>&1 || blocked "1Password CLI (op) not found; install it with: brew install 1password-cli"
 if [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
-	key=$(OP_BIOMETRIC_UNLOCK_ENABLED=false op read --no-newline "$ref" </dev/null 2>/dev/null) || key=""
+	# op's stderr goes to a private temp file so it can be classified; it is never echoed raw.
+	errfile=$(mktemp "${TMPDIR:-/tmp}/ggshield-op.XXXXXX") || blocked "Could not create a temporary file."
+	trap 'rm -f "$errfile"' EXIT
+	trap 'exit 1' HUP INT TERM
+	key=$(OP_BIOMETRIC_UNLOCK_ENABLED=false op read --no-newline "$ref" </dev/null 2>"$errfile") || key=""
+	if [ -z "$key" ] && grep -qiE 'too many requests|rate[- ]limit' "$errfile"; then
+		retry=$(grep -ioE '(try again|retry) (in|after) [0-9]+ *[a-z]+' "$errfile" | head -n 1)
+		blocked "The 1Password service account is rate-limited (too many requests).
+${retry:+1Password says: $retry. }Wait for the quota to reset, then commit again."
+	fi
+	rm -f "$errfile"
+	trap - EXIT HUP INT TERM
 else
 	# No service account on this machine: prompt for approval through the 1Password desktop app.
 	echo "Requesting the GitGuardian key from 1Password; approve the prompt to continue." >&2
