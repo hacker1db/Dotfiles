@@ -3,17 +3,17 @@
 [Fleet](https://github.com/nicknisi/fleet) is a terminal dashboard for managing
 multiple AI agent sessions in tmux. It watches Claude Code and Codex sessions
 through hooks, surfaces hook-less agents (Copilot among them) by spotting them
-in the process table, and shows which agents need attention as clickable chips
-in the tmux status bar and in the sketchybar agents pill.
+in the process table, and shows which agents need attention in its dashboard,
+sidebar, and the sketchybar agents pill. The tmux status bar carries no fleet
+chips.
 
 ## Provenance
 
 - The `fleet` binary is Nick Nisi's [nicknisi/fleet](https://github.com/nicknisi/fleet),
   installed from his [nicknisi/formulae](https://github.com/nicknisi/homebrew-formulae)
   Homebrew tap via the Brewfile.
-- The tmux and sketchybar wiring in this repository — `bin/tmux-fleet-chips`,
-  `bin/sketchybar-fleet-watch`, the fleet block in `config/tmux/tmux.conf`, and
-  the sketchybar agents plugins — is adapted from
+- The tmux and sketchybar wiring in this repository — `bin/sketchybar-fleet-watch`, the
+  fleet block in `config/tmux/tmux.conf`, and the sketchybar agents plugins — is adapted from
   [nicknisi/dotfiles](https://github.com/nicknisi/dotfiles) (MIT).
 - Planned follow-ups (multi-machine visibility, T3 Code tracking) are tracked in
   [hacker1db/Dotfiles#72](https://github.com/hacker1db/Dotfiles/issues/72);
@@ -68,26 +68,17 @@ default to no); decline them yourself when running manually. This repo's
 
 ## tmux wiring
 
-`config/tmux/tmux.conf` keeps the single status row and mounts the chips in the
-theme's `status-right` via `bin/tmux-fleet-chips` (which runs
-`fleet status --statusline`). The fleet block sits after the theme sourcing:
+`config/tmux/tmux.conf` keeps the single status row with no fleet chips; the
+fleet block sits after the theme sourcing:
 
 | Binding | Action |
 | --- | --- |
 | `prefix+O` | Fleet dashboard in a popup |
 | `prefix+f` | Toggle the persistent fleet sidebar split |
 | `prefix+n` | Jump to the next waiting agent pane |
-| Left-click a chip | Switch to that agent's pane |
-| Right-click a chip | Acknowledge it in place (no switch) |
-| Click `✕ clear` | Dismiss every ready agent at once |
-| Click `☰` | Open/focus the sidebar |
-
-Only agents whose turn it is for you appear as chips: PERMIT (tool approval),
-QUESTION, and DONE/ready. Working and idle sessions stay off the bar — watch
-those in the dashboard (`prefix+O`).
 
 After upgrading fleet, run `fleet statusline --inject --force` once to refresh
-the click bindings, then `tmux source-file ~/.config/tmux/tmux.conf`.
+its bindings, then `tmux source-file ~/.config/tmux/tmux.conf`.
 
 ## sketchybar wiring
 
