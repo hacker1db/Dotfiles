@@ -31,7 +31,7 @@ LABEL_COLOR="$FG"
 [ "$COUNT" -ge "$THRESHOLD" ] && LABEL_COLOR="$YELLOW"
 
 ARGS=(--animate tanh 15 --set "$NAME" drawing=on
-  label="$COUNT" label.color="$LABEL_COLOR" icon.color="$FG")
+  label="$COUNT PRs" label.color="$LABEL_COLOR" icon.color="$FG")
 
 i=0
 while IFS=$'\t' read -r REPO TITLE URL; do
@@ -40,6 +40,7 @@ while IFS=$'\t' read -r REPO TITLE URL; do
     ARGS+=(--set "$NAME.popup.$i" drawing=on icon=→
       label="+$((COUNT - i)) more  ·  open all" \
       click_script="open https://github.com/pulls/review-requested; sketchybar --set github popup.drawing=off")
+    i=$((i + 1))
     break
   fi
   ARGS+=(--set "$NAME.popup.$i" drawing=on label="$REPO: $TITLE"

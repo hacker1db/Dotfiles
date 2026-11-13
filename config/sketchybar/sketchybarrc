@@ -27,6 +27,7 @@ source "$CONFIG_DIR/colors.sh"
 
 GAUGE=$(printf '\xf3\xb0\x89\x81')  # nf-md-gauge  U+F0241
 GITHUB=$(printf '\xef\x82\x9b')     # nf-fa-github U+F09B
+PLANS=$(printf '\xef\x82\xae')      # nf-fa-tasks  U+F0AE
 
 MONO="Monaspace Neon"
 
@@ -146,6 +147,29 @@ for i in $(seq 0 9); do
   sketchybar --add item github.popup.$i popup.github \
     --set github.popup.$i \
     icon="$GITHUB" \
+    icon.color="$GREY" \
+    label.max_chars=48 \
+    label.color="$FG_DIM" \
+    drawing=off
+done
+
+# plans: active Plan Manager plans, beside the review count; left-click drops
+# down the most recent plans (rows open their plan), right-click opens the dashboard.
+sketchybar --add item plans right \
+  --subscribe plans mouse.exited.global system_woke \
+  --set plans \
+  icon="$PLANS" \
+  icon.color="$FG" \
+  update_freq=300 \
+  popup.align=right \
+  drawing=off \
+  click_script="$PLUGIN_DIR/plans_click.sh" \
+  script="$PLUGIN_DIR/plans.sh"
+
+for i in $(seq 0 9); do
+  sketchybar --add item plans.popup.$i popup.plans \
+    --set plans.popup.$i \
+    icon="$PLANS" \
     icon.color="$GREY" \
     label.max_chars=48 \
     label.color="$FG_DIM" \
