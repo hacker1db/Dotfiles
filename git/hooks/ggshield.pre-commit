@@ -4,10 +4,12 @@
 # never sent to the personal workspace. It never falls back to the machine's default (work) login.
 # Override the owner match with GITGUARDIAN_PERSONAL_REMOTES (an extended regex).
 #
-# The personal API key is read from the 1Password Automation vault with the service account
-# (OP_SERVICE_ACCOUNT_TOKEN, exported by ~/.localrc), the same way fleet-manager's fleet-git and
-# fleet-ssh get their keys. It never uses the desktop app or biometric unlock, so it works
-# headless and from agents. Override the item with GITGUARDIAN_PERSONAL_OP_REF.
+# The personal API key is read from 1Password. When OP_SERVICE_ACCOUNT_TOKEN is set (exported by
+# ~/.localrc on headless machines), the Automation vault service account is used with biometric
+# unlock disabled, the same way fleet-manager's fleet-git and fleet-ssh get their keys. When it is
+# not set, op uses the desktop app integration so you approve the read with Touch ID; the account
+# is pinned to GITGUARDIAN_PERSONAL_OP_ACCOUNT (default my.1password.com) so it never reads from a
+# work account. Override the item with GITGUARDIAN_PERSONAL_OP_REF.
 
 personal='github\.com[:/](hacker1db|zerobitconsulting)/|^git@(github-hacker1db|hb1):'
 origin=$(git remote get-url origin 2>/dev/null) || exit 0
@@ -23,12 +25,14 @@ blocked() {
 $1
 The GitGuardian pre-commit hook reads your personal API key (scope "scan") from 1Password:
   ${ref}
-using the Automation vault service account (export OP_SERVICE_ACCOUNT_TOKEN in ~/.localrc).
+using the Automation vault service account when OP_SERVICE_ACCOUNT_TOKEN is set, otherwise the
+1Password desktop app (account ${account}; enable Settings > Developer > Integrate with 1Password CLI).
 Set GITGUARDIAN_PERSONAL_OP_REF to use a different item. The commit is blocked until then.
 MSG
 	exit 1
 }
 
+account="${GITGUARDIAN_PERSONAL_OP_ACCOUNT:-my.1password.com}"
 ref="${GITGUARDIAN_PERSONAL_OP_REF:-op://Automation/GG Scan Token/credential}"
 case $ref in
 	op://*\?*) blocked "GITGUARDIAN_PERSONAL_OP_REF must not contain query parameters." ;;
@@ -36,9 +40,13 @@ case $ref in
 	*) blocked "GITGUARDIAN_PERSONAL_OP_REF must be an op:// reference." ;;
 esac
 command -v op >/dev/null 2>&1 || blocked "1Password CLI (op) not found; install it with: brew install 1password-cli"
-[ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || blocked "OP_SERVICE_ACCOUNT_TOKEN is not set."
-
-key=$(OP_BIOMETRIC_UNLOCK_ENABLED=false op read --no-newline "$ref" </dev/null 2>/dev/null) || key=""
+if [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
+	key=$(OP_BIOMETRIC_UNLOCK_ENABLED=false op read --no-newline "$ref" </dev/null 2>/dev/null) || key=""
+else
+	# No service account on this machine: prompt for approval through the 1Password desktop app.
+	echo "Requesting the GitGuardian key from 1Password; approve the prompt to continue." >&2
+	key=$(op read --no-newline --account "$account" "$ref" </dev/null) || key=""
+fi
 [ -n "$key" ] || blocked "Could not read the GitGuardian key from 1Password."
 
 # Only op sees the service-account token; ggshield gets just the GitGuardian key.
