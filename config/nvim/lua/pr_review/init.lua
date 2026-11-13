@@ -10,12 +10,13 @@ local SECTIONS = {
 }
 local SEVERITIES = { "critical", "high", "medium", "low", "info" }
 local SEVERITY_HL = { critical = "DiagnosticError", high = "DiagnosticError", medium = "DiagnosticWarn", low = "DiagnosticInfo", info = "DiagnosticHint" }
+local CLAUDE_MODELS = { "fable", "opus", "sonnet" }
 local AGENTS = {
-  { id = "codex", label = "Codex", personal = true, skill = "$pr-review", argv = function(p) return { "codex", p } end },
-  { id = "claude-personal", label = "Claude · personal", personal = true, skill = "/pr-review", argv = function(p) return { "claude-personal", p } end },
-  { id = "copilot", label = "GitHub Copilot", personal = false, skill = "/pr-review", argv = function(p) return { "copilot", "-i", p } end },
-  { id = "claude-work", label = "Claude · work", personal = false, skill = "/pr-review", argv = function(p) return { "claude-subscription", p } end },
-  { id = "claude-foundry", label = "Claude · Foundry", personal = false, skill = "/pr-review", argv = function(p) return { "claude-foundry", p } end },
+  { id = "codex", label = "Codex", personal = true, skill = "$pr-review", cmd = { "codex" }, model_flag = "-m", models = {} },
+  { id = "claude-personal", label = "Claude · personal", personal = true, skill = "/pr-review", cmd = { "claude-personal" }, model_flag = "--model", models = CLAUDE_MODELS },
+  { id = "copilot", label = "GitHub Copilot", personal = false, skill = "/pr-review", cmd = { "copilot", "-i" }, model_flag = "--model", models = { "auto" } },
+  { id = "claude-work", label = "Claude · work", personal = false, skill = "/pr-review", cmd = { "claude-subscription" }, model_flag = "--model", models = CLAUDE_MODELS },
+  { id = "claude-foundry", label = "Claude · Foundry", personal = false, skill = "/pr-review", cmd = { "claude-foundry" }, model_flag = "--model", models = CLAUDE_MODELS },
 }
 local TIER_CACHE = vim.fn.stdpath("state") .. "/pr-review-tiers.json"
 local REVIEW_ROOT = vim.fn.expand("~/.local/state/pr-reviews")
@@ -415,6 +416,43 @@ local function with_alert(argv, file, number)
   return vim.list_extend({ "/bin/zsh", "-c", script, "pr-review-agent", file, message }, argv)
 end
 
+local DEFAULT_MODEL = "Profile default"
+local OTHER_MODEL = "Other…"
+
+local function pick_model(agent, cb)
+  local choices = vim.list_extend({ DEFAULT_MODEL }, vim.deepcopy(agent.models))
+  choices[#choices + 1] = OTHER_MODEL
+  vim.ui.select(choices, { prompt = ("Which model should %s use?"):format(agent.label) }, function(choice)
+    if not choice then return end
+    if choice == DEFAULT_MODEL then return cb(nil) end
+    if choice ~= OTHER_MODEL then return cb(choice) end
+    vim.ui.input({ prompt = "Model: " }, function(model)
+      model = vim.trim(model or "")
+      if model ~= "" then cb(model) end
+    end)
+  end)
+end
+
+local function agent_argv(agent, model, prompt)
+  local argv = vim.deepcopy(agent.cmd)
+  if model then vim.list_extend(argv, { agent.model_flag, model }) end
+  argv[#argv + 1] = prompt
+  return argv
+end
+
+local function open_split(argv, dir)
+  if vim.env.TMUX and vim.fn.executable("tmux") == 1 then
+    local cmd = { "tmux", "split-window", "-h", "-l", "45%", "-c", dir }
+    if vim.env.TMUX_PANE then vim.list_extend(cmd, { "-t", vim.env.TMUX_PANE }) end
+    local r = vim.system(vim.list_extend(cmd, argv), { text = true }):wait()
+    if r.code == 0 then return true end
+    notify("tmux split failed: " .. vim.trim(r.stderr or ""), vim.log.levels.ERROR)
+    return false
+  end
+  Snacks.terminal(argv, { cwd = dir, win = { position = "right", width = 0.45 }, interactive = true })
+  return true
+end
+
 local function watch_review(url, number)
   local file = M.review_dir(url) .. "/review.json"
   local before = (vim.uv.fs_stat(file) or {}).mtime
@@ -451,21 +489,20 @@ function M.agent(arg)
       if agent.personal ~= personal then
         return notify(("%s is not allowed for %s/%s"):format(agent.label, pr.owner, pr.repo), vim.log.levels.ERROR)
       end
-      local function launch(t)
-        local dir = M.review_dir(url)
-        vim.fn.mkdir(dir, "p")
-        Snacks.terminal(with_alert(agent.argv(review_prompt(agent, url, t)), dir .. "/review.json", pr.number), {
-          cwd = dir,
-          win = { position = "right", width = 0.45 },
-          interactive = true,
-        })
-        watch_review(url, pr.number)
-        notify(("%s is reviewing #%s; nothing is posted to GitHub"):format(agent.label, pr.number))
-      end
-      local cached = tiers[url]
-      if cached then return launch(cached) end
-      gh_json({ "pr", "view", url, "--json", "files" }, function(data)
-        launch(data and tier.classify_pr(data.files) or { tier = "branch", reason = "unknown" })
+      pick_model(agent, function(model)
+        local function launch(t)
+          local dir = M.review_dir(url)
+          vim.fn.mkdir(dir, "p")
+          local argv = with_alert(agent_argv(agent, model, review_prompt(agent, url, t)), dir .. "/review.json", pr.number)
+          if not open_split(argv, dir) then return end
+          watch_review(url, pr.number)
+          notify(("%s (%s) is reviewing #%s; nothing is posted to GitHub"):format(agent.label, model or "default model", pr.number))
+        end
+        local cached = tiers[url]
+        if cached then return launch(cached) end
+        gh_json({ "pr", "view", url, "--json", "files" }, function(data)
+          launch(data and tier.classify_pr(data.files) or { tier = "branch", reason = "unknown" })
+        end)
       end)
     end)
   end)
