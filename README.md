@@ -46,18 +46,14 @@ dotfiles-use
 
 ### Moving from `~/.dotfiles`
 
-The repository used to live at `~/.dotfiles`. To move an existing machine to `~/Developer/dotfiles`, close other terminals and run:
+The repository used to live at `~/.dotfiles`. To move an existing machine to `~/Developer/dotfiles`, close other terminals and editors that have files open in it, then run `bin/dotfiles-relocate` from any checkout:
 
 ```zsh
-mv ~/.dotfiles ~/Developer/dotfiles
-cd ~/Developer/dotfiles
-git --git-dir=.bare worktree repair */
-cd main
-./install.sh link
-exec zsh
+~/.dotfiles/main/bin/dotfiles-relocate --dry-run
+~/.dotfiles/main/bin/dotfiles-relocate
 ```
 
-`worktree repair` rewrites the absolute paths that link the worktrees to `.bare`. `install.sh link` repoints the installed symlinks at `~/Developer/dotfiles/main`. Then update the Dotfiles path for this machine in fleet-manager's `fleet.json`.
+It moves the bare repository, runs `git worktree repair` for every worktree, and rewrites each symlink under `$HOME` that pointed into `~/.dotfiles` so it points at the same checkout under `~/Developer/dotfiles`. A machine using a feature worktree through `install.sh use` keeps using that worktree. It also copies Claude Code project folders to their new path names, lists machine-local files that still mention the old path, and opens a fresh Zsh in the selected checkout. Optional arguments set the source and destination: `dotfiles-relocate [--dry-run] [from] [to]`. Then update the Dotfiles path for this machine in fleet-manager's `fleet.json`.
 
 Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/tools.zsh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. Bundle applies the trust declarations in `install/brewfile`. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
