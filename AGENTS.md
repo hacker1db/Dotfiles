@@ -106,6 +106,6 @@ The repository installs unchanged on many machines.
 ## Boundaries
 
 - Never modify the Claude Code status line: the `statusLine` block in `claude/settings.base.json`, `claude/statusline-command.sh`, or the generated `settings.json` in any Claude profile. The user manages it.
-- Personal skills live in the [skills repository](https://github.com/hacker1db/skills), cloned to `$HOME/Developer/skills` and managed by `skillctl`. Read its README before changing skill behavior. Do not add skills here; `install/agent-profiles.zsh` runs `skillctl sync --global` for each Claude profile. `bin/install-caido-skills` is a separate, project-scoped installer.
+- Personal skills live in the [skills repository](https://github.com/hacker1db/skills), cloned to `$HOME/Developer/skills` and managed by `skillctl`. Read its README before changing skill behavior. Do not add skills here; `install/agent-profiles.zsh` runs `skillctl sync --global` for each Claude profile. Caido skills use the same skillctl workflow.
 - `global/AGENTS.md` is the global agent policy for every repository. `claude/CLAUDE.md`, `codex/AGENTS.md`, and `copilot/copilot-instructions.md` are symlinks to it, so edit only `global/AGENTS.md`, and only when asked.
 - Plan-manager integration is described in [docs/plan-manager.md](docs/plan-manager.md).

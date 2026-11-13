@@ -177,10 +177,10 @@ Agent sessions across Claude Code, Codex, and Copilot are monitored with [Fleet]
 
 Personal skill sources live in [hacker1db/skills](https://github.com/hacker1db/skills). `bin/skillctl` resolves a normal checkout at `~/Developer/skills` or its `main/` worktree, rebuilds the Go CLI for normal invocations, and reuses the last build for completion. Set `SKILLCTL_REPO_DIR` for another checkout. Follow that repository's README for selections and installation.
 
-Dotfiles holds no personal skills; they come from the skills repository through skillctl, which the profile installer runs for each Claude profile. The project-only `bin/install-caido-skills` remains separate.
+Dotfiles holds no personal skills; they come from the skills repository through skillctl, which the profile installer runs for each Claude profile. Caido Mode uses the same catalog and installation workflow once the skills checkout includes it.
 
-```sh
-install-caido-skills /path/to/project
+```zsh
+skillctl --repo /path/to/project add caido-mode
 ```
 
 ### Plan-manager integration
