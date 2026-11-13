@@ -216,8 +216,6 @@ brew "pkcs11-helper"
 brew "openvpn"
 # Swiss-army knife of markup format conversion
 brew "pandoc"
-# Fast, disk space efficient package manager
-brew "pnpm", link: false
 # Tool for managing OCI containers and pods
 brew "podman"
 # Alternative to docker-compose using podman

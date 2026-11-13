@@ -3,14 +3,10 @@ set -uo pipefail
 source "${0:A:h}/lib.zsh"
 
 title "Setting up Node global tools"
-if ! command -v pnpm >/dev/null 2>&1; then
-    print "pnpm not found, skipping Node global tools"
+if ! ensure_pnpm; then
+    warning "pnpm install failed, skipping Node global tools"
     exit 0
 fi
-
-export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
-mkdir -p "$PNPM_HOME"
-export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 
 typeset -a tools=(
     "@azure/static-web-apps-cli" "@github/copilot" "@readwise/cli"

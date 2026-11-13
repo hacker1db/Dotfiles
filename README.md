@@ -61,7 +61,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | --- | --- |
 | `./install.sh tools` | Install Homebrew, the tools declared in `install/brewfile` (removing undeclared Homebrew and App Store packages), and developer tools; finish with the deferred installs and `chsh` |
 | `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, configure the Git identity and signing key, and install the Go `plan` CLI |
-| `./install.sh node` | Install pnpm global tools; run Readwise and Codex Security login setup |
+| `./install.sh node` | Install pnpm (standalone installer, if missing) and pnpm global tools; run Readwise and Codex Security login setup |
 | `./install.sh dotnet` | Install .NET SDKs, runtimes, and global tools |
 | `./install.sh osx` | Apply macOS preferences, create standard folders, and install NvimTmux.app with `duti` associations |
 | `./install.sh theme list` | List theme candidates (`apply <name>`, `current`, and `sync` also work) |
