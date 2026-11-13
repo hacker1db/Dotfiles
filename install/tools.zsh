@@ -58,10 +58,6 @@ title "Installing standalone tools"
 
 [[ -x "$HOME/.local/bin/codex" ]] || curl --proto "=https" --tlsv1.2 -fsSL https://chatgpt.com/codex/install.sh | sh || true
 
-if [[ "$OSTYPE" == darwin* && ! -d "$HOME/Applications/Herdr.app" && ! -d /Applications/Herdr.app ]]; then
-    curl --proto "=https" --tlsv1.2 -fsSL https://releases.herdr.dev/app/install.sh | sh || true
-fi
-
 [[ -d "$HOME/wordlists" ]] || git clone https://github.com/danielmiessler/SecLists.git "$HOME/wordlists" || true
 
 title "Installing Homebrew packages"

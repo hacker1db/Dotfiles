@@ -16,23 +16,6 @@ for config in "$DOTFILES"/config/*(N); do
     link_file "$config" "$HOME/.config/${config:t}"
 done
 
-title "Linking Herdr app config"
-HERDR_HOME="$HOME/.config/herdr-app"
-mkdir -p "$HERDR_HOME"/{layouts,themes,mods}
-typeset herdr_src
-for herdr_src in "$DOTFILES/herdr/keys.json" "$DOTFILES"/herdr/{layouts,themes}/*.json(N) "$DOTFILES"/herdr/mods/*(N/); do
-    destination="$HERDR_HOME/${herdr_src#$DOTFILES/herdr/}"
-    if [[ -e "$destination" && ! -L "$destination" ]]; then
-        backup="$(backup_path "$destination")"
-        mv "$destination" "$backup" || { LINK_FAILURE=1; continue }
-        print "Preserved existing Herdr file: $backup"
-    fi
-    link_file "$herdr_src" "$destination"
-done
-if command -v herdr-app >/dev/null 2>&1 && herdr-app status >/dev/null 2>&1; then
-    herdr-app do layout.switch --name dotfiles >/dev/null 2>&1 && print "Switched Herdr to the dotfiles layout"
-fi
-
 title "Linking agent instructions"
 typeset instructions="$DOTFILES/global/AGENTS.md"
 [[ -f "$instructions" ]] || { error "Missing instruction source: $instructions"; exit 1 }
