@@ -34,6 +34,10 @@ fi
 # Claude Code comes from the native installer (auto-updates in ~/.local/bin); the claude cask is the desktop app.
 [ -x "$HOME/.local/bin/claude" ] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
 
+if ! ensure_pnpm; then
+  echo "pnpm install failed; rerun ./install.sh homebrew" >&2
+fi
+
 # Terraform setup
 if command -v tfenv >/dev/null 2>&1; then
   tfenv install latest || true
@@ -47,9 +51,6 @@ if command -v nvm >/dev/null 2>&1; then
 fi
 
 if command -v pnpm >/dev/null 2>&1; then
-  export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
-  mkdir -p "$PNPM_HOME"
-  export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
   npm install --global --ignore-scripts yarn || true
   yarn global add expo-cli || true
   pnpm add --global vercel || true

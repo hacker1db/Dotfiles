@@ -150,3 +150,24 @@ github_owner() {
   [ -n "$owner" ] || return 1
   printf '%s\n' "$owner"
 }
+
+# pnpm comes from its standalone installer (https://get.pnpm.io), not Homebrew,
+# so `pnpm self-update` works. PNPM_NO_MODIFY_PATH keeps it from editing the
+# linked ~/.zshrc; zshrc.symlink already puts $PNPM_HOME/bin on PATH.
+load_pnpm_env() {
+  export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+  case ":$PATH:" in
+    *":$PNPM_HOME/bin:"*) ;;
+    *) export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH" ;;
+  esac
+}
+
+ensure_pnpm() {
+  load_pnpm_env
+  [ -x "$PNPM_HOME/bin/pnpm" ] && return 0
+  echo "Installing pnpm to $PNPM_HOME"
+  curl --proto "=https" --tlsv1.2 -fsSL https://get.pnpm.io/install.sh \
+    | PNPM_HOME="$PNPM_HOME" PNPM_NO_MODIFY_PATH=1 sh - || return 1
+  hash -r
+  [ -x "$PNPM_HOME/bin/pnpm" ]
+}

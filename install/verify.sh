@@ -3,6 +3,7 @@ set -uo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/log.sh"
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/env.sh"
+load_pnpm_env
 
 login=1
 [[ "${DOTFILES_NONINTERACTIVE:-0}" == 1 ]] && login=0

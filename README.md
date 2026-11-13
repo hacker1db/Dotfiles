@@ -30,7 +30,7 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | `./install.sh link` | Link configuration, generate Claude settings/profiles, and bootstrap plan-manager |
 | `./install.sh terminfo` | Install terminal capability entries |
 | `./install.sh homebrew` | Install tools declared in `install/brewfile`, then remove undeclared Homebrew and App Store packages |
-| `./install.sh node-tools` | Install pnpm global tools; run Readwise and Codex Security login setup |
+| `./install.sh node-tools` | Install pnpm (standalone installer, if missing) and pnpm global tools; run Readwise and Codex Security login setup |
 | `./install.sh shell` | Configure Zsh |
 | `./install.sh git` | Configure Git identity and optional account profiles |
 | `./install.sh macos` | Apply macOS preferences |

@@ -2,15 +2,13 @@
 
 echo "Setting up Node global tools"
 
-if ! command -v pnpm &>/dev/null; then
-  echo "pnpm not found, skipping Node global tools"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/env.sh"
+
+if ! ensure_pnpm; then
+  echo "pnpm install failed, skipping Node global tools"
   # install.sh sources this script; return so later phases still run.
   return 0 2>/dev/null || exit 0
 fi
-
-export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
-mkdir -p "$PNPM_HOME"
-export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 
 tools=(
   "@azure/static-web-apps-cli"
