@@ -8,6 +8,9 @@
 # (OP_SERVICE_ACCOUNT_TOKEN, exported by ~/.localrc), the same way fleet-manager's fleet-git and
 # fleet-ssh get their keys. It never uses the desktop app or biometric unlock, so it works
 # headless and from agents. Override the item with GITGUARDIAN_PERSONAL_OP_REF.
+# A name-based reference (op://Automation/GG Scan Token/credential) costs the service account
+# 3 API requests per read; an ID-based one (op://<vault-id>/<item-id>/credential) costs 1, which
+# matters when the account's request quota is tight. A rate-limited read is reported as such.
 
 personal='github\.com[:/](hacker1db|zerobitconsulting)/|^git@(github-hacker1db|hb1):'
 origin=$(git remote get-url origin 2>/dev/null) || exit 0
@@ -38,8 +41,21 @@ esac
 command -v op >/dev/null 2>&1 || blocked "1Password CLI (op) not found; install it with: brew install 1password-cli"
 [ -n "${OP_SERVICE_ACCOUNT_TOKEN:-}" ] || blocked "OP_SERVICE_ACCOUNT_TOKEN is not set."
 
-key=$(OP_BIOMETRIC_UNLOCK_ENABLED=false op read --no-newline "$ref" </dev/null 2>/dev/null) || key=""
-[ -n "$key" ] || blocked "Could not read the GitGuardian key from 1Password."
+# op's stderr goes to a private temp file so it can be classified; it is never echoed raw.
+errfile=$(mktemp "${TMPDIR:-/tmp}/ggshield-op.XXXXXX") || blocked "Could not create a temporary file."
+trap 'rm -f "$errfile"' EXIT
+trap 'exit 1' HUP INT TERM
+key=$(OP_BIOMETRIC_UNLOCK_ENABLED=false op read --no-newline "$ref" </dev/null 2>"$errfile") || key=""
+if [ -z "$key" ]; then
+	if grep -qiE 'too many requests|rate[- ]limit' "$errfile"; then
+		retry=$(grep -ioE '(try again|retry) (in|after) [0-9]+ *[a-z]+' "$errfile" | head -n 1)
+		blocked "The 1Password service account is rate-limited (too many requests).
+${retry:+1Password says: $retry. }Wait for the quota to reset, then commit again."
+	fi
+	blocked "Could not read the GitGuardian key from 1Password."
+fi
+rm -f "$errfile"
+trap - EXIT HUP INT TERM
 
 # Only op sees the service-account token; ggshield gets just the GitGuardian key.
 exec env -u OP_SERVICE_ACCOUNT_TOKEN GITGUARDIAN_API_KEY="$key" \

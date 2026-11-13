@@ -17,6 +17,7 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y zsh
       - run: for file in install.sh install/*.zsh; do zsh -n "$file" || exit 1; done
       - run: for file in zsh/*.zsh zsh/*.symlink zsh/functions/*; do zsh -n "$file" || exit; done
+      - run: for test in tests/*.sh; do sh "$test" || exit 1; done
       - uses: lunarmodules/luacheck@cc089e3f65acdd1ef8716cc73a3eca24a6b845e4 # v1.2.0
         with:
           args: config/nvim --no-color --codes --globals vim M Snacks dd --no-max-line-length --no-unused

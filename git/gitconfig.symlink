@@ -144,14 +144,38 @@
 [grep]
     extendRegexp = true
     lineNumber = true
-# Git talks to GitHub over SSH only; HTTPS URLs are rewritten and no
-# credential helper exists to fall back to.
-[url "git@github.com:"]
-	insteadOf = https://github.com/
-	insteadOf = http://github.com/
+# GitHub: fetch, pull, clone, and ls-remote use HTTPS with the gh login token, so
+# they never touch 1Password (frequent background fetches used to exhaust its
+# service-account quota over SSH). Pushes go over SSH with the 1Password agent,
+# and commits are still signed with SSH keys (gpg.format below).
+# Every GitHub URL form is rewritten to HTTPS for fetching, and pushInsteadOf
+# sends pushes back to git@github.com:. The identity line
+# `pushInsteadOf = git@github.com:` is needed: without it a remote stored as
+# git@github.com: would push over HTTPS, because insteadOf also applies to
+# push URLs that no pushInsteadOf matches. A remote with an explicit pushurl
+# skips pushInsteadOf but not insteadOf, so even `pushurl = git@github.com:...`
+# becomes HTTPS and pushes with the gh token; remove the pushurl to push over SSH.
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+	insteadOf = ssh://git@github.com/
 	insteadOf = git://github.com/
+	insteadOf = http://github.com/
+[url "git@github.com:"]
+	pushInsteadOf = https://github.com/
+	pushInsteadOf = http://github.com/
+	pushInsteadOf = git://github.com/
+	pushInsteadOf = ssh://git@github.com/
+	pushInsteadOf = git@github.com:
+# No credential helper by default; only GitHub gets one: gh, found on PATH or in
+# the Homebrew/Linuxbrew prefixes that non-login processes may not have on PATH.
 [credential]
 	helper =
+[credential "https://github.com"]
+	helper =
+	helper = "!f() { PATH=\"$PATH:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin\"; gh auth git-credential \"$@\"; }; f"
+[credential "https://gist.github.com"]
+	helper =
+	helper = "!f() { PATH=\"$PATH:/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin\"; gh auth git-credential \"$@\"; }; f"
 ; [difftool "Kaleidoscope"] cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
 ;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
 ;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
