@@ -11,7 +11,7 @@ Personal macOS development configuration for Zsh, Neovim, tmux, Ghostty, Git, an
 On a new machine, nothing needs to be set up first. The repository is cloned bare with one worktree per branch, the same layout `bin/git-bare-clone` creates. That script is not on `PATH` yet, so clone by hand:
 
 ```sh
-mkdir -p ~/.dotfiles && cd ~/.dotfiles
+mkdir -p ~/Developer/dotfiles && cd ~/Developer/dotfiles
 git clone --bare https://github.com/hacker1db/Dotfiles.git .bare
 echo "gitdir: ./.bare" > .git
 git --git-dir=.bare config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
@@ -22,15 +22,15 @@ cd main
 ./install.sh all
 ```
 
-The first clone uses HTTPS because 1Password and its SSH agent are not installed yet; the repository is public, so it needs no credentials. Once `install.sh` links `~/.gitconfig`, its `insteadOf` rule sends GitHub traffic over SSH, so later fetches and pushes in `~/.dotfiles` go through 1Password like any other repository. The installed links always point at `~/.dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/.dotfiles/`.
+The first clone uses HTTPS because 1Password and its SSH agent are not installed yet; the repository is public, so it needs no credentials. Once `install.sh` links `~/.gitconfig`, its `insteadOf` rule sends GitHub traffic over SSH, so later fetches and pushes in `~/Developer/dotfiles` go through 1Password like any other repository. The installed links always point at `~/Developer/dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/Developer/dotfiles/`.
 
 Each step under `install/` is one zsh script with the same name; `install.sh` runs them in order. The scripts change macOS preferences and configure applications, so review them before a full run.
 
 To try the configuration from a different worktree, select it explicitly:
 
 ```zsh
-cd ~/.dotfiles/refactor-install-cleanup
-./install.sh use ~/.dotfiles/refactor-install-cleanup
+cd ~/Developer/dotfiles/refactor-install-cleanup
+./install.sh use ~/Developer/dotfiles/refactor-install-cleanup
 ```
 
 `use` retargets existing configuration symlinks from the active checkout to the selected checkout, then opens a fresh Zsh automatically when run in a terminal. It preserves unmanaged files, checks replacement paths before changing links, and runs no package installs. Zsh derives `DOTFILES` from its selected configuration file. Other existing terminals need to reload; applications load the selected configuration when they next reload or restart. This selection applies across terminals. Keep the selected worktree until you switch away from it. Noninteractive invocations only update the links.
@@ -38,11 +38,26 @@ cd ~/.dotfiles/refactor-install-cleanup
 From the selected feature shell, switch back with:
 
 ```zsh
-cd ~/.dotfiles/main
+cd ~/Developer/dotfiles/main
 dotfiles-use
 ```
 
 `dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer.
+
+### Moving from `~/.dotfiles`
+
+The repository used to live at `~/.dotfiles`. To move an existing machine to `~/Developer/dotfiles`, close other terminals and run:
+
+```zsh
+mv ~/.dotfiles ~/Developer/dotfiles
+cd ~/Developer/dotfiles
+git --git-dir=.bare worktree repair */
+cd main
+./install.sh link
+exec zsh
+```
+
+`worktree repair` rewrites the absolute paths that link the worktrees to `.bare`. `install.sh link` repoints the installed symlinks at `~/Developer/dotfiles/main`. Then update the Dotfiles path for this machine in fleet-manager's `fleet.json`.
 
 Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/tools.zsh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. Bundle applies the trust declarations in `install/brewfile`. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
@@ -102,7 +117,7 @@ wt pull-all
 
 `wt pull-all` fetches every remote with pruning, then runs `git pull --ff-only --no-autostash` in each worktree **of the current repository** using that branch's configured upstream. Worktrees without a resolvable upstream, including detached worktrees, are skipped. A failed initial fetch stops the operation; individual pull failures are reported while remaining worktrees continue. Diverged branches require manual resolution. Local edits are not stashed; Git refuses updates that would overwrite them. This does not discover unrelated repositories or change remote URLs.
 
-`wt-pull-all` in `zsh/functions.zsh` is the fuller sync. It fetches all remotes with pruning, runs `wt switch --no-cd --no-hooks` for every remote branch of `origin` that has no worktree yet and is not already merged into the default branch, fast-forwards every worktree the same way the alias does, and then confirms the local default branch matches its upstream. When the default branch is not checked out anywhere it is fast-forwarded as a plain ref, so the primary worktree can stay on a feature branch. A default branch that is behind or diverged is reported and makes the command exit non-zero. Finally `wt step prune --foreground` removes worktrees and branches already merged into the default branch, keeping Worktrunk's one-day age guard for fresh worktrees. `wt-pull-all --dry-run` prints the worktrees it would add and previews the prune without changing anything. Reload it with `source ~/.dotfiles/main/zsh/functions.zsh`. `cob` wraps `wt switch --create`; `git-bare-clone` supports cloning, `--init`, and `--fix` for a `.bare` repository with linked worktrees. Run `git-bare-clone --help` for its arguments. `gcc` invokes `git-clean-merged`, which can delete merged local **and remote** branches.
+`wt-pull-all` in `zsh/functions.zsh` is the fuller sync. It fetches all remotes with pruning, runs `wt switch --no-cd --no-hooks` for every remote branch of `origin` that has no worktree yet and is not already merged into the default branch, fast-forwards every worktree the same way the alias does, and then confirms the local default branch matches its upstream. When the default branch is not checked out anywhere it is fast-forwarded as a plain ref, so the primary worktree can stay on a feature branch. A default branch that is behind or diverged is reported and makes the command exit non-zero. Finally `wt step prune --foreground` removes worktrees and branches already merged into the default branch, keeping Worktrunk's one-day age guard for fresh worktrees. `wt-pull-all --dry-run` prints the worktrees it would add and previews the prune without changing anything. Reload it with `source ~/Developer/dotfiles/main/zsh/functions.zsh`. `cob` wraps `wt switch --create`; `git-bare-clone` supports cloning, `--init`, and `--fix` for a `.bare` repository with linked worktrees. Run `git-bare-clone --help` for its arguments. `gcc` invokes `git-clean-merged`, which can delete merged local **and remote** branches.
 
 ## Neovim
 
@@ -145,7 +160,7 @@ ssh -N -o ExitOnForwardFailure=yes -L 127.0.0.1:23000:127.0.0.1:3000 aiserver
 These expose each machine's port 3000 at `http://127.0.0.1:13000` and `http://127.0.0.1:23000`, while local port 3000 remains available. Choose another local port if one is occupied. Stop a tunnel with Ctrl+c. Existing SSH sessions retain their forwards until disconnected; remove any duplicate automatic `LocalForward` entries from `~/.ssh/config` as well.
 
 
-New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, which `install.sh link` creates and `install.sh use` repoints at the selected checkout. The dispatcher resolves `git/hooks/` from the checkout `~/.gitconfig` links to, falling back to `~/.dotfiles/main`. Git copies template hooks only at clone time, so `install.sh link` also replaces stale dispatcher copies in existing repositories under `~/Developer` (override with colon-separated `DOTFILES_HOOK_ROOTS`). It runs matching files there and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a GitGuardian (`ggshield`, installed by the Brewfile) secret scan of staged changes. The GitGuardian hook runs only for repos whose `origin` is a personal owner (`hacker1db`, `zerobitconsulting`, or the `github-hacker1db`/`hb1` SSH aliases; override with `GITGUARDIAN_PERSONAL_REMOTES`) and skips every other repo, including work remotes. It uses only your personal token, read with `op read` from the 1Password Automation vault (`op://Automation/GG Scan Token/credential`; override with `GITGUARDIAN_PERSONAL_OP_REF`) through the service account in `OP_SERVICE_ACCOUNT_TOKEN` (exported by `~/.localrc`), the same way fleet-manager's `fleet-git` gets its keys. It never uses the desktop app or a work login, so it works headless and from agents. It blocks the commit when it finds a secret, when the token or service account is missing or invalid, or when `ggshield` or `op` is not installed. Any work scanning hooks are configured machine-locally, outside this repository.
+New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, which `install.sh link` creates and `install.sh use` repoints at the selected checkout. The dispatcher resolves `git/hooks/` from the checkout `~/.gitconfig` links to, falling back to `~/Developer/dotfiles/main`. Git copies template hooks only at clone time, so `install.sh link` also replaces stale dispatcher copies in existing repositories under `~/Developer` (override with colon-separated `DOTFILES_HOOK_ROOTS`). It runs matching files there and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a GitGuardian (`ggshield`, installed by the Brewfile) secret scan of staged changes. The GitGuardian hook runs only for repos whose `origin` is a personal owner (`hacker1db`, `zerobitconsulting`, or the `github-hacker1db`/`hb1` SSH aliases; override with `GITGUARDIAN_PERSONAL_REMOTES`) and skips every other repo, including work remotes. It uses only your personal token, read with `op read` from the 1Password Automation vault (`op://Automation/GG Scan Token/credential`; override with `GITGUARDIAN_PERSONAL_OP_REF`) through the service account in `OP_SERVICE_ACCOUNT_TOKEN` (exported by `~/.localrc`), the same way fleet-manager's `fleet-git` gets its keys. It never uses the desktop app or a work login, so it works headless and from agents. It blocks the commit when it finds a secret, when the token or service account is missing or invalid, or when `ggshield` or `op` is not installed. Any work scanning hooks are configured machine-locally, outside this repository.
 
 ## CI and security scanning
 
@@ -214,7 +229,7 @@ zsh install/agent-profiles.zsh --check
 git diff --check
 ```
 
-Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh` (links target `~/.dotfiles/main` unless `DOTFILES` says otherwise). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` loops plus TruffleHog, which fails on any finding.
+Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh` (links target `~/Developer/dotfiles/main` unless `DOTFILES` says otherwise). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` loops plus TruffleHog, which fails on any finding.
 
 ## Screenshots
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 set -euo pipefail
 
-root="${DOTFILES:-$HOME/.dotfiles/main}"
+root="${DOTFILES:-$HOME/Developer/dotfiles/main}"
 claude_dir="$root/claude"
 profiles_dir="$claude_dir/profiles"
 generated="$claude_dir/.local/profiles"

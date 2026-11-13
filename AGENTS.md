@@ -19,14 +19,14 @@ docs/         Integration guides
 
 ## Checkouts and Worktrees
 
-`~/.dotfiles` is a bare repository with one worktree per branch; `~/.dotfiles/main` is the production checkout.
+`~/Developer/dotfiles` is a bare repository with one worktree per branch; `~/Developer/dotfiles/main` is the production checkout.
 
 - `main` must always work. Never edit or commit in the `main` checkout.
 - If the current worktree is on a feature branch, work there. Do not create another worktree or stack a branch for follow-up tasks; this overrides any global rule asking for a new worktree per task.
 - Starting from `main`, create a worktree and branch with `wt switch -c <branch>`.
-- Run every command from the worktree root with repo-relative paths. Paths under `~/.dotfiles/main` validate `main`, not your changes.
+- Run every command from the worktree root with repo-relative paths. Paths under `~/Developer/dotfiles/main` validate `main`, not your changes.
 - Installed links (`~/.zshrc`, `~/.config/*`, `~/.git-templates`, and others) point at the selected checkout, `main` by default. Anything that writes through them, such as `Lazy sync` updating `lazy-lock.json` or `install.sh theme apply`, changes that checkout. Edit files in the worktree, never through `~/.config`.
-- `./install.sh use` points the installed links at the current worktree for every terminal on the machine. Ask before running it, and switch back afterward with `dotfiles-use` from `~/.dotfiles/main`.
+- `./install.sh use` points the installed links at the current worktree for every terminal on the machine. Ask before running it, and switch back afterward with `dotfiles-use` from `~/Developer/dotfiles/main`.
 
 ## Validation
 

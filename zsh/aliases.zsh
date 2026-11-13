@@ -1,7 +1,7 @@
 # reload zsh config
 alias reload!='source ~/.zshrc'
 alias r!='reload!'
-alias e!="nvim ~/.dotfiles/main/config/nvim/init.vim"
+alias e!="nvim $DOTFILES/config/nvim/init.lua"
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
     colorflag="--color"

@@ -1,5 +1,5 @@
 #!/usr/bin/env zsh
-DOTFILES="${DOTFILES:-$HOME/.dotfiles/main}"
+DOTFILES="${DOTFILES:-$HOME/Developer/dotfiles/main}"
 
 title() { print "\n\e[1;35m$1\e[0m\n\e[1;38;5;243m==============================\e[0m" }
 info() { print "\e[1;34mInfo:\e[0m $1" }

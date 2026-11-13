@@ -14,7 +14,7 @@ _zshrc_path="${${(%):-%N}:A}"
 if [[ ${_zshrc_path:t} == zshrc.symlink ]]; then
     export DOTFILES="${_zshrc_path:h:h}"
 elif [[ ! -f ${DOTFILES:-}/zsh/zshrc.symlink ]]; then
-    export DOTFILES="$HOME/.dotfiles/main"
+    export DOTFILES="$HOME/Developer/dotfiles/main"
 fi
 [[ -L ~/.zshrc ]] || print -u2 "~/.zshrc is not a symlink; restore it: ln -sf $DOTFILES/zsh/zshrc.symlink ~/.zshrc"
 unset _zshrc_path

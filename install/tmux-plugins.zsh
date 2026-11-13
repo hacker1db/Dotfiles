@@ -5,7 +5,7 @@ plugins_dir="$HOME/.local/share/tmux/plugins"
 tpm="$plugins_dir/tpm"
 
 if [[ ! -e "$plugins_dir" ]]; then
-    for legacy in "$HOME/.config/tmux/plugins" "$HOME"/.dotfiles/*/config/tmux/plugins(N-/); do
+    for legacy in "$HOME/.config/tmux/plugins" "$HOME"/.dotfiles/*/config/tmux/plugins(N-/) "$HOME"/Developer/dotfiles/*/config/tmux/plugins(N-/); do
         [[ -x "$legacy/tpm/tpm" && -x "$legacy/tpm/bindings/install_plugins" ]] || continue
         mkdir -p "${plugins_dir:h}"
         cp -R "$legacy/." "$plugins_dir"

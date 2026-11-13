@@ -8,7 +8,7 @@ palette, managed by `theme apply <name>`.
 ## Setup
 
 ```zsh
-brew bundle --file=~/.dotfiles/main/install/brewfile   # sketchybar, nowplaying-cli
+brew bundle --file=~/Developer/dotfiles/main/install/brewfile   # sketchybar, nowplaying-cli
 brew services start sketchybar
 ```
 
