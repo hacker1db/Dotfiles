@@ -464,3 +464,47 @@ function bmad-init() {
     --modules bmm,bmb,cis \
     --tools claude-code,codex "$@"
 }
+
+# Caido in the background: proxy on :8082 (invisible), UI on :8081.
+# `caido` (start) | `caido stop` | `caido status` | `caido logs` | `caido fg`
+# Pair with `caido-thick up <domain>` for thick clients.
+function caido() {
+  local dir="${XDG_CACHE_HOME:-$HOME/.cache}/caido"
+  local pidfile="$dir/caido.pid" log="$dir/caido.log"
+  local -a args=(--proxy-listen "127.0.0.1:${CAIDO_PROXY_PORT:-8082}"
+                 --ui-listen "127.0.0.1:${CAIDO_UI_PORT:-8081}" --invisible)
+  local pid="$(cat "$pidfile" 2>/dev/null)"
+  local running=false
+  [[ -n $pid ]] && kill -0 "$pid" 2>/dev/null && running=true
+  mkdir -p "$dir"
+
+  case "${1:-start}" in
+    start)
+      if $running; then
+        echo "Caido already running (pid $pid) → http://127.0.0.1:${CAIDO_UI_PORT:-8081}"
+        return 0
+      fi
+      local holder="$(lsof -nP -iTCP:${CAIDO_PROXY_PORT:-8082} -sTCP:LISTEN -t 2>/dev/null | head -1)"
+      if [[ -n $holder ]]; then
+        echo "Port ${CAIDO_PROXY_PORT:-8082} already in use by pid $holder ($(ps -o comm= -p $holder)). Stop it first." >&2
+        return 1
+      fi
+      nohup caido-cli "${args[@]}" "${@:2}" >>"$log" 2>&1 &!
+      echo $! >"$pidfile"
+      sleep 1
+      if kill -0 "$(cat "$pidfile")" 2>/dev/null; then
+        echo "Caido started (pid $(cat "$pidfile")) → http://127.0.0.1:${CAIDO_UI_PORT:-8081}  logs: caido logs"
+      else
+        echo "Caido failed to start; last log lines:" >&2; tail -20 "$log" >&2; return 1
+      fi ;;
+    stop)
+      $running || { echo "Caido not running"; rm -f "$pidfile"; return 0; }
+      kill "$pid" && rm -f "$pidfile" && echo "Caido stopped (pid $pid)" ;;
+    status)
+      $running && echo "running (pid $pid)" || { echo "not running"; return 1; } ;;
+    logs)  tail -f "$log" ;;
+    fg)    $running && { echo "Caido already running in background (pid $pid); 'caido stop' first" >&2; return 1; }
+           caido-cli "${args[@]}" "${@:2}" ;;
+    *)     echo "usage: caido [start|stop|status|logs|fg] [extra caido-cli flags]" >&2; return 1 ;;
+  esac
+}
