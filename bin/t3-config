@@ -8,61 +8,9 @@ import shutil
 from pathlib import Path
 import tempfile
 
-CLIENT_KEYS = set('''notificationMode inAppNotificationsEnabled diffColorScheme chatWidth
-appearanceContrast panelAnimationDurationMs browserDefaultZoomFactor browserDefaultAppearance
-browserRecordingFrameRate browserRecordingShowKeyPresses browserRecordingShowMousePresses
-browserLinkTarget browserSearchEngine browserAutoShowFloatingPreview confirmQuit
-confirmThreadArchive confirmThreadDelete confirmThreadUnpin diffFilesCollapsed diffIgnoreWhitespace
-diffLayout environmentIdentificationMode glassOpacity fontSizeInterface fontSizePrompt fontSizeCode
-fontSizeTerminal fontFamilyCode fontFamilyComposer fontFamilySans fontFamilyTerminal fontSmoothing
-persistComposerContextStrip pullRequestLinksOpenInApp planModeEnabled contextWindowMeterEnabled
-composerCollapseOnScroll composerRichTextEnabled sendShortcut followUpBehavior proactivePanelsEnabled
-showSkillsInSlashMenu legacySidebarEnabled sidebarWorkingShelfEnabled sidebarProjectGroupingMode
-sidebarProjectSortOrder sidebarThreadSortOrder sidebarThreadPreviewCount timestampFormat wordWrap
-mathRenderingEnabled'''.split())
-SERVER_KEYS = set('''defaultAutoPull defaultRuntimeMode idleCompaction branchNamingMode
-removeAgentCreditsOnMerge pullRequestMergeMethod'''.split())
-FILES = ('client-settings.json', 'settings.json', 'keybindings.json')
-
 
 def read_json(path, default=None):
     return json.loads(path.read_text()) if path.exists() else copy.deepcopy(default)
-
-
-def select(data, keys):
-    return {key: value for key, value in data.items() if key in keys}
-
-
-def portable(data):
-    client = select(data['client-settings.json'], CLIENT_KEYS)
-    server = select(data['settings.json'], SERVER_KEYS)
-    model = data['settings.json'].get('defaultModelSelection')
-    if model and model.get('instanceId') in {'codex', 'claudeAgent', 'antigravity'}:
-        server['defaultModelSelection'] = select(model, {'instanceId', 'model'})
-        server['defaultModelSelection']['options'] = [
-            select(option, {'id', 'value'}) for option in model.get('options', [])
-            if option.get('id') in {'reasoningEffort', 'serviceTier'}
-        ]
-    providers = {}
-    for name, provider in data['settings.json'].get('providerInstances', {}).items():
-        if name not in {'codex', 'claudeAgent', 'antigravity'}:
-            continue
-        providers[name] = select(provider, {'driver', 'enabled'})
-        config = select(provider.get('config', {}), {'authMethod'})
-        if config:
-            providers[name]['config'] = config
-    if providers:
-        server['providerInstances'] = providers
-    bindings = data['keybindings.json']
-    if not isinstance(bindings, list) or any(
-        not isinstance(rule, dict) or not {'key', 'command'} <= rule.keys()
-        or not rule.keys() <= {'key', 'command', 'when'}
-        or not all(isinstance(value, str) for value in rule.values())
-        for rule in bindings
-    ):
-        raise ValueError('keybindings must contain key/command strings and optional when strings')
-    bindings = [rule for rule in bindings if not rule['command'].startswith('script.')]
-    return dict(zip(FILES, (client, server, bindings)))
 
 
 def merge(current, patch):
@@ -189,56 +137,13 @@ def configure_providers(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Export or apply portable T3 Code preferences. Quit T3 before applying.')
-    parser.add_argument('action', choices=('export', 'apply', 'providers'))
+    parser = argparse.ArgumentParser(description='Reconcile T3 Code provider profiles. Quit T3 before running.')
+    parser.add_argument('action', choices=('providers',))
     parser.add_argument('--userdata', type=Path, default=Path.home() / '.t3/userdata')
-    parser.add_argument('--config', type=Path, default=Path(__file__).resolve().parents[1] / 'config/t3code/preferences.json')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--check', action='store_true')
     parser.add_argument('--dotfiles-root', type=Path, default=Path(__file__).resolve().parents[1])
-    args = parser.parse_args()
-    if args.action == 'providers':
-        return configure_providers(args)
-    if args.check:
-        parser.error('--check is only supported for providers')
-    data = {name: read_json(args.userdata / name, [] if name == 'keybindings.json' else {}) for name in FILES}
-    if args.action == 'export':
-        if any(not (args.userdata / name).is_file() for name in FILES):
-            raise ValueError('export requires all three existing T3 configuration files')
-        snapshot = portable(data)
-        if not args.dry_run:
-            write_json(args.config, snapshot)
-        print(f'Exported portable preferences: {args.config}' if not args.dry_run else f'Would export: {args.config}')
-        return
-    snapshot = read_json(args.config)
-    if not isinstance(snapshot, dict) or set(snapshot) != set(FILES) or portable(snapshot) != snapshot:
-        raise ValueError('snapshot contains unsupported fields; export again or review the allowlist')
-    existing_providers = data['settings.json'].get('providerInstances', {})
-    for name, provider in snapshot['settings.json'].get('providerInstances', {}).items():
-        existing = existing_providers.get(name)
-        if existing and existing.get('driver') != provider.get('driver'):
-            raise ValueError(f'provider driver mismatch: {name}')
-    updates = []
-    for name in FILES:
-        path = args.userdata / name
-        if path.is_symlink():
-            raise ValueError(f'refusing to replace symlink: {path}')
-        updated = snapshot[name] if name == 'keybindings.json' else merge(data[name], snapshot[name])
-        if name == 'keybindings.json':
-            updated = updated + [rule for rule in data[name] if rule.get('command', '').startswith('script.')]
-        if data[name] != updated or not path.exists():
-            updates.append((path, updated))
-    for path, updated in updates:
-        if not args.dry_run:
-            if path.exists():
-                fd, backup = tempfile.mkstemp(prefix=path.name + '.backup-', dir=path.parent)
-                with os.fdopen(fd, 'wb') as stream:
-                    stream.write(path.read_bytes())
-                print(f'Backup: {backup}')
-            write_json(path, updated)
-        print(f'{"Would update" if args.dry_run else "Updated"}: {path}')
-    if not updates:
-        print('Portable T3 preferences already match.')
+    return configure_providers(parser.parse_args())
 
 
 if __name__ == '__main__':

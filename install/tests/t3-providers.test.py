@@ -17,7 +17,8 @@ class T3ProvidersTests(unittest.TestCase):
         self.home = self.base / 'home'
         self.root = self.home / '.dotfiles/main'
         for name in ['bin/t3-config', 'install/t3-config.sh', 'install.sh',
-                     'install/lib/log.sh', 'install/lib/env.sh', 'config/t3code/profiles.json']:
+                     'install/lib/log.sh', 'install/lib/env.sh', 'config/t3code/profiles.json',
+                     'config/t3code/client-settings.json', 'config/t3code/keybindings.json']:
             dest = self.root / name
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / name, dest)
@@ -150,6 +151,31 @@ class T3ProvidersTests(unittest.TestCase):
         self.assertGreater(call, text.index('bash "$DOTFILES/install/claude-profiles.sh"'))
         self.assertGreater(call, text.index('! reconcile_codex_config'))
 
+
+    def test_link_skips_without_t3_and_only_warns_on_incomplete_profiles(self):
+        text = (ROOT / 'install/link.sh').read_text()
+        block = text[text.index('if [[ -d "$HOME/.t3" ]]; then'):text.index('Skipping T3 provider profiles')]
+        self.assertIn('bash "$DOTFILES/install/t3-config.sh"', block)
+        incomplete = block[block.index('2)'):block.index('*)')]
+        self.assertNotIn('LINK_FAILURE', incomplete)
+        self.assertIn('LINK_FAILURE=1', block[block.index('*)'):])
+
+    def test_install_links_ui_files_and_backs_up_existing(self):
+        userdata = self.settings.parent
+        self.write(userdata / 'keybindings.json', [{'key': 'local', 'command': 'local'}])
+        self.run_install('--check', status=2)
+        self.run_install('--dry-run')
+        self.assertFalse((userdata / 'keybindings.json').is_symlink())
+        self.run_install()
+        for name in ['client-settings.json', 'keybindings.json']:
+            target = userdata / name
+            self.assertTrue(target.is_symlink())
+            self.assertEqual(Path(os.readlink(target)), self.root / 'config/t3code' / name)
+        backups = list(userdata.glob('keybindings.json.backup-*'))
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(json.loads(backups[0].read_text()), [{'key': 'local', 'command': 'local'}])
+        self.assertFalse(list(userdata.glob('client-settings.json.backup-*')))
+        self.run_install('--check')
 
 if __name__ == '__main__':
     unittest.main()

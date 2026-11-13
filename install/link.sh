@@ -231,13 +231,17 @@ if [ "$PLAN_MANAGER_READY" -eq 1 ]; then
   fi
 fi
 
-T3_CONFIG_STATUS=0
-bash "$DOTFILES/install/t3-config.sh" || T3_CONFIG_STATUS=$?
-case "$T3_CONFIG_STATUS" in
-    0) ;;
-    2) warning "T3 provider profiles are incomplete; see the disabled profile diagnostics above."; LINK_FAILURE=1 ;;
-    *) warning "T3 provider configuration failed."; LINK_FAILURE=1 ;;
-esac
+if [[ -d "$HOME/.t3" ]]; then
+    T3_CONFIG_STATUS=0
+    bash "$DOTFILES/install/t3-config.sh" || T3_CONFIG_STATUS=$?
+    case "$T3_CONFIG_STATUS" in
+        0) ;;
+        2) warning "Some T3 provider profiles are disabled until provisioned; see the diagnostics above." ;;
+        *) warning "T3 provider configuration failed."; LINK_FAILURE=1 ;;
+    esac
+else
+    info "Skipping T3 provider profiles; ~/.t3 not found."
+fi
 
 if [ "$PLAN_MANAGER_FAILURE" -ne 0 ] || [ "${LINK_FAILURE:-0}" -ne 0 ]; then
   echo "Dotfiles installation needs attention; see the diagnostics above."
