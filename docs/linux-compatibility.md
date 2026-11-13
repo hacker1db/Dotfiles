@@ -44,7 +44,7 @@ Detect the platform with `[[ $OSTYPE == darwin* ]]`; the installer scripts are z
 ## Linux gaps (no equivalent yet)
 
 - **Plan-manager service**: no service is installed on any OS anymore; the hosted site is the dashboard, and `plan serve` runs the local one by hand.
-- **1Password SSH agent on Linux**: the socket is `~/.1password/agent.sock`. `config/1Password/ssh/agent.toml` is cross-platform.
+- **1Password SSH agent on Linux**: the socket is `~/.1password/agent.sock`. Each machine owns its `~/.config/1Password/ssh/agent.toml`; Dotfiles does not track it.
 - **Clipboard over SSH**: tmux has `set-clipboard on`, so OSC 52 works in Ghostty. Nvim's `unnamedplus` needs a provider (`wl-copy`, `xclip`, or `vim.g.clipboard = "osc52"` when headless).
 
 ## Verified on Linux
