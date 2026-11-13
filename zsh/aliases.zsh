@@ -11,6 +11,7 @@ fi
 
 alias vim="nvim"
 alias vi="nvim"
+alias code="nvim"
 alias f="flutter"
 alias gitpulla='find . -mindepth 1 -maxdepth 1 -type d -print -exec git -C {} pull \;'
 # Filesystem aliases
