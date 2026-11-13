@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Spend chip clicks: right = today's spend breakdown in a tmux popup
-# (same popup-on-the-terminal-workspace convention as agents_click.sh).
+# (same popup convention as agents_click.sh).
 # Left-click does nothing — the chip is information, not navigation.
 
 [ "$BUTTON" = "right" ] || exit 0
@@ -18,6 +18,5 @@ cat >"$JQ" <<'EOF'
 (.byModel[:6][] | "  \((.label | split("/") | last))  $\(.costUSD*100|round/100)")
 EOF
 
-"$CONFIG_DIR/plugins/wm.sh" focus-label D || exit 1
 tmux display-popup -E -w 55% -h 40% \
   "echo 'crunching sessions…'; sessions report --today --stdout 2>/dev/null | jq -rf '$JQ'; echo; read -r"

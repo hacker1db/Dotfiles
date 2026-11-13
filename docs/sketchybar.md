@@ -17,10 +17,9 @@ The bar draws on the macOS main display (`display=main`). Hide the menu bar
 
 ## Upstream assumptions and how this port degrades
 
-- **AeroSpace/OmniWM**: upstream exits without a tiling WM. Here the workspace
-  pills, binding-mode badge, and WM watchdog are skipped and the center title
-  follows the frontmost app. With AeroSpace installed, the upstream behavior
-  returns on reload.
+- **AeroSpace/OmniWM**: upstream requires a tiling WM. This port drops the
+  workspace pills, binding-mode badge, and WM watchdog entirely; the center
+  title follows the frontmost app.
 - **fleet**: his agent-fleet watcher is not ported. The agents pill counts
   claude/codex panes found in tmux and hides when there are none; the attention
   chip needs fleet's hook status files and stays hidden.

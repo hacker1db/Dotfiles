@@ -110,14 +110,9 @@ if [ "$WAITING" -eq 0 ] && [ "${PREV:-0}" -gt 0 ]; then
   sleep 2
 fi
 
-# On the terminal workspace tmux's own statusline already shows all of
-# this — keep the pill quiet and drop the chip instead of shouting twice.
-SUPPRESS=0
-[ "$(cat "$STATE_DIR/focused-workspace" 2>/dev/null)" = "D" ] && SUPPRESS=1
-
 ROBOT=$(printf '\xf3\xb0\x9a\xa9') # nf-md-robot U+F06A9
 
-if [ "$WAITING" -gt 0 ] && [ "$SUPPRESS" -eq 0 ]; then
+if [ "$WAITING" -gt 0 ]; then
   TOP=$(head -1 <<<"$ROWS")
   IFS='|' read -r STATE PANE SESSION TOOL <<<"$TOP"
   # Fleet's vocabulary: waiting / asking / ready
@@ -140,7 +135,7 @@ if [ "$WAITING" -gt 0 ] && [ "$SUPPRESS" -eq 0 ]; then
     --set attention drawing=on icon="$GLYPH" icon.color="$COLOR" \
     label="$SESSION $VERB: $TASK" label.color="$COLOR" \
     background.color="$FILL" background.border_color="$EDGE" \
-    click_script="\"$CONFIG_DIR/plugins/wm.sh\" focus-label D && fleet switch $PANE"
+    click_script="fleet switch $PANE"
 
   # Escalation bounce: only when the top tier got MORE urgent
   if [ "$RANK" -gt "${PREV_RANK:-0}" ]; then
@@ -148,10 +143,8 @@ if [ "$WAITING" -gt 0 ] && [ "$SUPPRESS" -eq 0 ]; then
   fi
 else
   # Calm: dim green robot = fleet healthy; unlit edge, muted count.
-  # (Suppressed-but-waiting on D keeps fg text so it's readable up close.)
   COLOR="$CALM_GREEN"
   COUNT_COLOR="$GREY"
-  [ "$WAITING" -gt 0 ] && COUNT_COLOR="$FG"
   sketchybar --animate tanh 15 \
     --set "$NAME" drawing=on icon="$ROBOT" icon.color="$COLOR" \
     label="$TOTAL" label.color="$COUNT_COLOR" \

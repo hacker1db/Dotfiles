@@ -2,8 +2,6 @@
 # Agents pill clicks: left = fleet dashboard popup (mirrors prefix-y),
 # right = jump to next waiting agent (mirrors prefix-n).
 
-"$CONFIG_DIR/plugins/wm.sh" focus-label D || exit 1
-
 case "$BUTTON" in
 right)
   fleet next || tmux display-message "fleet next: no waiting agents"
