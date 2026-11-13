@@ -18,7 +18,9 @@ if command -v gh &> /dev/null; then
     repo="$(gh repo view --json nameWithOwner -q .nameWithOwner 2> /dev/null)"
 fi
 
-print -P "%B%F{cyan}󰊢 ${toplevel:t}%f%b %F{8}($(git branch --show-current 2> /dev/null || print detached))%f"
+local name="${toplevel:t}" branch="$(git branch --show-current 2> /dev/null)"
+[[ -n "$branch" ]] || branch=detached
+print -P "%B%F{cyan}󰊢 ${${${name//[[:cntrl:]]/}//\\/\\\\}//\%/%%}%f%b %F{8}(${${${branch//[[:cntrl:]]/}//\\/\\\\}//\%/%%})%f"
 if [[ "$signing" == true ]]; then
     print -P "  %F{green}●%f auto-signing %F{green}on%f %F{8}(gpg.format=${format:-openpgp})%f"
 else
@@ -52,7 +54,7 @@ git log -n "$count" --format='%H%x1f%h%x1f%G?%x1f%GS%x1f%s' "$rev" | while IFS=$
             if [[ "$verified" == true ]]; then
                 remote_status="%F{green} verified%f"
             else
-                remote_status="%F{red} not verified (${reason})%f"
+                remote_status="%F{red} not verified (${${${reason//[[:cntrl:]]/}//\\/\\\\}//\%/%%})%f"
             fi
         else
             remote_status="%F{8} not pushed%f"
@@ -61,8 +63,8 @@ git log -n "$count" --format='%H%x1f%h%x1f%G?%x1f%GS%x1f%s' "$rev" | while IFS=$
 
     print -P "%F{magenta}${short}%f  ${local_status}  ${remote_status}"
     by=""
-    [[ -n "$signer" ]] && by=" %F{8}by ${signer//\%/%%}%f"
-    print -P "         %F{white}${subject//\%/%%}%f${by}"
+    [[ -n "$signer" ]] && by=" %F{8}by ${${${signer//[[:cntrl:]]/}//\\/\\\\}//\%/%%}%f"
+    print -P "         %F{white}${${${subject//[[:cntrl:]]/}//\\/\\\\}//\%/%%}%f${by}"
 done
 
 print
