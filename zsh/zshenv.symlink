@@ -9,6 +9,11 @@ export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
 [[ -d "$CACHEDIR" ]] || mkdir -p "$CACHEDIR"
 [[ -d "$VIM_TMP" ]] || mkdir -p "$VIM_TMP"
 
+for _op_sock in ~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock ~/.1password/agent.sock; do
+    [[ -S $_op_sock ]] && { export SSH_AUTH_SOCK=$_op_sock; break; }
+done
+unset _op_sock
+
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
 
 source "$DOTFILES/zsh/fpath"
