@@ -1,0 +1,8 @@
+command -v sketchybar &> /dev/null || { print -u2 "sb: sketchybar is not installed"; return 1 }
+if pgrep -x sketchybar &> /dev/null; then
+    brew services stop sketchybar &> /dev/null
+    pkill -x sketchybar
+    print "sketchybar stopped"
+else
+    brew services start sketchybar &> /dev/null && print "sketchybar started"
+fi

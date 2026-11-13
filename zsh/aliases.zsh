@@ -127,6 +127,5 @@ alias xfc='codex-foundry resume --last'
 alias devtoy='open /Applications/DevToy.app'
 
 # SketchyBar
-alias sb='sketchybar --bar hidden=toggle'
 alias sbon='brew services start sketchybar'
 alias sboff='brew services stop sketchybar'
