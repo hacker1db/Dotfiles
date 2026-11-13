@@ -31,10 +31,17 @@ if command -v skillctl &> /dev/null; then
     unset _skillctl_completion
 fi
 
-# t3 completion
+# T3 Code completion. `t3 --completions zsh` takes ~0.4s, so cache it and
+# regenerate only when the t3 runtime changes (t3m's completion lives in zsh/functions/_t3m).
 if command -v t3 &> /dev/null; then
-    _t3_completion="$(t3 --completions zsh 2>/dev/null)" && [[ -n $_t3_completion ]] && eval "$_t3_completion"
-    unset _t3_completion
+    _t3_cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/_t3_completion.zsh"
+    _t3_bin="${T3CODE_HOME:-$HOME/.t3}/runtime/versions"
+    if [[ ! -s $_t3_cache || $_t3_bin -nt $_t3_cache ]]; then
+        mkdir -p "${_t3_cache:h}"
+        t3 --completions zsh > "$_t3_cache" 2>/dev/null || rm -f "$_t3_cache"
+    fi
+    [[ -s $_t3_cache ]] && source "$_t3_cache"
+    unset _t3_cache _t3_bin
 fi
 
 # Moved auto help load stuff for me

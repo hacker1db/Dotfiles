@@ -102,6 +102,10 @@ To retire a tool, remove its Brewfile declaration and run the installer on each 
 - `./install.sh tmux-plugins` bootstraps TPM at `~/.local/share/tmux/plugins/tpm`, copying an existing plugin directory from a dotfiles worktree when available and otherwise cloning over SSH. Plugin storage is shared across worktrees. Incomplete installations fail with a diagnostic. Reload tmux, then press Ctrl+a followed by Shift+i to install configured plugins.
 - `tmux-reload-all` reloads the server configuration, refreshes attached clients, and starts a fresh Zsh in the current terminal. Run it once in each affected shell after a Homebrew Zsh upgrade; other panes keep their running programs. Reloading configuration alone cannot restore module files removed from an older Zsh installation.
 
+### T3 Code
+
+`bin/t3m` puts fzf menus and shortcuts on top of the T3 Code `t3` CLI. Run `t3m` alone for a menu, or use `t3m threads`, `t3m projects`, `t3m new [project] [message]`, `t3m send`, `t3m show`, `t3m web`, `t3m add`, `t3m rename`, `t3m rm`, `t3m open` and `t3m pair`. Other subcommands go straight to `t3`. Projects can be named by id, title, or any path inside them. Threads started here run on the same background server as the desktop and mobile apps, so you can pick them up there. Project and thread lists come from T3's state database, opened read-only, because `t3` has no command to list projects. `zsh/functions/_t3m` completes live project ids, thread ids and model slugs. `zsh/completion.zsh` caches `t3 --completions zsh` and rebuilds it when the t3 runtime changes. After first install, run `rm ~/.zcompdump-*; exec zsh` so `compinit -C` picks up `_t3m`. Tests: `bash install/tests/t3m.test.sh`.
+
 ### Worktrunk and Git worktrees
 
 `wt` shell integration is loaded from Zsh. User settings are in [config/worktrunk/config.toml](config/worktrunk/config.toml), linked at `~/.config/worktrunk/config.toml`. Worktrees use sibling directories named after sanitized branches; switching in tmux renames the window. Commit generation calls the configured `ocr` command, which must be available separately.
