@@ -20,6 +20,7 @@ alias ...='cd ../..'
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias cat='bat'
+alias bathelp='bat --plain --language=help'
 alias tf="terraform"
 alias p="pnpm"
 alias pn="pnpm"
@@ -129,3 +130,44 @@ alias devtoy='open /Applications/DevToy.app'
 # SketchyBar
 alias sbon='brew services start sketchybar'
 alias sboff='brew services stop sketchybar'
+
+# kubectl
+if command -v kubectl &> /dev/null; then
+    alias k=kubectl
+    compdef __start_kubectl k
+fi
+
+# git
+alias ga='git add'
+alias gb='git branch'
+alias gl='git pull'
+alias gp='git push'
+alias gd='hunk diff'
+alias gdc='git diff --cached --name-only --relative --diff-filter=d | xargs bat --diff'
+alias gs='git s'
+alias gss='git stash save'
+alias gsp='git stash pop'
+alias gmv='git mv'
+alias grm='git rm'
+alias grn='git-rename'
+alias glog="git l"
+alias gcm="git commit -am"
+alias gcs="git commit -S -am"
+alias gds='hunk diff --staged'
+alias git-undo='git reset --soft HEAD~1'
+alias git-count='git shortlog -sn'
+alias git-undopush="git push -f origin HEAD^:master"
+alias cpbr="git rev-parse --abbrev-ref HEAD | pbcopy"
+alias gcb="git rev-parse --abbrev-ref HEAD | pbcopy"
+alias sch="git rev-parse HEAD | pbcopy"
+# git root
+alias gr='[ ! -z `git rev-parse --show-cdup` ] && cd `git rev-parse --show-cdup || pwd`'
+alias sub-pull='git submodule foreach git pull origin master'
+alias gcc='git-clean-merged'
+alias wtm='wt main'
+
+# tmux
+alias ta='tmux attach'
+alias tls='tmux ls'
+alias tat='tmux attach -t'
+alias tns='tmux new-session -s'
