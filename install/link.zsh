@@ -170,7 +170,11 @@ title "Configuring the 1Password SSH agent"
 OP_AGENT_TOML="$HOME/.config/1Password/ssh/agent.toml"
 typeset op_item op_vault op_current
 if [[ -L "$HOME/.config/1Password" || -L "${OP_AGENT_TOML:h}" || -L "$OP_AGENT_TOML" ]]; then
-    warning "$OP_AGENT_TOML is linked into a checkout; make it machine-owned with 'fleet op-agent -item <item> -vault <vault>' from fleet-manager"
+    if command -v fm &> /dev/null; then
+        warning "$OP_AGENT_TOML is linked into a checkout; make it machine-owned with 'fm op-agent -item <item> -vault <vault>'"
+    else
+        warning "$OP_AGENT_TOML is linked into a checkout; replace the link with a regular file, then rerun this step"
+    fi
 elif [[ "${DOTFILES_NONINTERACTIVE:-0}" != 1 && -t 0 ]]; then
     op_current=("${(@f)$(op_agent_first_key "$OP_AGENT_TOML")}")
     read -r "op_item?1Password item name of this machine's GitHub SSH key (blank to skip) [${op_current[1]:-}]: "

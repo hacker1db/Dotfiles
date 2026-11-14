@@ -6,7 +6,7 @@
 #
 # The personal API key is read from 1Password. When OP_SERVICE_ACCOUNT_TOKEN is set (exported by
 # ~/.localrc on headless machines), the Automation vault service account is used with biometric
-# unlock disabled, the same way fleet-manager's fleet-git and fleet-ssh get their keys. When it is
+# unlock disabled. When it is
 # not set, op uses the desktop app integration so you approve the read with Touch ID; the account
 # is pinned to GITGUARDIAN_PERSONAL_OP_ACCOUNT (default my.1password.com) so it never reads from a
 # work account. Override the item with GITGUARDIAN_PERSONAL_OP_REF.
