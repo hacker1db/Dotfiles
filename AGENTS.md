@@ -103,7 +103,7 @@ The repository installs unchanged on many machines.
 - Never commit, log, or expose secrets, API keys, or credentials. The GitGuardian pre-commit hook blocks them in personal repos, and CI runs TruffleHog.
 - Never write SSH key files to disk, including public keys for `IdentityFile` pinning. Keys live only in a password manager and are served by its SSH agent. Fix key selection through the password manager, not through files in `~/.ssh`.
 - Git signs with SSH keys from that agent. The signing key is set in `~/.gitconfig-local`.
-- GitHub fetches use HTTPS with the `gh` credential helper; only pushes use SSH (see README, GitHub transport). Do not reintroduce SSH `insteadOf` rules for fetching: background fetches over SSH exhaust the 1Password service-account quota.
+- GitHub remotes use SSH with Git's defaults. Do not add URL rewrites (`insteadOf`, `pushInsteadOf`) or credential helpers to the tracked gitconfig; machine-specific transport settings belong in untracked config.
 - Zsh runs `compinit -C`, which skips the security check on completion directories.
 
 ## Boundaries

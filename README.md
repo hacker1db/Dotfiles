@@ -16,7 +16,7 @@ zsh -c "$(curl -fsSL https://raw.githubusercontent.com/hacker1db/Dotfiles/main/i
 
 When `install.sh` runs outside a checkout, it clones the repository bare into `~/Developer/dotfiles` with a `main` worktree (the layout `bin/git-bare-clone` creates), then runs `~/Developer/dotfiles/main/install.sh all`. Pass a step to run it instead of `all`: `zsh -c "$(curl ...)" _ link`. It first checks for the Xcode Command Line Tools, which provide Git, and starts their installer if they are missing; run the command again once they finish. Rerunning resumes an interrupted clone and skips steps already done, and it stops if `~/Developer/dotfiles/.bare` or `main` exists but is not this repository.
 
-The first clone uses HTTPS because no SSH agent is set up yet; the repository is public, so it needs no credentials. Once `install.sh` links `~/.gitconfig`, GitHub fetches (including in `~/Developer/dotfiles`) use HTTPS with the `gh` login token and pushes use SSH, like any other repository; see [GitHub transport](#github-transport). The installed links always point at `~/Developer/dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/Developer/dotfiles/`.
+The first clone uses HTTPS because no SSH agent is set up yet; the repository is public, so it needs no credentials. Once SSH works, switch its remote with `git -C ~/Developer/dotfiles remote set-url origin git@github.com:hacker1db/Dotfiles.git`. The installed links always point at `~/Developer/dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/Developer/dotfiles/`.
 
 Each step under `install/` is one zsh script with the same name; `install.sh` runs them in order. The scripts change macOS preferences and configure applications, so review them before a full run.
 
@@ -44,15 +44,16 @@ Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEB
 | --- | --- |
 | `./install.sh tools` | Install Homebrew, the tools declared in `install/brewfile` (removing undeclared Homebrew and App Store packages), and developer tools; finish with the deferred installs and `chsh` |
 | `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, configure the Git identity and signing key, and install the Go `plan` CLI |
-| `./install.sh node` | Install pnpm (standalone installer, if missing) and pnpm global tools; run Readwise and Codex Security login setup |
+| `./install.sh node` | Install pnpm (standalone installer, if missing) and pnpm global tools; run `readwise login` when interactive |
 | `./install.sh dotnet` | Install .NET SDKs, runtimes, and global tools |
 | `./install.sh osx` | Apply macOS preferences, create standard folders, and install NvimTmux.app with `duti` associations |
+| `./install.sh browser list` | List browsers that can be the default (`apply <name>`, `current`, and `sync` also work) |
 | `./install.sh theme list` | List theme candidates (`apply <name>`, `current`, and `sync` also work) |
 | `./install.sh tmux-plugins` | Bootstrap TPM at `~/.local/share/tmux/plugins/tpm` |
 | `./install.sh agent-profiles` | Generate and link the Claude Code profiles and the Codex Foundry home (`--check`, `--skip-foundry`) |
 | `./install.sh deferred` | Finish the Brewfile installation and cleanup that were skipped because they need a password, then `chsh` |
 
-`all` runs tools, link, node, dotnet, osx, theme, browser, tmux-plugins, and agent-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` (GitHub fetches need the `gh` login; pushes need an SSH agent) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs tools, link, node, dotnet, osx, theme, browser, tmux-plugins, and agent-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` (GitHub remotes use SSH) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity and signing-key prompts; it does not suppress every authentication prompt.
 
@@ -79,7 +80,7 @@ To retire a tool, remove its Brewfile declaration and run the installer on each 
 - fzf-tab uses zfetch; completion includes kubectl, 1Password, sesh, and skillctl. fnm selects Node versions when entering directories with Node project markers.
 - Plan completion uses native Zsh output when supported and falls back to Bash completion through the initialized `bashcompinit` for older CLI installations.
 - `daily` opens a dated SecondBrain note, `yy` changes directory through Yazi, `ts` and Alt+s select sesh sessions, and `gh-rate-limit` inspects GitHub limits.
-- Ghostty uses `config/ghostty/config`: JetBrains Mono italic at 14pt, 78% opacity, blur, linkarzu colors, and clipboard copy-on-select. The old WezTerm configuration has been removed.
+- Ghostty uses `config/ghostty/config`: JetBrains Mono italic at 14pt, 87% opacity, blur, the Eldritch theme, and clipboard copy-on-select. The old WezTerm configuration has been removed.
 - tmux lives in `config/tmux/tmux.conf`, uses Ctrl+a as its prefix, and includes vi copy mode, mouse support, undercurl colors, session persistence through resurrect/continuum, and Neovim pane navigation. Prefix+o opens sesh; prefix+g opens lazygit; prefix+G opens gh-dash; prefix+O opens the fleet dashboard popup; prefix+u uses the fzf URL picker. `tm` lists sessions or creates one (`tm <name>`); inside tmux it switches the current client instead of nesting.
 - ai-usage reads `config/ai-usage/projects.yaml`, linked at `~/.config/ai-usage/`, for its ownership rules and dashboard profile filters (`profiles:`). By default GitHub user-owned repos are labeled personal and org-owned repos org; the file holds exceptions.
 - `./install.sh tmux-plugins` bootstraps TPM at `~/.local/share/tmux/plugins/tpm`, copying an existing plugin directory from a dotfiles worktree when available and otherwise cloning `git@github.com:tmux-plugins/tpm` (fetched over HTTPS once `~/.gitconfig` is linked). Plugin storage is shared across worktrees. Incomplete installations fail with a diagnostic. Reload tmux, then press Ctrl+a followed by Shift+i to install configured plugins.
@@ -87,11 +88,11 @@ To retire a tool, remove its Brewfile declaration and run the installer on each 
 
 ### T3 Code
 
-`bin/t3m` puts fzf menus and shortcuts on top of the T3 Code `t3` CLI. Run `t3m` alone for a menu, or use `t3m threads`, `t3m projects`, `t3m new [project] [message]`, `t3m send`, `t3m show`, `t3m web`, `t3m add`, `t3m rename`, `t3m rm`, `t3m open` and `t3m pair`. Other subcommands go straight to `t3`. Projects can be named by id, title, or any path inside them. Threads started here run on the same background server as the desktop and mobile apps, so you can pick them up there. Project and thread lists come from T3's state database, opened read-only, because `t3` has no command to list projects. `zsh/functions/_t3m` completes live project ids, thread ids and model slugs. `zsh/completion.zsh` caches `t3 --completions zsh` and rebuilds it when the t3 runtime changes. After first install, run `rm ~/.zcompdump-*; exec zsh` so `compinit -C` picks up `_t3m`.
+`bin/t3m` puts fzf menus and shortcuts on top of the T3 Code `t3` CLI. Run `t3m` alone for a menu, or use `t3m threads`, `t3m projects`, `t3m new [project] [message]`, `t3m send`, `t3m show`, `t3m web`, `t3m add`, `t3m rename`, `t3m rm`, and `t3m open`. Other subcommands, such as `t3m pair`, go straight to `t3`. Projects can be named by id, title, or any path inside them. Threads started here run on the same background server as the desktop and mobile apps, so you can pick them up there. Project and thread lists come from T3's state database, opened read-only, because `t3` has no command to list projects. `zsh/functions/_t3m` completes live project ids, thread ids and model slugs. `zsh/completion.zsh` caches `t3 --completions zsh` and rebuilds it when the t3 runtime changes. After first install, run `rm ~/.zcompdump-*; exec zsh` so `compinit -C` picks up `_t3m`.
 
 ### Worktrunk and Git worktrees
 
-`wt` shell integration is loaded from Zsh. User settings are in [config/worktrunk/config.toml](config/worktrunk/config.toml), linked at `~/.config/worktrunk/config.toml`. Worktrees use sibling directories named after sanitized branches; switching in tmux renames the window. Commit generation calls the configured `ocr` command, which must be available separately.
+`wt` shell integration is loaded from Zsh. User settings are in [config/worktrunk/config.toml](config/worktrunk/config.toml), linked at `~/.config/worktrunk/config.toml`. Worktrees use sibling directories named after sanitized branches. Commit generation calls the configured `ocr` command, which must be available separately.
 
 ```sh
 wt switch --create feature/my-change
@@ -127,12 +128,12 @@ git-bare-clone --fix [<path>]                         # repair a missing .git po
 
 ## Neovim
 
-Configuration: `config/nvim/`. lazy.nvim imports the `extra`, `git`, `ui`, `lsp`, and `mini` plugin directories.
+Configuration: `config/nvim/`. lazy.nvim imports `lua/plugins/` and its `extra`, `git`, `ui`, `lsp`, and `mini` subdirectories.
 
 | Area | Current configuration |
 | --- | --- |
 | Completion | blink.cmp, LuaSnip, Copilot completion integration |
-| LSP | mason.nvim, lspconfig, lspsaga; TypeScript tools, gopls, Lua, Python, Terraform, Docker, YAML, JSON, markdown-oxide, and harper-ls |
+| LSP | mason.nvim, lspconfig, lspsaga; TypeScript tools, gopls, Lua, Python, Terraform, Docker, YAML, markdown-oxide, and harper-ls |
 | Formatting/linting | conform.nvim and nvim-lint |
 | Navigation/UI | Snacks explorer, picker, dashboard, notifier, indent, terminal, and zen; lualine, noice, which-key, trouble |
 | Git | Fugitive, Gitsigns, Neogit, Octo; Telescope Git pickers and Snacks Git views |
@@ -143,7 +144,7 @@ Configuration: `config/nvim/`. lazy.nvim imports the `extra`, `git`, `ui`, `lsp`
 
 `;` is both the leader and local leader. Use `<leader>e` for the explorer, `<leader>ff` for files, `<leader>fr` for recent files, `<leader>/` for grep, `<leader>,` for buffers, and `<leader>sh` for help. `gd`/`gr` navigate LSP definitions/references. See `lua/core/keymaps.lua` and plugin `keys` tables for the complete mappings; some Git mappings are defined in both places.
 
-The former nvim-cmp and nvim-tree configurations are removed. mini.files, mini.pick, and Avante are not configured. [Mini plugin notes](config/nvim/lua/plugins/mini/mini.md) describe the active modules. Standalone specs for mini.bracketed, mini.diff, and undotree remain directly under `lua/plugins/`, outside the imported directories; their presence and related keymaps do not establish that they load.
+The former nvim-cmp and nvim-tree configurations are removed. mini.files, mini.pick, and Avante are not configured. [Mini plugin notes](config/nvim/lua/plugins/mini/mini.md) describe the active modules. mini.bracketed, mini.diff, and undotree are top-level specs in `lua/plugins/` and load like the rest.
 
 ```sh
 nvim +checkhealth
@@ -156,17 +157,13 @@ Plugin sync installs/updates plugins and can modify `lazy-lock.json`; it is not 
 
 Each machine uses one GitHub user. `git/gitconfig.symlink` holds account-neutral defaults: `hunk pager`, Delta for interactive diffs, and fast-forward-only pulls. The machine's `user.name`, `user.email`, `github.user`, `user.signingkey`, and `gpg.ssh.program` live in the untracked `~/.gitconfig-local`, which `~/.gitconfig` includes last. `./install.sh link` prompts for each value and enables commit and tag signing once a signing key is set. Commits are signed with SSH keys from your SSH agent; `~/.ssh/config` is left to each machine.
 
-### GitHub transport
+### Hooks
 
-`git/gitconfig.symlink` splits GitHub traffic by direction. Fetch, pull, clone, and `ls-remote` rewrite every GitHub URL form (`git@github.com:`, `ssh://git@github.com/`, `http://`, `git://`) to `https://github.com/` and authenticate with `gh auth git-credential`, so fetches need no SSH key. Pushes are rewritten back to `git@github.com:` with `pushInsteadOf` and go over SSH; commit signing still uses SSH keys. The credential helper is scoped to `https://github.com` and `https://gist.github.com` (no helper for other hosts) and finds `gh` on `PATH` or in `/opt/homebrew/bin`, `/home/linuxbrew/.linuxbrew/bin`, or `/usr/local/bin`, so it also works from non-login processes. `gh` must be logged in as the machine's GitHub user. Non-GitHub remotes are untouched. A remote with an explicit `pushurl` is not covered by `pushInsteadOf`, so it pushes over HTTPS with the `gh` token; remove the `pushurl` to push over SSH. Check a remote with `git remote get-url origin` (fetch) and `git remote get-url --push origin` (push).
-
-New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, which `install.sh link` creates and `install.sh use` repoints at the selected checkout. The dispatcher resolves `git/hooks/` from the checkout `~/.gitconfig` links to, falling back to `~/Developer/dotfiles/main`. Git copies template hooks only at clone time, so `install.sh link` also replaces stale dispatcher copies in existing repositories under `~/Developer` (override with colon-separated `DOTFILES_HOOK_ROOTS`). It runs matching files there and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a GitGuardian (`ggshield`, installed by the Brewfile) secret scan of staged changes. The GitGuardian hook runs only for repositories whose `origin` matches your personal remotes (`GITGUARDIAN_PERSONAL_REMOTES`) and skips every other repository. It reads your personal GitGuardian API key from 1Password with `op read` (`GITGUARDIAN_PERSONAL_OP_REF` selects the item; `GITGUARDIAN_PERSONAL_OP_ACCOUNT` selects the account), so you approve the read in the 1Password app. It blocks the commit when it finds a secret, when the key cannot be read, or when `ggshield` or `op` is not installed.
+New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, which `install.sh link` creates and `install.sh use` repoints at the selected checkout. The dispatcher resolves `git/hooks/` from the checkout `~/.gitconfig` links to, falling back to `~/Developer/dotfiles/main`. Git copies template hooks only at clone time, so `install.sh link` also replaces stale dispatcher copies in existing repositories under `~/Developer` (override with colon-separated `DOTFILES_HOOK_ROOTS`). It runs matching files there and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a GitGuardian (`ggshield`, installed by the Brewfile) secret scan of staged changes. The GitGuardian hook scans only repositories whose `origin` belongs to `github.user` or a `github.org` value from your Git config (override with `GITGUARDIAN_PERSONAL_REMOTES`), and skips every other repository. It uses ggshield's stored login, so run `ggshield auth login` once per machine (`--method oob` without a browser); without one, the commit is blocked with that instruction. On a machine where ggshield is logged in to a different account, set `GITGUARDIAN_PERSONAL_OP_REF` in `~/.localrc` to an `op://` reference for your personal key.
 
 ## CI and security scanning
 
-`.github/workflows/ci.yml` runs on pushes to `main` and on pull requests: `zsh -n` over `install.sh`, `install/*.zsh`, and the Zsh configuration, plus Luacheck over the Neovim config (ignoring existing unused-variable and line-length warnings). A `secrets` job scans the full history with TruffleHog, pinned to a commit SHA, and fails on any finding, verified or unverified; false alarms get an exclude file reviewed in the PR. On pull requests, dependency review fails if a change adds a dependency with a known vulnerability of any severity.
-
-`.github/workflows/codeql.yml` runs CodeQL `security-extended` queries for GitHub Actions and JavaScript/TypeScript on pushes to `main`, on pull requests, and weekly. `.github/dependabot.yml` opens update pull requests for npm, NuGet, Docker, and pinned GitHub Actions. Every action is pinned to a commit SHA.
+CI runs syntax checks, Luacheck, a TruffleHog secret scan, dependency review, and CodeQL. See [CI and security scanning](docs/ci.md).
 
 ## T3 Code
 
@@ -177,10 +174,10 @@ Installation registers T3 providers for Claude personal, work subscription, and 
 | Tool | Source | Installed instruction file |
 | --- | --- | --- |
 | Claude Code | `claude/CLAUDE.md` | `~/.claude-{personal,subscription,foundry}/CLAUDE.md` |
-| Codex | `codex/AGENTS.md` → `global/AGENTS.md` | `~/.codex/AGENTS.md` |
-| Copilot CLI | `config/copilot/copilot-instructions.md` → `global/AGENTS.md` | `~/.copilot/copilot-instructions.md` |
+| Codex | `global/AGENTS.md` | `~/.codex/AGENTS.md` |
+| Copilot CLI | `global/AGENTS.md` | `~/.copilot/copilot-instructions.md` |
 
-Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for the single shared policy. `claude/CLAUDE.md` and the other tool instruction sources are symlinks to it. `./install.sh link` installs the instruction links with backups. Start a new tool session to reload them.
+Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for the single shared policy. `claude/CLAUDE.md` and the other tool instruction sources are symlinks to it. `./install.sh link` links the Codex and Copilot files and backs up anything already there; `./install.sh agent-profiles` links each Claude profile's `CLAUDE.md` and skips a path that is not already a link. Start a new tool session to reload them.
 
 Claude installation links instructions, output styles, and the statusline script into each profile directory, and generates each profile's settings from layered fragments. MCP configuration is linked to `~/.mcp.json`.
 
@@ -213,16 +210,15 @@ skillctl --repo /path/to/project add caido-mode
 ./install.sh theme sync
 ```
 
-The theme script writes Neovim, Starship, Ghostty, and tmux settings. Candidate names come from the terminal/tmux theme files; a listed name does not guarantee a matching theme for every application. These operations can modify tracked configuration.
+The theme script writes tmux, Ghostty, Starship, and sketchybar settings; Neovim keeps its own Eldritch colorscheme. Candidate names come from the terminal/tmux theme files; a listed name does not guarantee a matching theme for every application. These operations can modify tracked configuration.
 
 ## Validation
 
-```sh
-for f in install.sh install/*.zsh; do zsh -n "$f" || exit 1; done
-zsh -n zsh/zshrc.symlink
-zsh -n zsh/functions.zsh
-zsh install/agent-profiles.zsh --check
+```zsh
+for f in install.sh install/*.zsh zsh/*.zsh zsh/*.symlink zsh/functions/* bin/tmux-reload-all; do zsh -n "$f" || print -u2 "syntax error: $f"; done
 git diff --check
+luacheck config/nvim
+zsh install/agent-profiles.zsh --check
 ```
 
-Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh` (links target `~/Developer/dotfiles/main` unless `DOTFILES` says otherwise). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` loops plus TruffleHog, which fails on any finding.
+Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh` (links target `~/Developer/dotfiles/main` unless `DOTFILES` says otherwise). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` checks and Luacheck, plus TruffleHog, which fails on any finding.
