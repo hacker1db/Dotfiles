@@ -8,19 +8,13 @@ Personal macOS development configuration for Zsh, Neovim, tmux, Ghostty, Git, an
 
 ## Installation
 
-On a new machine, nothing needs to be set up first. The repository is cloned bare with one worktree per branch, the same layout `bin/git-bare-clone` creates. That script is not on `PATH` yet, so clone by hand:
+On a new machine, run:
 
-```sh
-mkdir -p ~/Developer/dotfiles && cd ~/Developer/dotfiles
-git clone --bare https://github.com/hacker1db/Dotfiles.git .bare
-echo "gitdir: ./.bare" > .git
-git --git-dir=.bare config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-git --git-dir=.bare fetch origin
-git --git-dir=.bare worktree add main main
-git -C main branch --set-upstream-to=origin/main
-cd main
-./install.sh all
+```zsh
+zsh -c "$(curl -fsSL https://raw.githubusercontent.com/hacker1db/Dotfiles/main/install.sh)"
 ```
+
+When `install.sh` runs outside a checkout, it clones the repository bare into `~/Developer/dotfiles` with a `main` worktree (the layout `bin/git-bare-clone` creates), then runs `~/Developer/dotfiles/main/install.sh all`. Pass a step to run it instead of `all`: `zsh -c "$(curl ...)" _ link`. It first checks for the Xcode Command Line Tools, which provide Git, and starts their installer if they are missing; run the command again once they finish. Rerunning resumes an interrupted clone and skips steps already done, and it stops if `~/Developer/dotfiles/.bare` or `main` exists but is not this repository.
 
 The first clone uses HTTPS because 1Password and its SSH agent are not installed yet; the repository is public, so it needs no credentials. Once `install.sh` links `~/.gitconfig`, GitHub fetches (including in `~/Developer/dotfiles`) use HTTPS with the `gh` login token and pushes use SSH through 1Password, like any other repository; see [GitHub transport](#github-transport). The installed links always point at `~/Developer/dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/Developer/dotfiles/`.
 
