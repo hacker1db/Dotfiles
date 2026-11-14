@@ -12,7 +12,7 @@ function wt-pull-all() {
             -n|--dry-run) dry_run=1 ;;
             -h|--help)
                 print "usage: wt-pull-all [--dry-run]"
-                print "Fetch all remotes, add a worktree for every unmerged remote branch, fast-forward every worktree,"
+                print "Fetch all remotes, add a worktree for every unmerged non-Dependabot remote branch, fast-forward every worktree,"
                 print "verify the default branch matches its upstream, then prune worktrees already merged into it."
                 return 0
                 ;;
@@ -63,6 +63,10 @@ function wt-pull-all() {
     local branch added=0
     for branch in "${remote_branches[@]}"; do
         if [[ "$branch" == "$default_branch" ]] || (( ${worktree_branches[(Ie)$branch]} )); then
+            continue
+        fi
+        if [[ "$branch" == dependabot/* ]]; then
+            print "    skipping $branch: Dependabot branch"
             continue
         fi
         if git merge-base --is-ancestor "$remote/$branch" "$remote/$default_branch" 2> /dev/null; then
