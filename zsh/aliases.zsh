@@ -58,7 +58,6 @@ alias docker='podman'
 alias publicip="pwsh -c '(Invoke-WebRequest ifconfig.me/ip).Content.Trim()'"
 alias localip="ipconfig getifaddr en1"
 alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
-alias k="kubectl"
 # Flush Directory Service cache
 alias flush="dscacheutil -flushcache"
 

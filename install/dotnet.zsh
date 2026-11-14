@@ -9,9 +9,7 @@ title "Installing .NET SDKs and runtimes"
 mkdir -p "$DOTNET_HOME"
 
 typeset install_script downloaded=""
-if [[ -x "$DOTFILES/bin/dotnet-install.sh" ]]; then
-    install_script="$DOTFILES/bin/dotnet-install.sh"
-elif command -v dotnet-install.sh >/dev/null 2>&1; then
+if command -v dotnet-install.sh >/dev/null 2>&1; then
     install_script="dotnet-install.sh"
 else
     install_script="$(mktemp)"
