@@ -213,7 +213,6 @@ function newreview(){
   $CODE_DIR/clitools/new-secure-review.sh "$@"
 }
 
-alias bathelp='bat --plain --language=help'
 help() {
     "$@" --help 2>&1 | bathelp
 }
@@ -335,11 +334,12 @@ function azdlogin(){
        fi
     az acr login -n "$@" --expose-token --query 'accessToken' -o tsv | podman login -u 00000000-0000-0000-0000-000000000000 --password-stdin "$@.azurecr.io"
 }
+# Add an issue/PR URL to a GitHub project; GHA_OWNER and GHA_PROJECT are set in the private ~/.localrc.
 function gha(){
-       gh project item-add 16 --owner Alaska-ITS --url "$@"
+       gh project item-add "${GHA_PROJECT:?set GHA_PROJECT in ~/.localrc}" --owner "${GHA_OWNER:?set GHA_OWNER in ~/.localrc}" --url "$@"
 }
 function brew-cleanup(){
-    local brewfile="${DOTFILES:-$HOME/.dotfiles/main}/install/brewfile"
+    local brewfile="${DOTFILES:-$HOME/Developer/dotfiles/main}/install/brewfile"
     local snapshot
     local leaves
     local formula
@@ -388,30 +388,48 @@ function brew-cleanup(){
 }
 
 function update-node-tools(){
-if ! command -v pnpm >/dev/null 2>&1; then
-  echo "pnpm not found."
-  return 1
-fi
-
-export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
-mkdir -p "$PNPM_HOME"
-export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
-
-if ! pnpm list --global --depth -1 2>/dev/null | grep -Eq '^[├└]── '; then
-  echo "No global pnpm packages found."
-  if command -v npm >/dev/null 2>&1; then
-    local npm_global_count
-    npm_global_count="$(npm list -g --depth=0 2>/dev/null | grep -Ec '^[├└]── ' || true)"
-    if [[ "${npm_global_count:-0}" -gt 0 ]]; then
-      echo "Found ${npm_global_count} npm global package(s). Run: npm update -g"
+    if ! command -v pnpm >/dev/null 2>&1; then
+        echo "pnpm not found."
+        return 1
     fi
-  fi
-  return 0
-fi
 
-echo "Updating global pnpm packages..."
-pnpm update --global --latest
-echo "All global pnpm packages updated!"
+    local -x PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+    local -x PATH="$PATH:$PNPM_HOME/bin:$PNPM_HOME"
+    local packages
+    mkdir -p "$PNPM_HOME" || return 1
+    packages="$(pnpm list --global --depth -1)" || return 1
+
+    local -a unmanaged=("@openai/codex-security")
+    local package removed=0
+    for package in $unmanaged; do
+        if print -r -- "$packages" | grep -qF -- "── ${package}@"; then
+            echo "Removing $package from global pnpm (not updatable from the registry)..."
+            pnpm remove --global "$package" || return 1
+            removed=1
+        fi
+    done
+    if (( removed )); then
+        packages="$(pnpm list --global --depth -1)" || return 1
+    fi
+
+    if ! print -r -- "$packages" | grep -Eq '^[├└]── '; then
+        echo "No global pnpm packages found."
+        if command -v npm >/dev/null 2>&1; then
+            local npm_global_count
+            npm_global_count="$(npm list -g --depth=0 2>/dev/null | grep -Ec '^[├└]── ' || true)"
+            if [[ "${npm_global_count:-0}" -gt 0 ]]; then
+                echo "Found ${npm_global_count} npm global package(s). Run: npm update -g"
+            fi
+        fi
+        return 0
+    fi
+
+    echo "Updating global pnpm packages..."
+    if ! pnpm update --global --latest; then
+        echo "Global pnpm update failed."
+        return 1
+    fi
+    echo "All global pnpm packages updated!"
 }
 
 function get-azsubcount(){
@@ -444,4 +462,48 @@ function bmad-init() {
   bmad-method install --yes \
     --modules bmm,bmb,cis \
     --tools claude-code,codex "$@"
+}
+
+# Caido in the background: proxy on :8082 (invisible), UI on :8081.
+# `caido` (start) | `caido stop` | `caido status` | `caido logs` | `caido fg`
+# Pair with `caido-thick up <domain>` for thick clients.
+function caido() {
+  local dir="${XDG_CACHE_HOME:-$HOME/.cache}/caido"
+  local pidfile="$dir/caido.pid" log="$dir/caido.log"
+  local -a args=(--proxy-listen "127.0.0.1:${CAIDO_PROXY_PORT:-8082}"
+                 --ui-listen "127.0.0.1:${CAIDO_UI_PORT:-8081}" --invisible)
+  local pid="$(cat "$pidfile" 2>/dev/null)"
+  local running=false
+  [[ -n $pid ]] && kill -0 "$pid" 2>/dev/null && running=true
+  mkdir -p "$dir"
+
+  case "${1:-start}" in
+    start)
+      if $running; then
+        echo "Caido already running (pid $pid) → http://127.0.0.1:${CAIDO_UI_PORT:-8081}"
+        return 0
+      fi
+      local holder="$(lsof -nP -iTCP:${CAIDO_PROXY_PORT:-8082} -sTCP:LISTEN -t 2>/dev/null | head -1)"
+      if [[ -n $holder ]]; then
+        echo "Port ${CAIDO_PROXY_PORT:-8082} already in use by pid $holder ($(ps -o comm= -p $holder)). Stop it first." >&2
+        return 1
+      fi
+      nohup caido-cli "${args[@]}" "${@:2}" >>"$log" 2>&1 &!
+      echo $! >"$pidfile"
+      sleep 1
+      if kill -0 "$(cat "$pidfile")" 2>/dev/null; then
+        echo "Caido started (pid $(cat "$pidfile")) → http://127.0.0.1:${CAIDO_UI_PORT:-8081}  logs: caido logs"
+      else
+        echo "Caido failed to start; last log lines:" >&2; tail -20 "$log" >&2; return 1
+      fi ;;
+    stop)
+      $running || { echo "Caido not running"; rm -f "$pidfile"; return 0; }
+      kill "$pid" && rm -f "$pidfile" && echo "Caido stopped (pid $pid)" ;;
+    status)
+      $running && echo "running (pid $pid)" || { echo "not running"; return 1; } ;;
+    logs)  tail -f "$log" ;;
+    fg)    $running && { echo "Caido already running in background (pid $pid); 'caido stop' first" >&2; return 1; }
+           caido-cli "${args[@]}" "${@:2}" ;;
+    *)     echo "usage: caido [start|stop|status|logs|fg] [extra caido-cli flags]" >&2; return 1 ;;
+  esac
 }

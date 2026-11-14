@@ -1,0 +1,195 @@
+#!/usr/bin/env bash
+# SketchyBar — https://felixkratz.github.io/SketchyBar/
+# Visual direction: "Phosphor" — dark frosted glass framed by the same
+# accent-blue hairline glow as the JankyBorders window borders; structure
+# drawn with 1px luminous strokes, not fills; Monaspace labels.
+#
+# Complements (never duplicates) the macOS menu bar OR the tmux statusline:
+# fleet-driven agent state with an attention chip, PRs awaiting review,
+# Claude usage when running hot, now-playing.
+#
+# Event flow (all push, polling only where no push exists):
+#   fleet hook status files -> bin/sketchybar-fleet-watch (fswatch)
+#     -> fleet_state_change -> plugins/agents.sh (agents pill + chip)
+#   bin/claude-statusline tee -> claude_usage_update -> plugins/usage.sh
+#   music: 5s system Now Playing poll via nowplaying-cli
+
+CONFIG_DIR="${CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/sketchybar}"
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+# Addressed through the ~/.config/sketchybar symlink so helpers come from
+# whichever checkout install.sh use has made active.
+DOTFILES_BIN="$CONFIG_DIR/../../bin"
+# colors.sh itself sources the active named theme (themes/current.sh) at the end
+source "$CONFIG_DIR/colors.sh"
+# Ported from nicknisi/dotfiles (MIT), without upstream's tiling-WM workspaces.
+
+GAUGE=$(printf '\xf3\xb0\x89\x81')  # nf-md-gauge  U+F0241
+GITHUB=$(printf '\xef\x82\x9b')     # nf-fa-github U+F09B
+PLANS=$(printf '\xef\x82\xae')      # nf-fa-tasks  U+F0AE
+
+MONO="Monaspace Neon"
+
+# ── Bar: dark glass with a live edge ─────────────────────────────
+sketchybar --bar \
+  position=top \
+  height=36 \
+  margin=10 \
+  y_offset=6 \
+  corner_radius=10 \
+  blur_radius=0 \
+  color="$BAR_COLOR" \
+  border_width=1 \
+  border_color="$BAR_BORDER" \
+  shadow=on \
+  padding_left=12 \
+  padding_right=12 \
+  display=main
+
+sketchybar --hotload true
+
+# ── Defaults: every chip has a visible fill AND a resting hairline ─
+sketchybar --default \
+  icon.font="Symbols Nerd Font Mono:Regular:14.0" \
+  icon.color="$GREY" \
+  label.font="$MONO:Regular:12.0" \
+  label.color="$FG" \
+  icon.padding_left=8 \
+  icon.padding_right=4 \
+  label.padding_left=2 \
+  label.padding_right=8 \
+  padding_left=6 \
+  padding_right=6 \
+  background.corner_radius=4 \
+  background.height=24 \
+  background.color="$ITEM_BG" \
+  background.border_width=1 \
+  background.border_color="$HAIRLINE" \
+  popup.background.color="$POPUP_BG" \
+  popup.background.corner_radius=6 \
+  popup.background.border_width=1 \
+  popup.background.border_color="$POPUP_BORDER" \
+  popup.blur_radius=30
+
+# ── Events ───────────────────────────────────────────────────────
+sketchybar --add event fleet_state_change \
+  --add event claude_usage_update
+
+# ── Right: agents · attention chip · reviews · usage · music ─────
+# agents: calm = dim green robot (fleet healthy); alerts light the edge
+# in fleet tier hues. Left-click = fleet popup, right-click = fleet next.
+sketchybar --add item agents right \
+  --subscribe agents fleet_state_change \
+  --set agents \
+  update_freq=60 \
+  click_script="$PLUGIN_DIR/agents_click.sh" \
+  script="$PLUGIN_DIR/agents.sh"
+
+# attention chip: rendered by agents.sh in the same batched call.
+# The loudest neon element — one saturated 1px edge, not a shout.
+sketchybar --add item attention right \
+  --set attention \
+  drawing=off \
+  label.max_chars=30 \
+  scroll_texts=on
+
+# spend: running daily dollar total across claude/codex/pi via
+# `sessions report` — placed beside the agents it measures
+sketchybar --add item spend right \
+  --subscribe spend system_woke \
+  --set spend \
+  icon="$" \
+  icon.font="$MONO:Bold:12.0" \
+  update_freq=900 \
+  drawing=off \
+  click_script="$PLUGIN_DIR/spend_click.sh" \
+  script="$PLUGIN_DIR/spend.sh"
+
+# The agent instrument cluster shares one shelf outline
+sketchybar --add bracket agent_cluster spend attention agents \
+  --set agent_cluster \
+  background.color="$TRANSPARENT" \
+  background.border_width=1 \
+  background.border_color="$GLOW_TRACE" \
+  background.corner_radius=6 \
+  background.height=28
+
+# github: review-requested count; left-click drops down the PR list
+# (rows open their PR), right-click opens the pulls page.
+sketchybar --add item github right \
+  --subscribe github mouse.exited.global system_woke \
+  --set github \
+  icon="$GITHUB" \
+  icon.color="$FG" \
+  update_freq=300 \
+  popup.align=right \
+  click_script="$PLUGIN_DIR/github_click.sh" \
+  script="$PLUGIN_DIR/github.sh"
+
+# Dropdown rows: pre-allocated slots filled by github.sh in one batch
+# (up to 9 PRs; the 10th becomes an overflow row when count > slots).
+for i in $(seq 0 9); do
+  sketchybar --add item github.popup.$i popup.github \
+    --set github.popup.$i \
+    icon="$GITHUB" \
+    icon.color="$GREY" \
+    label.max_chars=48 \
+    label.color="$FG_DIM" \
+    drawing=off
+done
+
+# plans: active Plan Manager plans, beside the review count; left-click drops
+# down the most recent plans (rows open their plan), right-click opens the dashboard.
+sketchybar --add item plans right \
+  --subscribe plans mouse.exited.global system_woke \
+  --set plans \
+  icon="$PLANS" \
+  icon.color="$FG" \
+  update_freq=300 \
+  popup.align=right \
+  drawing=off \
+  click_script="$PLUGIN_DIR/plans_click.sh" \
+  script="$PLUGIN_DIR/plans.sh"
+
+for i in $(seq 0 9); do
+  sketchybar --add item plans.popup.$i popup.plans \
+    --set plans.popup.$i \
+    icon="$PLANS" \
+    icon.color="$GREY" \
+    label.max_chars=48 \
+    label.color="$FG_DIM" \
+    drawing=off
+done
+
+# usage: hidden until the 5h Claude window runs hot (>=70%)
+sketchybar --add item usage right \
+  --subscribe usage claude_usage_update \
+  --set usage \
+  icon="$GAUGE" \
+  update_freq=300 \
+  drawing=off \
+  script="$PLUGIN_DIR/usage.sh"
+
+# now-playing: added last so it sits innermost, nearest the center.
+# 5s system Now Playing poll (media_change does not fire on this build);
+# album art renders inside the chip as the icon's background image.
+# Left-click play/pause, right-click next track.
+sketchybar --add item music right \
+  --subscribe music system_woke \
+  --set music \
+  icon="♪" \
+  icon.color="$MAGENTA" \
+  label.max_chars=28 \
+  scroll_texts=on \
+  update_freq=5 \
+  drawing=off \
+  click_script="$PLUGIN_DIR/music_click.sh" \
+  script="$PLUGIN_DIR/music.sh"
+
+# ── Fleet push watcher (only when fleet's watcher is installed) ──
+if [ -x "$DOTFILES_BIN/sketchybar-fleet-watch" ]; then
+  pkill -f 'fswatch.*claude-status' 2>/dev/null
+  (nohup "$DOTFILES_BIN/sketchybar-fleet-watch" >/dev/null 2>&1 &)
+fi
+
+# Force every item to run its script once so the bar starts populated
+sketchybar --update

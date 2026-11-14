@@ -1,6 +1,6 @@
 # hacker1db.dev — Blog Reference
 
-Shared reference for all blog agents (Claude Code, OpenCode). Read this file when generating, improving, or converting blog content.
+Shared reference for all blog agents (Claude Code, Codex, Copilot). Read this file when generating, improving, or converting blog content.
 
 ## Brand Voice
 

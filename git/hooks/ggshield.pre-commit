@@ -1,0 +1,47 @@
+#!/bin/sh
+# Scans staged changes with GitGuardian, only for repos whose origin belongs to a personal owner:
+# `git config github.user` and every `git config github.org` value. Every other repo is skipped.
+# Override the match with GITGUARDIAN_PERSONAL_REMOTES (an extended regex).
+#
+# ggshield uses its stored login (`ggshield auth login`) for GITGUARDIAN_PERSONAL_INSTANCE
+# (default https://dashboard.gitguardian.com). On a machine whose stored login belongs to another
+# account, set GITGUARDIAN_PERSONAL_OP_REF to an op:// reference for the personal API key; it is
+# read through the 1Password app for GITGUARDIAN_PERSONAL_OP_ACCOUNT (default my.1password.com).
+
+owners=$(
+	{
+		git config --get github.user
+		git config --get-all github.org
+	} 2>/dev/null | grep -E '^[A-Za-z0-9-]+$' | paste -sd '|' -
+)
+personal=${GITGUARDIAN_PERSONAL_REMOTES:-${owners:+github\.com[:/]($owners)/}}
+[ -n "$personal" ] || exit 0
+origin=$(git remote get-url origin 2>/dev/null) || exit 0
+printf '%s\n' "$origin" | grep -qiE "$personal" || exit 0
+
+command -v ggshield >/dev/null 2>&1 || {
+	echo "ggshield not found; install it with: brew install gitguardian/tap/ggshield" >&2
+	exit 1
+}
+
+GITGUARDIAN_INSTANCE=${GITGUARDIAN_PERSONAL_INSTANCE:-https://dashboard.gitguardian.com}
+export GITGUARDIAN_INSTANCE
+
+ref=${GITGUARDIAN_PERSONAL_OP_REF:-}
+if [ -n "$ref" ]; then
+	case $ref in
+		op://*) ;;
+		*) echo "GITGUARDIAN_PERSONAL_OP_REF must be an op:// reference; the commit is blocked." >&2; exit 1 ;;
+	esac
+	command -v op >/dev/null 2>&1 || {
+		echo "1Password CLI (op) not found; install it with: brew install 1password-cli" >&2
+		exit 1
+	}
+	echo "Requesting the GitGuardian key from 1Password; approve the prompt to continue." >&2
+	key=$(op read --no-newline --account "${GITGUARDIAN_PERSONAL_OP_ACCOUNT:-my.1password.com}" "$ref" </dev/null) || key=""
+	[ -n "$key" ] || { echo "Could not read the GitGuardian key from $ref; the commit is blocked." >&2; exit 1; }
+	GITGUARDIAN_API_KEY=$key
+	export GITGUARDIAN_API_KEY
+fi
+
+exec ggshield secret scan pre-commit "$@"

@@ -1,0 +1,11 @@
+fpath=(
+    "$DOTFILES/zsh/functions"
+    /usr/local/share/zsh/site-functions
+    /opt/homebrew/share/zsh/site-functions
+    $fpath
+    /opt/homebrew/share/zsh/functions
+    /usr/local/share/zsh/functions
+)
+typeset -U fpath
+fpath=(${^fpath}(N-/))
+typeset +x FPATH

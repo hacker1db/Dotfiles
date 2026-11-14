@@ -4,9 +4,7 @@ worktree-path = "{{ repo_path }}/../{{ branch | sanitize }}"
 pull-all = '''
 git fetch --all --prune && wt step for-each -- 'git rev-parse --verify -q @{u} >/dev/null || { echo "Skipping: no upstream"; exit 0; }; git pull --ff-only --no-autostash'
 '''
+main = "wt switch {{ default_branch }} && git -C {{ primary_worktree_path }} pull origin {{ default_branch }}"
 
 [commit.generation]
 command = "ocr -c \"write a commit message and push\""
-
-[post-switch]
-tmux = "[ -n \"$TMUX\" ] && tmux rename-window \"$(basename $(dirname {{ repo_path }}))/{{ branch | sanitize }}\""

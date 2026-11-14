@@ -1,12 +1,8 @@
 # vim:ft=gitconfig
-[github]
-    # @hacker1db on twitter/X :D
-[include]
-    # A local gitconfig, outside of version control.
-    # If the file doesn't exist it is silently ignored
-    path = ~/.gitconfig-local
+# Identity, signing, and anything machine-specific live in ~/.gitconfig-local,
+# written by `install.sh link`. It is included last so it overrides these defaults.
 [init]
-    templatedir = ~/.dotfiles/main/git/templates
+    templatedir = ~/.git-templates
 	defaultBranch = main
 [alias]
     # list all aliases
@@ -132,7 +128,6 @@
     editor = vim
     whitespace = cr-at-eol
 	autocrlf = input
-	hooksPath = /Users/David.Walters@alaskaair.com/Library/Application Support/ggshield/git-hooks
 
 [interactive]
     diffFilter = delta --color-only
@@ -149,14 +144,6 @@
 [grep]
     extendRegexp = true
     lineNumber = true
-# Git talks to GitHub over SSH only; HTTPS URLs are rewritten and no
-# credential helper exists to fall back to.
-[url "git@github.com:"]
-	insteadOf = https://github.com/
-	insteadOf = http://github.com/
-	insteadOf = git://github.com/
-[credential]
-	helper =
 ; [difftool "Kaleidoscope"] cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
 ;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
 ;  cmd = ksdiff --partial-changeset --relative-path \"$MERGED\" -- \"$LOCAL\" \"$REMOTE\" [mergetool "Kaleidoscope"]
@@ -170,6 +157,8 @@
 [pull]
 	ff = only
 
+[gpg]
+    format = ssh
+
 [include]
-    # Optional account profile linked by install/git.sh; ignored when missing
-    path = ~/.gitconfig-accounts
+    path = ~/.gitconfig-local

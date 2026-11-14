@@ -1,0 +1,109 @@
+#!/usr/bin/env zsh
+# caido-thick: route a thick client's traffic through Caido's invisible proxy.
+#
+#   caido-thick up <domain>...   hosts entries + redirect 80/443 -> Caido proxy port
+#   caido-thick down             remove everything this script added
+#   caido-thick status           show current hosts entries and redirect rules
+#
+# Based on https://docs.caido.io/app/tutorials/invisible_proxy.html
+# Start Caido with the `caido` alias (proxy on $CAIDO_PROXY_PORT, invisible mode).
+emulate -L zsh
+setopt err_return no_unset pipe_fail
+
+port="${CAIDO_PROXY_PORT:-8082}"
+marker="# caido-thick"
+hosts=/etc/hosts
+anchor="com.apple/caido-thick"   # macOS pf.conf already loads com.apple/* rdr anchors
+
+die() { print -u2 -- "caido-thick: $*"; return 1; }
+
+flush_dns() {
+    if [[ $OSTYPE == darwin* ]]; then
+        sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder 2>/dev/null || true
+    elif (( $+commands[resolvectl] )); then
+        sudo resolvectl flush-caches 2>/dev/null || true
+    fi
+}
+
+resolve() {
+    # Real IPv4 address, skipping any loopback entry we may have already added.
+    local ip
+    if (( $+commands[dig] )); then
+        ip="$(dig +short A "$1" | grep -E '^[0-9.]+$' | grep -v '^127\.' | head -1)"
+    else
+        ip="$(getent ahostsv4 "$1" 2>/dev/null | awk '$1 !~ /^127\./ {print $1; exit}')"
+    fi
+    [[ -n $ip ]] || return 1
+    print -r -- "$ip"
+}
+
+redirect_up() {
+    if [[ $OSTYPE == darwin* ]]; then
+        printf 'rdr pass on lo0 inet proto tcp from any to 127.0.0.1 port %s -> 127.0.0.1 port %s\n' 80 "$port" 443 "$port" \
+            | sudo pfctl -q -a "$anchor" -f -
+        sudo pfctl -q -e 2>/dev/null || true   # already enabled is fine
+    else
+        local p
+        for p in 80 443; do
+            sudo iptables -t nat -C OUTPUT -p tcp -d 127.0.0.1 --dport $p -j REDIRECT --to-port "$port" \
+                -m comment --comment caido-thick 2>/dev/null ||
+            sudo iptables -t nat -A OUTPUT -p tcp -d 127.0.0.1 --dport $p -j REDIRECT --to-port "$port" \
+                -m comment --comment caido-thick
+        done
+    fi
+}
+
+redirect_down() {
+    if [[ $OSTYPE == darwin* ]]; then
+        sudo pfctl -q -a "$anchor" -F all 2>/dev/null || true
+    else
+        local p
+        for p in 80 443; do
+            while sudo iptables -t nat -D OUTPUT -p tcp -d 127.0.0.1 --dport $p -j REDIRECT --to-port "$port" \
+                -m comment --comment caido-thick 2>/dev/null; do :; done
+        done
+    fi
+}
+
+cmd_up() {
+    (( $# )) || die "usage: caido-thick up <domain>..."
+    local d ip
+    local -a rewrites
+    for d in "$@"; do
+        ip="$(resolve "$d")" || die "could not resolve $d (already pointed at 127.0.0.1? run 'down' first)"
+        rewrites+=("$d -> $ip")
+        sudo sed -i.bak "/[[:space:]]$d $marker\$/d" "$hosts"
+        print -r -- "127.0.0.1 $d $marker" | sudo tee -a "$hosts" >/dev/null
+    done
+    sudo rm -f "$hosts.bak"
+    redirect_up
+    flush_dns
+    print "Ports 80/443 on 127.0.0.1 now go to Caido on :$port."
+    print "\nIn Caido: Settings → Network → + Add Rewrite → Use static IP, one rule per host:"
+    print -l -- "  ${^rewrites}"
+    print "\n(Without these rewrites Caido resolves the domain to itself and loops.)"
+}
+
+cmd_down() {
+    sudo sed -i.bak "/ $marker\$/d" "$hosts" && sudo rm -f "$hosts.bak"
+    redirect_down
+    flush_dns
+    print "Removed caido-thick hosts entries and redirect rules."
+}
+
+cmd_status() {
+    print "Hosts entries:"; grep -- " $marker\$" "$hosts" || print "  (none)"
+    print "\nRedirect rules:"
+    if [[ $OSTYPE == darwin* ]]; then
+        sudo pfctl -a "$anchor" -s nat 2>/dev/null | grep . || print "  (none)"
+    else
+        sudo iptables -t nat -S OUTPUT | grep caido-thick || print "  (none)"
+    fi
+}
+
+case "${1:-}" in
+    up)     shift; cmd_up "$@" ;;
+    down)   cmd_down ;;
+    status) cmd_status ;;
+    *)      sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; [[ -n ${1:-} ]] && return 1 || true ;;
+esac

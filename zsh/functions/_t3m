@@ -1,0 +1,84 @@
+#compdef t3m
+# Completion for t3m (bin/t3m): subcommands, live project/thread ids, models.
+
+__t3m_projects() {
+  local -a items; local id title root
+  while IFS=$'\t' read -r id title root; do
+    [[ -n $id ]] && items+=("${id}:${title} — ${root/#$HOME/~}")
+  done < <(t3m _projects 2>/dev/null)
+  _describe -t projects 'T3 project' items
+  _path_files -/
+}
+
+__t3m_threads() {
+  local -a items; local id project title updated
+  while IFS=$'\t' read -r id project title updated; do
+    [[ -n $id ]] && items+=("${id//:/\\:}:${updated} [${project}] ${title}")
+  done < <(t3m _threads 2>/dev/null)
+  _describe -V -t threads 'T3 thread' items
+}
+
+__t3m_models() {
+  local -a items; local provider slug
+  while IFS=$'\t' read -r provider slug; do
+    [[ -n $slug ]] && items+=("${slug}:${provider}")
+  done < <(t3m _models 2>/dev/null)
+  _describe -t models 'model' items
+}
+
+_t3m() {
+  local -a cmds
+  cmds=(
+    'projects:pick a project, then act on it'
+    'threads:pick a thread, then act on it'
+    'new:start a thread'
+    'send:send a message to a thread'
+    'show:show a thread'
+    'web:open a thread in the browser'
+    'add:add a project'
+    'rename:rename a project'
+    'rm:remove a project'
+    'open:open a project in the desktop app'
+    'pair:pair a phone'
+    'status:service and remote access status'
+    'service:manage the background service'
+    'doctor:check and repair T3 data'
+    'update:update t3'
+    'help:show help'
+  )
+
+  if (( CURRENT == 2 )); then
+    _describe -t commands 't3m command' cmds
+    return
+  fi
+
+  local cmd=$words[2]
+  case $cmd in
+    new|n)
+      _arguments -s \
+        '--model[model slug]:model:__t3m_models' \
+        '--provider[provider instance id]:provider:(codex claudeAgent antigravity cursor opencode grok)' \
+        '--worktree[run in a new worktree based on this ref]:ref:__git_refs' \
+        '--branch[branch name for the new worktree]:branch:' \
+        '--title[thread title]:title:' \
+        '--wait[wait for the reply]' \
+        '--pick-model[choose a model with fzf]' \
+        '2:project:__t3m_projects' \
+        '*:message:' ;;
+    send|s)
+      _arguments -s '--wait[wait for the reply]' '2:thread:__t3m_threads' '*:message:' ;;
+    show|web)
+      _arguments '2:thread:__t3m_threads' ;;
+    threads|ls|t|rename|rm|open)
+      _arguments '2:project:__t3m_projects' '*:title:' ;;
+    add)
+      _arguments '--title[project title]:title:' '2:directory:_path_files -/' ;;
+    *)
+      # Pass-through commands: reuse t3's own completion if it is loaded.
+      if (( $+functions[_t3] )); then
+        words[1]=t3; _t3
+      fi ;;
+  esac
+}
+
+_t3m "$@"

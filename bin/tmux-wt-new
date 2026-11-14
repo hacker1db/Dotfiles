@@ -1,0 +1,19 @@
+#!/usr/bin/env zsh
+emulate -L zsh
+setopt err_return pipe_fail
+
+(( $# == 1 )) && [[ -n "$1" ]] || { tmux display-message "Usage: tmux-wt-new <type/name>"; return 2 }
+local branch="$1" result dest err="${TMPDIR:-/tmp}/tmux-wt-new.$$"
+[[ "$branch" == */* ]] || branch="feat/$branch"
+branch="${${branch// /-}:l}"
+
+if ! result="$("${0:A:h}/wt-new" --json "$branch" 2> "$err")"; then
+    tmux display-message "wt-new failed: ${${(f)"$(< "$err")"}[-1]}"
+    rm -f "$err"
+    return 1
+fi
+rm -f "$err"
+dest="$(jq -r '.path // empty' <<<"$result")"
+[[ -d "$dest" ]] || { tmux display-message "wt-new reported no worktree path"; return 1 }
+tmux new-window -c "$dest" -n "${branch:t}"
+tmux display-message "Created $branch ($(jq -r '.copied | length' <<<"$result") env files copied)"

@@ -1,0 +1,181 @@
+#!/usr/bin/env zsh
+DOTFILES="${DOTFILES:-$HOME/Developer/dotfiles/main}"
+
+title() { print "\n\e[1;35m$1\e[0m\n\e[1;38;5;243m==============================\e[0m" }
+info() { print "\e[1;34mInfo:\e[0m $1" }
+warning() { print "\e[1;33mWarning:\e[0m $1" }
+error() { print "\e[1;31mError:\e[0m $1" }
+success() { print "\e[1;32m$1\e[0m" }
+
+load_brew_env() {
+    command -v brew >/dev/null 2>&1 && return 0
+    local candidate
+    for candidate in /opt/homebrew/bin/brew /usr/local/bin/brew /home/linuxbrew/.linuxbrew/bin/brew; do
+        [[ -x "$candidate" ]] && eval "$("$candidate" shellenv)" && return 0
+    done
+    return 1
+}
+
+deferred_installs_file() { print "${XDG_STATE_HOME:-$HOME/.local/state}/dotfiles/deferred-installs" }
+
+link_file() {
+    local src="$1" dest="$2"
+    if [[ -L "$dest" && "$(readlink "$dest")" == "$src" ]]; then
+        return 0
+    elif [[ -L "$dest" || ! -e "$dest" ]]; then
+        ln -sfn "$src" "$dest"
+        print "Linked $dest -> $src"
+    else
+        print "$dest exists and is not a symlink; skipping."
+    fi
+}
+
+backup_path() {
+    local candidate="$1.backup.$(date +%Y%m%d%H%M%S)" n=0
+    while [[ -e "$candidate" || -L "$candidate" ]]; do
+        candidate="$1.backup.$(date +%Y%m%d%H%M%S).$((++n))"
+    done
+    print "$candidate"
+}
+
+find_github_checkout() {
+    local slug="${(L)1}" dir url
+    for dir in "$HOME/Developer/${slug#*/}" "$HOME"/Developer/*/"${slug#*/}"(N); do
+        [[ -d "$dir" ]] || continue
+        url="$(git -C "$dir" config --get remote.origin.url 2>/dev/null)" || continue
+        [[ "${(L)url}" == *github(.com|-*)[:/]"$slug"(|.git) ]] && { print "$dir"; return 0 }
+    done
+    return 1
+}
+
+github_ssh_preflight() {
+    if [[ -n "${GITHUB_SSH_OK:-}" ]]; then
+        [[ "$GITHUB_SSH_OK" == 1 ]]; return
+    fi
+    local output
+    output="$(ssh -T -o BatchMode=yes -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new git@github.com 2>&1 || true)"
+    if [[ "$output" == *"successfully authenticated"* ]]; then
+        export GITHUB_SSH_OK=1
+        return 0
+    fi
+    export GITHUB_SSH_OK=0
+    warning "GitHub SSH authentication is not available; GitHub clones will use HTTPS (gh supplies credentials when logged in)."
+    print -u2 "  ssh said: $(print -r -- "$output" | tail -n 1)"
+    return 1
+}
+
+github_repo_url() {
+    github_ssh_preflight >&2 && print "git@github.com:$1.git" || print "https://github.com/$1.git"
+}
+
+github_git() {
+    export GIT_TERMINAL_PROMPT=0
+    if ! command -v gh >/dev/null 2>&1 || ! gh auth status >/dev/null 2>&1; then
+        git "$@"
+    elif github_ssh_preflight >/dev/null 2>&1; then
+        git -c credential.helper= -c 'credential.helper=!gh auth git-credential' "$@"
+    else
+        git -c credential.helper= -c 'credential.helper=!gh auth git-credential' \
+            -c url.https://github.com/.insteadOf=git@github.com: "$@"
+    fi
+}
+
+github_repo_accessible() { github_git ls-remote --exit-code "$1" HEAD >/dev/null 2>&1 }
+
+github_clone() { github_git clone "$@" }
+
+github_owner() {
+    if [[ -n "${DOTFILES_GITHUB_OWNER:-}" ]]; then
+        print "$DOTFILES_GITHUB_OWNER"
+        return
+    fi
+    local owner
+    owner="$(git config --get github.user 2>/dev/null)"
+    [[ -n "$owner" ]] && { print "$owner"; return }
+    owner="$(git -C "$DOTFILES" remote get-url origin 2>/dev/null |
+        sed -nE 's#^(git@github\.com:|ssh://git@github\.com/|https?://github\.com/)([^/]+)/.*#\2#p')"
+    [[ -n "$owner" ]] || return 1
+    print "$owner"
+}
+
+clitools_dir() {
+    local owner found
+    if [[ -n "${CLITOOLS_DIR:-}" ]]; then
+        print "$CLITOOLS_DIR"
+    elif owner="$(github_owner 2>/dev/null)" && found="$(find_github_checkout "$owner/clitools")"; then
+        [[ -d "$found/.bare" ]] && print "$found/main" || print "$found"
+    else
+        print "$HOME/Developer/clitools/main"
+    fi
+}
+
+update_clean_checkout() {
+    local dir="$1" url slug
+    url="$(git -C "$dir" config --get remote.origin.url 2>/dev/null)"
+    slug="$(print -r -- "$url" | sed -nE 's#^(ssh://)?(git@)?github-[^:/]+[:/](.+)$#\3#p')"
+    if [[ -n "$slug" ]]; then
+        git -C "$dir" remote set-url origin "git@github.com:${slug%.git}.git"
+        print "Rewrote ${dir:t} origin $url -> git@github.com:${slug%.git}.git"
+    fi
+    if [[ -n "$(git -C "$dir" status --porcelain --untracked-files=normal 2>/dev/null)" ]]; then
+        warning "$dir has local changes; preserving it without fetching or updating."
+    else
+        github_git -C "$dir" fetch --quiet && git -C "$dir" merge --ff-only --quiet '@{u}' 2>/dev/null ||
+            print "Could not update ${dir:t}; using existing copy"
+    fi
+}
+
+op_agent_first_key() {
+    [[ -f "$1" ]] || return 0
+    awk '
+        /^[[:space:]]*\[\[ssh-keys\]\][[:space:]]*$/ { if (seen++) exit; next }
+        seen && /^[[:space:]]*(item|vault)[[:space:]]*=/ {
+            key = $0; sub(/^[[:space:]]*/, "", key); sub(/[[:space:]]*=.*/, "", key)
+            v = $0; sub(/^[^"]*"/, "", v); sub(/"[[:space:]]*$/, "", v); val[key] = v
+        }
+        END { print val["item"]; print val["vault"] }
+    ' "$1"
+}
+
+op_agent_put_first() {
+    local file="$1" tmp="$1.tmp"
+    mkdir -p "${file:h}" && chmod 700 "${file:h}" || return 1
+    [[ -f "$file" ]] || : > "$file"
+    OP_ITEM="$2" OP_VAULT="$3" awk '
+        function value(line) { sub(/^[^"]*"/, "", line); sub(/"[[:space:]]*$/, "", line); return line }
+        function flush() {
+            if (!open) return
+            sub(/\n+$/, "", block)
+            if (item == ENVIRON["OP_ITEM"] && vault == ENVIRON["OP_VAULT"]) { if (first == "") first = block }
+            else rest = rest "\n\n" block
+            open = 0; block = item = vault = ""
+        }
+        /^[[:space:]]*\[\[ssh-keys\]\][[:space:]]*$/ { flush(); open = 1; block = "[[ssh-keys]]"; next }
+        !open { pre = pre $0 "\n"; next }
+        {
+            block = block "\n" $0
+            if ($0 ~ /^[[:space:]]*item[[:space:]]*=/) item = value($0)
+            if ($0 ~ /^[[:space:]]*vault[[:space:]]*=/) vault = value($0)
+        }
+        END {
+            flush()
+            if (first == "") first = "[[ssh-keys]]\nitem = \"" ENVIRON["OP_ITEM"] "\"\nvault = \"" ENVIRON["OP_VAULT"] "\""
+            sub(/^\n+/, "", pre); sub(/\n+$/, "", pre)
+            printf "%s%s%s\n", (pre == "" ? "" : pre "\n\n"), first, rest
+        }
+    ' "$file" > "$tmp" && chmod 600 "$tmp" && mv -f "$tmp" "$file"
+}
+
+# pnpm comes from its standalone installer (https://get.pnpm.io), not Homebrew,
+# so `pnpm self-update` works. PNPM_NO_MODIFY_PATH keeps it from editing the
+# linked ~/.zshrc; zshrc.symlink already puts $PNPM_HOME/bin on PATH.
+ensure_pnpm() {
+    export PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+    [[ ":$PATH:" == *":$PNPM_HOME/bin:"* ]] || export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
+    [[ -x "$PNPM_HOME/bin/pnpm" ]] && return 0
+    info "Installing pnpm to $PNPM_HOME"
+    curl --proto "=https" --tlsv1.2 -fsSL https://get.pnpm.io/install.sh \
+        | PNPM_HOME="$PNPM_HOME" PNPM_NO_MODIFY_PATH=1 sh - || return 1
+    rehash
+    [[ -x "$PNPM_HOME/bin/pnpm" ]]
+}
