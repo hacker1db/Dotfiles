@@ -188,7 +188,7 @@ brew "markdownlint-cli2"
 brew "mas"
 # Publisher CLI tool for the Official Model Context Protocol (MCP) Registry
 brew "mcp-publisher"
-# Mermaid diagram renderer (mmdc) for the Herdr plan view
+# Mermaid diagram renderer (mmdc) for Snacks image previews in Neovim
 brew "mermaid-cli"
 # Open source relational database management system
 brew "mysql-client"
@@ -220,8 +220,6 @@ brew "pandoc"
 brew "podman"
 # Alternative to docker-compose using podman
 brew "podman-compose"
-# PDF rendering library (pdftoppm, pdfinfo) for the Herdr PDF viewer
-brew "poppler"
 # Command-line shell and scripting language
 brew "powershell", link: false
 # Framework for managing multi-language pre-commit hooks

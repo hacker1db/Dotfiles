@@ -35,9 +35,9 @@ Use these absolute paths from GUI apps and other tools (such as T3 Code) that do
 Each profile dir contains:
 
 - `settings.json`: a symlink to that profile's generated settings
-- symlinks to the dotfiles copies of `CLAUDE.md`, `agents/`, `commands/`, `output-styles/` and `statusline-command.sh`
+- symlinks to the dotfiles copies of `CLAUDE.md`, `output-styles/` and `statusline-command.sh`
 - `hooks/`: a symlink to `claude/profiles/<profile>/hooks`
-- `skills/`: a real dir of links managed by skillctl
+- `skills/` and `agents/`: real dirs of links managed by skillctl
 - `plugins/`: plugins installed for that profile only
 - login credentials and history, which Claude writes itself
 
@@ -58,9 +58,9 @@ The Foundry profile also needs a working `az login`. Its resource and model come
 
 - links `~/.localrc` to `~/OneDrive*/Personal/.localrc` when a OneDrive dir exists (fails on two dirs or an unsynced file); without OneDrive, the existing `~/.localrc` is used as is
 - merges the layers with jq into ignored `claude/.local/profiles/<profile>.json` (mode 600), linked as `~/.claude-<profile>/settings.json` (dir mode 700), and backs up an unmanaged `settings.json` once
-- links `CLAUDE.md`, `agents/`, `commands/`, `output-styles/`, `statusline-command.sh` into each profile
+- links `CLAUDE.md`, `output-styles/`, `statusline-command.sh` into each profile
 - links `claude/profiles/<profile>/hooks` as `~/.claude-<profile>/hooks`
-- creates a real `skills/` dir and fills it with `CLAUDE_CONFIG_DIR=<dir> skillctl sync --global`
+- creates real `skills/` and `agents/` dirs filled by `CLAUDE_CONFIG_DIR=<dir> skillctl sync --global`, removing any leftover `agents` symlink first
 - adds the declared marketplaces and installs the declared plugins per profile
 
 Foundry reads `ANTHROPIC_FOUNDRY_RESOURCE` from the environment, or from `~/.localrc`. Rerun the installer after changing it. `~/.config/claude-code/automode.json` (or `foundry-automode.json`) contributes only `autoMode.environment`. Layers that contain `apiKeyHelper` or API keys or tokens are rejected.

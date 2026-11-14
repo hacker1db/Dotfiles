@@ -33,7 +33,7 @@ link_profile_items() {
     local item
     for item in $linked_items; do link_item "$claude_dir/$item" "$1/$item"; done
     link_item "$profiles_dir/${2}/hooks" "$1/hooks"
-    unlink_legacy_agents "$1"
+    unlink_agents_symlink "$1"
 }
 command -v jq >/dev/null || { print -u2 "jq is required."; exit 1 }
 umask 077
@@ -131,11 +131,11 @@ link_item() {
     fi
 }
 
-unlink_legacy_agents() {
+unlink_agents_symlink() {
     local dest="$1/agents"
-    [[ -L "$dest" && "$(readlink "$dest")" == "$claude_dir/agents" ]] || return 0
+    [[ -L "$dest" ]] || return 0
     if [[ "$check" -eq 1 ]]; then
-        problem "$dest is a stale link to $claude_dir/agents"
+        problem "$dest is a symlink; skillctl needs a real directory there"
     else
         rm "$dest" && print "Removed stale $dest"
     fi

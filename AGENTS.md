@@ -1,13 +1,12 @@
 # AI Agent Guidelines
 
-Personal macOS dotfiles: Zsh, Neovim, tmux, Ghostty, Git, Herdr, and AI coding tool profiles. [README.md](README.md) is the source of truth for installation and behavior; this file covers what agents need to work safely.
+Personal macOS dotfiles: Zsh, Neovim, tmux, Ghostty, Git, and AI coding tool profiles. [README.md](README.md) is the source of truth for installation and behavior; this file covers what agents need to work safely.
 
 ## Layout
 
 ```text
 bin/          Scripts on PATH
 config/       One directory per app, each linked to ~/.config/<name>
-herdr/        Herdr config, linked file by file into ~/.config/herdr-app
 git/          gitconfig, hook dispatchers (templates/hooks/) and hooks (hooks/)
 zsh/          zshrc, zshenv, aliases, functions (functions/, functions.zsh, git.zsh)
 install/      One script per install.sh step, plus lib.zsh and brewfile
@@ -87,7 +86,7 @@ New app config goes in `config/<app>/` in the worktree. `install.sh link` links 
 
 - Format: `type(scope): description`.
 - Types: feat, fix, perf, refactor, docs, style, test, chore.
-- Scopes name the area: install, zsh, nvim, tmux, git, ssh, herdr, ghostty, claude, codex, agents.
+- Scopes name the area: install, zsh, nvim, tmux, git, ssh, ghostty, claude, codex, agents.
 
 ## Machine-Agnostic Dotfiles
 
