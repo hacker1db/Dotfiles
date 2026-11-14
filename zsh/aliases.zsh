@@ -119,9 +119,9 @@ alias cw='claude-subscription'
 alias cwc='claude-subscription --continue'
 alias co='copilot'
 alias coc='copilot --continue'
-alias xp='codex'
+alias xp='codex --approve-for-me'
 alias xpc='codex resume --last'
-alias xf='codex-foundry'
+alias xf='codex-foundry --approve-for-me'
 alias xfc='codex-foundry resume --last'
 
 # applications
