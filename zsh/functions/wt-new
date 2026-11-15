@@ -1,0 +1,14 @@
+emulate -L zsh
+
+if [[ "${1:-}" == (-h|--help|--json) ]]; then
+    command wt-new "$@"
+    return
+fi
+
+local result dest
+result="$(command wt-new --json "$@")" || return
+dest="$(jq -r '.path // empty' <<<"$result")"
+[[ -d "$dest" ]] || { print -u2 "wt-new: no worktree path reported"; return 1 }
+print "Created $(jq -r .branch <<<"$result") at $dest"
+(( $(jq '.copied | length' <<<"$result") )) && print "Copied ignored env files: $(jq -r '.copied | join(", ")' <<<"$result")"
+cd "$dest"
