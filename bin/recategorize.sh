@@ -29,7 +29,7 @@ total_updated=0
 while true; do
   args=(reader-list-documents
     --category rss
-    --response-fields source_url,location
+    --response-fields "source_url,location"
     --limit 100
     --json)
   [ -n "$cursor" ] && args+=(--page-cursor "$cursor")

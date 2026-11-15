@@ -14,9 +14,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - run: sudo apt-get update && sudo apt-get install -y zsh
       - run: for file in install.sh install/*.zsh; do zsh -n "$file" || exit 1; done
       - run: for file in zsh/*.zsh zsh/*.symlink zsh/functions/*; do zsh -n "$file" || exit; done
+      - name: Lint scripts by interpreter
+        shell: bash
+        run: |
+          sh_files=()
+          for file in bin/* git/hooks/* git/templates/hooks/* config/sketchybar/plugins/* config/sketchybar/sketchybarrc; do
+            [[ -f "$file" ]] || continue
+            case "$(head -n 1 "$file")" in
+              *zsh*) zsh -n "$file" || exit 1 ;;
+              *bash* | */sh*) sh_files+=("$file") ;;
+            esac
+          done
+          shellcheck -S warning "${sh_files[@]}"
+      - run: ruby -c bin/gbrt
       - uses: lunarmodules/luacheck@cc089e3f65acdd1ef8716cc73a3eca24a6b845e4 # v1.2.0
         with:
           args: config/nvim --no-color --codes --globals vim M Snacks dd --no-max-line-length --no-unused
@@ -27,6 +42,7 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
+          persist-credentials: false
       - uses: trufflesecurity/trufflehog@ea68ca03c865c5f324e86e849ced20ed3cf9dbbb # v3.99.8
         with:
           extra_args: --results=verified,unverified,unknown
@@ -36,6 +52,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
         with:
           fail-on-severity: low

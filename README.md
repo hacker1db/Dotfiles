@@ -202,7 +202,7 @@ Dotfiles holds no personal skills; they come from the skills repository through 
 
 ## Symlinks and themes
 
-`*.symlink` sources map into `$HOME` with a leading dot; `config/*` maps into `~/.config/`. The general loops skip existing targets. Managed instruction links and selected integrations have their own replacement/backup behavior. `~/.gitconfig-local` is always a machine-owned file: an older link to a shared copy is replaced with a local copy of it. `link` may clone or fast-forward clitools and plan-manager and rebuild the `plan` CLI. Before cloning, it looks for an existing checkout of either repository under `~/Developer/<name>` or `~/Developer/*/<name>` whose `origin` matches, and uses it instead. clitools is a private repository: when it cannot be reached, the clone is skipped. plan-manager is public; a fork without its own plan-manager clones `hacker1db/plan-manager`.
+`*.symlink` sources map into `$HOME` with a leading dot; `config/*` maps into `~/.config/`. The general loops skip existing targets. Managed instruction links and selected integrations have their own replacement/backup behavior. `~/.gitconfig-local` is always a machine-owned file: an older link to a shared copy is replaced with a local copy of it. `link` may clone or fast-forward clitools and plan-manager and rebuild the `plan` CLI. Before cloning, it looks for an existing checkout of either repository under `~/Developer/<name>` or `~/Developer/*/<name>` whose `origin` matches, and uses it instead. clitools is a private repository: when it cannot be reached, the clone is skipped. plan-manager clones from `PLAN_MANAGER_REPO_URL`, or from the GitHub owner in `git config github.user`; with neither set, the clone is skipped.
 
 ```sh
 ./install.sh theme list

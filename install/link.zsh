@@ -237,10 +237,13 @@ if [[ ! -d "$PLAN_REPO_DIR" ]]; then
         PLAN_URL="$(github_repo_url "$GH_USER/plan-manager")"
         github_repo_accessible "$PLAN_URL" || PLAN_URL=""
     fi
-    PLAN_URL="${PLAN_URL:-https://github.com/hacker1db/plan-manager.git}"
-    print "Cloning $PLAN_URL"
-    mkdir -p "${PLAN_REPO_DIR:h}"
-    github_clone "$PLAN_URL" "$PLAN_REPO_DIR" || { error "Failed to clone plan-manager"; LINK_FAILURE=1 }
+    if [[ -z "$PLAN_URL" ]]; then
+        warning "No GitHub owner found; set PLAN_MANAGER_REPO_URL or git config github.user to clone plan-manager."
+    else
+        print "Cloning $PLAN_URL"
+        mkdir -p "${PLAN_REPO_DIR:h}"
+        github_clone "$PLAN_URL" "$PLAN_REPO_DIR" || { error "Failed to clone plan-manager"; LINK_FAILURE=1 }
+    fi
 fi
 PLAN_WORKTREE="$PLAN_REPO_DIR"
 [[ -d "$PLAN_REPO_DIR/.bare" ]] && PLAN_WORKTREE="$PLAN_REPO_DIR/main"

@@ -56,7 +56,7 @@ if [[ $(echo "$INDEX" | grep '^[MARCDU ]D ' 2>/dev/null) ]] || [[ $(echo "$INDEX
 fi
 
 # Check for stashes
-[[ $(git rev-parse --verify refs/stash >/dev/null 2>&1) ]] && git_status="${git_status}#[fg=#cba6f7,bold]${GIT_STASHED} #[fg=default,nobold]"
+git rev-parse --verify -q refs/stash >/dev/null 2>&1 && git_status="${git_status}#[fg=#cba6f7,bold]${GIT_STASHED} #[fg=default,nobold]"
 
 # Check for unmerged files
 if [[ $(echo "$INDEX" | grep '^U[UDA] ' 2>/dev/null) ]] || [[ $(echo "$INDEX" | grep '^AA ' 2>/dev/null) ]] || [[ $(echo "$INDEX" | grep '^DD ' 2>/dev/null) ]] || [[ $(echo "$INDEX" | grep '^[DA]U ' 2>/dev/null) ]]; then

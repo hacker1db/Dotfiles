@@ -14,10 +14,15 @@ owners=$(
 		git config --get-all github.org
 	} 2>/dev/null | grep -E '^[A-Za-z0-9-]+$' | paste -sd '|' -
 )
-personal=${GITGUARDIAN_PERSONAL_REMOTES:-${owners:+github\.com[:/]($owners)/}}
-[ -n "$personal" ] || exit 0
-origin=$(git remote get-url origin 2>/dev/null) || exit 0
-printf '%s\n' "$origin" | grep -qiE "$personal" || exit 0
+skip() {
+	echo "ggshield: secret scan skipped: $1" >&2
+	exit 0
+}
+
+personal=${GITGUARDIAN_PERSONAL_REMOTES:-${owners:+(github\.com[:/]|github-[A-Za-z0-9._-]+:)($owners)/}}
+[ -n "$personal" ] || skip "no github.user or github.org configured"
+origin=$(git remote get-url origin 2>/dev/null) || skip "no origin remote"
+printf '%s\n' "$origin" | grep -qiE "$personal" || skip "origin is not a personal repository"
 
 command -v ggshield >/dev/null 2>&1 || {
 	echo "ggshield not found; install it with: brew install gitguardian/tap/ggshield" >&2
