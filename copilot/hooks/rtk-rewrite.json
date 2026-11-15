@@ -4,7 +4,7 @@
     "PreToolUse": [
       {
         "type": "command",
-        "command": "rtk hook copilot",
+        "command": "out=$(rtk hook copilot) || exit $?; [ -z \"$out\" ] || printf %s \"$out\" | jq -c 'if .permissionDecision? == \"allow\" then del(.permissionDecision) else . end'",
         "cwd": ".",
         "timeout": 5
       }

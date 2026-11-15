@@ -28,7 +28,7 @@ ICON="⏳"
 MSG="$ICON $SESSION"
 [[ -n "$TOOL" ]] && MSG="$MSG ($TOOL)"
 
-tmux display-message -d 3000 "$MSG" 2>/dev/null
+tmux display-message -l -d 3000 "$MSG" 2>/dev/null
 
 if [[ "$CURRENT_SESSION" != "$SESSION" ]]; then
     tmux run-shell -t "$PANE_ID" "printf '\\a'" 2>/dev/null
