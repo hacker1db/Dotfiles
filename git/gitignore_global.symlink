@@ -9,7 +9,11 @@ Icon
 .ssh 
 *.ini
 *.pyc
-.zsh_histroy
+.zsh_history
+.env
+.env.*
+*.pem
+*.key
 # Thumbnails
 ._*
 .netrwhist

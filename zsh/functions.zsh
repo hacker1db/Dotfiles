@@ -199,7 +199,7 @@ function db() {
 
     echo "Building $DOCKERFILE with $IMAGENAME"
 
-    docker build -f "$DOCKERFILE" -t $IMAGENAME:tempbuild$RANDOM --build-arg PAT=$PATTOKEN .
+    PAT_SECRET="$PATTOKEN" DOCKER_BUILDKIT=1 docker build -f "$DOCKERFILE" -t "$IMAGENAME:tempbuild$RANDOM" --secret id=PAT,env=PAT_SECRET .
 }
 
 function clitools(){
