@@ -17,16 +17,22 @@ vim.api.nvim_create_autocmd("FileType", {
     local opts = { buffer = ev.buf, silent = true, desc = "Insert markdown link" }
     local function insert_link(mode)
       if mode == "v" then
-        local save_reg = vim.fn.getreg('"')
-        local save_type = vim.fn.getregtype('"')
-        vim.cmd("normal! y")
-        local sel = vim.fn.getreg('"')
-        vim.fn.setreg('"', save_reg, save_type)
+        local s, e = vim.fn.getpos("v"), vim.fn.getpos(".")
+        if s[2] > e[2] or (s[2] == e[2] and s[3] > e[3]) then s, e = e, s end
+        local sr, sc, er = s[2] - 1, s[3] - 1, e[2] - 1
+        local last = vim.fn.getline(e[2])
+        local ec = math.min(e[3] - 1 + #vim.fn.strpart(last, e[3] - 1, 1, true), #last)
+        sc = math.min(sc, #vim.fn.getline(s[2]))
+        vim.api.nvim_feedkeys(vim.keycode("<Esc>"), "nx", false)
+        local sel = table.concat(vim.api.nvim_buf_get_text(0, sr, sc, er, ec, {}), "\n")
         sel = sel:gsub("\n$", "")
         local url = vim.fn.input("URL: ") or ""
         local link = "[" .. sel .. "](" .. url .. ")"
-        vim.cmd("normal! gv")
-        vim.cmd("normal! c" .. link)
+        local lines = vim.split(link, "\n", { plain = true })
+        vim.api.nvim_buf_set_text(0, sr, sc, er, ec, lines)
+        local end_row = sr + #lines
+        local end_col = (#lines == 1 and sc or 0) + #lines[#lines] - 1
+        vim.api.nvim_win_set_cursor(0, { end_row, math.max(end_col, 0) })
       else
         local text = vim.fn.input("Link text (blank ok): ")
         if text == nil then text = "" end

@@ -3,6 +3,15 @@
 echo ""
 echo ""
 echo -e "\033[1m RECENT COMMITS \033[0m"
-git --no-pager log -n5 --graph --pretty=format:'%Cred%h%Creset %an: %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+color=never
+[[ -t 1 ]] && color=always
+git --no-pager log -n5 --graph --color="$color" --pretty=format:'%Cred%h%Creset%x1f%C(yellow)%d%Creset%x1f%Cgreen(%cr)%Creset%x1f%an%x1f%s' --abbrev-commit --date=relative | while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" != *$'\x1f'* ]]; then
+        printf '%s\n' "$line"
+        continue
+    fi
+    IFS=$'\x1f' read -r head refs when author subject <<< "$line"
+    printf '%s %s: %s -  %s %s\n' "$head" "${author//[[:cntrl:]]/}" "${subject//[[:cntrl:]]/}" "$refs" "$when"
+done
 echo ""
 echo ""
