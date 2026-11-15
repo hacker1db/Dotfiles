@@ -14,4 +14,4 @@ Snacks handles file exploration and picking: `<leader>e` for the explorer, `<lea
 
 Lualine supplies the statusline; there is no mini.statusline spec to enable. The old Comment.nvim and nvim-autopairs specs have been removed.
 
-Standalone mini.bracketed and mini.diff specs remain in the parent `lua/plugins/` directory. That directory is not imported by the current lazy.nvim setup, so these specs are not part of the active mini configuration. The mini.diff keymap in `lua/core/keymaps.lua` alone does not load its spec.
+mini.bracketed and mini.diff are top-level specs in the parent `lua/plugins/` directory, which lazy.nvim imports, so both load.

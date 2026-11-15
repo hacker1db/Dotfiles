@@ -1,0 +1,1 @@
+"${DOTFILES:-$HOME/Developer/dotfiles/main}/install.sh" browser "$@"

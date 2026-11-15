@@ -1,5 +1,25 @@
-export DOTFILES=$HOME/.dotfiles/main
+if [[ -o interactive ]]; then
+    for _zsh_module_dir in "${module_path[@]}"; do
+        if [[ $_zsh_module_dir == */Cellar/zsh/"$ZSH_VERSION"/* && ! -d $_zsh_module_dir ]]; then
+            exec "${_zsh_module_dir%%/Cellar/zsh/*}/bin/zsh" -i
+        fi
+    done
+    unset _zsh_module_dir
+fi
+
+# Derive DOTFILES from this file's real path only when ~/.zshrc is still the
+# symlink. Installers like `pnpm setup` rewrite ~/.zshrc as a plain copy, which
+# would resolve to $HOME/.. — fall back to the value ~/.zshenv already exported.
+_zshrc_path="${${(%):-%N}:A}"
+if [[ ${_zshrc_path:t} == zshrc.symlink ]]; then
+    export DOTFILES="${_zshrc_path:h:h}"
+elif [[ ! -f ${DOTFILES:-}/zsh/zshrc.symlink ]]; then
+    export DOTFILES="$HOME/Developer/dotfiles/main"
+fi
+[[ -L ~/.zshrc ]] || print -u2 "~/.zshrc is not a symlink; restore it: ln -sf $DOTFILES/zsh/zshrc.symlink ~/.zshrc"
+unset _zshrc_path
 export ZSH=$DOTFILES/zsh
+source "$ZSH/fpath"
 
 if [[ -d $DOTFILES/zsh/functions ]]; then
     for func in $DOTFILES/zsh/functions/*(:t); autoload -U $func
@@ -80,11 +100,6 @@ if [ -f $HOME/.fzf.zsh ]; then
   export FZF_DEFAULT_OPTS="--color bg:-1,bg+:-1,fg:-1,fg+:#feffff,hl:#993f84,hl+:#d256b5,info:#676767,prompt:#676767,pointer:#676767"
 fi
 
-if command -v kubectl &> /dev/null; then
-    alias k=kubectl
-    compdef __start_kubectl k
-fi
-
 export PATH="$PATH":"$HOME/.pub-cache/bin"
 export PATH="$PATH:$HOME/.dotnet/tools"
 
@@ -103,9 +118,14 @@ if [[ -x "$(command -v zoxide)" ]]; then
     eval "$(zoxide init zsh --hook pwd --cmd cd)"
 fi
 
-if [[ -x "$(command -v pnpm)" ]]; then
-    export PNPM_HOME="$HOME/Library/pnpm"
+# pnpm may be self-installed under PNPM_HOME, so key off the directory rather
+# than `command -v pnpm` (which can't see it until PATH is set). This replaces
+# the block `pnpm setup` would otherwise append to ~/.zshrc — don't run it.
+if [[ -d "${PNPM_HOME:=$HOME/Library/pnpm}" ]] || command -v pnpm &>/dev/null; then
+    export PNPM_HOME
     export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
+else
+    unset PNPM_HOME
 fi
 
 # Prefer the Homebrew-native Claude Code binary over the stale pnpm launcher.
@@ -114,11 +134,6 @@ export PATH="/opt/homebrew/bin:$PATH"
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 command -v pyenv &>/dev/null && eval "$(pyenv init - zsh --no-rehash)"
-
-if [[ -x "$(command -v eza)" ]]; then
-  alias ll="eza --icons --git --long"
-  alias l="eza --icons --git --all --long"
-fi
 
 if command -v starship >/dev/null 2>&1; then eval "$(starship init zsh)"; fi
 export STARSHIP_CONFIG=~/.config/starship/starship.toml

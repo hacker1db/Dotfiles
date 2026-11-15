@@ -1,0 +1,11 @@
+#!/bin/bash
+
+options=(
+  style=round
+  width=6.0
+  hidpi=on
+  active_color=0xff89b4fa    # light blue (focused window)
+  inactive_color=0x00000000  # transparent (unfocused)
+)
+
+borders "${options[@]}"

@@ -25,8 +25,8 @@ end
 
 -- Render-markdown highlights
 local codeblock_bg = colors["linkarzu_color07"]
-local inline_fg = colors["linkarzu_color10"]
-local inline_bg = colors["linkarzu_color02"]
+local inline_fg = colors["linkarzu_color16"]
+local inline_bg = colors["linkarzu_color25"]
 local quote_fg = colors["linkarzu_color12"]
 
 if codeblock_bg then vim.api.nvim_set_hl(0, "RenderMarkdownCode", { bg = codeblock_bg }) end
@@ -35,6 +35,6 @@ if quote_fg then vim.api.nvim_set_hl(0, "RenderMarkdownQuote", { fg = quote_fg }
 
 -- Markup overrides
 local bold_fg = colors["linkarzu_color24"]
-local raw_fg = colors["linkarzu_color01"]
+local raw_fg = colors["linkarzu_color16"]
 if bold_fg then vim.api.nvim_set_hl(0, "@markup.strong", { fg = bold_fg, bold = true }) end
 if raw_fg then vim.api.nvim_set_hl(0, "@markup.raw.markdown_inline", { fg = raw_fg }) end

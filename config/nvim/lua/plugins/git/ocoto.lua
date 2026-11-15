@@ -133,7 +133,7 @@ return {
             },
             file_panel = {
                 size = 10,
-                use_icons = true,
+                icons = true,
             },
             colors = {
                 white = "#ffffff",

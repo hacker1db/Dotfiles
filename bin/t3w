@@ -1,0 +1,216 @@
+#!/usr/bin/env bash
+# t3w - pick a git worktree and register/open it in T3 Code.
+#
+# Usage:
+#   t3w [open]   [--repo DIR]          Pick a worktree, add it as a T3 project if needed, open it in the app
+#   t3w add      [--repo DIR] [PATH]   Add a worktree (picked, or PATH) as a T3 project
+#   t3w thread   [--repo DIR] [MSG...] Pick a worktree and start a T3 thread in it (prompts for MSG if omitted)
+#   t3w new      BRANCH [--base REF]   Create a worktree with `wt`, add it as a project, open it
+#   t3w help
+#
+# Worktrees come from the repo you are in (or --repo DIR). Outside a repo you
+# first pick a repo from $T3W_ROOTS (colon-separated, default ~/Developer:~/.dotfiles).
+# Requires: t3, git, fzf (wt for `new`).
+
+set -euo pipefail
+
+T3W_ROOTS="${T3W_ROOTS:-$HOME/Developer:$HOME/.dotfiles}"
+
+die() { printf 't3w: %s\n' "$*" >&2; exit 1; }
+info() { printf '\033[90m%s\033[0m\n' "$*" >&2; }
+
+need() { command -v "$1" >/dev/null 2>&1 || die "missing dependency: $1"; }
+
+usage() { sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; }
+
+# Print the root of the repo containing $1 (works for bare-repo + worktree layouts).
+repo_root_of() {
+  local common
+  common="$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)" || return 1
+  dirname "$common"
+}
+
+repo_name_of() {
+  local root
+  root="$(repo_root_of "$1")" || return 1
+  basename "$root" | sed 's/^\.//'
+}
+
+# List worktrees of the repo at $1 as "branch<TAB>path", skipping the bare entry.
+list_worktrees() {
+  git -C "$1" worktree list --porcelain | awk '
+    /^worktree / { path = substr($0, 10); branch = ""; bare = 0; next }
+    /^branch /   { branch = substr($0, 8); sub("^refs/heads/", "", branch); next }
+    /^detached/  { branch = "(detached)"; next }
+    /^bare/      { bare = 1; next }
+    /^$/         { if (path != "" && !bare) printf "%s\t%s\n", branch, path; path = "" }
+    END          { if (path != "" && !bare) printf "%s\t%s\n", branch, path }
+  '
+}
+
+# Find repos under $T3W_ROOTS (a root itself may be a repo).
+list_repos() {
+  local IFS=: root d
+  for root in $T3W_ROOTS; do
+    [ -d "$root" ] || continue
+    if [ -e "$root/.git" ] || [ -d "$root/.bare" ]; then
+      printf '%s\n' "$root"
+      continue
+    fi
+    for d in "$root"/*/; do
+      d="${d%/}"
+      if [ -e "$d/.git" ] || [ -d "$d/.bare" ]; then
+        printf '%s\n' "$d"
+      elif [ -d "$d/main" ] && [ -e "$d/main/.git" ]; then
+        printf '%s\n' "$d"   # bare layout without a .bare dir name
+      fi
+    done
+  done
+}
+
+# A path git can run in for repo dir $1 (bare-layout roots aren't work trees).
+git_dir_for() {
+  if git -C "$1" rev-parse --git-dir >/dev/null 2>&1; then
+    printf '%s\n' "$1"
+  elif [ -d "$1/.bare" ]; then
+    printf '%s\n' "$1/.bare"
+  elif [ -e "$1/main/.git" ]; then
+    printf '%s\n' "$1/main"
+  else
+    return 1
+  fi
+}
+
+pick_repo() {
+  local repo
+  repo="$(list_repos | fzf --prompt='repo> ' --height=40% --reverse \
+    --preview 'git -C {} worktree list 2>/dev/null || git -C {}/.bare worktree list 2>/dev/null')" \
+    || die "no repo selected"
+  git_dir_for "$repo" || die "not a git repo: $repo"
+}
+
+# Echo the chosen worktree path.
+pick_worktree() {
+  local repo="${1:-}" lines choice
+  if [ -z "$repo" ]; then
+    if git rev-parse --git-dir >/dev/null 2>&1; then
+      repo="$PWD"
+    else
+      repo="$(pick_repo)"
+    fi
+  fi
+  lines="$(list_worktrees "$repo")"
+  [ -n "$lines" ] || die "no worktrees found for $repo"
+  if [ "$(printf '%s\n' "$lines" | wc -l | tr -d ' ')" = 1 ]; then
+    printf '%s\n' "$lines" | cut -f2
+    return
+  fi
+  # The preview string is evaluated by fzf, not here.
+  # shellcheck disable=SC2016
+  choice="$(printf '%s\n' "$lines" | fzf \
+    --delimiter=$'\t' --tabstop=40 \
+    --prompt="$(repo_name_of "$repo")> " --height=50% --reverse \
+    --header='enter: select · preview: T3 threads for this worktree' \
+    --preview 'out=$(t3 thread list --project {2} 2>/dev/null) && printf "%s\n" "$out" | grep -v "^\[[0-9][0-9]:[0-9][0-9]:" || echo "(not a T3 project yet)"')" \
+    || die "no worktree selected"
+  printf '%s\n' "$choice" | cut -f2
+}
+
+is_project() {
+  t3 thread list --project "$1" --json >/dev/null 2>&1
+}
+
+ensure_project() {
+  local path="$1" title branch
+  if is_project "$path"; then
+    info "already a T3 project: $path"
+    return
+  fi
+  branch="$(git -C "$path" branch --show-current 2>/dev/null || true)"
+  title="$(repo_name_of "$path" 2>/dev/null || basename "$path")"
+  [ -n "$branch" ] && title="$title ($branch)"
+  info "adding T3 project: $title -> $path"
+  t3 project add --title "$title" "$path"
+}
+
+parse_repo_flag() {
+  REPO=""
+  ARGS=()
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -r|--repo) [ $# -ge 2 ] || die "--repo needs a value"; REPO="$(git_dir_for "$2")" || die "not a git repo: $2"; shift 2 ;;
+      *) ARGS+=("$1"); shift ;;
+    esac
+  done
+}
+
+cmd_open() {
+  parse_repo_flag "$@"
+  local path; path="$(pick_worktree "$REPO")"
+  ensure_project "$path"
+  t3 app "$path"
+}
+
+cmd_add() {
+  parse_repo_flag "$@"
+  local path
+  if [ ${#ARGS[@]} -gt 0 ]; then
+    path="$(CDPATH='' cd -- "${ARGS[0]}" && pwd -P)" || die "no such directory: ${ARGS[0]}"
+  else
+    path="$(pick_worktree "$REPO")"
+  fi
+  ensure_project "$path"
+}
+
+cmd_thread() {
+  parse_repo_flag "$@"
+  local path msg
+  path="$(pick_worktree "$REPO")"
+  ensure_project "$path"
+  if [ ${#ARGS[@]} -gt 0 ]; then
+    msg="${ARGS[*]}"
+  else
+    read -r -p "Message for the agent: " msg
+  fi
+  [ -n "$msg" ] || die "empty message"
+  t3 thread start "$path" "$msg"
+}
+
+cmd_new() {
+  need wt
+  local branch="" base=""
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      -b|--base) [ $# -ge 2 ] || die "--base needs a value"; base="$2"; shift 2 ;;
+      *) [ -z "$branch" ] || die "unexpected argument: $1"; branch="$1"; shift ;;
+    esac
+  done
+  [ -n "$branch" ] || die "usage: t3w new BRANCH [--base REF]"
+  git rev-parse --git-dir >/dev/null 2>&1 || die "run 't3w new' inside the repo"
+  local -a wt_args=(switch --create "$branch" --no-cd)
+  [ -n "$base" ] && wt_args+=(--base "$base")
+  command wt "${wt_args[@]}"
+  local path
+  path="$(list_worktrees "$PWD" | awk -F'\t' -v b="$branch" '!found && ("x" $1) == ("x" b) { print $2; found = 1 }')"
+  [ -n "$path" ] || die "could not find the new worktree for $branch"
+  ensure_project "$path"
+  t3 app "$path"
+}
+
+main() {
+  need git
+  need t3
+  local cmd="${1:-open}"
+  [ $# -gt 0 ] && shift
+  case "$cmd" in
+    open)        need fzf; cmd_open "$@" ;;
+    add)         need fzf; cmd_add "$@" ;;
+    thread|t)    need fzf; cmd_thread "$@" ;;
+    new)         cmd_new "$@" ;;
+    -h|--help|help) usage ;;
+    -*)          need fzf; cmd_open "$cmd" "$@" ;;
+    *)           die "unknown command: $cmd (try 't3w help')" ;;
+  esac
+}
+
+main "$@"

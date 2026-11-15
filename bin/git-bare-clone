@@ -80,7 +80,7 @@ parse_params() {
   default_branch='main'
   github_create=0
   github_org=''
-  github_team='team-sec-devsecops'
+  github_team="${GIT_BARE_CLONE_TEAM:-}"
   github_team_explicit=0
   args=()
 
@@ -145,14 +145,25 @@ parse_params() {
   git check-ref-format --branch "$default_branch" > /dev/null 2>&1 || die "Invalid branch name: $default_branch"
 
   if [[ $github_create -eq 1 ]]; then
-    case "$github_org" in
-    ecomm) github_org='Alaska-ECommerce' ;;
-    its) github_org='Alaska-ITS' ;;
-    shared)
-      github_org='Alaska-Airlines-Shared'
-      [[ $github_team_explicit -eq 0 ]] && github_team='DevSecOps'
-      ;;
-    esac
+    # Org shortcuts and their default teams come from the private ~/.localrc, so no org names
+    # live in this public repo:  export GIT_BARE_CLONE_ORGS="short=Org-Name[:team],other=Org-Two"
+    local entry short target team
+    local -a org_aliases=()
+    IFS=',' read -ra org_aliases <<< "${GIT_BARE_CLONE_ORGS:-}"
+    for entry in ${org_aliases[@]+"${org_aliases[@]}"}; do
+      [[ "$entry" == *=* ]] || continue
+      short="${entry%%=*}"
+      target="${entry#*=}"
+      [[ "$short" == "$github_org" ]] || continue
+      team=''
+      if [[ "$target" == *:* ]]; then
+        team="${target#*:}"
+        target="${target%%:*}"
+      fi
+      github_org="$target"
+      [[ -n "$team" && $github_team_explicit -eq 0 ]] && github_team="$team"
+      break
+    done
   fi
 
   return 0
@@ -289,9 +300,9 @@ do_init() {
     # Create the empty remote only. We wire up 'origin' and push ourselves below,
     # because 'gh repo create --source' does not reliably configure the remote in a
     # bare-repo/worktree layout (the worktree's .git is a gitdir pointer, not a dir).
-    gh repo create "$github_org/$repo_name" \
-      --team "$github_team" \
-      --internal
+    local -a create_args=(--internal)
+    [[ -n "$github_team" ]] && create_args+=(--team "$github_team")
+    gh repo create "$github_org/$repo_name" "${create_args[@]}"
 
     msg "${YELLOW}Resolving remote URL...${NOFORMAT}"
     repo_url=$(gh repo view "$github_org/$repo_name" --json sshUrl --jq .sshUrl)

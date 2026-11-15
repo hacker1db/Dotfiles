@@ -1,0 +1,75 @@
+emulate -L zsh
+setopt extended_glob
+
+if [[ "$1" == (-h|--help) ]]; then
+    print "usage: gsig [count] [revision]   check commit signatures locally and on GitHub (default: 5 HEAD)"
+    return 0
+fi
+
+local count="${1:-5}" rev="${2:-HEAD}"
+[[ "$count" == <-> ]] || { print -u2 -P "%F{red}gsig: count must be a number%f"; return 1 }
+git rev-parse --git-dir &> /dev/null || { print -u2 -P "%F{red}gsig: not a git repository%f"; return 1 }
+
+local toplevel="$(git rev-parse --show-toplevel 2> /dev/null)"
+[[ -n "$toplevel" ]] || toplevel="$PWD"
+local signing="$(git config --get commit.gpgsign)" format="$(git config --get gpg.format)"
+local repo=""
+if command -v gh &> /dev/null; then
+    repo="$(gh repo view --json nameWithOwner -q .nameWithOwner 2> /dev/null)"
+fi
+
+local name="${toplevel:t}" branch="$(git branch --show-current 2> /dev/null)"
+[[ -n "$branch" ]] || branch=detached
+print -P "%B%F{cyan}󰊢 ${${${name//[[:cntrl:]]/}//\\/\\\\}//\%/%%}%f%b %F{8}(${${${branch//[[:cntrl:]]/}//\\/\\\\}//\%/%%})%f"
+if [[ "$signing" == true ]]; then
+    print -P "  %F{green}●%f auto-signing %F{green}on%f %F{8}(gpg.format=${format:-openpgp})%f"
+else
+    print -P "  %F{yellow}●%f auto-signing %F{yellow}off%f %F{8}(git config commit.gpgsign true to enable)%f"
+fi
+if [[ -n "$repo" ]]; then
+    print -P "  %F{blue}●%f GitHub %F{blue}${repo}%f"
+else
+    print -P "  %F{8}● GitHub check skipped (no gh or no GitHub remote)%f"
+fi
+print
+
+local sha short code signer subject local_status remote_status verified reason by
+local -i bad=0 total=0
+git log -n "$count" --format='%H%x1f%h%x1f%G?%x1f%GS%x1f%s' "$rev" | while IFS=$'\x1f' read -r sha short code signer subject; do
+    total+=1
+    case "$code" in
+        G) local_status="%F{green}✔ signed%f" ;;
+        U) local_status="%F{yellow}✔ signed, key not in allowed_signers%f" ;;
+        X) local_status="%F{yellow}✔ signed, signature expired%f" ;;
+        Y) local_status="%F{yellow}✔ signed, key expired%f" ;;
+        R) local_status="%F{red}✘ signed with a revoked key%f"; bad+=1 ;;
+        E) local_status="%F{yellow}? signed, cannot check locally%f" ;;
+        B) local_status="%F{red}✘ bad signature%f"; bad+=1 ;;
+        *) local_status="%F{red}✘ unsigned%f"; bad+=1 ;;
+    esac
+
+    remote_status=""
+    if [[ -n "$repo" ]]; then
+        if read -r verified reason < <(gh api "repos/$repo/commits/$sha" --jq '"\(.commit.verification.verified) \(.commit.verification.reason)"' 2> /dev/null); then
+            if [[ "$verified" == true ]]; then
+                remote_status="%F{green} verified%f"
+            else
+                remote_status="%F{red} not verified (${${${reason//[[:cntrl:]]/}//\\/\\\\}//\%/%%})%f"
+            fi
+        else
+            remote_status="%F{8} not pushed%f"
+        fi
+    fi
+
+    print -P "%F{magenta}${short}%f  ${local_status}  ${remote_status}"
+    by=""
+    [[ -n "$signer" ]] && by=" %F{8}by ${${${signer//[[:cntrl:]]/}//\\/\\\\}//\%/%%}%f"
+    print -P "         %F{white}${${${subject//[[:cntrl:]]/}//\\/\\\\}//\%/%%}%f${by}"
+done
+
+print
+if (( bad )); then
+    print -P "%B%F{red}✘ ${bad} of ${total} commits are not properly signed%f%b"
+    return 1
+fi
+print -P "%B%F{green}✔ all checked commits are signed%f%b"

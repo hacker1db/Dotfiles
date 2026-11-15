@@ -1,4 +1,4 @@
-export DOTFILES="$(dirname "$(dirname "$(readlink "${(%):-%N}")")")"
+export DOTFILES="${${(%):-%N}:A:h:h}"
 export CACHEDIR="$HOME/.local/share"
 export VIM_TMP="$HOME/.vim-tmp"
 # add a config file for ripgrep
@@ -9,16 +9,14 @@ export CLAUDE_CONFIG_DIR="$HOME/.claude-personal"
 [[ -d "$CACHEDIR" ]] || mkdir -p "$CACHEDIR"
 [[ -d "$VIM_TMP" ]] || mkdir -p "$VIM_TMP"
 
+for _op_sock in ~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock ~/.1password/agent.sock; do
+    [[ -S $_op_sock ]] && { export SSH_AUTH_SOCK=$_op_sock; break; }
+done
+unset _op_sock
+
 [[ -f ~/.zshenv.local ]] && source ~/.zshenv.local
 
-fpath=(
-    $DOTFILES/zsh/functions
-    /usr/local/share/zsh/site-functions
-    $fpath
-    /opt/homebrew/share/zsh/functions
-)
-typeset -U fpath
-fpath=(${^fpath}(N-/))
+source "$DOTFILES/zsh/fpath"
 
 typeset -aU path
 

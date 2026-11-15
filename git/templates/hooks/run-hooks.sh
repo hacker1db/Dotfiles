@@ -3,7 +3,12 @@
 EXIT_CODE=0
 
 hook_type=$(basename "$0")
-hooks="$HOME/.dotfiles/main/git/hooks"
+gitconfig=$(readlink -f "$HOME/.gitconfig" 2>/dev/null)
+dotfiles=${gitconfig%/git/gitconfig.symlink}
+if [ -z "$gitconfig" ] || [ "$dotfiles" = "$gitconfig" ]; then
+	dotfiles="$HOME/Developer/dotfiles/main"
+fi
+hooks="$dotfiles/git/hooks"
 
 echo "Executing $hook_type hook(s)"
 

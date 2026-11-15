@@ -1,30 +1,49 @@
-#!/bin/sh
+#!/usr/bin/env zsh
 
-# abort if we're already inside a TMUX session
-[ "$TMUX" == "" ] || exit 0
-# startup a "default" session if non currently exists
-# tmux has-session -t _default || tmux new-session -s _default -d
+go() {
+    if [[ -n "$TMUX" ]]; then
+        tmux switch-client -t "=$1"
+    else
+        tmux attach-session -t "=$1"
+    fi
+}
 
-# present menu for user to choose which workspace to open
+create() {
+    local name="$1"
+    if [[ -z "$name" ]]; then
+        name="${PWD:t}"
+        read "name?Enter new session name [$name]: " || exit 1
+        [[ -n "$name" ]] || name="${PWD:t}"
+    fi
+    name="${name//[.:]/_}"
+    tmux has-session -t "=$name" 2>/dev/null || tmux new-session -d -s "$name" -c "$PWD"
+    go "$name"
+}
+
+if [[ -n "$1" ]]; then
+    create "$1"
+    exit
+fi
+
+local current=""
+[[ -n "$TMUX" ]] && current="$(tmux display-message -p '#S')"
+
+local -a sessions choices
+sessions=(${(f)"$(tmux list-sessions -F '#S' 2>/dev/null)"})
+sessions=(${sessions:#$current})
+choices=($sessions "New Session")
+[[ -z "$TMUX" ]] && choices+=("zsh")
+
+print "Available sessions"
+[[ -n "$current" ]] && print "(current: $current)"
+print -- "------------------\n"
+
 PS3="Please choose your session: "
-options=($(tmux list-sessions -F "#S" 2>/dev/null) "New Session" "zsh")
-echo "Available sessions"
-echo "------------------"
-echo " "
-select opt in "${options[@]}"
-do
-	case $opt in
-		"New Session")
-			read -p "Enter new session name: " SESSION_NAME
-			tmux new -s "$SESSION_NAME"
-            			break
-			;;
-		"zsh")
-			zsh --login
-			break;;
-		*)
-			tmux attach-session -t $opt
-			break
-			;;
-	esac
+select opt in $choices; do
+    case "$opt" in
+        "New Session") create; break ;;
+        "zsh") exec zsh --login ;;
+        "") print -u2 "Invalid choice" ;;
+        *) go "$opt"; break ;;
+    esac
 done

@@ -1,7 +1,7 @@
 # reload zsh config
 alias reload!='source ~/.zshrc'
 alias r!='reload!'
-alias e!="nvim ~/.dotfiles/main/config/nvim/init.vim"
+alias e!="nvim $DOTFILES/config/nvim/init.lua"
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
     colorflag="--color"
@@ -11,6 +11,7 @@ fi
 
 alias vim="nvim"
 alias vi="nvim"
+alias code="nvim"
 alias f="flutter"
 alias gitpulla='find . -mindepth 1 -maxdepth 1 -type d -print -exec git -C {} pull \;'
 # Filesystem aliases
@@ -19,6 +20,7 @@ alias ...='cd ../..'
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias cat='bat'
+alias bathelp='bat --plain --language=help'
 alias tf="terraform"
 alias p="pnpm"
 alias pn="pnpm"
@@ -41,7 +43,7 @@ alias notes='cd $HOME/notes/SecondBrain'
 alias grep='grep --color=auto'
 alias df='df -h' # disk free, in Gigabytes, not bytes
 alias du='du -h -c' # calculate disk usage for a folder
-alias dotfiles="cd ~/.dotfiles/main"
+alias dotfiles='cd "$DOTFILES"'
 alias tfd="terraform apply --destroy --auto-approve"
 alias tfp="terraform plan"
 alias tfa="terraform apply --auto-approve"
@@ -57,7 +59,6 @@ alias docker='podman'
 alias publicip="pwsh -c '(Invoke-WebRequest ifconfig.me/ip).Content.Trim()'"
 alias localip="ipconfig getifaddr en1"
 alias ips="ifconfig -a | perl -nle'/(\d+\.\d+\.\d+\.\d+)/ && print $1'"
-alias k="kubectl"
 # Flush Directory Service cache
 alias flush="dscacheutil -flushcache"
 
@@ -116,10 +117,57 @@ alias cf='claude-foundry'
 alias cfc='claude-foundry --continue'
 alias cw='claude-subscription'
 alias cwc='claude-subscription --continue'
-alias oc='opencode'
-alias occ='copilot'
-alias ocr='opencode run'
+alias co='copilot'
+alias coc='copilot --continue'
+alias xp='codex --approve-for-me'
+alias xpc='codex resume --last'
+alias xf='codex-foundry --approve-for-me'
+alias xfc='codex-foundry resume --last'
 
 # applications
 alias devtoy='open /Applications/DevToy.app'
-alias scan='ggshield secret scan path --recursive --yes ./'
+
+# SketchyBar
+alias sbon='brew services start sketchybar'
+alias sboff='brew services stop sketchybar'
+
+# kubectl
+if command -v kubectl &> /dev/null; then
+    alias k=kubectl
+    compdef __start_kubectl k
+fi
+
+# git
+alias ga='git add'
+alias gb='git branch'
+alias gl='git pull'
+alias gp='git push'
+alias gd='hunk diff'
+alias gdc='git diff --cached --name-only --relative --diff-filter=d | xargs bat --diff'
+alias gs='git s'
+alias gss='git stash save'
+alias gsp='git stash pop'
+alias gmv='git mv'
+alias grm='git rm'
+alias grn='git-rename'
+alias glog="git l"
+alias gcm="git commit -am"
+alias gcs="git commit -S -am"
+alias gds='hunk diff --staged'
+alias git-undo='git reset --soft HEAD~1'
+alias git-count='git shortlog -sn'
+alias git-undopush="git push -f origin HEAD^:master"
+alias cpbr="git rev-parse --abbrev-ref HEAD | pbcopy"
+alias gcb="git rev-parse --abbrev-ref HEAD | pbcopy"
+alias sch="git rev-parse HEAD | pbcopy"
+# git root
+alias gr='[ ! -z `git rev-parse --show-cdup` ] && cd `git rev-parse --show-cdup || pwd`'
+alias sub-pull='git submodule foreach git pull origin master'
+alias gcc='git-clean-merged'
+alias wtm='wt main'
+
+# tmux
+alias ta='tmux attach'
+alias tls='tmux ls'
+alias tat='tmux attach -t'
+alias tns='tmux new-session -s'

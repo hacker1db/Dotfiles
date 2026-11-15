@@ -1,0 +1,20 @@
+# Codex Foundry profile: GPT deployments on Azure AI Foundry through foundry-entra-proxy.
+#
+# Template only. install/agent-profiles.zsh renders it to codex/.local/profiles/foundry.toml
+# (ignored by Git) and links that to ~/.codex-foundry/config.toml, so trust and project state
+# Codex writes back never lands in this file. Launch with bin/codex-foundry. See codex/PROFILES.md.
+model          = "gpt-6.1-sol"   # or gpt-6-luna, gpt-6-astra (must be on the proxy allowlist)
+model_provider = "foundry"
+
+[model_providers.foundry]
+name                   = "Azure AI Foundry via foundry-entra-proxy"
+base_url               = "http://127.0.0.1:8787/openai/v1"
+env_key                = "FOUNDRY_PROXY_KEY"   # loopback client key, never sent to Azure
+wire_api               = "responses"
+request_max_retries    = 4
+stream_max_retries     = 10
+stream_idle_timeout_ms = 300000
+
+# Keep the proxy key out of commands the model runs, whatever the base inherit policy is.
+[shell_environment_policy.filters]
+"FOUNDRY_PROXY_*" = "exclude"

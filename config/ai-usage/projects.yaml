@@ -1,0 +1,22 @@
+# ai-usage ownership rules (see projects.example.yaml in the ai-usage repo).
+#
+# Built-in rule: a repo whose GitHub owner is a user account is "personal"; a repo owned by a
+# GitHub organization, or with no GitHub remote, is "org". Add labels below
+# only for exceptions; the most specific match wins (repos, then paths, then owners). Setting
+# default: turns the built-in rule off. Edits apply on the dashboard's next refresh.
+
+# labels:
+#   shared:
+#     owners: [example-org]
+#   personal:
+#     paths: [~/Developer/sites, ~/Developer/side-code]
+
+# Profile filters: named groups of tool:profile series for the dashboard's profile bar (web
+# ?profile=<name>, TUI "p"). Each profile with data also gets its own chip automatically.
+# A pattern is "tool:profile" or a bare "profile" (any tool); * globs. Up to 12.
+profiles:
+  personal: [claude-code:personal, codex:personal-chatgpt]
+  work: [claude-code:work-*, codex:work-foundry, copilot:*]
+  foundry:
+    label: Azure Foundry
+    match: [work-foundry]
