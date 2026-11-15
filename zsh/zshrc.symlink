@@ -80,7 +80,7 @@ export ZPLUGDIR="$CACHEDIR/zsh/plugins"
 # array containing plugin information (managed by zfetch)
 typeset -A plugins
 
-zfetch Aloxaf/fzf-tab
+zfetch Aloxaf/fzf-tab "" "" 24105b15714bfec37989ed5c5b6e60f572253019
 
 if command -v fnm &> /dev/null; then
     _fnm_env="$(fnm env --shell zsh)" && eval "$_fnm_env"

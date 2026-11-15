@@ -150,7 +150,7 @@ install_plugins() {
     while IFS=$'\t' read -r name src; do
         jq -e --arg n "$name" 'any(.[]; .name == $n)' <<< "$have" >/dev/null ||
             CLAUDE_CONFIG_DIR="$dir" claude plugin marketplace add "$src" || problem "Failed to add marketplace $name to $dir"
-    done < <(jq -r '.extraKnownMarketplaces // {} | to_entries[] | [.key, (.value.source.repo // .value.source.url // .value.source.path)] | @tsv' <<< "$settings")
+    done < <(jq -r '.extraKnownMarketplaces // {} | to_entries[] | [.key, ((.value.source.repo // .value.source.url // .value.source.path) + (if .value.source.ref then (if .value.source.repo then "@" else "#" end) + .value.source.ref else "" end))] | @tsv' <<< "$settings")
     have="$(CLAUDE_CONFIG_DIR="$dir" claude plugin list --json)"
     while read -r id; do
         jq -e --arg id "$id" 'any(.[]; .id == $id)' <<< "$have" >/dev/null ||

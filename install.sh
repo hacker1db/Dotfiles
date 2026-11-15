@@ -45,10 +45,11 @@ if [[ ! -f "${0:A}" || ! -f "$ROOT/install/lib.zsh" ]]; then
     if [[ ! -d "$repo/.bare" ]]; then
         mkdir -p "$repo" && git clone --bare "$url" "$repo/.bare" || die "Cloning $url failed."
     fi
-    [[ "$(git --git-dir="$repo/.bare" config remote.origin.url)" == *[/:]hacker1db/Dotfiles(|.git) ]] \
+    origin_re='^(git@github\.com:|ssh://git@github\.com/|https://github\.com/|git@github-[A-Za-z0-9._-]+:)hacker1db/Dotfiles(\.git)?$'
+    [[ "$(git --git-dir="$repo/.bare" config remote.origin.url)" =~ $origin_re ]] \
         || die "$repo/.bare is not a clone of $url; move it aside and run this command again."
     if [[ -d "$repo/.git" ]]; then
-        [[ "$(git --git-dir="$repo/.git" config remote.origin.url)" == *[/:]hacker1db/Dotfiles(|.git) ]] \
+        [[ "$(git --git-dir="$repo/.git" config remote.origin.url)" =~ $origin_re ]] \
             || die "$repo is a clone of another repository; move it aside and run this command again."
         [[ -z "$(git -C "$repo" status --porcelain --untracked-files=no)" ]] \
             || die "$repo is a plain clone with local changes; commit or move them aside, then run this command again."

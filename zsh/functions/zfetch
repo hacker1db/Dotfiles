@@ -54,7 +54,7 @@ else
 
   if [[ ! -d $dest ]]; then
       local url=https://github.com/$name
-      local ref=$3
+      local ref=${4:-}
       echo -e "Missing plugin ${Yel}${name}${Rst}"
       echo -e "  Cloning from ${Blu}${url}${Rst}..."
       if [[ -n $ref ]]; then
@@ -65,8 +65,8 @@ else
               return $?
           fi
 
-          git checkout --quiet $ref
-          echo -e "  Checked out branch ${ref}"
+          git -C $dest -c advice.detachedHead=false checkout --quiet $ref || return 1
+          echo -e "  Checked out ${ref}"
       else
           git clone --quiet --depth 1 $url $dest
           if [[ $? != 0 ]]; then

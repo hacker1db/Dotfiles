@@ -75,7 +75,8 @@
     "cli-anything": {
       "source": {
         "source": "github",
-        "repo": "HKUDS/CLI-Anything"
+        "repo": "HKUDS/CLI-Anything",
+        "ref": "34f519533bc175d2fe287ab8316b0dd99bb9cc43"
       }
     },
     "claude-code-plugins": {
