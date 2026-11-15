@@ -6,9 +6,13 @@ if [[ ! -f "${0:A}" || ! -f "$ROOT/install/lib.zsh" ]]; then
     die() { print -u2 "$1"; exit 1 }
     url=https://github.com/hacker1db/Dotfiles.git
     repo="$HOME/Developer/dotfiles"
-    if ! xcode-select -p &> /dev/null; then
-        xcode-select --install
-        die "Finish installing the Command Line Tools, then run this command again."
+    if [[ "$OSTYPE" == darwin* ]]; then
+        if ! xcode-select -p &> /dev/null; then
+            xcode-select --install
+            die "Finish installing the Command Line Tools, then run this command again."
+        fi
+    elif ! command -v git &> /dev/null; then
+        die "Install git, then run this command again."
     fi
     if [[ ! -d "$repo/.bare" ]]; then
         mkdir -p "$repo" && git clone --bare "$url" "$repo/.bare" || die "Cloning $url failed."
