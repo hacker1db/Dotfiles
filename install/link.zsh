@@ -7,7 +7,12 @@ LINK_FAILURE=0
 title "Creating symlinks"
 typeset file config entry destination backup
 for file in "$DOTFILES"/*.symlink(N) "$DOTFILES"/*/*.symlink(N) "$DOTFILES"/*/*/*.symlink(N); do
-    link_file "$file" "$HOME/.${${file:t}%.symlink}"
+    destination="$HOME/.${${file:t}%.symlink}"
+    if [[ "${destination:t}" == .zsh(rc|env) && -e "$destination" && ! -L "$destination" ]]; then
+        backup="$(backup_path "$destination")"
+        mv "$destination" "$backup" && print "Moved $destination to $backup; put machine-specific settings in ~/.localrc"
+    fi
+    link_file "$file" "$destination"
 done
 
 title "Installing to ~/.config"

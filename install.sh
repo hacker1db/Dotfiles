@@ -77,6 +77,13 @@ typeset -a steps=(tools link node dotnet osx theme browser tmux-plugins agent-pr
 
 usage() { print -u2 "Usage: ${0:t} {all|${(j:|:)steps}|deferred|use} [args]"; exit 1 }
 
+restart_shell() {
+    [[ -t 0 && -t 1 && "${DOTFILES_NONINTERACTIVE:-0}" != 1 ]] || return 0
+    info "Starting a fresh shell"
+    unset DOTFILES
+    exec zsh -i
+}
+
 run_step() {
     local name="$1"; shift
     load_brew_env || true
@@ -112,6 +119,7 @@ if [[ "$cmd" == all ]]; then
     print
     [[ "${#failed}" -eq 0 ]] || { error "Finished with failures: $failed"; exit 1 }
     success "All tasks complete"
+    restart_shell
     exit 0
 fi
 
@@ -128,3 +136,5 @@ rc=$?
 [[ "$rc" -eq 0 ]] || exit "$rc"
 print
 success "Done."
+[[ "$cmd" == link ]] && restart_shell
+exit 0
