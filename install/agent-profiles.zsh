@@ -115,7 +115,7 @@ build() {
             | . * $layer | .hooks = $hooks | .enabledMcpjsonServers = $mcp)
         | .env += {CLAUDE_CODE_USE_BEDROCK: "0", CLAUDE_CODE_USE_VERTEX: "0"}
         | .extraKnownMarketplaces."fleet-local" = {source: {source: "directory", path: ($home + "/.local/share/fleet-marketplace")}}
-        | if $profile == "foundry" then . * $auto | .env.ANTHROPIC_FOUNDRY_RESOURCE = $resource
+        | if $profile == "foundry" then . * $auto | (if $resource == "" then . else .env.ANTHROPIC_FOUNDRY_RESOURCE = $resource end)
           else .env.CLAUDE_CODE_USE_FOUNDRY = "0" | .forceLoginMethod = "claudeai" end' "${layers[@]}"
 }
 
@@ -189,13 +189,7 @@ typeset profile dir dest target want
 for profile in personal subscription foundry; do
     if [[ "$profile" == foundry ]]; then
         [[ "$skip_foundry" -eq 0 ]] || continue
-        if [[ -z "$resource" && "${#drives}" -eq 0 ]]; then
-            print "Claude Foundry skipped: no ~/OneDrive* directory and ANTHROPIC_FOUNDRY_RESOURCE is unset."
-            continue
-        elif [[ -z "$resource" ]]; then
-            problem "Claude Foundry skipped: ANTHROPIC_FOUNDRY_RESOURCE is unset (export it from ~/.localrc)."
-            continue
-        fi
+        [[ -n "$resource" ]] || print "Claude Foundry: ANTHROPIC_FOUNDRY_RESOURCE is unset; creating the profile anyway (export it from ~/.localrc and rerun to use it)."
     fi
     dir="$HOME/.claude-$profile"
     dest="$dir/settings.json"
@@ -296,14 +290,7 @@ unlink_legacy_overlay
 typeset state item
 for profile in foundry; do
     [[ "$skip_foundry" -eq 0 ]] || continue
-    if [[ ! -r "$key_file" ]]; then
-        if [[ "${#drives}" -eq 0 ]]; then
-            print "Codex Foundry skipped: no foundry-entra-proxy client key at $key_file."
-        else
-            problem "Codex Foundry skipped: no client key at $key_file (run foundry-entra-proxy/install.sh in clitools)."
-        fi
-        continue
-    fi
+    [[ -r "$key_file" ]] || print "Codex Foundry: no client key at $key_file; creating the profile anyway (run foundry-entra-proxy/install.sh in clitools to use it)."
     dir="$HOME/.codex-$profile"
     dest="$dir/config.toml"
     target="$codex_generated/$profile.toml"

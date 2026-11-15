@@ -18,13 +18,13 @@ T3 reads `~/.t3/userdata/client-settings.json`, `~/.t3/userdata/settings.json`, 
 | `dotfiles-claude-subscription` | `~/.claude-subscription/settings.json` |
 | `dotfiles-claude-foundry` | `~/.claude-foundry/settings.json` |
 | `codex` | `~/.codex/config.toml` |
-| `dotfiles-codex-home-foundry` | `~/.codex_foundry/config.toml` |
+| `dotfiles-codex-home-foundry` | `~/.codex-foundry/config.toml` |
 
 Claude entries come from the definitions under `claude/profiles/`. T3 runs the native `~/.local/bin/claude` with each profile's `homePath`, which T3 maps to `CLAUDE_CONFIG_DIR`. This selects the same settings/login context as the shell launchers without depending on interactive shell initialization. Codex entries use the discovered executable, explicit `homePath`, `setupMode: existing`, and no shadow home. They reuse the local CLI configuration and authentication instead of T3-managed authentication.
 
 `config/t3code/profiles.json` declares additional Codex homes, including the Foundry placeholder. Paths beginning with `~/` expand at installation time, so no machine username is committed. Existing `~/.codex-*` and `~/.codex_*` homes with `config.toml` are also discovered. Duplicate normalized names fail before any write.
 
-A missing settings file or executable creates a disabled T3 entry. `bin/t3-config providers` and `--check` return status 2 for that; `link.zsh` only warns, and skips provider setup entirely when `~/.t3` does not exist. After provisioning the profile, rerun setup to enable its entry. Readiness here checks files and executables; it does not verify login, model access, or API connectivity. Claude Foundry still needs its resource settings and Azure login. Codex Foundry needs a separately provisioned `~/.codex_foundry/config.toml`; this integration does not invent a resource, deployment name, or credential. The pre-existing Codex Foundry provisioner was found on the separate `feature/codex-foundry` branch, not in this branch's base `main`.
+A missing settings file or executable creates a disabled T3 entry. `bin/t3-config providers` and `--check` return status 2 for that; `link.zsh` only warns, and skips provider setup entirely when `~/.t3` does not exist. After provisioning the profile, rerun setup to enable its entry. Readiness here checks files and executables; it does not verify login, model access, or API connectivity. Claude Foundry still needs its resource settings and Azure login. `install/agent-profiles.zsh` provisions `~/.codex-foundry/config.toml`; this integration does not invent a resource, deployment name, or credential.
 
 Codex named `*.config.toml` files are discovered as disabled placeholders. Codex CLI 0.164.0 rejects `--profile` for `app-server`, the transport used by this T3 build, even though [named profiles are supported for Codex runtime commands](https://learn.chatgpt.com/docs/config-file/config-advanced#profiles). Use separate Codex homes for T3. The diagnostic explains this limitation instead of generating invalid launch arguments.
 
