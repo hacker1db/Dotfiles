@@ -58,7 +58,14 @@ case "${1:-sync}" in
         shift
         apply_browser "${1:?browser name}"
         ;;
-    sync) apply_browser "$(resolve_browser)" ;;
+    sync)
+        # defaultbrowser is macOS-only; on Linux the desktop's own settings choose the browser.
+        if [[ "$OSTYPE" != darwin* ]]; then
+            print "Skipping default browser: not running on macOS"
+            exit 0
+        fi
+        apply_browser "$(resolve_browser)"
+        ;;
     *)
         print -u2 "Usage: browser {list|current|apply <name>|sync}"
         exit 1
