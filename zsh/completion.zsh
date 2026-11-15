@@ -27,8 +27,7 @@ eval "$(sesh completion zsh)"
 
 # skillctl completion (the launcher reuses the last build for completion requests)
 if command -v skillctl &> /dev/null; then
-    _skillctl_completion="$(skillctl completion zsh 2>/dev/null)" && [[ -n $_skillctl_completion ]] && eval "$_skillctl_completion"
-    unset _skillctl_completion
+    source <(skillctl completion zsh 2>/dev/null)
 fi
 
 # T3 Code completion. `t3 --completions zsh` takes ~0.4s, so cache it and
