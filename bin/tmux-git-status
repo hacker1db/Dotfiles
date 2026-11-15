@@ -16,7 +16,13 @@ branch=$(git symbolic-ref --short HEAD 2>/dev/null || git describe --tags --exac
 
 # Get git status indicators
 git_status=""
-INDEX=$(git --attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 -c core.fsmonitor=false -c core.untrackedCache=false --no-optional-locks status --porcelain -b --ignore-submodules=all 2>/dev/null)
+neutral=(--attr-source=4b825dc642cb6eb9a060e54bf8d69288fbee4904 -c core.fsmonitor=false -c core.untrackedCache=false)
+while read -r key; do
+  name="${key#filter.}"
+  name="${name%.*}"
+  neutral+=(-c "filter.$name.clean=" -c "filter.$name.smudge=" -c "filter.$name.process=" -c "filter.$name.required=false")
+done < <(git config --name-only --get-regexp '^filter\..*\.(clean|smudge|process)$' 2>/dev/null)
+INDEX=$(git "${neutral[@]}" --no-optional-locks status --porcelain -b --ignore-submodules=all 2>/dev/null)
 
 GIT_ADDED=''
 GIT_MODIFIED=''
