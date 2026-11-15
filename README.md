@@ -18,7 +18,7 @@ When `install.sh` runs outside a checkout, it clones the repository bare into `~
 
 The first clone uses HTTPS because no SSH agent is set up yet; the repository is public, so it needs no credentials. Once SSH works, switch its remote with `git -C ~/Developer/dotfiles remote set-url origin git@github.com:hacker1db/Dotfiles.git`. The installed links always point at `~/Developer/dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/Developer/dotfiles/`.
 
-Each step under `install/` is one zsh script with the same name; `install.sh` runs them in order. The scripts change macOS preferences and configure applications, so review them before a full run.
+Each step under `install/` is one zsh script with the same name; `install.sh` runs them in order. The scripts change macOS preferences and configure applications, so review them before a full run. Every step resolves `DOTFILES` from the checkout that contains it, so a stale value from an older shell setup is ignored. `link` moves a regular-file `~/.zshrc` or `~/.zshenv` aside to a timestamped `.backup` before linking it (carry machine-specific settings over to `~/.localrc`). When run in a terminal, `all` and `link` finish by starting a fresh Zsh with `DOTFILES` cleared, so the current terminal picks up the new configuration.
 
 To try the configuration from a different worktree, select it explicitly:
 
