@@ -10,12 +10,9 @@ tap "caffix/amass", trusted: true
 tap "clerk/stable"
 tap "derailed/k9s", trusted: true
 tap "FelixKratz/formulae", trusted: true
-tap "fsouza/prettierd"
 tap "gitguardian/tap", trusted: true
 tap "hacker1db/tap", trusted: true
 tap "hashicorp/tap", trusted: true
-tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
 tap "jesseduffield/lazygit", trusted: true
 tap "majd/repo", trusted: true
 tap "mondoohq/mondoo", trusted: true
@@ -28,6 +25,7 @@ tap "robscott/tap", trusted: true
 tap "rtk-ai/tap", trusted: true
 tap "rustscan/rustscan", "https://github.com/RustScan/homebrew-rustscan.git"
 tap "slp/krunkit"
+tap "terraform-linters/tap", trusted: true
 tap "sst/tap", "https://github.com/anomalyco/homebrew-tap.git", trusted: true
 tap "workos/tap", trusted: true
 # Search tool like grep, but optimized for programmers
@@ -50,10 +48,6 @@ brew "cryptography"
 brew "tree"
 # Automate deployment, configuration, and upgrading
 brew "ansible"
-# Allows you to programmatically authenticate into AWS accounts through IAM roles
-brew "aws-auth"
-# Microsoft Azure CLI 2.0
-brew "azure-cli"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Bash scripts that integrate bat with various command-line tools
@@ -64,8 +58,6 @@ brew "cloc"
 brew "cocoapods"
 # Tool for interacting with remote images and registries
 brew "crane"
-# Command-line tool for getting & setting the default browser
-brew "defaultbrowser"
 # Debugger for the Go programming language
 brew "delve"
 # Tool for exploring each layer in a docker image
@@ -78,10 +70,6 @@ brew "docker-credential-helper"
 brew "docutils"
 # .NET Core
 brew "dotnet"
-# .NET Core
-brew "dotnet@6"
-# Select default apps for documents and URL schemes on macOS
-brew "duti"
 # Command-line tool to interact with exercism.io
 brew "exercism"
 # Modern, maintained replacement for ls
@@ -150,8 +138,6 @@ brew "ideviceinstaller"
 brew "libidn2"
 # GNU utilities for networking
 brew "inetutils"
-# Install and debug iPhone apps from the command-line
-brew "ios-deploy"
 # Featureful UNIX password cracker
 brew "john"
 # Lightweight and flexible command-line JSON processor
@@ -184,8 +170,6 @@ brew "luacheck"
 brew "markdown"
 # Fast, flexible, config-based cli for linting Markdown/CommonMark files
 brew "markdownlint-cli2"
-# Mac App Store command-line interface
-brew "mas"
 # Publisher CLI tool for the Official Model Context Protocol (MCP) Registry
 brew "mcp-publisher"
 # Mermaid diagram renderer (mmdc) for Snacks image previews in Neovim
@@ -200,8 +184,6 @@ brew "neovim"
 brew "nikto"
 # Port scanning utility for large networks
 brew "nmap"
-# Send commands to the macOS Now Playing media session
-brew "nowplaying-cli"
 # Modern shell for the GitHub era
 brew "nushell"
 # Manage multiple Node.js versions
@@ -235,11 +217,7 @@ brew "python@3.12"
 # Tool Command Language
 brew "tcl-tk"
 # Interpreted, interactive, object-oriented programming language
-brew "python@3.8"
-# Interpreted, interactive, object-oriented programming language
 brew "python@3.9"
-# Reattach process (e.g., tmux) to background
-brew "reattach-to-user-namespace"
 # Token-saving proxy that compacts shell command output for AI agents
 brew "rtk-ai/tap/rtk"
 # Persistent key-value database, with built-in net interface
@@ -250,10 +228,6 @@ brew "rustscan"
 brew "scc"
 # Smart session manager for the terminal
 brew "sesh"
-# Window border system for macOS
-brew "FelixKratz/formulae/borders"
-# Highly customizable macOS status bar replacement
-brew "FelixKratz/formulae/sketchybar"
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Penetration testing for SQL injection and database servers
@@ -272,8 +246,6 @@ brew "terraform-docs"
 brew "terraform-lsp"
 # Terraform version manager inspired by rbenv
 brew "tfenv"
-# Linter for Terraform files
-brew "tflint"
 # Static analysis security scanner for your terraform code
 brew "tfsec"
 # Code-search similar to ack
@@ -298,8 +270,6 @@ brew "worktrunk"
 brew "yaml-language-server"
 # Blazing fast terminal file manager written in Rust, based on async I/O
 brew "yazi"
-# Download YouTube videos from the command-line
-brew "youtube-dl"
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
 brew "yq"
 # Feature-rich command-line audio/video downloader
@@ -316,6 +286,8 @@ brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 # Scanner for vulnerabilities in container images, file systems, and Git repositories, as well as for configuration issues
 brew "aquasecurity/trivy/trivy"
+# Linter for Terraform files (moved out of homebrew/core)
+cask "terraform-linters/tap/tflint"
 # Azure Functions Core Tools 4.0
 brew "azure/functions/azure-functions-core-tools@4"
 # Command-line interface for Clerk
@@ -332,10 +304,31 @@ brew "workos/tap/workos"
 brew "hacker1db/tap/ai-usage"
 # Loopback proxy that signs Azure AI Foundry requests with an Entra token
 brew "hacker1db/tap/foundry-entra-proxy"
+# macOS-only formulas (no Linux bottle or build)
+if OS.mac?
+  # Command-line tool for getting & setting the default browser
+  brew "defaultbrowser"
+  # Select default apps for documents and URL schemes on macOS
+  brew "duti"
+  # Install and debug iPhone apps from the command-line
+  brew "ios-deploy"
+  # Mac App Store command-line interface
+  brew "mas"
+  # Send commands to the macOS Now Playing media session
+  brew "nowplaying-cli"
+  # Reattach process (e.g., tmux) to background
+  brew "reattach-to-user-namespace"
+  # Window border system for macOS
+  brew "FelixKratz/formulae/borders"
+  # Highly customizable macOS status bar replacement
+  brew "FelixKratz/formulae/sketchybar"
+end
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
 cask "1password-cli"
+# Microsoft Azure CLI 2.0 (migrated from homebrew/core to a cask)
+cask "azure-cli"
 # Application launcher and productivity software
 cask "alfred"
 # Toolset to implement parts of Android apps in native code
