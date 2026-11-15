@@ -1,1 +1,1 @@
-../global/AGENTS.md
+@AGENTS.md
