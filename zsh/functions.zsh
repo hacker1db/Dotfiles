@@ -472,10 +472,45 @@ function bmad-init() {
     --tools claude-code,codex "$@"
 }
 
-# Caido in the background: proxy on :8082 (invisible), UI on :8081.
-# `caido` (start) | `caido stop` | `caido status` | `caido logs` | `caido fg`
-# Pair with `caido-thick up <domain>` for thick clients.
+# Caido: local instance in the background (proxy :8082 invisible, UI :8081), or a remote one.
+# `caido [--local|--remote [URL]|--url URL] [start|stop|status|logs|fg|url|proxy]`
+# Remote URL: argument, else $CAIDO_REMOTE_URL (set in ~/.localrc). Proxy: $CAIDO_REMOTE_PROXY,
+# else the remote host on $CAIDO_PROXY_PORT. Default mode: $CAIDO_MODE, else local.
+# Pair with `caido-thick up <domain>` for thick clients (local mode).
 function caido() {
+  local mode="${CAIDO_MODE:-local}" remote="${CAIDO_REMOTE_URL:-}"
+  while (( $# )); do
+    case "$1" in
+      --local)  mode=local; shift ;;
+      --remote) mode=remote; shift
+                if [[ ${1:-} == http(|s)://* ]]; then remote="$1"; shift; fi ;;
+      --url)    [[ -n ${2:-} ]] || { echo "caido: --url needs a URL" >&2; return 1; }
+                mode=remote; remote="$2"; shift 2 ;;
+      *)        break ;;
+    esac
+  done
+
+  if [[ $mode == remote ]]; then
+    [[ -n $remote ]] || { echo "caido: no remote URL; pass --remote <url> or set CAIDO_REMOTE_URL" >&2; return 1; }
+    [[ $remote == *://* ]] || remote="https://$remote"
+    remote="${remote%/}"
+    local host="${${remote#*://}%%[:/]*}"
+    local proxy="${CAIDO_REMOTE_PROXY:-http://$host:${CAIDO_PROXY_PORT:-8082}}"
+    case "${1:-start}" in
+      start|status)
+        if curl -fsS --max-time 5 -o /dev/null "$remote/health"; then
+          echo "Remote Caido up → UI $remote  proxy $proxy"
+        else
+          echo "Remote Caido unreachable at $remote/health" >&2; return 1
+        fi ;;
+      url)   echo "$remote" ;;
+      proxy) echo "$proxy" ;;
+      stop|logs|fg) echo "caido: '$1' is managed on the remote server" >&2; return 1 ;;
+      *)     echo "usage: caido --remote [URL] [start|status|url|proxy]" >&2; return 1 ;;
+    esac
+    return
+  fi
+
   local dir="${XDG_CACHE_HOME:-$HOME/.cache}/caido"
   local pidfile="$dir/caido.pid" log="$dir/caido.log"
   local -a args=(--proxy-listen "127.0.0.1:${CAIDO_PROXY_PORT:-8082}"
@@ -512,6 +547,8 @@ function caido() {
     logs)  tail -f "$log" ;;
     fg)    $running && { echo "Caido already running in background (pid $pid); 'caido stop' first" >&2; return 1; }
            caido-cli "${args[@]}" "${@:2}" ;;
-    *)     echo "usage: caido [start|stop|status|logs|fg] [extra caido-cli flags]" >&2; return 1 ;;
+    url)   echo "http://127.0.0.1:${CAIDO_UI_PORT:-8081}" ;;
+    proxy) echo "http://127.0.0.1:${CAIDO_PROXY_PORT:-8082}" ;;
+    *)     echo "usage: caido [--local|--remote [URL]|--url URL] [start|stop|status|logs|fg|url|proxy] [extra caido-cli flags]" >&2; return 1 ;;
   esac
 }
