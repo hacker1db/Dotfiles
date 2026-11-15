@@ -36,7 +36,7 @@ cd ~/Developer/dotfiles/main
 dotfiles-use
 ```
 
-`dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer. Switching works even after the previously selected worktree was deleted: links into any worktree of the repository, live or removed, move to the selected checkout, and generated agent profiles under `claude/.local` and `codex/.local` are copied over when the selected checkout lacks them. Links with no counterpart in the selected checkout are left alone and listed, so `install.sh link` and `install.sh agent-profiles` can repair them.
+`dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer. Switching works even after the previously selected worktree was deleted: links into any worktree of the repository, live or removed, move to the selected checkout, and generated agent profiles under `claude/.local` and `codex/.local` are copied over when the selected checkout lacks them. Links with no counterpart in the selected checkout are left alone and listed, so `install.sh link` can repair them.
 
 `wt remove` and `wt merge` run the `pre-remove` hook in `.config/wt.toml`, which switches the machine back to `main` before deleting the selected worktree (approve it the first time wt asks). If a selected worktree disappears another way, for example after merging on another machine, restore the shell with:
 
