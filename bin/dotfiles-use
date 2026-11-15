@@ -1,35 +1,97 @@
 #!/usr/bin/env zsh
 set -euo pipefail
 
-[[ $# -le 1 ]] || { print -u2 'Usage: dotfiles-use [checkout]'; exit 1; }
-target="${1:-$PWD}"
+usage() { print -u2 'Usage: dotfiles-use [--if-selected <checkout>] [checkout]'; exit 1 }
+
+only_if=""
+if [[ "${1:-}" == --if-selected ]]; then
+    [[ $# -ge 2 ]] || usage
+    only_if="${2:A}"
+    shift 2
+fi
+[[ $# -le 1 ]] || usage
+
+default_worktree() {
+    local repo="$1" branch line dir=""
+    branch="$(git -C "$repo" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)" || branch="origin/main"
+    branch="refs/heads/${branch#*/}"
+    while IFS= read -r line; do
+        [[ "$line" == "worktree "* ]] && dir="${line#worktree }"
+        [[ "$line" == "branch $branch" ]] && { print -r -- "$dir"; return 0 }
+    done < <(git -C "$repo" worktree list --porcelain)
+    print -u2 "No worktree has ${branch#refs/heads/} checked out in $repo"
+    return 1
+}
+
+if [[ $# -eq 1 ]]; then
+    target="$1"
+elif [[ -n "$only_if" ]]; then
+    target="$(default_worktree "$only_if")"
+else
+    target="$PWD"
+fi
 target="${target:A}"
 for required in zsh/zshrc.symlink zsh/zshenv.symlink install.sh; do
     [[ -f "$target/$required" ]] || { print -u2 "Missing $required in $target"; exit 1; }
 done
 [[ -L "$HOME/.zshrc" ]] || { print -u2 '~/.zshrc must already be a dotfiles symlink'; exit 1; }
-previous="${HOME}/.zshrc"
-previous="${previous:A:h:h}"
-[[ -f "$previous/install.sh" && -f "$previous/zsh/zshenv.symlink" ]] || {
-    print -u2 'The current ~/.zshrc does not point into a dotfiles checkout'
+current="$(readlink "$HOME/.zshrc")"
+[[ "$current" == /* ]] || current="$HOME/$current"
+[[ "$current" == */zsh/zshrc.symlink ]] || {
+    print -u2 "~/.zshrc points to $current, not into a dotfiles checkout"
     exit 1
 }
+previous="${current%/zsh/zshrc.symlink}"
+[[ -z "$only_if" || "$previous" == "$only_if" ]] || exit 0
 
-typeset -a destinations=() sources=()
+typeset -a roots=("$previous")
+typeset line
+while IFS= read -r line; do
+    [[ "$line" == "worktree "* ]] && roots+=("${line#worktree }")
+done < <(git -C "$target" worktree list --porcelain 2>/dev/null)
+container="${target:h}"
+typeset -i bare_layout=0
+[[ -d "$container/.bare" || -f "$container/.git" ]] && bare_layout=1
+
+checkout_root() {
+    local link="$1" root name
+    for root in "${roots[@]}"; do
+        [[ "$link" == "$root/"* ]] && { print -r -- "$root"; return 0 }
+    done
+    (( bare_layout )) && [[ "$link" == "$container/"*/* && ! -e "$link" ]] || return 1
+    name="${${link#$container/}%%/*}"
+    [[ "$name" != .bare ]] || return 1
+    [[ ! -e "$container/$name" || -f "$container/$name/install.sh" ]] || return 1
+    print -r -- "$container/$name"
+}
+
+typeset -a destinations=() sources=() skipped=()
 typeset -a candidates=(
     "$HOME"/.*(ND@)
     "$HOME"/.claude-*/*(N@)
+    "$HOME"/.codex*/*(N@)
+    "$HOME"/.copilot/*(N@)
+    "$HOME"/.copilot/hooks/*(N@)
     "$HOME"/.config/*(ND@)
-    "$HOME"/.codex/AGENTS.md(N@)
-    "$HOME"/.copilot/copilot-instructions.md(N@)
 )
+typeset destination link root relative replacement
 for destination in "${candidates[@]}"; do
+    [[ "$destination" == *.backup.* ]] && continue
     [[ -L "${destination:h}" || -L "${destination:h:h}" ]] && continue
-    source_path="${destination:A}"
-    [[ "$source_path" == "$previous/"* ]] || continue
-    [[ "$source_path" == */claude/.local/* ]] && continue
-    replacement="$target/${source_path#$previous/}"
-    [[ -e "$replacement" ]] || { print -u2 "Missing replacement: $replacement"; exit 1; }
+    link="$(readlink "$destination")"
+    [[ "$link" == /* ]] || continue
+    root="$(checkout_root "$link")" || continue
+    [[ "$root" != "$target" ]] || continue
+    relative="${link#$root/}"
+    replacement="$target/$relative"
+    if [[ "$relative" == (claude|codex)/.local/* && ! -e "$replacement" && -f "$link" ]]; then
+        mkdir -p "${replacement:h}"
+        cp -p "$link" "$replacement"
+    fi
+    if [[ ! -e "$replacement" ]]; then
+        skipped+=("$destination -> $link")
+        continue
+    fi
     destinations+=("$destination")
     sources+=("$replacement")
 done
@@ -38,6 +100,10 @@ for (( index = 1; index <= ${#destinations}; index++ )); do
     ln -sfn "${sources[index]}" "${destinations[index]}"
 done
 print -r -- "Dotfiles now point to $target"
-if [[ -t 0 && -t 1 ]]; then
+if (( ${#skipped} )); then
+    print -u2 "Left ${#skipped} links with no counterpart in $target; repair them with $target/install.sh link and agent-profiles:"
+    print -u2 -l -- "  ${^skipped[@]}"
+fi
+if [[ -z "$only_if" && -t 0 && -t 1 ]]; then
     exec zsh -i
 fi

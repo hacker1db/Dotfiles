@@ -23,8 +23,8 @@ Each step under `install/` is one zsh script with the same name; `install.sh` ru
 To try the configuration from a different worktree, select it explicitly:
 
 ```zsh
-cd ~/Developer/dotfiles/refactor-install-cleanup
-./install.sh use ~/Developer/dotfiles/refactor-install-cleanup
+wt switch -c my-change
+./install.sh use
 ```
 
 `use` retargets existing configuration symlinks from the active checkout to the selected checkout, then opens a fresh Zsh automatically when run in a terminal. It preserves unmanaged files, checks replacement paths before changing links, and runs no package installs. Zsh derives `DOTFILES` from its selected configuration file. Other existing terminals need to reload; applications load the selected configuration when they next reload or restart. This selection applies across terminals. Keep the selected worktree until you switch away from it. Noninteractive invocations only update the links.
@@ -36,7 +36,13 @@ cd ~/Developer/dotfiles/main
 dotfiles-use
 ```
 
-`dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer.
+`dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer. Switching works even after the previously selected worktree was deleted: links into any worktree of the repository, live or removed, move to the selected checkout, and generated agent profiles under `claude/.local` and `codex/.local` are copied over when the selected checkout lacks them. Links with no counterpart in the selected checkout are left alone and listed, so `install.sh link` and `install.sh agent-profiles` can repair them.
+
+`wt remove` and `wt merge` run the `pre-remove` hook in `.config/wt.toml`, which switches the machine back to `main` before deleting the selected worktree (approve it the first time wt asks). If a selected worktree disappears another way, for example after merging on another machine, restore the shell with:
+
+```zsh
+~/Developer/dotfiles/main/bin/dotfiles-use ~/Developer/dotfiles/main
+```
 
 Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/tools.zsh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. Bundle applies the trust declarations in `install/brewfile`. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
