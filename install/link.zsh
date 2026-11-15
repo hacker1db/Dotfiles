@@ -287,5 +287,18 @@ else
     info "Skipping T3 Code; ~/.t3 not found."
 fi
 
+title "Configuring agent profiles"
+PROFILES_INCOMPLETE=0
+profiles_rc=0
+zsh "$DOTFILES/install/agent-profiles.zsh" || profiles_rc=$?
+if [[ "$profiles_rc" -eq 2 ]]; then
+    warning "Agent profile setup is incomplete; see the diagnostics above."
+    PROFILES_INCOMPLETE=1
+elif [[ "$profiles_rc" -ne 0 ]]; then
+    error "Agent profile setup failed."
+    LINK_FAILURE=1
+fi
+
 [[ "$LINK_FAILURE" -eq 0 ]] || { error "Dotfiles linking needs attention; see the diagnostics above."; exit 1 }
 success "Linking complete"
+exit $(( PROFILES_INCOMPLETE ? 2 : 0 ))

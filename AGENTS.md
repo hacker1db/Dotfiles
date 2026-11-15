@@ -39,7 +39,7 @@ time zsh -i -c exit
 ```
 
 - `agent-profiles.zsh --check` is a read-only audit of the installed Claude and Codex profiles.
-- To rehearse linking without touching the real home: `HOME=$(mktemp -d) zsh install/link.zsh`. It clones repositories and builds the plan CLI.
+- To rehearse linking without touching the real home: `HOME=$(mktemp -d) zsh install/link.zsh`. It clones repositories, builds the plan CLI, and sets up the agent profiles in that home.
 - Neovim has no automated tests. Check it interactively with `nvim +checkhealth`.
 - `./install.sh {all|tools|link|...}` changes the live machine. Run it only when asked.
 - Report startup timings only after measuring them.
