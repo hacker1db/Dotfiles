@@ -11,7 +11,7 @@ tap "clerk/stable"
 tap "derailed/k9s", trusted: true
 tap "FelixKratz/formulae", trusted: true
 tap "gitguardian/tap", trusted: true
-tap "hacker1db/tap", trusted: true
+tap "hacker1db/ai-usage", "https://github.com/hacker1db/ai-usage", trusted: true
 tap "hashicorp/tap", trusted: true
 tap "jesseduffield/lazygit", trusted: true
 tap "majd/repo", trusted: true
@@ -301,9 +301,9 @@ brew "hashicorp/tap/vault"
 # Install AuthKit integrations and manage WorkOS resources
 brew "workos/tap/workos"
 # Local dashboard and reports for AI coding tool usage
-brew "hacker1db/tap/ai-usage"
+brew "hacker1db/ai-usage/ai-usage"
 # Loopback proxy that signs Azure AI Foundry requests with an Entra token
-brew "hacker1db/tap/foundry-entra-proxy"
+brew "hacker1db/ai-usage/foundry-entra-proxy"
 # macOS-only formulas (no Linux bottle or build)
 if OS.mac?
   # Command-line tool for getting & setting the default browser
