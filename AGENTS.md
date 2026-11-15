@@ -21,9 +21,8 @@ docs/         Integration guides
 `~/Developer/dotfiles` is a bare repository with one worktree per branch; `~/Developer/dotfiles/main` is the production checkout.
 
 - `main` must always work. Never edit or commit in the `main` checkout.
-- Exactly one feature branch and worktree exists besides `main`, and all work goes there. The current one is `refactor/install-cleanup` (`~/Developer/dotfiles/refactor-install-cleanup`). This overrides any global rule asking for a new worktree or branch per task.
-- Never create another worktree or branch, and never stack branches. `dotfiles-use` points the machine at one worktree for testing; extra worktrees break that.
-- Start a new feature branch (`wt switch -c <branch>`) only after the current one is merged and its worktree removed, and only when the user asks.
+- Create each task's worktree with `wt switch -c <branch>`, based on `origin/main`. Any number of worktrees may exist; never stack branches.
+- Remove worktrees with `wt remove` or `wt merge`. Their `pre-remove` hook (`.config/wt.toml`) points the machine back at `main` when the worktree being removed is selected. After removing one any other way, run `~/Developer/dotfiles/main/bin/dotfiles-use ~/Developer/dotfiles/main`.
 - Run every command from the worktree root with repo-relative paths. Paths under `~/Developer/dotfiles/main` validate `main`, not your changes.
 - Installed links (`~/.zshrc`, `~/.config/*`, `~/.git-templates`, and others) point at the selected checkout, `main` by default. Anything that writes through them, such as `Lazy sync` updating `lazy-lock.json` or `install.sh theme apply`, changes that checkout. Edit files in the worktree, never through `~/.config`.
 - `./install.sh use` points the installed links at the current worktree for every terminal on the machine. Ask before running it, and switch back afterward with `dotfiles-use` from `~/Developer/dotfiles/main`.
@@ -39,7 +38,7 @@ time zsh -i -c exit
 ```
 
 - `agent-profiles.zsh --check` is a read-only audit of the installed Claude and Codex profiles.
-- To rehearse linking without touching the real home: `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh`. It clones repositories and builds the plan CLI.
+- To rehearse linking without touching the real home: `HOME=$(mktemp -d) zsh install/link.zsh`. It clones repositories, builds the plan CLI, and sets up the agent profiles in that home.
 - Neovim has no automated tests. Check it interactively with `nvim +checkhealth`.
 - `./install.sh {all|tools|link|...}` changes the live machine. Run it only when asked.
 - Report startup timings only after measuring them.

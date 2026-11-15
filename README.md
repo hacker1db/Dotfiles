@@ -14,17 +14,17 @@ On a new machine, run:
 zsh -c "$(curl -fsSL https://raw.githubusercontent.com/hacker1db/Dotfiles/main/install.sh)"
 ```
 
-When `install.sh` runs outside a checkout, it clones the repository bare into `~/Developer/dotfiles` with a `main` worktree (the layout `bin/git-bare-clone` creates), then runs `~/Developer/dotfiles/main/install.sh all`. Pass a step to run it instead of `all`: `zsh -c "$(curl ...)" _ link`. On macOS it first checks for the Xcode Command Line Tools, which provide Git, and starts their installer if they are missing; run the command again once they finish. On Linux, `sh -c` or `bash -c` also work: a POSIX prologue installs zsh, Git, curl, and the Homebrew build prerequisites with apt, dnf, pacman, or zypper (through `sudo` unless run as root) when any are missing, then reruns the installer under zsh. Rerunning resumes an interrupted clone and skips steps already done, and it stops if `~/Developer/dotfiles/.bare` or `main` exists but is not this repository.
+When `install.sh` runs outside a checkout, it clones the repository bare into `~/Developer/dotfiles` with a `main` worktree (the layout `bin/git-bare-clone` creates), then runs `~/Developer/dotfiles/main/install.sh all`. Pass a step to run it instead of `all`: `zsh -c "$(curl ...)" _ link`. On macOS it first checks for the Xcode Command Line Tools, which provide Git, and starts their installer if they are missing; run the command again once they finish. On Linux, `sh -c` or `bash -c` also work: a POSIX prologue installs zsh, Git, curl, and the Homebrew build prerequisites with apt, dnf, pacman, or zypper (through `sudo` unless run as root) when any are missing, then reruns the installer under zsh. Rerunning resumes an interrupted clone and skips steps already done, and it stops if `~/Developer/dotfiles/.bare` or `main` exists but is not this repository. If `~/Developer/dotfiles` is a plain clone of this repository, the bootstrap converts it to the bare layout: with no local changes or unpushed commits, it removes the old checkout (untracked files stay in place) and creates the `main` worktree; otherwise it stops and says what to move aside.
 
 The first clone uses HTTPS because no SSH agent is set up yet; the repository is public, so it needs no credentials. Once SSH works, switch its remote with `git -C ~/Developer/dotfiles remote set-url origin git@github.com:hacker1db/Dotfiles.git`. The installed links always point at `~/Developer/dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/Developer/dotfiles/`.
 
-Each step under `install/` is one zsh script with the same name; `install.sh` runs them in order. The scripts change macOS preferences and configure applications, so review them before a full run.
+Each step under `install/` is one zsh script with the same name; `install.sh` runs them in order. The scripts change macOS preferences and configure applications, so review them before a full run. Every step resolves `DOTFILES` from the checkout that contains it, so a stale value from an older shell setup is ignored. `link` moves a regular-file `~/.zshrc` or `~/.zshenv` aside to a timestamped `.backup` before linking it (carry machine-specific settings over to `~/.localrc`). When run in a terminal, `all` and `link` finish by starting a fresh Zsh with `DOTFILES` cleared, so the current terminal picks up the new configuration.
 
 To try the configuration from a different worktree, select it explicitly:
 
 ```zsh
-cd ~/Developer/dotfiles/refactor-install-cleanup
-./install.sh use ~/Developer/dotfiles/refactor-install-cleanup
+wt switch -c my-change
+./install.sh use
 ```
 
 `use` retargets existing configuration symlinks from the active checkout to the selected checkout, then opens a fresh Zsh automatically when run in a terminal. It preserves unmanaged files, checks replacement paths before changing links, and runs no package installs. Zsh derives `DOTFILES` from its selected configuration file. Other existing terminals need to reload; applications load the selected configuration when they next reload or restart. This selection applies across terminals. Keep the selected worktree until you switch away from it. Noninteractive invocations only update the links.
@@ -36,24 +36,29 @@ cd ~/Developer/dotfiles/main
 dotfiles-use
 ```
 
-`dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer.
+`dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer. Switching works even after the previously selected worktree was deleted: links into any worktree of the repository, live or removed, move to the selected checkout, and generated agent profiles under `claude/.local` and `codex/.local` are copied over when the selected checkout lacks them. Links with no counterpart in the selected checkout are left alone and listed, so `install.sh link` can repair them.
+
+`wt remove` and `wt merge` run the `pre-remove` hook in `.config/wt.toml`, which switches the machine back to `main` before deleting the selected worktree (approve it the first time wt asks). If a selected worktree disappears another way, for example after merging on another machine, restore the shell with:
+
+```zsh
+~/Developer/dotfiles/main/bin/dotfiles-use ~/Developer/dotfiles/main
+```
 
 Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/tools.zsh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. Bundle applies the trust declarations in `install/brewfile`. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
 | Command | Purpose |
 | --- | --- |
 | `./install.sh tools` | Install Homebrew, the tools declared in `install/brewfile` (removing undeclared Homebrew and App Store packages), and developer tools; finish with the deferred installs and `chsh` |
-| `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, configure the Git identity and signing key, and install the Go `plan` CLI |
+| `./install.sh link` | Link configuration into `$HOME`, clone clitools and plan-manager, configure the Git identity and signing key, install the Go `plan` CLI, and generate and link the Claude Code profiles and the Codex Foundry home |
 | `./install.sh node` | Install pnpm (standalone installer, if missing) and pnpm global tools; run `readwise login` when interactive |
 | `./install.sh dotnet` | Install .NET SDKs, runtimes, and global tools |
 | `./install.sh osx` | Apply macOS preferences, create standard folders, and install NvimTmux.app with `duti` associations |
 | `./install.sh browser list` | List browsers that can be the default (`apply <name>`, `current`, and `sync` also work) |
 | `./install.sh theme list` | List theme candidates (`apply <name>`, `current`, and `sync` also work) |
 | `./install.sh tmux-plugins` | Bootstrap TPM at `~/.local/share/tmux/plugins/tpm` |
-| `./install.sh agent-profiles` | Generate and link the Claude Code profiles and the Codex Foundry home (`--check`, `--skip-foundry`) |
 | `./install.sh deferred` | Finish the Brewfile installation and cleanup that were skipped because they need a password, then `chsh` |
 
-`all` runs tools, link, node, dotnet, osx, theme, browser, tmux-plugins, and agent-profiles, in that order, then the deferred installs and shell change. Linking runs after the tools so `~/.gitconfig` (GitHub remotes use SSH) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
+`all` runs tools, link, node, dotnet, osx, theme, browser, and tmux-plugins, in that order, then the deferred installs and shell change. The link step finishes by generating the agent profiles (`install/agent-profiles.zsh`). Linking runs after the tools so `~/.gitconfig` (GitHub remotes use SSH) and the clitools and plan-manager clones work on the first pass. Steps that ask for your macOS password (casks that need `sudo`, Mac App Store installs, and `chsh`) are moved to the end; see [install password prompts](docs/install-password-prompts.md). Individual steps can be rerun, but package updates, authentication, and generated settings are not no-op operations.
 
 `DOTFILES_NONINTERACTIVE=1 ./install.sh link` suppresses the Git identity and signing-key prompts; it does not suppress every authentication prompt.
 
@@ -177,17 +182,17 @@ Installation registers T3 providers for Claude personal, work subscription, and 
 | Codex | `global/AGENTS.md` | `~/.codex/AGENTS.md` |
 | Copilot CLI | `global/AGENTS.md` | `~/.copilot/copilot-instructions.md` |
 
-Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for the single shared policy. `claude/CLAUDE.md` and the other tool instruction sources are symlinks to it. `./install.sh link` links the Codex and Copilot files and backs up anything already there; `./install.sh agent-profiles` links each Claude profile's `CLAUDE.md` and skips a path that is not already a link. Start a new tool session to reload them.
+Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for the single shared policy. `claude/CLAUDE.md` and the other tool instruction sources are symlinks to it. `./install.sh link` links the Codex and Copilot files and backs up anything already there, then links each Claude profile's `CLAUDE.md` and skips a path that is not already a link. Start a new tool session to reload them.
 
 Claude installation links instructions, output styles, and the statusline script into each profile directory, and generates each profile's settings from layered fragments. MCP configuration is linked to `~/.mcp.json`.
 
-- [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh agent-profiles` generates and installs all three.
-- [Codex profiles](codex/PROFILES.md): `xp` (personal, `~/.codex`) and `xf` (Foundry, `~/.codex-foundry`) use separate `CODEX_HOME` directories, so the Foundry profile never sees the personal ChatGPT login. The same `./install.sh agent-profiles` step generates and links the Foundry home.
+- [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh link` generates and installs all three.
+- [Codex profiles](codex/PROFILES.md): `xp` (personal, `~/.codex`) and `xf` (Foundry, `~/.codex-foundry`) use separate `CODEX_HOME` directories, so the Foundry profile never sees the personal ChatGPT login. The same `./install.sh link` step generates and links the Foundry home.
 - Workflow slash commands (reviews, GitHub/Azure DevOps, security, notes, reading, writing) come from the skills repository through skillctl, not from command files here. GitGuardian runs as a Git hook, not a Claude hook.
 
 ### Fleet agent orchestration
 
-Agent sessions across Claude Code, Codex, and Copilot are monitored with [Fleet](https://github.com/nicknisi/fleet), Nick Nisi's tmux agent dashboard, installed from his `nicknisi/formulae` Homebrew tap via the Brewfile. The tmux keybindings and sketchybar wiring here (`bin/sketchybar-fleet-watch`, the fleet block in `config/tmux/tmux.conf`) are adapted from [nicknisi/dotfiles](https://github.com/nicknisi/dotfiles) (MIT). `./install.sh agent-profiles` wires the fleet hooks into each Claude profile and Codex; Copilot is tracked by process discovery. See [Fleet integration](docs/fleet.md).
+Agent sessions across Claude Code, Codex, and Copilot are monitored with [Fleet](https://github.com/nicknisi/fleet), Nick Nisi's tmux agent dashboard, installed from his `nicknisi/formulae` Homebrew tap via the Brewfile. The tmux keybindings and sketchybar wiring here (`bin/sketchybar-fleet-watch`, the fleet block in `config/tmux/tmux.conf`) are adapted from [nicknisi/dotfiles](https://github.com/nicknisi/dotfiles) (MIT). `./install.sh link` wires the fleet hooks into each Claude profile and Codex; Copilot is tracked by process discovery. See [Fleet integration](docs/fleet.md).
 
 ### Personal skills
 
@@ -217,4 +222,4 @@ luacheck config/nvim
 zsh install/agent-profiles.zsh --check
 ```
 
-Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh` (links target `~/Developer/dotfiles/main` unless `DOTFILES` says otherwise). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` checks and Luacheck, plus TruffleHog, which fails on any finding.
+Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) zsh install/link.zsh` (links target the checkout that contains the script; an inherited `DOTFILES` is ignored). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` checks and Luacheck, plus TruffleHog, which fails on any finding.

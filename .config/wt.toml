@@ -1,0 +1,1 @@
+pre-remove = "zsh '{{ worktree_path }}/bin/dotfiles-use' --if-selected '{{ worktree_path }}' < /dev/null"

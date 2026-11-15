@@ -21,7 +21,7 @@ another deployment per run with `xf -m gpt-6-luna`.
 | Linked into `~/.codex-foundry` | `config.toml` → generated config, `AGENTS.md` → `global/AGENTS.md`, `hooks.json` → `codex/hooks.json` |
 | Skills | `~/.codex-foundry/skills`, filled by `CODEX_HOME=~/.codex-foundry skillctl sync --global` |
 | Launcher | `bin/codex-foundry` |
-| Installer | `install/agent-profiles.zsh` (`./install.sh agent-profiles`), shared with the Claude profiles |
+| Installer | `install/agent-profiles.zsh` (part of `./install.sh link`), shared with the Claude profiles |
 
 The generated config is the template plus the plan library under
 `sandbox_workspace_write.writable_roots`, built from `$HOME` at install time. Codex writes hook
@@ -58,7 +58,7 @@ codex-foundry ─► codex (CODEX_HOME=~/.codex-foundry) ─► foundry-entra-pr
 ```zsh
 az login                                                    # Entra session for the proxy
 ~/Developer/clitools/foundry-entra-proxy/install.sh         # build + LaunchAgent; resource from ANTHROPIC_FOUNDRY_RESOURCE
-./install.sh agent-profiles                                 # Claude profiles + ~/.codex-foundry
+./install.sh link                                           # Claude profiles + ~/.codex-foundry
 codex-foundry exec -s read-only --skip-git-repo-check "Reply with just: pong"
 ```
 
@@ -67,8 +67,8 @@ zsh install/agent-profiles.zsh --check         # read-only audit of Claude and C
 zsh install/agent-profiles.zsh --skip-foundry  # leave Claude and Codex Foundry untouched
 ```
 
-Without the proxy client key, Foundry is skipped; on a machine with `~/OneDrive*` that is reported
-as incomplete (exit 2). `~/Developer/clitools/foundry-entra-proxy/install.sh --check` reports the
+Without the proxy client key, the installer still creates `~/.codex-foundry` so the `xf` aliases
+resolve, and prints a note; `codex-foundry` refuses to start until the key exists. `~/Developer/clitools/foundry-entra-proxy/install.sh --check` reports the
 binary, key, LaunchAgent, `/healthz`, and `/readyz` (which shows `az_login_required` when the Azure
 CLI session has expired).
 

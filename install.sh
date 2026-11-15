@@ -47,6 +47,17 @@ if [[ ! -f "${0:A}" || ! -f "$ROOT/install/lib.zsh" ]]; then
     fi
     [[ "$(git --git-dir="$repo/.bare" config remote.origin.url)" == *[/:]hacker1db/Dotfiles(|.git) ]] \
         || die "$repo/.bare is not a clone of $url; move it aside and run this command again."
+    if [[ -d "$repo/.git" ]]; then
+        [[ "$(git --git-dir="$repo/.git" config remote.origin.url)" == *[/:]hacker1db/Dotfiles(|.git) ]] \
+            || die "$repo is a clone of another repository; move it aside and run this command again."
+        [[ -z "$(git -C "$repo" status --porcelain --untracked-files=no)" ]] \
+            || die "$repo is a plain clone with local changes; commit or move them aside, then run this command again."
+        [[ -z "$(git -C "$repo" log --branches --not --remotes --format=%H -- 2> /dev/null)" ]] \
+            || die "$repo is a plain clone with unpushed commits; push or move them aside, then run this command again."
+        typeset -a stale=("${(@f)$(git -C "$repo" ls-tree --name-only HEAD)}")
+        stale=(${stale:#})
+        rm -rf "$repo/.git" "${(@)stale/#/$repo/}"
+    fi
     [[ -f "$repo/.git" ]] || print "gitdir: ./.bare" > "$repo/.git"
     git --git-dir="$repo/.bare" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
     if [[ ! -e "$repo/main" ]]; then
@@ -62,9 +73,16 @@ fi
 
 source "$ROOT/install/lib.zsh"
 
-typeset -a steps=(tools link node dotnet osx theme browser tmux-plugins agent-profiles)
+typeset -a steps=(tools link node dotnet osx theme browser tmux-plugins)
 
 usage() { print -u2 "Usage: ${0:t} {all|${(j:|:)steps}|deferred|use} [args]"; exit 1 }
+
+restart_shell() {
+    [[ -t 0 && -t 1 && "${DOTFILES_NONINTERACTIVE:-0}" != 1 ]] || return 0
+    info "Starting a fresh shell"
+    unset DOTFILES
+    exec zsh -i
+}
 
 run_step() {
     local name="$1"; shift
@@ -89,7 +107,7 @@ if [[ "$cmd" == all ]]; then
         elif [[ "$step" == tools ]]; then
             error "tools failed; the remaining steps need Homebrew, stopping"
             exit 1
-        elif [[ "$step" == agent-profiles && "$rc" -eq 2 ]]; then
+        elif [[ "$step" == link && "$rc" -eq 2 ]]; then
             warning "Agent profile setup is incomplete; see the messages above."
         else
             error "$step failed; continuing"
@@ -101,6 +119,7 @@ if [[ "$cmd" == all ]]; then
     print
     [[ "${#failed}" -eq 0 ]] || { error "Finished with failures: $failed"; exit 1 }
     success "All tasks complete"
+    restart_shell
     exit 0
 fi
 
@@ -117,3 +136,5 @@ rc=$?
 [[ "$rc" -eq 0 ]] || exit "$rc"
 print
 success "Done."
+[[ "$cmd" == link ]] && restart_shell
+exit 0
