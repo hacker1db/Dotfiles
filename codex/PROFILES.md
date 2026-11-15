@@ -57,7 +57,7 @@ codex-foundry ─► codex (CODEX_HOME=~/.codex-foundry) ─► foundry-entra-pr
 
 ```zsh
 az login                                                    # Entra session for the proxy
-~/Developer/clitools/foundry-entra-proxy/install.sh         # build + LaunchAgent; resource from ANTHROPIC_FOUNDRY_RESOURCE
+~/Developer/ai-usage/main/scripts/install-proxy.sh          # build + LaunchAgent; resource from ANTHROPIC_FOUNDRY_RESOURCE
 ./install.sh link                                           # Claude profiles + ~/.codex-foundry
 codex-foundry exec -s read-only --skip-git-repo-check "Reply with just: pong"
 ```
@@ -68,7 +68,7 @@ zsh install/agent-profiles.zsh --skip-foundry  # leave Claude and Codex Foundry 
 ```
 
 Without the proxy client key, the installer still creates `~/.codex-foundry` so the `xf` aliases
-resolve, and prints a note; `codex-foundry` refuses to start until the key exists. `~/Developer/clitools/foundry-entra-proxy/install.sh --check` reports the
+resolve, and prints a note; `codex-foundry` refuses to start until the key exists. `~/Developer/ai-usage/main/scripts/install-proxy.sh --check` reports the
 binary, key, LaunchAgent, `/healthz`, and `/readyz` (which shows `az_login_required` when the Azure
 CLI session has expired).
 
