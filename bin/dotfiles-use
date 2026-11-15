@@ -101,7 +101,7 @@ for (( index = 1; index <= ${#destinations}; index++ )); do
 done
 print -r -- "Dotfiles now point to $target"
 if (( ${#skipped} )); then
-    print -u2 "Left ${#skipped} links with no counterpart in $target; repair them with $target/install.sh link and agent-profiles:"
+    print -u2 "Left ${#skipped} links with no counterpart in $target; repair them with $target/install.sh link:"
     print -u2 -l -- "  ${^skipped[@]}"
 fi
 if [[ -z "$only_if" && -t 0 && -t 1 ]]; then
