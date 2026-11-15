@@ -15,7 +15,7 @@
     ss  = status
     br = branch -v
 
-    l = log --graph --pretty=format:'%Cred%h%Creset %C(bold blue)%an%C(reset) - %s - %Creset %C(yellow)%d%Creset %Cgreen(%cr)%Creset' --abbrev-commit --date=relative
+    l = "!f() { c=auto; [ -t 1 ] && c=always; git log --graph --color=$c --pretty=format:'%Cred%h%Creset%x1f%C(yellow)%d%Creset%x1f%Cgreen(%cr)%Creset%x1f%an%x1f%s' --abbrev-commit --date=relative \"$@\" | perl -ne 'chomp; @f = split /\\x1f/, $_, 5; if (@f < 5) { print $_, qq(\\n); next } s/[[:cntrl:]]//g for @f[3, 4]; ($o, $c) = $f[0] =~ /\\e/ ? (qq(\\e[1;34m), qq(\\e[m)) : (q(), q()); print $f[0], q( ), $o, $f[3], $c, q( - ), $f[4], q( -  ), $f[1], q( ), $f[2], qq(\\n)'; }; f"
 
     # show what I did today
     day = "!sh -c 'git log --reverse --no-merges --branches=* --date=local --after=\"yesterday 11:59PM\" --author=\"`git config --get user.name`\"'"
@@ -108,6 +108,8 @@
     untracked = red
 [color "sh"]
     branch = yellow
+[pager]
+    l = true
 [push]
     # push will only do the current branch, not all branches
     default = current

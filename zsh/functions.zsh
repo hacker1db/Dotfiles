@@ -274,7 +274,7 @@ function escape() {
 
 # Decode \x{ABCD}-style Unicode escape sequences
 function unidecode() {
-    perl -e "binmode(STDOUT, ':utf8'); print \"$@\""
+    perl -CO -e '$_ = join(" ", @ARGV); s/\\x\{([0-9A-Fa-f]+)\}/chr(hex($1))/ge; print' -- "$@"
     echo # newline
 }
 

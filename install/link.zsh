@@ -72,7 +72,7 @@ typeset dispatcher="$DOTFILES/git/templates/hooks/run-hooks.sh" hook_root hook_f
 typeset -i hooks_refreshed=0
 for hook_root in ${(s.:.)${DOTFILES_HOOK_ROOTS:-$HOME/Developer}}; do
     [[ -d "$hook_root" ]] || continue
-    while IFS= read -r hook_file; do
+    while IFS= read -r -d '' hook_file; do
         grep -qF 'Executing $hook_type hook(s)' "$hook_file" 2>/dev/null || continue
         cmp -s "$dispatcher" "$hook_file" && continue
         if cp "$dispatcher" "$hook_file"; then
@@ -81,7 +81,7 @@ for hook_root in ${(s.:.)${DOTFILES_HOOK_ROOTS:-$HOME/Developer}}; do
             warning "Could not refresh $hook_file"
         fi
     done < <(find "$hook_root" -maxdepth 6 \( -name node_modules -o -name .terraform \) -prune \
-        -o -type f \( -path '*/.git/hooks/*' -o -path '*/.bare/hooks/*' \) -print 2>/dev/null)
+        -o -type f \( -path '*/.git/hooks/*' -o -path '*/.bare/hooks/*' \) -print0 2>/dev/null)
 done
 print "Refreshed $hooks_refreshed stale hook dispatcher copies"
 

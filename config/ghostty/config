@@ -19,7 +19,7 @@ font-size = 14
 font-feature = +liga
 
 
-clipboard-read = allow
+clipboard-read = ask
 clipboard-write = allow
 clipboard-trim-trailing-spaces = true
 copy-on-select = clipboard
