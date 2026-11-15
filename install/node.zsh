@@ -9,10 +9,10 @@ if ! ensure_pnpm; then
 fi
 
 typeset -a tools=(
-    "@azure/static-web-apps-cli" "@github/copilot" "@readwise/cli"
-    eslint markdownlint-cli2 md-to-pdf
-    obsidian-headless # ob CLI: Obsidian Sync without the desktop app (servers)
-    prettier typescript typescript-language-server vercel
+    "@azure/static-web-apps-cli@2.1.0" "@github/copilot@1.0.112" "@readwise/cli@0.5.11"
+    eslint@10.15.0 markdownlint-cli2@0.24.1 md-to-pdf@5.2.5
+    obsidian-headless@0.0.14 # ob CLI: Obsidian Sync without the desktop app (servers)
+    prettier@3.10.1 typescript@7.0.2 typescript-language-server@6.1.0 vercel@65.16.0
 )
 typeset tool
 for tool in $tools; do

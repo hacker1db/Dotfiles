@@ -7,7 +7,17 @@ defer="${DOTFILES_DEFER_PROMPTS:-0}"
 
 bundle_sync() {
     brew bundle install --file="$BREWFILE" || return 1
-    brew bundle cleanup --file="$BREWFILE" --brews --cask --tap --mas --force
+    local -a scope=(--file="$BREWFILE" --brews --cask --tap --mas)
+    local extra
+    extra="$(brew bundle cleanup "${scope[@]}")"
+    [[ -n "$extra" ]] || return 0
+    print -r -- "$extra"
+    if [[ -t 0 ]] && read -q "?Uninstall these? [y/N] "; then
+        print
+        brew bundle cleanup "${scope[@]}" --force
+    else
+        print "\nLeft installed; run: brew bundle cleanup --file=$BREWFILE --force"
+    fi
 }
 
 run_deferred() {
@@ -54,16 +64,16 @@ if [[ "${1:-}" == deferred ]]; then
 fi
 
 title "Installing standalone tools"
-[[ -x "$HOME/.local/bin/claude" ]] || curl --proto "=https" --tlsv1.2 -fsSL https://claude.ai/install.sh | bash || true
+[[ -x "$HOME/.local/bin/claude" ]] || run_installer https://claude.ai/install.sh bash || warning "Claude Code installer failed"
 
-[[ -x "$HOME/.local/bin/codex" ]] || curl --proto "=https" --tlsv1.2 -fsSL https://chatgpt.com/codex/install.sh | sh || true
+[[ -x "$HOME/.local/bin/codex" ]] || run_installer https://chatgpt.com/codex/install.sh sh || warning "Codex installer failed"
 
-[[ -d "$HOME/wordlists" ]] || git clone https://github.com/danielmiessler/SecLists.git "$HOME/wordlists" || true
+[[ -d "$HOME/wordlists" ]] || git clone --depth 1 https://github.com/danielmiessler/SecLists.git "$HOME/wordlists" || warning "SecLists clone failed"
 
 title "Installing Homebrew packages"
 if ! load_brew_env; then
     print "Installing Homebrew"
-    /bin/bash -c "$(curl --proto "=https" --tlsv1.2 -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    /bin/bash -c "$(curl --proto "=https" --tlsv1.2 -fsSL https://raw.githubusercontent.com/Homebrew/install/e5b3c5834e3932c8aaa42deef4794076c9b0cbf0/install.sh)"
     load_brew_env || { error "Homebrew installed but brew is not on PATH"; exit 1 }
 fi
 export HOMEBREW_NO_ASK=1
@@ -93,16 +103,18 @@ fi
 
 if command -v go >/dev/null 2>&1; then
     typeset pkg
-    for pkg in github.com/air-verse/air@latest github.com/charmbracelet/glow@latest; do
-        go install "$pkg" || true
+    for pkg in github.com/air-verse/air@v1.67.4 charm.land/glow/v3@v3.0.0; do
+        go install "$pkg" || warning "go install $pkg failed"
     done
 fi
 
 if command -v gh >/dev/null 2>&1; then
     gh auth status >/dev/null 2>&1 || gh auth login || true
     typeset ext
-    for ext in dlvhdr/gh-dash advanced-security/gh-sbom github/gh-stack; do
-        gh extension install "$ext" || true
+    typeset -A extensions=(dlvhdr/gh-dash v4.26.3 advanced-security/gh-sbom v0.1.1 github/gh-stack v0.3.0)
+    for ext in ${(ok)extensions}; do
+        gh extension list 2>/dev/null | grep -q "[[:space:]]$ext[[:space:]]" && continue
+        gh extension install --pin "${extensions[$ext]}" "$ext" || warning "gh extension install $ext failed"
     done
 fi
 

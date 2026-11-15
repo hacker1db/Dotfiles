@@ -43,7 +43,7 @@ find_github_checkout() {
     for dir in "$HOME/Developer/${slug#*/}" "$HOME"/Developer/*/"${slug#*/}"(N); do
         [[ -d "$dir" ]] || continue
         url="$(git -C "$dir" config --get remote.origin.url 2>/dev/null)" || continue
-        [[ "${(L)url}" == *github(.com|-*)[:/]"$slug"(|.git) ]] && { print "$dir"; return 0 }
+        [[ "${(L)url}" =~ "^(git@github\.com:|ssh://git@github\.com/|https://github\.com/|git@github-[a-z0-9._-]+:)${slug//./\\.}(\.git)?\$" ]] && { print "$dir"; return 0 }
     done
     return 1
 }
@@ -70,6 +70,25 @@ github_ssh_preflight() {
     warning "GitHub SSH authentication is not available; GitHub clones will use HTTPS (gh supplies credentials when logged in)."
     print -u2 "  ssh said: $(print -r -- "$output" | tail -n 1)"
     return 1
+}
+
+run_installer() {
+    local url="$1" shell="$2" script rc
+    script="$(mktemp)" || return 1
+    if ! curl --proto "=https" --tlsv1.2 -fsSL "$url" -o "$script"; then
+        rm -f "$script"
+        return 1
+    fi
+    "$shell" "$script"
+    rc=$?
+    rm -f "$script"
+    return $rc
+}
+
+pinned_clone() {
+    local url="$1" dest="$2" rev="$3"
+    git clone --quiet "$url" "$dest" || return 1
+    git -C "$dest" -c advice.detachedHead=false checkout --quiet "$rev" || { rm -rf "$dest"; return 1 }
 }
 
 github_repo_url() {
@@ -182,8 +201,7 @@ ensure_pnpm() {
     [[ ":$PATH:" == *":$PNPM_HOME/bin:"* ]] || export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
     [[ -x "$PNPM_HOME/bin/pnpm" ]] && return 0
     info "Installing pnpm to $PNPM_HOME"
-    curl --proto "=https" --tlsv1.2 -fsSL https://get.pnpm.io/install.sh \
-        | PNPM_HOME="$PNPM_HOME" PNPM_NO_MODIFY_PATH=1 sh - || return 1
+    PNPM_HOME="$PNPM_HOME" PNPM_NO_MODIFY_PATH=1 run_installer https://get.pnpm.io/install.sh sh || return 1
     rehash
     [[ -x "$PNPM_HOME/bin/pnpm" ]]
 }
