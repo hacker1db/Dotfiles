@@ -7,4 +7,4 @@ git fetch --all --prune && wt step for-each -- 'git rev-parse --verify -q @{u} >
 main = "wt switch {{ default_branch }} && git -C {{ primary_worktree_path }} pull origin {{ default_branch }}"
 
 [commit.generation]
-command = "ocr -c \"write a commit message and push\""
+command = "ocr -c \"write a commit message\""

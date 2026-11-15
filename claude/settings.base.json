@@ -104,7 +104,23 @@
       "Bash(mkfs*)",
       "Bash(fdisk*)",
       "Bash(diskutil erase*)",
-      "Bash(diskutil unmount*)"
+      "Bash(diskutil unmount*)",
+      "Read(~/.ssh/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.config/op/**)",
+      "Read(~/.localrc)",
+      "Read(~/.config/foundry-entra-proxy/client.key)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(gh *)",
+      "Bash(op *)",
+      "Bash(ssh *)",
+      "Bash(scp *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Edit(~/notes/SecondBrain/**)",
+      "Write(~/notes/SecondBrain/**)"
     ],
     "disableBypassPermissionsMode": "disable"
   }
