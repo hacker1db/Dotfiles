@@ -290,7 +290,7 @@ unlink_legacy_overlay
 typeset state item
 for profile in foundry; do
     [[ "$skip_foundry" -eq 0 ]] || continue
-    [[ -r "$key_file" ]] || print "Codex Foundry: no client key at $key_file; creating the profile anyway (run foundry-entra-proxy/install.sh in clitools to use it)."
+    [[ -r "$key_file" ]] || print "Codex Foundry: no client key at $key_file; creating the profile anyway (run ~/Developer/ai-usage/main/scripts/install-proxy.sh to use it)."
     dir="$HOME/.codex-$profile"
     dest="$dir/config.toml"
     target="$codex_generated/$profile.toml"
