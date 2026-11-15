@@ -54,7 +54,7 @@ The Foundry profile also needs a working `az login`. Its resource and model come
 
 ## Install
 
-`./install.sh agent-profiles` runs `install/agent-profiles.zsh`, which sets up the Codex Foundry home (see `codex/PROFILES.md`) as well and, for Claude:
+`./install.sh link` runs `install/agent-profiles.zsh` as its final step, which sets up the Codex Foundry home (see `codex/PROFILES.md`) as well and, for Claude:
 
 - links `~/.localrc` to `~/OneDrive*/Personal/.localrc` when a OneDrive dir exists (fails on two dirs or an unsynced file); without OneDrive, the existing `~/.localrc` is used as is
 - merges the layers with jq into ignored `claude/.local/profiles/<profile>.json` (mode 600), linked as `~/.claude-<profile>/settings.json` (dir mode 700), and backs up an unmanaged `settings.json` once
@@ -94,7 +94,7 @@ When `~/.localrc` exists, the installer sources it in a subshell and merges thes
 | `CLAUDE_SETTINGS_JSON` | every profile |
 | `CLAUDE_SETTINGS_JSON_PERSONAL`, `_SUBSCRIPTION`, `_FOUNDRY` | that profile, after `CLAUDE_SETTINGS_JSON` |
 
-Each value must be a JSON object in settings format. Scalars such as `model` replace the committed value, objects merge, `hooks` concatenate per event with duplicates dropped, and `enabledMcpjsonServers` arrays union. The provider pins below and the credential check still apply, so `~/.localrc` cannot switch a profile's provider or add API keys. Without `~/.localrc`, or without the variables, only the committed layers are used. Rerun `./install.sh agent-profiles` after changing them.
+Each value must be a JSON object in settings format. Scalars such as `model` replace the committed value, objects merge, `hooks` concatenate per event with duplicates dropped, and `enabledMcpjsonServers` arrays union. The provider pins below and the credential check still apply, so `~/.localrc` cannot switch a profile's provider or add API keys. Without `~/.localrc`, or without the variables, only the committed layers are used. Rerun `./install.sh link` after changing them.
 
 ```zsh
 IFS= read -r -d '' CLAUDE_SETTINGS_JSON <<'JSON' || true
@@ -128,4 +128,4 @@ zsh install/agent-profiles.zsh --check
 
 ## Rollback
 
-Revert the dotfiles commits, rerun `./install.sh agent-profiles`, and launch plain `claude` with `CLAUDE_CONFIG_DIR` unset. `~/.claude` stays intact until the profiles are verified.
+Revert the dotfiles commits, rerun `./install.sh link`, and launch plain `claude` with `CLAUDE_CONFIG_DIR` unset. `~/.claude` stays intact until the profiles are verified.

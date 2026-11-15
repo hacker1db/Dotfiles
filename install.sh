@@ -73,7 +73,7 @@ fi
 
 source "$ROOT/install/lib.zsh"
 
-typeset -a steps=(tools link node dotnet osx theme browser tmux-plugins agent-profiles)
+typeset -a steps=(tools link node dotnet osx theme browser tmux-plugins)
 
 usage() { print -u2 "Usage: ${0:t} {all|${(j:|:)steps}|deferred|use} [args]"; exit 1 }
 
@@ -107,7 +107,7 @@ if [[ "$cmd" == all ]]; then
         elif [[ "$step" == tools ]]; then
             error "tools failed; the remaining steps need Homebrew, stopping"
             exit 1
-        elif [[ "$step" == agent-profiles && "$rc" -eq 2 ]]; then
+        elif [[ "$step" == link && "$rc" -eq 2 ]]; then
             warning "Agent profile setup is incomplete; see the messages above."
         else
             error "$step failed; continuing"
