@@ -73,6 +73,7 @@ For every pull request:
 2. Reuse that issue, or create one before opening the pull request when no suitable issue exists.
 3. Reference the issue in the pull request body. Use `Closes #<number>`, `Fixes #<number>`, or `Resolves #<number>` when the pull request fully completes the issue; use `Refs #<number>` and state the remaining work when it is only partial.
 4. Verify the final pull request body contains the issue reference. Never create an unlinked pull request.
+5. When the repository is a Git work tree with a configured, reachable remote, tier the pull request with the `pr-tier` skill: 🌳 Trunk, 🌿 Branch, or 🍃 Leaf. Apply its title prefix and `tier:*` label when opening or updating the pull request, and include the tier when reviewing one. Keep squash and merge commit subjects conventional, without the tier prefix. Skip tiering for local-only repositories or remotes that cannot be reached.
 
 ## Communication
 
