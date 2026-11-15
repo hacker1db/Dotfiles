@@ -65,6 +65,10 @@ function wt-pull-all() {
         if [[ "$branch" == "$default_branch" ]] || (( ${worktree_branches[(Ie)$branch]} )); then
             continue
         fi
+        if [[ "$branch" == -* ]]; then
+            print "    skipping $branch: name starts with a dash"
+            continue
+        fi
         if [[ "$branch" == dependabot/* ]]; then
             print "    skipping $branch: Dependabot branch"
             continue
@@ -222,7 +226,7 @@ help() {
 }
 
 function bd() {
-    git diff --name-only --relative --diff-filter=d | xargs bat --diff
+    git diff --name-only --relative --diff-filter=d -z | xargs -0 bat --diff --
 }
 
 

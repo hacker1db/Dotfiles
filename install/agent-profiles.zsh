@@ -91,8 +91,10 @@ for local_key in all personal subscription foundry; do
     if [[ -z "$local_raw" ]]; then
         local_layers[$local_key]='{}'
     else
-        local_layers[$local_key]="$(jq -ce 'if type == "object" then . else error("not an object") end' <<< "$local_raw" 2>/dev/null)" ||
-            die "~/.localrc: $local_var must be a JSON object."
+        local_layers[$local_key]="$(jq -ce 'if type != "object" then error("not an object")
+            elif has("permissions") or has("hooks") or has("apiKeyHelper") or ((.env // {}) | has("ANTHROPIC_BASE_URL")) then error("forbidden key")
+            else . end' <<< "$local_raw" 2>/dev/null)" ||
+            die "~/.localrc: $local_var must be a JSON object without permissions, hooks, apiKeyHelper, or env.ANTHROPIC_BASE_URL."
         print "Merging $local_var from ~/.localrc"
     fi
 done

@@ -94,7 +94,7 @@ When `~/.localrc` exists, the installer sources it in a subshell and merges thes
 | `CLAUDE_SETTINGS_JSON` | every profile |
 | `CLAUDE_SETTINGS_JSON_PERSONAL`, `_SUBSCRIPTION`, `_FOUNDRY` | that profile, after `CLAUDE_SETTINGS_JSON` |
 
-Each value must be a JSON object in settings format. Scalars such as `model` replace the committed value, objects merge, `hooks` concatenate per event with duplicates dropped, and `enabledMcpjsonServers` arrays union. The provider pins below and the credential check still apply, so `~/.localrc` cannot switch a profile's provider or add API keys. Without `~/.localrc`, or without the variables, only the committed layers are used. Rerun `./install.sh link` after changing them.
+Each value must be a JSON object in settings format. Scalars such as `model` replace the committed value, objects merge, and `enabledMcpjsonServers` arrays union. The installer rejects a value that sets `permissions`, `hooks`, `apiKeyHelper`, or `env.ANTHROPIC_BASE_URL`, so `~/.localrc` cannot loosen the permission rules, add commands that run on tool events, or redirect API traffic. The provider pins below and the credential check still apply, so it cannot switch a profile's provider or add API keys either. Without `~/.localrc`, or without the variables, only the committed layers are used. Rerun `./install.sh link` after changing them.
 
 ```zsh
 IFS= read -r -d '' CLAUDE_SETTINGS_JSON <<'JSON' || true

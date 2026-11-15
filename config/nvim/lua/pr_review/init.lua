@@ -11,12 +11,23 @@ local SECTIONS = {
 local SEVERITIES = { "critical", "high", "medium", "low", "info" }
 local SEVERITY_HL = { critical = "DiagnosticError", high = "DiagnosticError", medium = "DiagnosticWarn", low = "DiagnosticInfo", info = "DiagnosticHint" }
 local CLAUDE_MODELS = { "fable", "opus", "sonnet" }
+local GH_WRITES = { "gh pr review", "gh pr comment", "gh pr merge", "gh pr close", "gh pr edit", "gh issue", "gh api", "git push" }
+local function claude_guard()
+  local denied = { "mcp__github" }
+  for _, c in ipairs(GH_WRITES) do denied[#denied + 1] = ("Bash(%s:*)"):format(c) end
+  return { "--permission-mode", "default", "--disallowedTools", table.concat(denied, ",") }
+end
+local function copilot_guard()
+  local args = { "--deny-tool=github-mcp-server" }
+  for _, c in ipairs(GH_WRITES) do args[#args + 1] = ("--deny-tool=shell(%s)"):format(c) end
+  return args
+end
 local AGENTS = {
-  { id = "codex", label = "Codex", personal = true, skill = "$pr-review", cmd = { "codex" }, model_flag = "-m", models = {} },
-  { id = "claude-personal", label = "Claude · personal", personal = true, skill = "/pr-review", cmd = { "claude-personal" }, model_flag = "--model", models = CLAUDE_MODELS },
-  { id = "copilot", label = "GitHub Copilot", personal = false, skill = "/pr-review", cmd = { "copilot", "-i" }, model_flag = "--model", models = { "auto" } },
-  { id = "claude-work", label = "Claude · work", personal = false, skill = "/pr-review", cmd = { "claude-subscription" }, model_flag = "--model", models = CLAUDE_MODELS },
-  { id = "claude-foundry", label = "Claude · Foundry", personal = false, skill = "/pr-review", cmd = { "claude-foundry" }, model_flag = "--model", models = CLAUDE_MODELS },
+  { id = "codex", label = "Codex", personal = true, skill = "$pr-review", cmd = { "codex", "-s", "workspace-write", "-a", "on-request" }, model_flag = "-m", models = {} },
+  { id = "claude-personal", label = "Claude · personal", personal = true, skill = "/pr-review", cmd = vim.list_extend({ "claude-personal" }, claude_guard()), model_flag = "--model", models = CLAUDE_MODELS },
+  { id = "copilot", label = "GitHub Copilot", personal = false, skill = "/pr-review", cmd = vim.list_extend({ "copilot", "-i" }, copilot_guard()), model_flag = "--model", models = { "auto" } },
+  { id = "claude-work", label = "Claude · work", personal = false, skill = "/pr-review", cmd = vim.list_extend({ "claude-subscription" }, claude_guard()), model_flag = "--model", models = CLAUDE_MODELS },
+  { id = "claude-foundry", label = "Claude · Foundry", personal = false, skill = "/pr-review", cmd = vim.list_extend({ "claude-foundry" }, claude_guard()), model_flag = "--model", models = CLAUDE_MODELS },
 }
 local TIER_CACHE = vim.fn.stdpath("state") .. "/pr-review-tiers.json"
 local REVIEW_ROOT = vim.fn.expand("~/.local/state/pr-reviews")
@@ -496,7 +507,7 @@ function M.agent(arg)
           local argv = with_alert(agent_argv(agent, model, review_prompt(agent, url, t)), dir .. "/review.json", pr.number)
           if not open_split(argv, dir) then return end
           watch_review(url, pr.number)
-          notify(("%s (%s) is reviewing #%s; nothing is posted to GitHub"):format(agent.label, model or "default model", pr.number))
+          notify(("%s (%s) is reviewing #%s; GitHub write commands are denied"):format(agent.label, model or "default model", pr.number))
         end
         local cached = tiers[url]
         if cached then return launch(cached) end

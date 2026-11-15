@@ -25,6 +25,9 @@ end
 
 local function open_external(url)
     if not url or url == "" then return end
+    if not (url:match("^https?://[^%s]+$") or url:match("^mailto:[^%s-][^%s]*$")) then
+        return notify("Refusing to open: " .. url, vim.log.levels.WARN)
+    end
     local cmd = { M.opts.open_cmd, url }
     if vim.system then
         vim.system(cmd, { detach = true })
@@ -35,15 +38,21 @@ local function open_external(url)
 end
 
 local function open_spotify(uri)
-    local uri_type = uri:match("^spotify:([a-z]+):")
-    local script
-    if uri_type == "track" or uri_type == "episode" then
-        script = string.format('tell application "Spotify" to play track "%s"', uri)
-    else
-        -- shows, albums, playlists — navigate to the specific page
-        script = string.format('tell application "Spotify" to open location "%s"', uri)
+    local uri_type = uri:match("^spotify:([a-z]+):[A-Za-z0-9]+$")
+    if not uri_type then
+        return notify("Refusing Spotify URI: " .. uri, vim.log.levels.WARN)
     end
-    local cmd = { "osascript", "-e", script }
+    local action = "open location"
+    if uri_type == "track" or uri_type == "episode" then
+        action = "play track"
+    end
+    local cmd = {
+        "osascript",
+        "-e", "on run argv",
+        "-e", 'tell application "Spotify" to ' .. action .. " (item 1 of argv)",
+        "-e", "end run",
+        uri,
+    }
     if vim.system then
         vim.system(cmd, { detach = true })
     else
