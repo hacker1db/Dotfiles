@@ -47,6 +47,17 @@ if [[ ! -f "${0:A}" || ! -f "$ROOT/install/lib.zsh" ]]; then
     fi
     [[ "$(git --git-dir="$repo/.bare" config remote.origin.url)" == *[/:]hacker1db/Dotfiles(|.git) ]] \
         || die "$repo/.bare is not a clone of $url; move it aside and run this command again."
+    if [[ -d "$repo/.git" ]]; then
+        [[ "$(git --git-dir="$repo/.git" config remote.origin.url)" == *[/:]hacker1db/Dotfiles(|.git) ]] \
+            || die "$repo is a clone of another repository; move it aside and run this command again."
+        [[ -z "$(git -C "$repo" status --porcelain --untracked-files=no)" ]] \
+            || die "$repo is a plain clone with local changes; commit or move them aside, then run this command again."
+        [[ -z "$(git -C "$repo" log --branches --not --remotes --format=%H -- 2> /dev/null)" ]] \
+            || die "$repo is a plain clone with unpushed commits; push or move them aside, then run this command again."
+        typeset -a stale=("${(@f)$(git -C "$repo" ls-tree --name-only HEAD)}")
+        stale=(${stale:#})
+        rm -rf "$repo/.git" "${(@)stale/#/$repo/}"
+    fi
     [[ -f "$repo/.git" ]] || print "gitdir: ./.bare" > "$repo/.git"
     git --git-dir="$repo/.bare" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
     if [[ ! -e "$repo/main" ]]; then
