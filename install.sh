@@ -1,4 +1,32 @@
 #!/usr/bin/env zsh
+if [ -z "${ZSH_VERSION:-}" ]; then
+    if [ "$(uname -s)" = Linux ]; then
+        missing=
+        for cmd in zsh git curl make gcc file ps; do
+            command -v "$cmd" > /dev/null 2>&1 || missing=1
+        done
+        if [ -n "$missing" ]; then
+            if [ "$(id -u)" -eq 0 ]; then sudo=; else sudo=sudo; fi
+            if command -v apt-get > /dev/null 2>&1; then
+                $sudo apt-get update && $sudo apt-get install -y zsh git curl build-essential procps file
+            elif command -v dnf > /dev/null 2>&1; then
+                $sudo dnf install -y zsh git curl gcc make procps-ng file
+            elif command -v pacman > /dev/null 2>&1; then
+                $sudo pacman -Sy --needed --noconfirm zsh git curl base-devel procps-ng file
+            elif command -v zypper > /dev/null 2>&1; then
+                $sudo zypper --non-interactive install zsh git curl gcc make procps file
+            else
+                echo "Install zsh, git, curl, a C compiler, make, procps, and file, then run this command again." >&2
+                exit 1
+            fi || { echo "Installing prerequisites failed." >&2; exit 1; }
+        fi
+    fi
+    command -v zsh > /dev/null 2>&1 || { echo "Install zsh, then run this command again." >&2; exit 1; }
+    case "$0" in
+        *install.sh) [ -f "$0" ] && exec zsh "$0" "$@" ;;
+    esac
+    exec zsh -c "$(curl -fsSL https://raw.githubusercontent.com/hacker1db/Dotfiles/main/install.sh)" zsh "$@"
+fi
 set -uo pipefail
 ROOT="${0:A:h}"
 
