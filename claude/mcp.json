@@ -3,14 +3,15 @@
 "playwright": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@playwright/mcp"]
+      "args": ["-y", "@playwright/mcp@0.0.85"]
     },
     "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/",
       "headers": {
         "Authorization": "Bearer ${GITHUB_TOKEN_MCP}",
-        "X-MCP-Toolsets": "default,copilot_spaces"
+        "X-MCP-Toolsets": "default,copilot_spaces",
+        "X-MCP-Readonly": "true"
       }
     }
   }
