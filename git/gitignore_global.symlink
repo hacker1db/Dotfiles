@@ -39,3 +39,4 @@ tmp
 **/.claude/settings.local.json
 _bmad/
 .agents/
+.skillctl.yaml
