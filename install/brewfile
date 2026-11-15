@@ -7,7 +7,7 @@ tap "azure/functions", trusted: true
 tap "azure/kubelogin", trusted: true
 tap "clerk/stable"
 tap "derailed/k9s", trusted: true
-tap "FelixKratz/formulae", trusted: true
+tap "felixkratz/formulae", trusted: true
 tap "gitguardian/tap", trusted: true
 tap "hacker1db/ai-usage", "https://github.com/hacker1db/ai-usage", trusted: true
 tap "hashicorp/tap", trusted: true
@@ -24,6 +24,11 @@ tap "slp/krunkit"
 tap "terraform-linters/tap", trusted: true
 tap "sst/tap", "https://github.com/anomalyco/homebrew-tap.git", trusted: true
 tap "workos/tap", trusted: true
+tap "brandonskerritt/rustscan", "https://github.com/RustScan/homebrew-rustscan.git", trusted: true
+tap "caffix/amass", "https://github.com/owasp-amass/homebrew-amass.git", trusted: true
+tap "owasp-amass/amass", "https://github.com/owasp-amass/homebrew-amass.git", trusted: true
+tap "raine/aven", trusted: { casks: ["aven"] }
+tap "rustscan/rustscan", "https://github.com/RustScan/homebrew-rustscan.git", trusted: true
 # Search tool like grep, but optimized for programmers
 brew "ack"
 # Run your GitHub Actions locally
@@ -90,8 +95,6 @@ brew "ggshield"
 brew "gh"
 # Distributed revision control system
 brew "git"
-# Syntax-highlighting pager for git and diff output
-brew "git-delta"
 # GitHub Model Context Protocol server for AI tools
 brew "github-mcp-server"
 # Render markdown on the CLI
@@ -158,6 +161,7 @@ brew "lazygit"
 brew "libfido2"
 # Access large language models from the command-line
 brew "llm"
+brew "llmfit"
 # Curses-based tool for viewing and analyzing log files
 brew "lnav"
 # Tool for linting and static analysis of Lua code
@@ -282,9 +286,8 @@ brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 # Scanner for vulnerabilities in container images, file systems, and Git repositories, as well as for configuration issues
 brew "aquasecurity/trivy/trivy"
-# Linter for Terraform files (moved out of homebrew/core)
-cask "terraform-linters/tap/tflint"
 # Azure Functions Core Tools 4.0
+cask "terraform-linters/tap/tflint"
 brew "azure/functions/azure-functions-core-tools@4"
 # Command-line interface for Clerk
 brew "clerk/stable/clerk", trusted: true
@@ -298,10 +301,15 @@ brew "hashicorp/tap/vault"
 brew "workos/tap/workos"
 # Local dashboard and reports for AI coding tool usage
 brew "hacker1db/ai-usage/ai-usage"
-# Loopback proxy that signs Azure AI Foundry requests with an Entra token
-brew "hacker1db/ai-usage/foundry-entra-proxy"
+brew "gitleaks"
+brew "mt32emu"
+brew "pnpm", link: false
+brew "poppler"
+brew "vhs"
+brew "whisper.cpp"
 # macOS-only formulas (no Linux bottle or build)
 if OS.mac?
+    brew "container"
   # Command-line tool for getting & setting the default browser
   brew "defaultbrowser"
   # Select default apps for documents and URL schemes on macOS
@@ -315,15 +323,14 @@ if OS.mac?
   # Reattach process (e.g., tmux) to background
   brew "reattach-to-user-namespace"
   # Window border system for macOS
-  brew "FelixKratz/formulae/borders"
+  brew "felixkratz/formulae/borders"
   # Highly customizable macOS status bar replacement
-  brew "FelixKratz/formulae/sketchybar"
+  brew "felixkratz/formulae/sketchybar"
 end
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
 cask "1password-cli"
-# Microsoft Azure CLI 2.0 (migrated from homebrew/core to a cask)
 cask "azure-cli"
 # Application launcher and productivity software
 cask "alfred"
@@ -343,8 +350,6 @@ cask "chatgpt"
 cask "claude"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
-# Brings the power of Copilot coding agent directly to your terminal
-cask "copilot-cli"
 # Utilities designed to make common development tasks easier
 cask "devtoys"
 # Provides developers secure tunnels to share local web services
@@ -423,6 +428,7 @@ cask "wispr-flow"
 cask "zen"
 # Video communication and virtual meeting platform
 cask "zoom"
+cask "grok-bot"
 mas "Amphetamine", id: 937984704
 mas "Developer", id: 640199958
 mas "Final Cut Pro", id: 424389933
