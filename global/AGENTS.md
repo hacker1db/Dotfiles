@@ -74,6 +74,8 @@ For every pull request:
 3. Reference the issue in the pull request body. Use `Closes #<number>`, `Fixes #<number>`, or `Resolves #<number>` when the pull request fully completes the issue; use `Refs #<number>` and state the remaining work when it is only partial.
 4. Verify the final pull request body contains the issue reference. Never create an unlinked pull request.
 5. When the repository is a Git work tree with a configured, reachable remote, tier the pull request with the `pr-tier` skill: 🌳 Trunk, 🌿 Branch, or 🍃 Leaf. Apply its title prefix and `tier:*` label when opening or updating the pull request, and include the tier when reviewing one. Keep squash and merge commit subjects conventional, without the tier prefix. Skip tiering for local-only repositories or remotes that cannot be reached.
+6. Any change to authentication or authorization is 🌳 Trunk and needs approval from a human or operator. AI reviews never count as that approval. Never merge such a pull request, or bypass its review requirement, without that approval.
+7. Under the same remote conditions, start the `babysit-pr` skill right after opening a pull request, without being asked. It watches CI, fixes review comments on the pull request branch, and runs the PR review and security review in parallel with a model other than the one that wrote the code.
 
 ## Communication
 
