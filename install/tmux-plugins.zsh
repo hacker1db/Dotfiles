@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 set -euo pipefail
+source "${0:A:h}/lib.zsh"
 
 plugins_dir="$HOME/.local/share/tmux/plugins"
 tpm="$plugins_dir/tpm"
@@ -24,7 +25,7 @@ if [[ -e "$tpm" || -L "$tpm" ]]; then
 fi
 
 mkdir -p "${tpm:h}"
-git clone git@github.com:tmux-plugins/tpm.git "$tpm"
+github_clone "$(github_repo_url tmux-plugins/tpm)" "$tpm"
 [[ -x "$tpm/tpm" && -x "$tpm/bindings/install_plugins" ]] || {
     print -u2 "TPM installation is incomplete at $tpm"
     exit 1

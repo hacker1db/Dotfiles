@@ -77,6 +77,22 @@ Cleanup runs only after installation succeeds. During `./install.sh all`, the de
 
 To retire a tool, remove its Brewfile declaration and run the installer on each machine. Do not run capture first, because it would record the still-installed tool again. To preview removal without accepting prompts, run `brew bundle cleanup --file=install/brewfile --brews --cask --tap --mas < /dev/null`.
 
+### Linux dev container
+
+`.devcontainer/devcontainer.json` targets Podman and Ubuntu 24.04 on the host's native architecture. Open a worktree directory, such as `~/Developer/dotfiles/<branch>`. The parent repository is mounted at its original absolute path so Git can resolve the bare repository and worktree metadata without rewriting host Git links. This mount includes sibling worktrees; container edits are host edits.
+
+Set the VS Code Dev Containers Docker path to `podman`, or use the Dev Containers CLI:
+
+```zsh
+devcontainer up --workspace-folder . --docker-path podman
+```
+
+The configuration uses Podman's `--userns=keep-id:uid=1000,gid=1000` and disables automatic UID updates to preserve the image's `vscode` user mapping. Docker does not support this flag.
+
+Creation runs `install.sh all` and waits for it to finish before attaching. Each start checks the Linux login shell, Git worktree access, interactive Zsh checkout selection, Neovim startup, and tmux configuration. The tmux check uses a separate server and cleans it up on failure.
+
+Full installation currently requires resolving the Linux gaps in [Linux compatibility](docs/linux-compatibility.md), including macOS-only Brewfile formulae and noninteractive shell setup. A failed installation stops container setup; the smoke check does not make a partial installation successful. Initial installation can be slow when formulae build from source on ARM Linux.
+
 ## Shell and terminal workflow
 
 - Zsh loads `zsh/**/*.zsh`, autoloads `zsh/functions/`, and reads `~/.localrc` for local overrides.

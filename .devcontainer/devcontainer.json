@@ -1,0 +1,41 @@
+{
+    "name": "dotfiles",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu24.04",
+    "runArgs": [
+        "--userns=keep-id:uid=1000,gid=1000"
+    ],
+    "workspaceMount": "source=${localWorkspaceFolder}/..,target=${localWorkspaceFolder}/..,type=bind",
+    "workspaceFolder": "${localWorkspaceFolder}",
+    "remoteUser": "vscode",
+    "containerEnv": {
+        "DOTFILES": "${containerWorkspaceFolder}",
+        "DOTFILES_NONINTERACTIVE": "1",
+        "NONINTERACTIVE": "1",
+        "HOMEBREW_NO_ASK": "1",
+        "DOTFILES_HOOK_ROOTS": "/home/vscode/Developer"
+    },
+    "onCreateCommand": [
+        "zsh",
+        "-euc",
+        "sudo apt-get update; sudo apt-get install -y build-essential procps file zsh; sudo chown \"$(id -u):$(id -g)\" \"$DOTFILES/claude/.local\" \"$DOTFILES/codex/.local\""
+    ],
+    "postCreateCommand": [
+        "zsh",
+        "-euc",
+        "./install.sh all"
+    ],
+    "postStartCommand": {
+        "smoke": [
+            "zsh",
+            "-lic",
+            "set -eu\n[[ $(uname -s) == Linux ]]\n[[ $(getent passwd \"$(id -un)\" | cut -d: -f7) == */zsh ]]\n[[ $(git rev-parse --show-toplevel) == \"$PWD\" ]]\n[[ \"$DOTFILES\" == \"$PWD\" ]]\ncommand -v nvim tmux\nnvim --headless \"+lua if vim.v.errmsg ~= [[]] then vim.api.nvim_err_writeln(vim.v.errmsg); vim.cmd([[cquit 1]]) end\" +qa\nsocket=\"dotfiles-smoke-$$\"\ntrap 'tmux -L \"$socket\" kill-server 2>/dev/null || true' EXIT\ntmux -L \"$socket\" -f ~/.config/tmux/tmux.conf new-session -d -s smoke\n[[ $(tmux -L \"$socket\" show-option -gv prefix) == C-a ]]\nprint 'devcontainer smoke test passed' "
+        ]
+    },
+    "updateRemoteUserUID": false,
+    "waitFor": "postCreateCommand",
+    "mounts": [
+        "source=${devcontainerId}-claude-profiles,target=${containerWorkspaceFolder}/claude/.local,type=volume",
+        "source=${devcontainerId}-codex-profiles,target=${containerWorkspaceFolder}/codex/.local,type=volume"
+    ],
+    "containerUser": "vscode"
+}

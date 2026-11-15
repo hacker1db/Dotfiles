@@ -1,4 +1,4 @@
-tap "1password/tap", trusted: true
+tap "1password/tap", trusted: true if OS.mac?
 tap "anchore/grype", trusted: true
 tap "anchore/syft", trusted: true
 tap "anomalyco/tap", trusted: true
@@ -9,15 +9,15 @@ tap "brandonskerritt/rustscan", trusted: true
 tap "caffix/amass", trusted: true
 tap "clerk/stable"
 tap "derailed/k9s", trusted: true
-tap "FelixKratz/formulae", trusted: true
-tap "fsouza/prettierd"
+tap "FelixKratz/formulae", trusted: true if OS.mac?
+tap "fsouza/prettierd" if OS.mac?
 tap "gitguardian/tap", trusted: true
 tap "hacker1db/tap", trusted: true
 tap "hashicorp/tap", trusted: true
-tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
+tap "homebrew/bundle" if OS.mac?
+tap "homebrew/cask-fonts" if OS.mac?
 tap "jesseduffield/lazygit", trusted: true
-tap "majd/repo", trusted: true
+tap "majd/repo", trusted: true if OS.mac?
 tap "mondoohq/mondoo", trusted: true
 tap "nicknisi/formulae", trusted: true
 tap "noahgorstein/tap", trusted: true
@@ -27,7 +27,7 @@ tap "rcmdnk/file", trusted: true
 tap "robscott/tap", trusted: true
 tap "rtk-ai/tap", trusted: true
 tap "rustscan/rustscan", "https://github.com/RustScan/homebrew-rustscan.git"
-tap "slp/krunkit"
+tap "slp/krunkit" if OS.mac?
 tap "sst/tap", "https://github.com/anomalyco/homebrew-tap.git", trusted: true
 tap "workos/tap", trusted: true
 # Search tool like grep, but optimized for programmers
@@ -51,9 +51,10 @@ brew "tree"
 # Automate deployment, configuration, and upgrading
 brew "ansible"
 # Allows you to programmatically authenticate into AWS accounts through IAM roles
-brew "aws-auth"
+brew "aws-auth" if OS.mac?
 # Microsoft Azure CLI 2.0
-brew "azure-cli"
+brew "azure-cli" if OS.mac?
+cask "azure-cli" if OS.linux?
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Bash scripts that integrate bat with various command-line tools
@@ -65,7 +66,7 @@ brew "cocoapods"
 # Tool for interacting with remote images and registries
 brew "crane"
 # Command-line tool for getting & setting the default browser
-brew "defaultbrowser"
+brew "defaultbrowser" if OS.mac?
 # Debugger for the Go programming language
 brew "delve"
 # Tool for exploring each layer in a docker image
@@ -79,9 +80,9 @@ brew "docutils"
 # .NET Core
 brew "dotnet"
 # .NET Core
-brew "dotnet@6"
+brew "dotnet@6" if OS.mac?
 # Select default apps for documents and URL schemes on macOS
-brew "duti"
+brew "duti" if OS.mac?
 # Command-line tool to interact with exercism.io
 brew "exercism"
 # Modern, maintained replacement for ls
@@ -151,7 +152,7 @@ brew "libidn2"
 # GNU utilities for networking
 brew "inetutils"
 # Install and debug iPhone apps from the command-line
-brew "ios-deploy"
+brew "ios-deploy" if OS.mac?
 # Featureful UNIX password cracker
 brew "john"
 # Lightweight and flexible command-line JSON processor
@@ -185,7 +186,7 @@ brew "markdown"
 # Fast, flexible, config-based cli for linting Markdown/CommonMark files
 brew "markdownlint-cli2"
 # Mac App Store command-line interface
-brew "mas"
+brew "mas" if OS.mac?
 # Publisher CLI tool for the Official Model Context Protocol (MCP) Registry
 brew "mcp-publisher"
 # Mermaid diagram renderer (mmdc) for Snacks image previews in Neovim
@@ -201,13 +202,13 @@ brew "nikto"
 # Port scanning utility for large networks
 brew "nmap"
 # Send commands to the macOS Now Playing media session
-brew "nowplaying-cli"
+brew "nowplaying-cli" if OS.mac?
 # Modern shell for the GitHub era
 brew "nushell"
 # Manage multiple Node.js versions
 brew "nvm"
 # Create, run, and share large language models (LLMs)
-brew "ollama", restart_service: :changed
+brew "ollama", restart_service: OS.mac? ? :changed : false
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
 # Library to simplify the interaction with PKCS#11
@@ -235,11 +236,11 @@ brew "python@3.12"
 # Tool Command Language
 brew "tcl-tk"
 # Interpreted, interactive, object-oriented programming language
-brew "python@3.8"
+brew "python@3.8" if OS.mac?
 # Interpreted, interactive, object-oriented programming language
-brew "python@3.9"
+brew "python@3.9" if OS.mac?
 # Reattach process (e.g., tmux) to background
-brew "reattach-to-user-namespace"
+brew "reattach-to-user-namespace" if OS.mac?
 # Token-saving proxy that compacts shell command output for AI agents
 brew "rtk-ai/tap/rtk"
 # Persistent key-value database, with built-in net interface
@@ -251,9 +252,9 @@ brew "scc"
 # Smart session manager for the terminal
 brew "sesh"
 # Window border system for macOS
-brew "FelixKratz/formulae/borders"
+brew "FelixKratz/formulae/borders" if OS.mac?
 # Highly customizable macOS status bar replacement
-brew "FelixKratz/formulae/sketchybar"
+brew "FelixKratz/formulae/sketchybar" if OS.mac?
 # Static analysis and lint tool, for (ba)sh scripts
 brew "shellcheck"
 # Penetration testing for SQL injection and database servers
@@ -273,7 +274,7 @@ brew "terraform-lsp"
 # Terraform version manager inspired by rbenv
 brew "tfenv"
 # Linter for Terraform files
-brew "tflint"
+brew "tflint" if OS.mac?
 # Static analysis security scanner for your terraform code
 brew "tfsec"
 # Code-search similar to ack
@@ -299,7 +300,7 @@ brew "yaml-language-server"
 # Blazing fast terminal file manager written in Rust, based on async I/O
 brew "yazi"
 # Download YouTube videos from the command-line
-brew "youtube-dl"
+brew "youtube-dl" if OS.mac?
 # Process YAML, JSON, XML, CSV and properties documents from the CLI
 brew "yq"
 # Feature-rich command-line audio/video downloader
@@ -333,115 +334,115 @@ brew "hacker1db/tap/ai-usage"
 # Loopback proxy that signs Azure AI Foundry requests with an Entra token
 brew "hacker1db/tap/foundry-entra-proxy"
 # Password manager that keeps all passwords secure behind one password
-cask "1password"
+cask "1password" if OS.mac?
 # Command-line interface for 1Password
 cask "1password-cli"
 # Application launcher and productivity software
-cask "alfred"
+cask "alfred" if OS.mac?
 # Toolset to implement parts of Android apps in native code
-cask "android-ndk"
+cask "android-ndk" if OS.mac?
 # Android SDK component
-cask "android-platform-tools"
+cask "android-platform-tools" if OS.mac?
 # Compact TeX distribution as alternative to the full TeX Live / MacTeX
-cask "basictex"
+cask "basictex" if OS.mac?
 # Virtual Audio Driver
-cask "blackhole-2ch"
+cask "blackhole-2ch" if OS.mac?
 # Web security auditing toolkit
-cask "caido"
+cask "caido" if OS.mac?
 # OpenAI's official ChatGPT desktop app
-cask "chatgpt"
+cask "chatgpt" if OS.mac?
 # Anthropic's official Claude AI desktop app
-cask "claude"
+cask "claude" if OS.mac?
 # OpenAI's Codex desktop app for managing coding agents
-cask "codex-app"
+cask "codex-app" if OS.mac?
 # Brings the power of Copilot coding agent directly to your terminal
 cask "copilot-cli"
 # Utilities designed to make common development tasks easier
-cask "devtoys"
+cask "devtoys" if OS.mac?
 # Provides developers secure tunnels to share local web services
 cask "devtunnel"
 # Voice and text chat software
-cask "discord"
+cask "discord" if OS.mac?
 # Online diagram software
-cask "drawio"
+cask "drawio" if OS.mac?
 # Collaborative team software
-cask "figma"
-cask "font-hack-nerd-font"
-cask "font-jetbrains-mono"
-cask "font-jetbrains-mono-nerd-font"
-cask "font-monaspace"
-cask "font-monaspice-nerd-font"
-cask "font-symbols-only-nerd-font"
+cask "figma" if OS.mac?
+cask "font-hack-nerd-font" if OS.mac?
+cask "font-jetbrains-mono" if OS.mac?
+cask "font-jetbrains-mono-nerd-font" if OS.mac?
+cask "font-monaspace" if OS.mac?
+cask "font-monaspice-nerd-font" if OS.mac?
+cask "font-symbols-only-nerd-font" if OS.mac?
 # Set of tools to manage resources and applications hosted on Google Cloud
 cask "gcloud-cli"
 # Terminal emulator that uses platform-native UI and GPU acceleration
-cask "ghostty"
+cask "ghostty" if OS.mac?
 # Client for the Google Drive storage service
-cask "google-drive"
+cask "google-drive" if OS.mac?
 # Chromium based web browser
-cask "helium-browser"
+cask "helium-browser" if OS.mac?
 # Utility to hide menu bar items
-cask "hiddenbar"
+cask "hiddenbar" if OS.mac?
 # Free and open-source media player
-cask "iina"
+cask "iina" if OS.mac?
 # CLI tool for searching and downloading iOS app packages from the App Store
-cask "majd/repo/ipatool"
+cask "majd/repo/ipatool" if OS.mac?
 # Open-source keystroke visualiser
-cask "keycastr"
+cask "keycastr" if OS.mac?
 # Noise cancelling application
-cask "krisp"
+cask "krisp" if OS.mac?
 # Menu bar app for managing Kubernetes contexts
-cask "kubecontext"
-cask "livetail"
+cask "kubecontext" if OS.mac?
+cask "livetail" if OS.mac?
 # Discover, download, and run local LLMs
-cask "lm-studio"
+cask "lm-studio" if OS.mac?
 # Trims video and audio files losslessly
-cask "losslesscut"
+cask "losslesscut" if OS.mac?
 # Set of CPU, memory, disk, and network monitoring tools
-cask "menumeters"
+cask "menumeters" if OS.mac?
 # Provides updates to various Microsoft products
-cask "microsoft-auto-update"
+cask "microsoft-auto-update" if OS.mac?
 # Meet, chat, call, and collaborate in just one place
-cask "microsoft-teams"
+cask "microsoft-teams" if OS.mac?
 # Open-source software for live streaming and screen recording
-cask "obs"
+cask "obs" if OS.mac?
 # Knowledge base that works on top of a local folder of plain text Markdown files
-cask "obsidian"
+cask "obsidian" if OS.mac?
 # Browse, manage, inspect containers and images
-cask "podman-desktop"
+cask "podman-desktop" if OS.mac?
 # Collaboration platform for API development
-cask "postman"
-cask "powershell"
+cask "postman" if OS.mac?
+cask "powershell" if OS.mac?
 # Control your tools with a few keystrokes
-cask "raycast"
+cask "raycast" if OS.mac?
 # Save articles to read, highlight key content, and organise notes for review
-cask "reader"
+cask "reader" if OS.mac?
 # Instant messaging application focusing on security
-cask "signal"
+cask "signal" if OS.mac?
 # Music streaming service
-cask "spotify"
+cask "spotify" if OS.mac?
 # Video game digital distribution service
-cask "steam"
+cask "steam" if OS.mac?
 # Minimal GUI for AI code agents
-cask "t3-code"
+cask "t3-code" if OS.mac?
 # To-do list
-cask "todoist-app"
+cask "todoist-app" if OS.mac?
 # Tool to install Linux/BSD distributions to a partition or USB drive
-cask "unetbootin"
+cask "unetbootin" if OS.mac?
 # Voice-to-text dictation with AI-powered auto-editing
-cask "wispr-flow"
+cask "wispr-flow" if OS.mac?
 # Gecko based web browser
-cask "zen"
+cask "zen" if OS.mac?
 # Video communication and virtual meeting platform
-cask "zoom"
-mas "Amphetamine", id: 937984704
-mas "Developer", id: 640199958
-mas "Final Cut Pro", id: 424389933
-mas "Goodnotes", id: 1444383602
-mas "Grit", id: 6446997766
-mas "Keynote", id: 409183694
-mas "Kindle", id: 302584613
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
-mas "Spark Desktop", id: 6445813049
-mas "Xcode", id: 497799835
+cask "zoom" if OS.mac?
+mas "Amphetamine", id: 937984704 if OS.mac?
+mas "Developer", id: 640199958 if OS.mac?
+mas "Final Cut Pro", id: 424389933 if OS.mac?
+mas "Goodnotes", id: 1444383602 if OS.mac?
+mas "Grit", id: 6446997766 if OS.mac?
+mas "Keynote", id: 409183694 if OS.mac?
+mas "Kindle", id: 302584613 if OS.mac?
+mas "Numbers", id: 409203825 if OS.mac?
+mas "Pages", id: 409201541 if OS.mac?
+mas "Spark Desktop", id: 6445813049 if OS.mac?
+mas "Xcode", id: 497799835 if OS.mac?

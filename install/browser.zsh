@@ -2,6 +2,11 @@
 set -euo pipefail
 source "${0:A:h}/lib.zsh"
 
+if [[ "$OSTYPE" != darwin* ]]; then
+    print "Skipping macOS browser setup: not running on macOS"
+    exit 0
+fi
+
 BROWSER_FILE="$DOTFILES/config/browser/current"
 
 ensure_browser_file() {

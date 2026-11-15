@@ -386,7 +386,39 @@ function brew-cleanup(){
         return 1
     fi
 
-    mv "$snapshot" "$brewfile"
+    local merged
+    merged="$(mktemp "${TMPDIR:-/tmp}/brewfile-merged.XXXXXX")" || { rm -f "$snapshot"; return 1 }
+    awk -v platform="$OSTYPE" '
+        function package(line, kind, name) {
+            kind = line; sub(/ .*/, "", kind)
+            name = line; sub(/^[^"]*"/, "", name); sub(/".*/, "", name)
+            return kind " " tolower(name)
+        }
+        FILENAME == ARGV[1] {
+            if ($0 ~ /^(tap|brew|cask|mas) "/ && $0 ~ /OS[.](mac|linux)[?]/) {
+                key = package($0)
+                guarded[key] = $0
+                order[++count] = key
+            }
+            next
+        }
+        /^(tap|brew|cask|mas) "/ {
+            key = package($0)
+            seen[key] = 1
+            if (key in guarded) { print guarded[key]; next }
+        }
+        { print }
+        END {
+            for (i = 1; i <= count; i++) {
+                key = order[i]
+                if (seen[key]) continue
+                if ((platform !~ /^darwin/ && guarded[key] ~ / if OS[.]mac[?]$/) ||
+                    (platform !~ /^linux/ && guarded[key] ~ / if OS[.]linux[?]$/)) print guarded[key]
+            }
+        }
+    ' "$brewfile" "$snapshot" > "$merged" || { rm -f "$snapshot" "$merged"; return 1 }
+    mv "$merged" "$brewfile" || { rm -f "$snapshot" "$merged"; return 1 }
+    rm -f "$snapshot"
     command brew cleanup || return 1
     command brew doctor
 }
@@ -397,7 +429,9 @@ function update-node-tools(){
         return 1
     fi
 
-    local -x PNPM_HOME="${PNPM_HOME:-$HOME/Library/pnpm}"
+    local default_home="$HOME/.local/share/pnpm"
+    [[ "$OSTYPE" != darwin* ]] || default_home="$HOME/Library/pnpm"
+    local -x PNPM_HOME="${PNPM_HOME:-$default_home}"
     local -x PATH="$PATH:$PNPM_HOME/bin:$PNPM_HOME"
     local packages
     mkdir -p "$PNPM_HOME" || return 1

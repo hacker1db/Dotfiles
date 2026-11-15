@@ -121,7 +121,12 @@ fi
 # pnpm may be self-installed under PNPM_HOME, so key off the directory rather
 # than `command -v pnpm` (which can't see it until PATH is set). This replaces
 # the block `pnpm setup` would otherwise append to ~/.zshrc — don't run it.
-if [[ -d "${PNPM_HOME:=$HOME/Library/pnpm}" ]] || command -v pnpm &>/dev/null; then
+if [[ "$OSTYPE" == darwin* ]]; then
+    : ${PNPM_HOME:=$HOME/Library/pnpm}
+else
+    : ${PNPM_HOME:=$HOME/.local/share/pnpm}
+fi
+if [[ -d "$PNPM_HOME" ]] || command -v pnpm &>/dev/null; then
     export PNPM_HOME
     export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
 else
@@ -129,7 +134,7 @@ else
 fi
 
 # Prefer the Homebrew-native Claude Code binary over the stale pnpm launcher.
-export PATH="/opt/homebrew/bin:$PATH"
+[[ -n "${HOMEBREW_PREFIX:-}" && -d "$HOMEBREW_PREFIX/bin" ]] && export PATH="$HOMEBREW_PREFIX/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
