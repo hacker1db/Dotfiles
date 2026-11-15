@@ -20,7 +20,13 @@ return {
                 enabled = false,
             },
             filetypes = {
-                ["*"] = true,
+                ["*"] = function()
+                    local name = vim.fs.basename(vim.api.nvim_buf_get_name(0))
+                    for _, pattern in ipairs({ "^%.env", "^%.localrc$", "^%.netrc$", "%.pem$", "%.key$", "^id_", "credentials" }) do
+                        if name:match(pattern) then return false end
+                    end
+                    return true
+                end,
                 TelescopePrompt = false,
             },
         },

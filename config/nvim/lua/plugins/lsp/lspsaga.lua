@@ -23,7 +23,7 @@ return {
             auto_save = true,
         },
         hover = {
-            open_cmd = "!open",
+            open_link = {},
         },
         outline = {
             layout = "float",
