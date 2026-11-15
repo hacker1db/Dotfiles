@@ -493,12 +493,19 @@ function caido() {
   if [[ $mode == remote ]]; then
     [[ -n $remote ]] || { echo "caido: no remote URL; pass --remote <url> or set CAIDO_REMOTE_URL" >&2; return 1; }
     [[ $remote == *://* ]] || remote="https://$remote"
+    [[ $remote == http(|s)://* ]] || { echo "caido: remote URL must be http(s)://" >&2; return 1; }
     remote="${remote%/}"
-    local host="${${remote#*://}%%[:/]*}"
+    local authority="${${remote#*://}%%/*}" host
+    [[ $authority == *@* ]] && { echo "caido: remote URL must not contain credentials" >&2; return 1; }
+    if [[ $authority == \[* ]]; then
+      host="${authority%%\]*}]"
+    else
+      host="${authority%%:*}"
+    fi
     local proxy="${CAIDO_REMOTE_PROXY:-http://$host:${CAIDO_PROXY_PORT:-8082}}"
     case "${1:-start}" in
       start|status)
-        if curl -fsS --max-time 5 -o /dev/null "$remote/health"; then
+        if curl -fsS --max-time 5 -o /dev/null --url "$remote/health"; then
           echo "Remote Caido up → UI $remote  proxy $proxy"
         else
           echo "Remote Caido unreachable at $remote/health" >&2; return 1
