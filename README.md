@@ -217,4 +217,4 @@ luacheck config/nvim
 zsh install/agent-profiles.zsh --check
 ```
 
-Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) DOTFILES=$PWD zsh install/link.zsh` (links target `~/Developer/dotfiles/main` unless `DOTFILES` says otherwise). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` checks and Luacheck, plus TruffleHog, which fails on any finding.
+Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) zsh install/link.zsh` (links target the checkout that contains the script; an inherited `DOTFILES` is ignored). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` checks and Luacheck, plus TruffleHog, which fails on any finding.
