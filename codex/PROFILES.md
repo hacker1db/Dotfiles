@@ -67,8 +67,8 @@ zsh install/agent-profiles.zsh --check         # read-only audit of Claude and C
 zsh install/agent-profiles.zsh --skip-foundry  # leave Claude and Codex Foundry untouched
 ```
 
-Without the proxy client key, Foundry is skipped; on a machine with `~/OneDrive*` that is reported
-as incomplete (exit 2). `~/Developer/clitools/foundry-entra-proxy/install.sh --check` reports the
+Without the proxy client key, the installer still creates `~/.codex-foundry` so the `xf` aliases
+resolve, and prints a note; `codex-foundry` refuses to start until the key exists. `~/Developer/clitools/foundry-entra-proxy/install.sh --check` reports the
 binary, key, LaunchAgent, `/healthz`, and `/readyz` (which shows `az_login_required` when the Azure
 CLI session has expired).
 
