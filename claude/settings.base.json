@@ -13,7 +13,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "if command -v rtk >/dev/null 2>&1; then out=$(rtk hook claude) || exit $?; [ -z \"$out\" ] || printf %s \"$out\" | jq -c 'if .hookSpecificOutput.permissionDecision? == \"allow\" then del(.hookSpecificOutput.permissionDecision) else . end'; fi",
+            "command": "export PATH=\"/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH\"; if command -v rtk >/dev/null 2>&1; then out=$(rtk hook claude) || exit $?; [ -z \"$out\" ] || printf %s \"$out\" | jq -c 'if .hookSpecificOutput.permissionDecision? == \"allow\" then del(.hookSpecificOutput.permissionDecision) else . end'; fi",
             "timeout": 10
           }
         ]
