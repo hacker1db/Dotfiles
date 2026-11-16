@@ -168,7 +168,7 @@ New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, 
 
 ## CI and security scanning
 
-CI runs syntax checks, Luacheck, a TruffleHog secret scan, dependency review, and CodeQL. See [CI and security scanning](docs/ci.md).
+CI runs syntax checks, Luacheck, a GitGuardian (`ggshield`) secret scan, dependency review, and CodeQL. See [CI and security scanning](docs/ci.md).
 
 ## T3 Code
 
@@ -222,6 +222,6 @@ luacheck config/nvim
 zsh install/agent-profiles.zsh --check
 ```
 
-Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) zsh install/link.zsh` (links target the checkout that contains the script; an inherited `DOTFILES` is ignored). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` checks and Luacheck, plus TruffleHog, which fails on any finding.
+Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) zsh install/link.zsh` (links target the checkout that contains the script; an inherited `DOTFILES` is ignored). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` checks and Luacheck, plus a GitGuardian (`ggshield`) secret scan, which fails on any finding.
 
 When `ggshield` is on `PATH`, the `link` step runs `ggshield machine setup --no-honeytokens --agent claude-code --agent codex` after configuring agent profiles. Setup is idempotent and uses the current machine’s environment without hardcoded usernames, home paths, or macOS-specific paths. Honeytokens are disabled; AI and Git hook setup retain ggshield’s defaults. A setup failure marks the link step as failed. Copilot is excluded from machine setup because ggshield 1.56.1 identifies Copilot by an exact set of payload fields and rejects payloads that contain `traceparent` (or `tracestate`, or the `tool_use_id` Copilot CLI 1.0.112 sends on tool hooks) as `Unrecognized agent`; Copilot runs hooks fail-closed, so every tool call would be denied. Instead, `link` links `copilot/hooks/ggshield-ai-hook.json` to `~/.copilot/hooks/` as the only ggshield hook for Copilot. It uses `jq` to keep only the fields ggshield expects before `ggshield secret scan ai-hook`, resolves `jq` and `ggshield` from `PATH`, and does nothing when either is missing. A machine-generated `~/.copilot/hooks/hooks.json` whose hooks are all ggshield's own generated commands is moved to a backup so it does not run alongside the linked file; any other content is left in place with a warning.
