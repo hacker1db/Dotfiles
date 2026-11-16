@@ -77,11 +77,20 @@ For every pull request:
 6. Any change to authentication or authorization is 🌳 Trunk and needs approval from a human or operator. AI reviews never count as that approval. Never merge such a pull request, or bypass its review requirement, without that approval.
 7. Under the same remote conditions, start the `babysit-pr` skill right after opening a pull request, without being asked. It watches CI, fixes review comments on the pull request branch, and runs the PR review and security review in parallel with a model other than the one that wrote the code.
 
+## Working efficiently
+
+- Define the requested outcome and inspect the relevant implementation before editing.
+- Search narrowly first. Read enough surrounding context to understand behavior; expand when evidence requires it.
+- Reuse current findings and check results unless relevant state changes or evidence is incomplete.
+- Fix the responsible mechanism. Reuse existing patterns and avoid unrelated cleanup or speculative features.
+- Batch independent lookups when supported. Keep dependent operations sequential.
+- Run focused verification and required repository checks. Stop expanding work when the requested outcome is verified.
+
 ## Communication
 
 When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
 
-Apply this to chat replies, not authored files, commits, PRs, issues, or plans. Preserve required evidence, commands run, paths, IDs, errors, and material uncertainty.
+Apply this to chat replies, not authored files, commits, PRs, issues, or plans. Preserve required evidence, technical facts, negations, commands run, paths, IDs, errors, and material uncertainty.
 
 ## Bug fixes
 
