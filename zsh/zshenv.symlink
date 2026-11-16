@@ -19,6 +19,11 @@ unset _op_sock
 source "$DOTFILES/zsh/fpath"
 
 typeset -aU path
+for _brew_prefix in /opt/homebrew /home/linuxbrew/.linuxbrew /usr/local; do
+    [[ -x "$_brew_prefix/bin/brew" ]] && path=("$_brew_prefix/bin" "$_brew_prefix/sbin" $path)
+done
+unset _brew_prefix
+export PATH
 
 
 ## Only source this if it exsits

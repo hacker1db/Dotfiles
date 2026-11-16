@@ -309,6 +309,10 @@ brew "poppler"
 brew "vhs"
 brew "whisper.cpp"
 # macOS-only formulas (no Linux bottle or build)
+if OS.linux?
+  brew "bubblewrap"
+end
+
 if OS.mac?
     brew "container"
   # Command-line tool for getting & setting the default browser
