@@ -69,7 +69,9 @@ typeset copilot_ggshield_hooks="$HOME/.copilot/hooks/hooks.json"
 if [[ -f "$copilot_ggshield_hooks" && ! -L "$copilot_ggshield_hooks" ]]; then
     if ! command -v jq >/dev/null 2>&1; then
         warning "jq not found; cannot check $copilot_ggshield_hooks for a duplicate ggshield hook"
-    elif jq -e '[.hooks[]?[]?.hooks[]?.command] | length > 0 and all(test("ggshield secret scan ai-hook"))' \
+    elif jq -e '[.hooks[]?[]? | if type == "object" and has("hooks") then .hooks[]? else . end | .command?] as $commands
+        | ($commands | length) > 0
+        and all($commands[]; type == "string" and test("^(\u0027[^\u0027]*/ggshield\u0027|([^ \u0027]*/)?ggshield) secret scan ai-hook$"))' \
         "$copilot_ggshield_hooks" >/dev/null 2>&1; then
         backup="$(backup_path "$copilot_ggshield_hooks")"
         mv "$copilot_ggshield_hooks" "$backup"
