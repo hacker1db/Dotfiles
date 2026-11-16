@@ -302,6 +302,14 @@ elif [[ "$profiles_rc" -ne 0 ]]; then
     LINK_FAILURE=1
 fi
 
+if command -v ggshield >/dev/null 2>&1; then
+    title "Configuring GitGuardian machine protection"
+    if ! ggshield machine setup --no-honeytokens --agent claude-code --agent copilot --agent codex; then
+        error "GitGuardian machine setup failed."
+        LINK_FAILURE=1
+    fi
+fi
+
 [[ "$LINK_FAILURE" -eq 0 ]] || { error "Dotfiles linking needs attention; see the diagnostics above."; exit 1 }
 success "Linking complete"
 exit $(( PROFILES_INCOMPLETE ? 2 : 0 ))

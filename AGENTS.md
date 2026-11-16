@@ -21,7 +21,7 @@ docs/         Integration guides
 `~/Developer/dotfiles` is a bare repository with one worktree per branch; `~/Developer/dotfiles/main` is the production checkout.
 
 - `main` must always work. Never edit or commit in the `main` checkout.
-- Create each task's worktree with `wt switch -c <branch>`, based on `origin/main`. Any number of worktrees may exist; never stack branches.
+- Reuse the current feature branch and worktree unless the user explicitly requests a new branch. When starting from `main` or a detached HEAD, create a feature worktree with `wt switch -c <branch>`, based on `origin/main`. New branches also use `origin/main` unless the user explicitly requests another base.
 - Remove worktrees with `wt remove` or `wt merge`. Their `pre-remove` hook (`.config/wt.toml`) points the machine back at `main` when the worktree being removed is selected. After removing one any other way, run `~/Developer/dotfiles/main/bin/dotfiles-use ~/Developer/dotfiles/main`.
 - Run every command from the worktree root with repo-relative paths. Paths under `~/Developer/dotfiles/main` validate `main`, not your changes.
 - Installed links (`~/.zshrc`, `~/.config/*`, `~/.git-templates`, and others) point at the selected checkout, `main` by default. Anything that writes through them, such as `Lazy sync` updating `lazy-lock.json` or `install.sh theme apply`, changes that checkout. Edit files in the worktree, never through `~/.config`.
