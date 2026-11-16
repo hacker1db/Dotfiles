@@ -223,3 +223,5 @@ zsh install/agent-profiles.zsh --check
 ```
 
 Linking can be rehearsed in a throwaway home with `HOME=$(mktemp -d) zsh install/link.zsh` (links target the checkout that contains the script; an inherited `DOTFILES` is ignored). These checks do not prove a complete fresh-machine install, live provider authentication, or interactive Neovim/tmux behavior. No credentials should be committed; use local configuration and the configured credential providers. CI runs the same `zsh -n` checks and Luacheck, plus TruffleHog, which fails on any finding.
+
+When `ggshield` is on `PATH`, the `link` step runs `ggshield machine setup --no-honeytokens --agent claude-code --agent copilot --agent codex` after configuring agent profiles. Setup is idempotent and uses the current machine’s environment without hardcoded usernames, home paths, or macOS-specific paths. Honeytokens are disabled; AI and Git hook setup retain ggshield’s defaults. A setup failure marks the link step as failed.
