@@ -4,7 +4,7 @@
     "PreToolUse": [
       {
         "type": "command",
-        "command": "out=$(rtk hook copilot) || exit $?; [ -z \"$out\" ] || printf %s \"$out\" | jq -c 'if .permissionDecision? == \"allow\" then del(.permissionDecision) else . end'",
+        "command": "export PATH=\"/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH\"; out=$(rtk hook copilot) || exit $?; [ -z \"$out\" ] || printf %s \"$out\" | jq -c 'if .permissionDecision? == \"allow\" then del(.permissionDecision) else . end'",
         "cwd": ".",
         "timeout": 5
       }

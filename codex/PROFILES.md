@@ -80,3 +80,31 @@ CLI session has expired).
 - Foundry sessions from before the split stay in `~/.codex/sessions`.
 
 Claude Code profiles are documented separately in `claude/PROFILES.md`.
+
+## Linux sandbox prerequisite
+
+The Brewfile installs Bubblewrap on Linux. Codex uses the first `bwrap` on
+`PATH`; the shell configuration exposes the Homebrew prefix in noninteractive
+shells as well. Keep Bubblewrap at 0.12.0 or newer: Ubuntu's
+`0.11.1-1ubuntu0.3` reverted the CVE-2026-87766 fix.
+
+On Ubuntu with restricted unprivileged user namespaces, the distro AppArmor
+profile attaches to `/usr/bin/bwrap`, not Homebrew's versioned executable. A
+host administrator must load a separate copy of
+`/etc/apparmor.d/bwrap-userns-restrict` with its attachment set to the resolved
+Homebrew `bwrap` path and both profile names changed consistently to avoid
+colliding with the distro profiles. Preserve all child capability restrictions.
+Repeat that attachment check after a Homebrew upgrade changes the binary path.
+Do not disable the global user-namespace restriction to work around a missing
+attachment. If a GUI service does not inherit Homebrew on `PATH`, a host-managed
+`/usr/local/bin/bwrap` symlink to the Homebrew executable makes it discoverable
+without restarting unrelated services. Keep that link current after upgrades.
+
+Verify a read-only command with `codex sandbox -c 'sandbox_mode="read-only"' --
+/usr/bin/true`, then check that a write outside the workspace is still denied.
+The RTK hook should rewrite a live Codex `git status --short` call to
+`rtk git status --short`; changed hook definitions require renewed trust.
+
+References: [Codex sandbox prerequisites](https://learn.chatgpt.com/docs/sandboxing#prerequisites),
+[Ubuntu regression notice](https://ubuntu.com/security/notices/USN-8779-2),
+[Bubblewrap advisory](https://github.com/containers/bubblewrap/security/advisories/GHSA-pxhw-h44j-8pfx).
