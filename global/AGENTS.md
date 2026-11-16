@@ -79,18 +79,20 @@ For every pull request:
 
 ## Working efficiently
 
-- Define the requested outcome and inspect the relevant implementation before editing.
-- Search narrowly first. Read enough surrounding context to understand behavior; expand when evidence requires it.
-- Reuse current findings and check results unless relevant state changes or evidence is incomplete.
-- Fix the responsible mechanism. Reuse existing patterns and avoid unrelated cleanup or speculative features.
-- Batch independent lookups when supported. Keep dependent operations sequential.
-- Run focused verification and required repository checks. Stop expanding work when the requested outcome is verified.
+These rules cut wasted work. They never waive a step required elsewhere in this policy or in a repository's instructions.
+
+- Before editing, read the code you will change and whatever its behavior depends on. Do not guess at code you have not read.
+- Start with a targeted search. Widen it, or read whole files, only when what you found leaves the behavior unclear.
+- Run independent lookups in one batch when the tool supports it.
+- Do not re-read a file or re-run a check whose inputs have not changed. Re-run a check after any edit that could change its result; a result from before the last edit is not verification.
+- Change only what the request needs. Follow existing patterns. Report unrelated problems you notice instead of fixing them.
+- Verify with the narrowest check that proves the outcome, plus every check the repository requires. Then stop: add no scope once the outcome is verified and the required steps are done.
 
 ## Communication
 
 When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
 
-Apply this to chat replies, not authored files, commits, PRs, issues, or plans. Preserve required evidence, technical facts, negations, commands run, paths, IDs, errors, and material uncertainty.
+Apply this to chat replies, not authored files, commits, PRs, issues, or plans. Preserve required evidence, commands run, paths, IDs, exact values, errors, material uncertainty, and words that change meaning (not, only, unless).
 
 ## Bug fixes
 
