@@ -41,6 +41,9 @@ fi
 if command -v fm &> /dev/null; then
     source <(fm completion zsh 2>/dev/null)
 fi
+if command -v tailscale &> /dev/null; then
+    source <(tailscale completion zsh 2>/dev/null)
+fi
 setopt COMPLETE_ALIASES
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 export REPORTTIME=10 # display how long all tasks over 10 seconds take
