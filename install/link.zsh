@@ -47,6 +47,7 @@ title "Linking agent hooks"
 typeset -A agent_hooks=(
     "$DOTFILES/codex/hooks.json" "$HOME/.codex/hooks.json"
     "$DOTFILES/copilot/hooks/rtk-rewrite.json" "$HOME/.copilot/hooks/rtk-rewrite.json"
+    "$DOTFILES/copilot/hooks/ggshield-ai-hook.json" "$HOME/.copilot/hooks/ggshield-ai-hook.json"
 )
 typeset hook_src
 for hook_src destination in "${(@kv)agent_hooks}"; do
@@ -63,6 +64,20 @@ for hook_src destination in "${(@kv)agent_hooks}"; do
     ln -sfn "$hook_src" "$destination"
     print "Linked $destination -> $hook_src"
 done
+
+typeset copilot_ggshield_hooks="$HOME/.copilot/hooks/hooks.json"
+if [[ -f "$copilot_ggshield_hooks" && ! -L "$copilot_ggshield_hooks" ]]; then
+    if ! command -v jq >/dev/null 2>&1; then
+        warning "jq not found; cannot check $copilot_ggshield_hooks for a duplicate ggshield hook"
+    elif jq -e '[.hooks[]?[]?.hooks[]?.command] | length > 0 and all(test("ggshield secret scan ai-hook"))' \
+        "$copilot_ggshield_hooks" >/dev/null 2>&1; then
+        backup="$(backup_path "$copilot_ggshield_hooks")"
+        mv "$copilot_ggshield_hooks" "$backup"
+        print "Moved machine-generated ggshield Copilot hook to $backup"
+    elif grep -qF "ggshield" "$copilot_ggshield_hooks"; then
+        warning "$copilot_ggshield_hooks has other hooks besides ggshield; remove its ggshield entries by hand"
+    fi
+fi
 
 title "Linking Git templates"
 link_file "$DOTFILES/git/templates" "$HOME/.git-templates"
@@ -304,7 +319,7 @@ fi
 
 if command -v ggshield >/dev/null 2>&1; then
     title "Configuring GitGuardian machine protection"
-    if ! ggshield machine setup --no-honeytokens --agent claude-code --agent copilot --agent codex; then
+    if ! ggshield machine setup --no-honeytokens --agent claude-code --agent codex; then
         error "GitGuardian machine setup failed."
         LINK_FAILURE=1
     fi

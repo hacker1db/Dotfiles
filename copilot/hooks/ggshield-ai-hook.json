@@ -1,0 +1,37 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v ggshield >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 || exit 0; jq -c 'del(.traceparent, .tracestate)' | ggshield secret scan ai-hook"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v ggshield >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 || exit 0; jq -c 'del(.traceparent, .tracestate)' | ggshield secret scan ai-hook"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v ggshield >/dev/null 2>&1 && command -v jq >/dev/null 2>&1 || exit 0; jq -c 'del(.traceparent, .tracestate)' | ggshield secret scan ai-hook"
+          }
+        ]
+      }
+    ]
+  }
+}
