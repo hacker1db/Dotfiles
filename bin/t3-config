@@ -86,7 +86,8 @@ def provider_profiles(root):
             if (directory / 'config.toml').is_file() and directory not in homes.values():
                 name = directory.name[7:]
                 if name in homes:
-                    raise ValueError(f'duplicate Codex home name: {name}')
+                    incomplete.append(f'Codex · {name}: skipped {directory}; {homes[name]} already uses that name')
+                    continue
                 homes[name] = directory
     for name, directory in sorted(homes.items()):
         instance_id = 'codex' if name == 'default' else f'dotfiles-codex-home-{slug(name)}'
