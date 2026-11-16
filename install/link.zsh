@@ -329,7 +329,7 @@ fi
 
 if command -v ggshield >/dev/null 2>&1; then
     title "Configuring GitGuardian machine protection"
-    if ! ggshield machine setup --no-honeytokens --agent claude-code --agent codex; then
+    if ! ggshield machine setup --no-honeytokens --no-git-hooks --agent claude-code; then
         error "GitGuardian machine setup failed."
         LINK_FAILURE=1
     fi
