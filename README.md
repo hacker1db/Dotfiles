@@ -95,6 +95,8 @@ To retire a tool, remove its Brewfile declaration and run the installer on each 
 
 `bin/t3m` puts fzf menus and shortcuts on top of the T3 Code `t3` CLI. Run `t3m` alone for a menu, or use `t3m threads`, `t3m projects`, `t3m new [project] [message]`, `t3m send`, `t3m show`, `t3m web`, `t3m add`, `t3m rename`, `t3m rm`, and `t3m open`. Other subcommands, such as `t3m pair`, go straight to `t3`. Projects can be named by id, title, or any path inside them. Threads started here run on the same background server as the desktop and mobile apps, so you can pick them up there. Project and thread lists come from T3's state database, opened read-only, because `t3` has no command to list projects. `zsh/functions/_t3m` completes live project ids, thread ids and model slugs. `zsh/completion.zsh` caches `t3 --completions zsh` and rebuilds it when the t3 runtime changes. After first install, run `rm ~/.zcompdump-*; exec zsh` so `compinit -C` picks up `_t3m`.
 
+Neovim (`:T3Start`, `:T3Send`, `:T3Steer`, `:T3Stop`, `:T3Show`, `:T3Threads`, `:T3Providers`, under `<leader>T`) and tmux (`prefix A` menu, `prefix C-t` start, via `bin/t3-tmux`) drive the same threads without the desktop app. Set `T3_CLI` to use a different `t3` build. See [T3 Code from Neovim and tmux](docs/t3-nvim-tmux.md).
+
 ### Worktrunk and Git worktrees
 
 `wt` shell integration is loaded from Zsh. User settings are in [config/worktrunk/config.toml](config/worktrunk/config.toml), linked at `~/.config/worktrunk/config.toml`. Worktrees use sibling directories named after sanitized branches. Commit generation calls the configured `ocr` command, which must be available separately.

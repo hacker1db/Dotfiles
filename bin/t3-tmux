@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+# t3-tmux - drive T3 Code threads from tmux popups through the `t3` CLI.
+#
+# Usage:
+#   t3-tmux [menu]   [DIR]            Pick an action (default)
+#   t3-tmux start    [DIR]            Start a thread in DIR's project (asks for the message)
+#   t3-tmux send     [DIR] [THREAD]   Send a message (queued after the running turn)
+#   t3-tmux steer    [DIR] [THREAD]   Steer the running turn
+#   t3-tmux stop     [DIR] [THREAD]   Stop the thread
+#   t3-tmux watch    [DIR] [THREAD]   Follow `t3 thread show` (refreshes; q quits, s send, e steer, x stop)
+#   t3-tmux window   [DIR]            Pick a thread and watch it in a new tmux window
+#   t3-tmux help
+#
+# DIR defaults to the current directory (tmux bindings pass #{pane_current_path});
+# its T3 project is the one whose workspace root contains it. Without THREAD you
+# pick one; the last thread used per project is listed first (marked ★) and is
+# shared with the Neovim :T3* commands.
+#
+# Env: T3_CLI (CLI command, default "t3"; may include arguments, e.g.
+#      "node ~/Developer/osc/t3code/feat-hacker1db-all/apps/server/src/bin.ts"),
+#      T3_BASE_DIR (T3 data dir, exported as T3CODE_HOME; default: the CLI's ~/.t3),
+#      T3_START_ARGS (extra `thread start` flags, e.g. "--provider claudeAgent --model claude-haiku-5-5"),
+#      T3_TMUX_MESSAGES (watch, default 15), T3_TMUX_INTERVAL (watch seconds, default 3).
+# Requires: t3 (or T3_CLI), jq, fzf.
+
+set -euo pipefail
+
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/$(basename "${BASH_SOURCE[0]}")"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/t3-cli/last-threads.json"
+FZF_OPTS=(--height=100% --reverse --border=rounded --info=inline)
+
+die() { printf 't3-tmux: %s\n' "$*" >&2; pause; exit 1; }
+info() { printf '\033[90m%s\033[0m\n' "$*" >&2; }
+need() { command -v "$1" >/dev/null 2>&1 || die "missing dependency: $1"; }
+usage() { sed -n '2,24p' "$SELF" | sed 's/^# \{0,1\}//'; }
+# Keep popups open long enough to read an error or result.
+pause() { [ -t 0 ] && [ -n "${TMUX:-}" ] && { read -r -n1 -s -p $'\033[90m[press a key]\033[0m' </dev/tty || true; echo; }; return 0; }
+
+# T3_CLI may hold arguments; split on whitespace and expand a leading ~.
+read -r -a T3 <<<"${T3_CLI:-t3}"
+for i in "${!T3[@]}"; do T3[$i]="${T3[$i]/#\~/$HOME}"; done
+t3() { command "${T3[@]}" "$@"; }
+read -r -a START_ARGS <<<"${T3_START_ARGS:-}"
+# `--base-dir` only works after the subcommand; T3CODE_HOME works everywhere,
+# including the fzf preview subshell. State keys get a "<home>::" prefix so
+# thread ids from different T3 homes never mix (same as nvim lua/t3).
+KEY_PREFIX=""
+if [ -n "${T3_BASE_DIR:-}" ]; then
+  export T3CODE_HOME="${T3_BASE_DIR/#\~/$HOME}"
+  KEY_PREFIX="$(cd -- "$T3CODE_HOME" 2>/dev/null && pwd -P || printf '%s' "$T3CODE_HOME")::"
+fi
+
+# --- state (shared with nvim lua/t3) ---------------------------------------
+
+last_thread() { [ -r "$STATE" ] && jq -r --arg p "$1" '.[$p] // empty' "$STATE" 2>/dev/null || true; }
+
+remember() {  # $1 project id, $2 thread id
+  mkdir -p "$(dirname "$STATE")"
+  local cur='{}'; [ -r "$STATE" ] && cur="$(cat "$STATE")"
+  # A corrupt state file would otherwise block every later write.
+  jq -e 'type == "object"' <<<"$cur" >/dev/null 2>&1 || cur='{}'
+  jq -c --arg p "$1" --arg t "$2" '. + {($p): $t}' <<<"$cur" >"$STATE.tmp" 2>/dev/null \
+    && mv "$STATE.tmp" "$STATE" || rm -f "$STATE.tmp"
+}
+
+# --- project / thread resolution --------------------------------------------
+
+# Prints "id<TAB>title<TAB>key" for the project whose workspace root holds $1
+# (longest match). key = real path of that root; it indexes the shared
+# last-thread state. A CLI without `project list` (t3 <= 0.1.9), or one that
+# cannot read the running server's database, falls back to the git root of $1:
+# thread commands accept any path inside a project.
+resolve_project() {
+  local dir abs json root
+  dir="${1:-$PWD}"
+  abs="$(cd -- "$dir" && pwd -P)" || die "no such directory: $dir"
+  root="$(git -C "$abs" rev-parse --show-toplevel 2>/dev/null || printf '%s' "$abs")"
+  if ! json="$(t3 project list --json 2>/dev/null)" || ! jq -e 'type == "array"' <<<"$json" >/dev/null 2>&1; then
+    printf '%s\t%s\t%s\n' "$root" "$(basename "$root")" "$KEY_PREFIX$root"; return
+  fi
+  local hit
+  hit="$(jq -r '.[] | select(.deletedAt == null) | [.id, .title, .workspaceRoot] | @tsv' <<<"$json" |
+    while IFS=$'\t' read -r id title wsroot; do
+      real="$(cd -- "$wsroot" 2>/dev/null && pwd -P || printf '%s' "$wsroot")"
+      # "(pattern)": macOS bash 3.2 cannot parse "pattern)" inside $(...).
+      case "$abs/" in ("$real/"*) printf '%s\t%s\t%s\t%s\n' "${#real}" "$id" "$title" "$KEY_PREFIX$real" ;; esac
+    done | sort -rn | head -1 | cut -f2-)"
+  if [ -z "$hit" ]; then
+    confirm "No T3 project contains $abs. Add $root?" || die "no project"
+    t3 project add "$root" >&2 || die "t3 project add failed"
+    resolve_project "$root"; return
+  fi
+  printf '%s\n' "$hit"
+}
+
+pick_thread() {  # $1 project id, $2 project title, $3 state key; prints thread id
+  local last json
+  last="$(last_thread "$3")"
+  json="$(t3 thread list --project "$1" --json)" || die "t3 thread list failed"
+  local line
+  line="$(jq -r --arg last "$last" '
+      (map(select(.threadId == $last)) + map(select(.threadId != $last)))[]
+      | [.threadId, (if .threadId == $last then "★" else " " end), .status, .title] | @tsv' <<<"$json" |
+    fzf "${FZF_OPTS[@]}" --delimiter=$'\t' --with-nth=2,3,4 --no-sort \
+      --prompt="thread ($2)> " --header='enter: select · ctrl-/: toggle preview' \
+      --bind 'ctrl-/:toggle-preview' \
+      --preview "$(printf '%q ' "${T3[@]}")thread show --messages 3 {1} 2>&1" \
+      --preview-window=right,55%,wrap)" || die "no thread selected"
+  cut -f1 <<<"$line"
+}
+
+# Sets PROJECT_ID, PROJECT_TITLE, PROJECT_KEY, THREAD from DIR [THREAD].
+target() {
+  local p; p="$(resolve_project "${1:-$PWD}")" || return 1  # explicit: set -e is off under `|| true`
+  IFS=$'\t' read -r PROJECT_ID PROJECT_TITLE PROJECT_KEY <<<"$p"
+  THREAD="${2:-}"
+  [ -n "$THREAD" ] || { THREAD="$(pick_thread "$PROJECT_ID" "$PROJECT_TITLE" "$PROJECT_KEY")" || return 1; }
+  remember "$PROJECT_KEY" "$THREAD"
+}
+
+# --- input ------------------------------------------------------------------
+
+read_message() {  # $1 prompt label; empty input opens $EDITOR
+  local msg tmp
+  read -r -e -p "$1 (empty = \$EDITOR): " msg </dev/tty || true
+  if [ -z "$msg" ]; then
+    tmp="$(mktemp "${TMPDIR:-/tmp}/t3-tmux-msg.XXXXXX")"
+    "${EDITOR:-nvim}" "$tmp" </dev/tty >/dev/tty
+    msg="$(cat "$tmp")"; rm -f "$tmp"
+  fi
+  [ -n "${msg//[[:space:]]/}" ] || die "empty message"
+  printf '%s' "$msg"
+}
+
+confirm() { local a; read -r -p "$1 [y/N] " a </dev/tty || true; [[ "$a" =~ ^[Yy] ]]; }
+
+# --- commands ---------------------------------------------------------------
+
+cmd_start() {
+  local p id title key msg out
+  p="$(resolve_project "${1:-$PWD}")"; IFS=$'\t' read -r id title key <<<"$p"
+  info "project: $title"
+  msg="$(read_message "New thread")"
+  out="$(printf '%s' "$msg" | t3 thread start ${START_ARGS[@]+"${START_ARGS[@]}"} --json "$id" -)" || die "t3 thread start failed"
+  local thread; thread="$(jq -r '.threadId' <<<"$out")"
+  remember "$key" "$thread"
+  printf 'Started %s\n' "$thread"
+  if confirm "Watch it?"; then cmd_watch "${1:-$PWD}" "$thread"; fi
+}
+
+cmd_send() {  # $1 mode (queue|steer), $2 dir, $3 thread
+  local mode="$1"; shift
+  target "$@" || return 1
+  local msg; msg="$(read_message "$mode → $THREAD")" || return 1
+  if [ "$mode" = steer ]; then
+    printf '%s' "$msg" | t3 thread steer "$THREAD" - || die "t3 thread steer failed"
+  else
+    # queue is the default; no --mode keeps t3 <= 0.1.9 working.
+    printf '%s' "$msg" | t3 thread send "$THREAD" - || die "t3 thread send failed"
+  fi
+  pause
+}
+
+cmd_stop() {
+  target "$@"
+  t3 thread stop "$THREAD" || die "t3 thread stop failed"
+  pause
+}
+
+cmd_watch() {
+  target "$@"
+  local n="${T3_TMUX_MESSAGES:-15}" every="${T3_TMUX_INTERVAL:-3}" key out
+  while :; do
+    out="$(t3 thread show --messages "$n" "$THREAD" 2>&1)" || true
+    printf '\033[H\033[2J%s\n\n\033[90m%s · every %ss · q quit · s send · e steer · x stop · r refresh\033[0m\n' \
+      "$out" "$(date +%H:%M:%S)" "$every"
+    key=""; read -r -s -n1 -t "$every" key </dev/tty || true
+    case "$key" in
+      q) break ;;
+      # Subshells: an empty message or a failed send must not end the watch.
+      s) (cmd_send queue "${1:-$PWD}" "$THREAD") || true ;;
+      e) (cmd_send steer "${1:-$PWD}" "$THREAD") || true ;;
+      x) t3 thread stop "$THREAD" || true; sleep 1 ;;
+    esac
+  done
+}
+
+cmd_window() {
+  local dir="${1:-$PWD}"
+  target "$dir"
+  tmux new-window -c "$dir" -n "t3:${THREAD:0:8}" "$(printf '%q ' "$SELF" watch "$dir" "$THREAD")"
+}
+
+cmd_menu() {
+  local dir="${1:-$PWD}" action
+  action="$(printf '%s\n' \
+      $'start\tStart a thread here' $'send\tSend to a thread (queue)' $'steer\tSteer a running thread' \
+      $'stop\tStop a thread' $'watch\tWatch a thread here' $'window\tWatch a thread in a new window' |
+    fzf "${FZF_OPTS[@]}" --delimiter=$'\t' --with-nth=2 --no-sort --prompt='t3> ' | cut -f1)" || exit 0
+  case "$action" in
+    start) cmd_start "$dir" ;;
+    send) cmd_send queue "$dir" ;;
+    steer) cmd_send steer "$dir" ;;
+    stop) cmd_stop "$dir" ;;
+    watch) cmd_watch "$dir" ;;
+    window) cmd_window "$dir" ;;
+  esac
+}
+
+main() {
+  local cmd="${1:-menu}"; [ $# -gt 0 ] && shift
+  case "$cmd" in -h|--help|help) usage; return ;; esac
+  need jq; need fzf; need "${T3[0]}"
+  case "$cmd" in
+    menu)   cmd_menu "$@" ;;
+    start)  cmd_start "$@" ;;
+    send)   cmd_send queue "$@" ;;
+    steer)  cmd_send steer "$@" ;;
+    stop)   cmd_stop "$@" ;;
+    watch)  cmd_watch "$@" ;;
+    window) cmd_window "$@" ;;
+    *) usage; exit 2 ;;
+  esac
+}
+
+main "$@"
