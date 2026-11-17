@@ -27,3 +27,6 @@ config/hunk/state.json
 
 # fleet registers machine-local status dirs here when ~/.config/fleet is a repo link
 config/fleet/agents.json
+
+# Added by ggshield
+.cache_ggshield
