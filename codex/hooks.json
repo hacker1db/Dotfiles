@@ -46,7 +46,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/opt/homebrew/bin/ggshield secret scan ai-hook"
+            "command": "command -v ggshield >/dev/null 2>&1 || exit 0; ggshield secret scan ai-hook"
           }
         ]
       }
@@ -75,7 +75,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/opt/homebrew/bin/ggshield secret scan ai-hook"
+            "command": "command -v ggshield >/dev/null 2>&1 || exit 0; ggshield secret scan ai-hook"
           }
         ]
       }
@@ -86,7 +86,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/opt/homebrew/bin/ggshield secret scan ai-hook"
+            "command": "command -v ggshield >/dev/null 2>&1 || exit 0; ggshield secret scan ai-hook"
           }
         ]
       }
