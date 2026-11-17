@@ -8,6 +8,20 @@ T3 reads `~/.t3/userdata/client-settings.json`, `~/.t3/userdata/settings.json`, 
 
 `settings.json` is not linked. It holds provider credentials, binary paths, worktree directories, and per-machine provider entries. Do not commit it or the `~/.t3/userdata/secrets/` directory.
 
+## Shared Eldritch theme
+
+`config/t3code/themes/eldritch-tmux-nvim.json` contains the Eldritch palette shared with tmux and Neovim. `./install.sh link` (also run by `all`) publishes it into `~/.t3/userdata/themes/` and selects it as the environment theme using `t3 theme set`. Connected desktop and web clients follow the selection; mobile does not follow the environment default.
+
+The theme file is copied through T3's CLI, not symlinked. `settings.json` remains machine-local, and T3 preserves its other settings. Each link run reapplies Eldritch through T3, including when another theme was selected. If the CLI is unavailable, link warns and skips theme setup; install the CLI and rerun link.
+
+To apply only the theme from this checkout:
+
+```zsh
+t3 theme set "$PWD/config/t3code/themes/eldritch-tmux-nvim.json" --base-dir "$HOME/.t3"
+```
+
+Pull the dotfiles changes on each machine, then run the theme command or the normal link step. Commit the palette JSON, never the machine-local `settings.json` or secrets directory.
+
 ## Provider profiles during installation
 
 `./install.sh link` (and `./install.sh all`) links the UI files above and runs `bin/t3-config providers`, which updates only `providerInstances` in `~/.t3/userdata/settings.json`. `link.zsh` skips this step when `~/.t3` does not exist. Quit T3 and stop any standalone server using that directory before running installation.
