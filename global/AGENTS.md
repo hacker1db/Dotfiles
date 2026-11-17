@@ -8,15 +8,15 @@
 - Keep `~/notes/SecondBrain` read-only by default. Do not edit, move, or delete synced vault files unless the user explicitly requests those changes.
 - SecondBrain uses a single `main` branch and its existing working copy. For explicitly requested vault changes, work there directly; do not create a branch or Git worktree, switch branches, or request a worktree exception. This includes canonical plan changes made through the `plan` CLI. This exception does not authorize unrelated vault edits.
 
-## File edits require a new worktree
+## Reuse feature branches; never edit the default branch
 
 - These worktree requirements apply to Git repositories outside `~/notes/SecondBrain`; the vault follows the single-branch exception above.
 - Use Worktrunk (`wt`) to create and manage required worktrees. If it is unavailable, report the blocker instead of silently substituting another workflow.
 - Load and apply the `git-workflow` skill only when the user explicitly invokes it (for example, `$git-workflow` or "use the git-workflow skill"). Routine Git operations, repository edits, and this worktree policy are not an invocation. The worktree requirements remain in force without loading the skill.
-- Before editing files in any other Git repository, always create a new worktree and a dedicated task branch. Never edit files in a checkout on `main`, `master`, or the repository's default branch, even for small changes, documentation, configuration, or generated files.
-- Check the repository root, current branch, and working-tree status before any write. Create the worktree from the appropriate base, then use its absolute path as the working directory for all edits, formatting, code generation, and checks that write files.
-- Create a new worktree for each new editing task. Continue using that task's worktree for follow-up work; changing branches in the original checkout is not a substitute.
-- Resolve symlinks before writing. Never edit a main/default-branch checkout indirectly through a symlink or an installed configuration path; edit the source in the new worktree instead.
+- When already on a feature branch, work in that branch and its existing checkout unless the user explicitly requests a new branch. Never edit files in a checkout on `main`, `master`, or the repository's default branch, even for small changes, documentation, configuration, or generated files.
+- Check the repository root, current branch, and working-tree status before any write. Use the selected feature checkout’s absolute path as the working directory for all edits, formatting, code generation, and checks that write files.
+- When starting from `main`, `master`, the default branch, or a detached HEAD, create a new worktree and dedicated task branch from the appropriate base before editing. A new task alone does not require a new branch when already on a feature branch.
+- Resolve symlinks before writing. Never edit a main/default-branch checkout indirectly through a symlink or an installed configuration path; edit the source in the selected feature checkout instead.
 - Preserve existing changes in every other checkout. Do not reset, stash, move, or overwrite unrelated work to set up the worktree.
 - If the required worktree cannot be created or accessed, stop before editing and report the blocker. Do not fall back to editing the main/default-branch checkout.
 
@@ -77,11 +77,26 @@ For every pull request:
 6. Any change to authentication or authorization is 🌳 Trunk and needs approval from a human or operator. AI reviews never count as that approval. Never merge such a pull request, or bypass its review requirement, without that approval.
 7. Under the same remote conditions, start the `babysit-pr` skill right after opening a pull request, without being asked. It watches CI, fixes review comments on the pull request branch, and runs the PR review and security review in parallel with a model other than the one that wrote the code.
 
+## Working efficiently
+
+These rules cut wasted work. They never waive a step required elsewhere in this policy or in a repository's instructions.
+
+- Before editing, read the code you will change and whatever its behavior depends on. Do not guess at code you have not read.
+- Start with a targeted search. Widen it, or read whole files, only when what you found leaves the behavior unclear.
+- Run independent lookups in one batch when the tool supports it.
+- Do not re-read a file or re-run a check whose inputs have not changed. Re-run a check after any edit that could change its result; a result from before the last edit is not verification.
+- Change only what the request needs. Follow existing patterns. Report unrelated problems you notice instead of fixing them.
+- Verify with the narrowest check that proves the outcome, plus every check the repository requires. Then stop: add no scope once the outcome is verified and the required steps are done.
+
+## Opening files
+
+I use Neovim in tmux, not a GUI editor. When I ask to open, show, view, jump to, or edit a file or `path:line`, or to review files you changed, use the `nvim-tmux` skill. Never open files in VS Code, Cursor, or another GUI editor, and do not open files unless I ask.
+
 ## Communication
 
 When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
 
-Apply this to chat replies, not authored files, commits, PRs, issues, or plans. Preserve required evidence, commands run, paths, IDs, errors, and material uncertainty.
+Apply this to chat replies, not authored files, commits, PRs, issues, or plans. Preserve required evidence, commands run, paths, IDs, exact values, errors, material uncertainty, and words that change meaning (not, only, unless).
 
 ## Bug fixes
 

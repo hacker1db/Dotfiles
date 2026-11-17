@@ -43,9 +43,20 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: trufflesecurity/trufflehog@ea68ca03c865c5f324e86e849ced20ed3cf9dbbb # v3.99.8
-        with:
-          extra_args: --results=verified,unverified,unknown
+      - name: Require GitGuardian API key
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+        run: |
+          if [ -z "$GITGUARDIAN_API_KEY" ]; then
+            echo "::error::GITGUARDIAN_API_KEY is unavailable. Fork pull requests get no secrets, and Dependabot pull requests need it under Dependabot secrets. A maintainer must scan these changes."
+            exit 1
+          fi
+      - uses: GitGuardian/ggshield-action@5cc1ed2be3e8bf625d354c7170731880670f74de # v1.56.1
+        env:
+          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
   dependency-review:
     if: github.event_name == 'pull_request'
