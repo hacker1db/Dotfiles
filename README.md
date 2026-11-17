@@ -172,7 +172,7 @@ CI runs syntax checks, Luacheck, a GitGuardian (`ggshield`) secret scan, depende
 
 ## T3 Code
 
-Installation registers T3 providers for Claude personal, work subscription, and Foundry, plus default Codex and a Codex Foundry placeholder. It discovers additional Codex homes and reports missing profile settings as disabled entries. Run `bin/t3-config providers --check` to audit alignment. `client-settings.json` and `keybindings.json` are symlinked from `config/t3code/`; `settings.json` stays local. Credentials stay local. See [T3 Code configuration](docs/t3code.md) for setup and backup behavior.
+Installation registers T3 providers for Claude personal, work subscription, and Foundry, plus default Codex and a Codex Foundry placeholder. It discovers additional Codex homes and reports missing profile settings as disabled entries. Run `bin/t3-config providers --check` to audit alignment. `client-settings.json` and `keybindings.json` are symlinked from `config/t3code/`; `settings.json` stays local. The link step also publishes and selects the tracked Eldritch theme when the `t3` CLI is available; matching theme state is left unchanged. Credentials stay local. See [T3 Code configuration](docs/t3code.md) for setup and backup behavior.
 
 ## AI tools and shared instructions
 

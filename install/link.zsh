@@ -296,6 +296,14 @@ if [[ -d "$HOME/.t3" ]]; then
         fi
         link_file "$DOTFILES/config/t3code/$file" "$destination"
     done
+    if command -v t3 >/dev/null 2>&1; then
+        if ! python3 "$DOTFILES/bin/t3-config" theme --dotfiles-root "$DOTFILES"; then
+            error "T3 theme configuration failed."
+            LINK_FAILURE=1
+        fi
+    else
+        warning "Skipping T3 theme; install the t3 CLI and rerun link."
+    fi
     T3_STATUS=0
     python3 "$DOTFILES/bin/t3-config" providers --dotfiles-root "$DOTFILES" || T3_STATUS=$?
     case "$T3_STATUS" in
