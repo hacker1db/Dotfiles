@@ -12,14 +12,12 @@ T3 reads `~/.t3/userdata/client-settings.json`, `~/.t3/userdata/settings.json`, 
 
 `config/t3code/themes/eldritch-tmux-nvim.json` contains the Eldritch palette shared with tmux and Neovim. `./install.sh link` (also run by `all`) publishes it into `~/.t3/userdata/themes/` and selects it as the environment theme using `t3 theme set`. Connected desktop and web clients follow the selection; mobile does not follow the environment default.
 
-The theme file is copied through T3's CLI, not symlinked. `settings.json` remains machine-local, and T3 preserves its other settings. Repeated setup skips the CLI when both the published palette and selected theme already match. Running link restores Eldritch if another theme was selected. If the CLI is unavailable, link warns and skips theme setup; install the CLI and rerun link.
+The theme file is copied through T3's CLI, not symlinked. `settings.json` remains machine-local, and T3 preserves its other settings. Each link run reapplies Eldritch through T3, including when another theme was selected. If the CLI is unavailable, link warns and skips theme setup; install the CLI and rerun link.
 
-To apply or inspect only the theme from this checkout:
+To apply only the theme from this checkout:
 
 ```zsh
-python3 bin/t3-config theme
-python3 bin/t3-config theme --check
-python3 bin/t3-config theme --dry-run
+t3 theme set "$PWD/config/t3code/themes/eldritch-tmux-nvim.json" --base-dir "$HOME/.t3"
 ```
 
 Pull the dotfiles changes on each machine, then run the theme command or the normal link step. Commit the palette JSON, never the machine-local `settings.json` or secrets directory.

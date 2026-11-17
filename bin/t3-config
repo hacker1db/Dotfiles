@@ -5,7 +5,6 @@ import json
 import os
 import re
 import shutil
-import subprocess
 from pathlib import Path
 import tempfile
 
@@ -137,39 +136,14 @@ def configure_providers(args):
     return 2 if incomplete else 0
 
 
-def configure_theme(args):
-    if args.userdata.name != 'userdata':
-        raise ValueError('T3 theme setup requires a userdata directory named userdata')
-    source = args.dotfiles_root / 'config/t3code/themes/eldritch-tmux-nvim.json'
-    theme = read_json(source)
-    theme_id = theme['id']
-    current = read_json(args.userdata / 'settings.json', {})
-    published = read_json(args.userdata / 'themes' / f'{theme_id}.json')
-    if current.get('defaultTheme') == theme_id and published == theme:
-        print('T3 Eldritch theme already matches.')
-        return 0
-    if args.check:
-        print('T3 Eldritch theme needs reconciliation.')
-        return 2
-    if args.dry_run:
-        print(f'Would publish and select T3 theme: {source}')
-        return 0
-    binary = shutil.which('t3')
-    if not binary:
-        raise ValueError('T3 theme setup requires the t3 CLI; install it and rerun link')
-    return subprocess.run([binary, 'theme', 'set', str(source), '--id', theme_id,
-                           '--base-dir', str(args.userdata.parent)], check=False).returncode
-
-
 def main():
-    parser = argparse.ArgumentParser(description='Reconcile T3 Code providers or theme. Quit T3 before running.')
-    parser.add_argument('action', choices=('providers', 'theme'))
+    parser = argparse.ArgumentParser(description='Reconcile T3 Code provider profiles. Quit T3 before running.')
+    parser.add_argument('action', choices=('providers',))
     parser.add_argument('--userdata', type=Path, default=Path.home() / '.t3/userdata')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--check', action='store_true')
     parser.add_argument('--dotfiles-root', type=Path, default=Path(__file__).resolve().parents[1])
-    args = parser.parse_args()
-    return configure_theme(args) if args.action == 'theme' else configure_providers(args)
+    return configure_providers(parser.parse_args())
 
 
 if __name__ == '__main__':

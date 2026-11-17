@@ -297,7 +297,7 @@ if [[ -d "$HOME/.t3" ]]; then
         link_file "$DOTFILES/config/t3code/$file" "$destination"
     done
     if command -v t3 >/dev/null 2>&1; then
-        if ! python3 "$DOTFILES/bin/t3-config" theme --dotfiles-root "$DOTFILES"; then
+        if ! t3 theme set "$DOTFILES/config/t3code/themes/eldritch-tmux-nvim.json" --base-dir "$HOME/.t3"; then
             error "T3 theme configuration failed."
             LINK_FAILURE=1
         fi
