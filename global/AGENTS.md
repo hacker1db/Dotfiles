@@ -88,6 +88,10 @@ These rules cut wasted work. They never waive a step required elsewhere in this 
 - Change only what the request needs. Follow existing patterns. Report unrelated problems you notice instead of fixing them.
 - Verify with the narrowest check that proves the outcome, plus every check the repository requires. Then stop: add no scope once the outcome is verified and the required steps are done.
 
+## Opening files
+
+I use Neovim in tmux, not a GUI editor. When I ask to open, show, view, jump to, or edit a file or `path:line`, or to review files you changed, use the `nvim-tmux` skill. Never open files in VS Code, Cursor, or another GUI editor, and do not open files unless I ask.
+
 ## Communication
 
 When reporting information to me, be extremely concise and sacrifice grammar for the sake of concision.
