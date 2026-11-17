@@ -5,7 +5,7 @@
 -- arguments ("node ~/src/t3code/apps/server/src/bin.ts") or a list.
 --
 -- The last thread used per project is stored in
--- ~/.local/state/t3-cli/last-threads.json, shared with bin/t3-tmux.
+-- ~/.local/state/t3-cli/last-threads.json, shared with bin/t3m.
 
 local M = {}
 
@@ -22,7 +22,7 @@ M.config = {
   timeout = 120000, -- ms per CLI call (calls with --wait are not used)
   open_on_start = true, -- open :T3Show after :T3Start
   show_split = "botright vsplit", -- how :T3Show opens its window; "float" for a float
-  -- Same path as bin/t3-tmux, which honors $XDG_STATE_HOME.
+  -- Same path as bin/t3m, which honors $XDG_STATE_HOME.
   state_file = (vim.env.XDG_STATE_HOME or vim.fn.expand("~/.local/state")) .. "/t3-cli/last-threads.json",
 }
 
@@ -105,7 +105,7 @@ local function guard(fn)
 end
 
 ---------------------------------------------------------------------------
--- last-thread state (shared with bin/t3-tmux)
+-- last-thread state (shared with bin/t3m)
 ---------------------------------------------------------------------------
 
 local function read_state()

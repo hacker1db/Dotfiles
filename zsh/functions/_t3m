@@ -32,13 +32,19 @@ _t3m() {
     'projects:pick a project, then act on it'
     'threads:pick a thread, then act on it'
     'new:start a thread'
+    'start:start a thread in a directory project'
     'send:send a message to a thread'
+    'steer:steer the running turn'
+    'stop:stop a thread'
+    'watch:follow a thread'
+    'window:watch a thread in a new tmux window'
     'show:show a thread'
     'web:open a thread in the browser'
     'add:add a project'
     'rename:rename a project'
     'rm:remove a project'
     'open:open a project in the desktop app'
+    'worktree:open a worktree as a project'
     'pair:pair a phone'
     'status:service and remote access status'
     'service:manage the background service'
@@ -67,7 +73,14 @@ _t3m() {
         '*:message:' ;;
     send|s)
       _arguments -s '--wait[wait for the reply]' '2:thread:__t3m_threads' '*:message:' ;;
-    show|web)
+    steer)
+      _arguments '2:thread:__t3m_threads' '*:message:' ;;
+    start)
+      _arguments '2:directory:_path_files -/' '*:message:' ;;
+    worktree|wt)
+      _arguments '--repo[repository]:directory:_path_files -/' '--base[base ref for new]:ref:__git_refs' \
+        '2:action:(open add thread new)' '*:path or message:' ;;
+    show|web|stop|watch|window)
       _arguments '2:thread:__t3m_threads' ;;
     threads|ls|t|rename|rm|open)
       _arguments '2:project:__t3m_projects' '*:title:' ;;
