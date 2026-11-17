@@ -40,6 +40,15 @@
             "type": "command"
           }
         ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/homebrew/bin/ggshield secret scan ai-hook"
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -58,6 +67,26 @@
           {
             "type": "command",
             "command": "out=$(rtk hook codex) || exit $?; [ -z \"$out\" ] || printf %s \"$out\" | jq -c 'if .hookSpecificOutput.permissionDecision? == \"allow\" then empty else . end'"
+          }
+        ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/homebrew/bin/ggshield secret scan ai-hook"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/opt/homebrew/bin/ggshield secret scan ai-hook"
           }
         ]
       }
