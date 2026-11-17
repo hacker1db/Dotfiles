@@ -6,7 +6,7 @@ Start, message, steer, stop, and read T3 Code agent threads without opening the 
 | --- | --- |
 | Neovim module | `config/nvim/lua/t3/init.lua` |
 | lazy.nvim spec and keymaps | `config/nvim/lua/plugins/extra/t3.lua` |
-| tmux script | `bin/t3-tmux` |
+| Shell and tmux front end | `bin/t3m` |
 | tmux bindings | `config/tmux/tmux.conf` (T3 block under the fleet popup) |
 
 ## Choosing the CLI (`T3_CLI`)
@@ -38,7 +38,7 @@ Pair `T3_BASE_DIR` with a CLI from the same build as that server. An older CLI w
 
 ## Projects and the last thread
 
-The project is the T3 project whose workspace root contains the current file's Git root (Neovim) or the pane's current path (tmux). If the CLI has no `project list` command, or the command fails, the Git root is passed to `t3` as the project. Thread commands accept any path inside a project. When `project list` works and no project matches, you are asked whether to add the Git root with `t3 project add`.
+The project is the T3 project whose workspace root contains the current file's Git root (Neovim) or the current directory (`t3m`, which tmux runs at the pane's path). Neovim lists projects with `t3 project list`; `t3m` reads T3's state database first and uses `project list` as the fallback. When neither works, the Git root is passed to `t3` as the project. Thread commands accept any path inside a project. When projects can be listed and none matches, you are asked whether to add the Git root with `t3 project add`.
 
 The last thread used in each project is kept in `~/.local/state/t3-cli/last-threads.json`, keyed by the project's real workspace root. Neovim and tmux share it. Starting, picking, showing, or messaging a thread makes it the last thread. Pickers list it first with a ★.
 
@@ -73,13 +73,14 @@ Options (`opts` in `plugins/extra/t3.lua`): `cmd`, `base_dir`, `start_args`, `me
 | `prefix A` | T3 menu: start (`s`), send (`m`), steer (`e`), stop (`x`), watch in a popup (`w`), watch in a new window (`W`), fzf menu (`f`) |
 | `prefix C-t` | Start a thread in the pane's directory |
 
-Every action runs `bin/t3-tmux` in a popup at `#{pane_current_path}`. Thread pickers use fzf with a `t3 thread show` preview. Message prompts are one line; leave it empty to write the message in `$EDITOR`. The watch view re-runs `t3 thread show` every 3 seconds (`T3_TMUX_INTERVAL`) with the latest 15 messages (`T3_TMUX_MESSAGES`). In it, `s` sends, `e` steers, `x` stops, `r` refreshes, and `q` quits.
+Every action runs `bin/t3m` in a popup at `#{pane_current_path}` with `T3M_POPUP=1`, which uses the whole popup for fzf and waits for a key before closing on an error or result. Without a thread argument, the picker lists the threads of the directory's project, or every project outside one, with a `t3 thread show` preview. Message prompts are one line; leave it empty to write the message in `$EDITOR`. The watch view re-runs `t3 thread show` every 3 seconds (`T3M_INTERVAL`) with the latest 15 messages (`T3M_WATCH_MESSAGES`). In it, `s` sends, `e` steers, `x` stops, `r` refreshes, and `q` quits.
 
-The script also works outside tmux:
+The same commands work outside tmux, next to the project, worktree, and model commands (`t3m help` lists them all):
 
 ```sh
-t3-tmux start ~/Developer/project      # or: send | steer | stop | watch | window | menu
-t3-tmux watch . <thread-id>
+t3m start ~/Developer/project      # or: send | steer | stop | watch | window | menu
+t3m watch <thread-id>
+t3m worktree new feat/x --base main
 ```
 
-`bin/t3m` is the older fzf front end. It reads T3's state database directly and covers projects, models, and the web link. `t3-tmux` uses only the CLI.
+Project and thread lists come from T3's state database, opened read-only, and fall back to `t3 project list` and `t3 thread list` when it cannot be read. Actions always go through the CLI.
