@@ -1,4 +1,7 @@
 {
+  "claudeLabels": {
+    "subscription": "work"
+  },
   "codexHomes": {
     "foundry": "~/.codex-foundry"
   }
