@@ -65,15 +65,16 @@ def provider_profiles(root):
             raise ValueError(f'profile name cannot form a T3 instance ID: {name}')
         return value
 
+    declared = read_json(root / 'config/t3code/profiles.json', {'codexHomes': {}})
+    claude_labels = declared.get('claudeLabels', {})
     for definition in sorted((root / 'claude/profiles').glob('*/settings.json')):
         name = definition.parent.name
         directory = home / f'.claude-{name}'
         instance_id = 'claudeAgent' if name == 'personal' else f'dotfiles-claude-{slug(name)}'
-        register(instance_id, 'claudeAgent', f'Claude · {name}', directory,
+        register(instance_id, 'claudeAgent', f'Claude · {claude_labels.get(name, name)}', directory,
                  directory / 'settings.json', claude_binary)
 
     homes = {'default': home / '.codex'}
-    declared = read_json(root / 'config/t3code/profiles.json', {'codexHomes': {}})
     for name, path in declared['codexHomes'].items():
         if name == 'default':
             raise ValueError('default is reserved for ~/.codex')
