@@ -115,7 +115,9 @@ def configure_providers(args):
         if name in existing and existing[name].get('driver') != provider['driver']:
             raise ValueError(f'provider driver mismatch: {name}')
     updated = merge(current, {'providerInstances': providers})
-    if updated['providerInstances'].pop('opencode', None) is not None:
+    opencode = updated['providerInstances'].get('opencode')
+    if opencode is not None and not opencode.get('enabled'):
+        del updated['providerInstances']['opencode']
         print('opencode: removed')
     for name, provider in providers.items():
         status = 'enabled' if provider['enabled'] else 'disabled'
