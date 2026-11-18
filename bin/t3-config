@@ -116,9 +116,14 @@ def configure_providers(args):
             raise ValueError(f'provider driver mismatch: {name}')
     updated = merge(current, {'providerInstances': providers})
     opencode = updated['providerInstances'].get('opencode')
-    if opencode is not None and not opencode.get('enabled'):
-        del updated['providerInstances']['opencode']
-        print('opencode: removed')
+    if opencode is not None:
+        config = opencode.get('config')
+        flags = [flag for flag in (opencode.get('enabled'),
+                                   config.get('enabled') if isinstance(config, dict) else None)
+                 if isinstance(flag, bool)]
+        if False in flags or True not in flags:
+            del updated['providerInstances']['opencode']
+            print('opencode: removed')
     for name, provider in providers.items():
         status = 'enabled' if provider['enabled'] else 'disabled'
         print(f'{name}: {status}; {provider["config"]["homePath"]}')
