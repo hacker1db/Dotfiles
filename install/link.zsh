@@ -242,6 +242,28 @@ else
     fi
 fi
 
+title "Setting Codex automatic approval review"
+if [[ -L "$CODEX_CONFIG" ]]; then
+    warning "Skipped automatic approval review for symlinked $CODEX_CONFIG"
+elif ! node --input-type=module - "$CODEX_CONFIG" <<'JS'
+import { readFileSync, writeFileSync } from 'node:fs'
+
+const path = process.argv[2]
+const source = readFileSync(path, 'utf8')
+const firstTable = source.search(/^[ \t]*\[/m)
+const settings = firstTable === -1 ? source : source.slice(0, firstTable)
+const reviewer = /^[ \t]*approvals_reviewer[ \t]*=[ \t]*(?:"[^"\r\n]*"|'[^'\r\n]*')/m
+const value = 'approvals_reviewer = "auto_review"'
+const updated = reviewer.test(settings)
+  ? settings.replace(reviewer, value) + source.slice(settings.length)
+  : value + (source.includes('\r\n') ? '\r\n' : '\n') + source
+if (updated !== source) writeFileSync(path, updated)
+JS
+then
+    warning "Could not set automatic approval review in $CODEX_CONFIG"
+    LINK_FAILURE=1
+fi
+
 title "Installing the Go plan CLI"
 PLAN_REPO_DIR="${PLAN_MANAGER_REPO_DIR:-}"
 if [[ -z "$PLAN_REPO_DIR" && -n "$GH_USER" ]]; then
