@@ -111,8 +111,7 @@
       "Read(~/.config/op/**)",
       "Read(~/.localrc)",
       "Read(~/.config/foundry-entra-proxy/client.key)",
-      "Edit(~/.localrc)",
-      "Write(~/.localrc)"
+      "Edit(~/.localrc)"
     ],
     "ask": [
       "Bash(git push *)",
@@ -123,11 +122,8 @@
       "Bash(curl *)",
       "Bash(wget *)",
       "Edit(~/notes/SecondBrain/**)",
-      "Write(~/notes/SecondBrain/**)",
       "Edit(~/.git-templates/**)",
-      "Write(~/.git-templates/**)",
-      "Edit(~/Developer/dotfiles/main/**)",
-      "Write(~/Developer/dotfiles/main/**)"
+      "Edit(~/Developer/dotfiles/main/**)"
     ],
     "disableBypassPermissionsMode": "disable"
   }
