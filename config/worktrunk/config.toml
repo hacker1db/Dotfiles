@@ -1,5 +1,11 @@
 worktree-path = "{{ repo_path }}/../{{ branch | sanitize }}"
 
+[post-start]
+copy-ignored = "wt step copy-ignored"
+
+[step.copy-ignored]
+exclude = [".venv/", "venv/"]
+
 [aliases]
 pull-all = '''
 git fetch --all --prune && wt step for-each -- 'git rev-parse --verify -q @{u} >/dev/null || { echo "Skipping: no upstream"; exit 0; }; git pull --ff-only --no-autostash'
