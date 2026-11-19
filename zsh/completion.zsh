@@ -23,7 +23,9 @@ zstyle ':fzf-tab:*' switch-group '<' '>'
 
 
 # sesh completion
-eval "$(sesh completion zsh)"
+if command -v sesh &> /dev/null; then
+    eval "$(sesh completion zsh)"
+fi
 
 # skillctl completion (the launcher reuses the last build for completion requests)
 if command -v skillctl &> /dev/null; then
