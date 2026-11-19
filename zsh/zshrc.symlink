@@ -28,7 +28,15 @@ fi
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 # initialize autocomplete
 autoload -U compinit add-zsh-hook
-compinit -C -d "$HOME/.zcompdump-$ZSH_VERSION"
+_zcompdump="$HOME/.zcompdump-$ZSH_VERSION"
+_zcompdirs=(${^fpath}(N-/e:'[[ $REPLY -nt $_zcompdump ]]':))
+if [[ -f $_zcompdump && -z $_zcompdirs ]]; then
+    compinit -C -d "$_zcompdump"
+else
+    compinit -u -d "$_zcompdump"
+    touch "$_zcompdump"
+fi
+unset _zcompdump _zcompdirs
 # Reevaluate the prompt string each time it's displaying a prompt
 autoload bashcompinit && bashcompinit
 setopt prompt_subst
