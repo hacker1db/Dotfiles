@@ -132,7 +132,9 @@
       "Bash(wt list)",
       "Bash(wt list *)",
       "Bash(wt switch -c *)",
-      "Bash(wt switch --create *)"
+      "Bash(wt switch --create *)",
+      "Bash(gh pr create *)",
+      "Bash(gh issue create *)"
     ],
     "deny": [
       "Bash(sudo *)",
@@ -152,7 +154,6 @@
     ],
     "ask": [
       "Bash(git push *)",
-      "Bash(gh pr create *)",
       "Bash(gh pr merge *)",
       "Bash(gh pr close *)",
       "Bash(gh pr reopen *)",
@@ -160,7 +161,6 @@
       "Bash(gh pr comment *)",
       "Bash(gh pr review *)",
       "Bash(gh pr ready *)",
-      "Bash(gh issue create *)",
       "Bash(gh issue close *)",
       "Bash(gh issue reopen *)",
       "Bash(gh issue edit *)",
