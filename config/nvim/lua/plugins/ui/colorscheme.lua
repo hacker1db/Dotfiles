@@ -8,14 +8,14 @@ return {
         local c = require("core.colors").colors
 
         require("eldritch").setup({
-            transparent = false,
+            transparent = true,
             terminal_colors = true,
             styles = {
                 comments = { italic = true },
                 keywords = { italic = true },
                 functions = { bold = true },
                 variables = {},
-                sidebars = "dark",
+                sidebars = "transparent",
                 floats = "dark",
             },
             sidebars = { "qf", "help" },
