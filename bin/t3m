@@ -133,7 +133,9 @@ def obj(value):
     return value if isinstance(value, dict) else {}
 
 def text(value):
-    return " ".join(value.split()) if isinstance(value, str) else ""
+    if not isinstance(value, str):
+        return ""
+    return " ".join("".join(ch if ch.isprintable() else " " for ch in value).split())
 
 def slug_of(item):
     if isinstance(item, dict):
@@ -148,9 +150,11 @@ instances = obj(load(sys.argv[2]).get("providerInstances"))
 if not instances:
     instances = {driver: {"driver": driver} for driver in current}
 for instance_id, instance in instances.items():
-    instance = obj(instance)
+    instance_id = text(instance_id)
+    if not instance_id or not isinstance(instance, dict):
+        continue
     config = obj(instance.get("config"))
-    if not instance or instance.get("enabled") is False or config.get("enabled") is False:
+    if instance.get("enabled") is False or config.get("enabled") is False:
         continue
     driver = text(instance.get("driver")) or instance_id
     slugs = []
@@ -158,9 +162,9 @@ for instance_id, instance in instances.items():
         slug = slug_of(item)
         if slug and slug not in slugs:
             slugs.append(slug)
-    name = text(instance.get("displayName")) or text(instance_id)
+    name = text(instance.get("displayName")) or instance_id
     for slug in slugs:
-        print(f"{text(instance_id)}\t{slug}\t{name}")
+        print(f"{instance_id}\t{slug}\t{name}")
 PY
 }
 
