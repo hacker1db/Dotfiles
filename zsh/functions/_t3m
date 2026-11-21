@@ -21,7 +21,7 @@ __t3m_threads() {
 __t3m_models() {
   local -a items; local provider slug name
   while IFS=$'\t' read -r provider slug name; do
-    [[ -n $slug ]] && items+=("${slug}:${name:-$provider}")
+    [[ -n $slug ]] && items+=("${slug//:/\\:}:${name:-$provider}")
   done < <(t3m _models 2>/dev/null)
   _describe -t models 'model' items
 }

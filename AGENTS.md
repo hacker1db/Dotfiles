@@ -10,7 +10,7 @@ config/       One directory per app, each linked to ~/.config/<name>
 git/          gitconfig, hook dispatchers (templates/hooks/) and hooks (hooks/)
 zsh/          zshrc, zshenv, aliases, functions (functions/, functions.zsh, git.zsh)
 install/      One script per install.sh step, plus lib.zsh and brewfile
-global/       AGENTS.md: the global agent policy linked for Claude, Codex and Copilot
+global/       AGENTS.md: the global agent policy linked for Claude, Codex, Copilot and Antigravity
 claude/       Claude Code profiles (see claude/PROFILES.md)
 codex/        Codex profiles (see codex/PROFILES.md)
 docs/         Integration guides

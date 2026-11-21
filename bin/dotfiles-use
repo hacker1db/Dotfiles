@@ -72,6 +72,7 @@ typeset -a candidates=(
     "$HOME"/.codex*/*(N@)
     "$HOME"/.copilot/*(N@)
     "$HOME"/.copilot/hooks/*(N@)
+    "$HOME"/.gemini/*(N@)
     "$HOME"/.config/*(ND@)
 )
 typeset destination link root relative replacement
