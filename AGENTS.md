@@ -16,16 +16,15 @@ codex/        Codex profiles (see codex/PROFILES.md)
 docs/         Integration guides
 ```
 
-## Checkouts and Worktrees
+## Checkout and Branches
 
-`~/Developer/dotfiles` is a bare repository with one worktree per branch; `~/Developer/dotfiles/main` is the production checkout.
+`~/Developer/dotfiles` is a plain clone with one checkout. Do not create Worktrunk worktrees for it.
 
-- `main` must always work. Never edit or commit in the `main` checkout.
-- Reuse the current feature branch and worktree unless the user explicitly requests a new branch. When starting from `main` or a detached HEAD, create a feature worktree with `wt switch -c <branch>`, based on `origin/main`. New branches also use `origin/main` unless the user explicitly requests another base.
-- Remove worktrees with `wt remove` or `wt merge`. Their `pre-remove` hook (`.config/wt.toml`) points the machine back at `main` when the worktree being removed is selected. After removing one any other way, run `~/Developer/dotfiles/main/bin/dotfiles-use ~/Developer/dotfiles/main`.
-- Run every command from the worktree root with repo-relative paths. Paths under `~/Developer/dotfiles/main` validate `main`, not your changes.
-- Installed links (`~/.zshrc`, `~/.config/*`, `~/.git-templates`, and others) point at the selected checkout, `main` by default. Anything that writes through them, such as `Lazy sync` updating `lazy-lock.json` or `install.sh theme apply`, changes that checkout. Edit files in the worktree, never through `~/.config`.
-- `./install.sh use` points the installed links at the current worktree for every terminal on the machine. Ask before running it, and switch back afterward with `dotfiles-use` from `~/Developer/dotfiles/main`.
+- `main` must always work. Never edit or commit while `main` is checked out.
+- Reuse the current feature branch unless the user explicitly requests a new branch. When starting from `main` or a detached HEAD, create a branch in place with `git switch -c <branch> origin/main`. New branches use `origin/main` unless the user explicitly requests another base.
+- Installed links (`~/.zshrc`, `~/.config/*`, `~/.git-templates`, and others) point at this checkout, so the checked-out branch is the live configuration. Switching branches changes every terminal and application on the machine. Ask before switching away from a branch with uncommitted changes, and switch back to `main` when testing is done.
+- Anything that writes through the links, such as `Lazy sync` updating `lazy-lock.json` or `install.sh theme apply`, changes the checkout. Edit files in `~/Developer/dotfiles`, never through `~/.config`.
+- Run commands from the repository root with repo-relative paths.
 
 ## Validation
 

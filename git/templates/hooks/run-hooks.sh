@@ -6,7 +6,7 @@ hook_type=$(basename "$0")
 gitconfig=$(readlink -f "$HOME/.gitconfig" 2>/dev/null)
 dotfiles=${gitconfig%/git/gitconfig.symlink}
 if [ -z "$gitconfig" ] || [ "$dotfiles" = "$gitconfig" ]; then
-	dotfiles="$HOME/Developer/dotfiles/main"
+	dotfiles="$HOME/Developer/dotfiles"
 fi
 hooks="$dotfiles/git/hooks"
 

@@ -53,7 +53,7 @@ fast-forwarded.
 
 ```bash
 # On any machine after cloning dotfiles
-cd ~/Developer/dotfiles/main
+cd ~/Developer/dotfiles
 ./install.sh link
 ```
 

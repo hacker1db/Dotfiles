@@ -42,34 +42,21 @@ if [[ ! -f "${0:A}" || ! -f "$ROOT/install/lib.zsh" ]]; then
     elif ! command -v git &> /dev/null; then
         die "Install git, then run this command again."
     fi
-    if [[ ! -d "$repo/.bare" ]]; then
-        mkdir -p "$repo" && git clone --bare "$url" "$repo/.bare" || die "Cloning $url failed."
-    fi
     origin_re='^(git@github\.com:|ssh://git@github\.com/|https://github\.com/|git@github-[A-Za-z0-9._-]+:)hacker1db/Dotfiles(\.git)?$'
-    [[ "$(git --git-dir="$repo/.bare" config remote.origin.url)" =~ $origin_re ]] \
-        || die "$repo/.bare is not a clone of $url; move it aside and run this command again."
-    if [[ -d "$repo/.git" ]]; then
-        [[ "$(git --git-dir="$repo/.git" config remote.origin.url)" =~ $origin_re ]] \
-            || die "$repo is a clone of another repository; move it aside and run this command again."
-        [[ -z "$(git -C "$repo" status --porcelain --untracked-files=no)" ]] \
-            || die "$repo is a plain clone with local changes; commit or move them aside, then run this command again."
-        [[ -z "$(git -C "$repo" log --branches --not --remotes --format=%H -- 2> /dev/null)" ]] \
-            || die "$repo is a plain clone with unpushed commits; push or move them aside, then run this command again."
-        typeset -a stale=("${(@f)$(git -C "$repo" ls-tree --name-only HEAD)}")
-        stale=(${stale:#})
-        rm -rf "$repo/.git" "${(@)stale/#/$repo/}"
+    # Older machines use a bare clone with a main/ worktree; keep running from it.
+    if [[ -d "$repo/.bare" ]]; then
+        [[ "$(git --git-dir="$repo/.bare" config remote.origin.url)" =~ $origin_re && -f "$repo/main/install.sh" ]] \
+            || die "$repo/.bare is not a clone of $url with a main/ worktree; move it aside and run this command again."
+        exec "$repo/main/install.sh" "${@:-all}"
     fi
-    [[ -f "$repo/.git" ]] || print "gitdir: ./.bare" > "$repo/.git"
-    git --git-dir="$repo/.bare" config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-    if [[ ! -e "$repo/main" ]]; then
-        git --git-dir="$repo/.bare" fetch origin || die "Fetching origin failed."
-        git -C "$repo" worktree add main main || die "Creating the main worktree failed."
-        git -C "$repo/main" branch --set-upstream-to=origin/main
+    if [[ ! -d "$repo/.git" ]]; then
+        [[ ! -e "$repo" || -z "$(ls -A "$repo")" ]] \
+            || die "$repo exists and is not a clone of $url; move it aside and run this command again."
+        git clone "$url" "$repo" || die "Cloning $url failed."
     fi
-    common="$(git -C "$repo/main" rev-parse --path-format=absolute --git-common-dir 2> /dev/null)"
-    [[ -n "$common" && "${common:A}" == "${repo:A}/.bare" && -f "$repo/main/install.sh" ]] \
-        || die "$repo/main is not a worktree of $repo/.bare; move it aside and run this command again."
-    exec "$repo/main/install.sh" "${@:-all}"
+    [[ "$(git -C "$repo" config remote.origin.url)" =~ $origin_re && -f "$repo/install.sh" ]] \
+        || die "$repo is not a clone of $url; move it aside and run this command again."
+    exec "$repo/install.sh" "${@:-all}"
 fi
 
 source "$ROOT/install/lib.zsh"

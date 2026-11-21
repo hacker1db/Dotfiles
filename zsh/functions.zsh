@@ -347,7 +347,7 @@ function gha(){
        gh project item-add "${GHA_PROJECT:?set GHA_PROJECT in ~/.localrc}" --owner "${GHA_OWNER:?set GHA_OWNER in ~/.localrc}" --url "$@"
 }
 function brew-cleanup(){
-    local brewfile="${DOTFILES:-$HOME/Developer/dotfiles/main}/install/brewfile"
+    local brewfile="${DOTFILES:-$HOME/Developer/dotfiles}/install/brewfile"
     local snapshot
     local leaves
     local formula

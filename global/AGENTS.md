@@ -20,6 +20,8 @@
 - Preserve existing changes in every other checkout. Do not reset, stash, move, or overwrite unrelated work to set up the worktree.
 - If the required worktree cannot be created or accessed, stop before editing and report the blocker. Do not fall back to editing the main/default-branch checkout.
 
+Exception: `~/Developer/dotfiles` is a plain clone with a single checkout, not a Worktrunk layout. Do not create worktrees there. When it is on `main`, create a task branch in place with `git switch -c <branch> origin/main`, then edit in `~/Developer/dotfiles`. Its installed links point at that checkout, so switching branches changes the live configuration; before switching away from a branch with uncommitted changes, ask. All other rules in this section still apply, including never editing while `main` is checked out.
+
 Exception: for in-scope plan requests, `plan` CLI writes within `~/notes/SecondBrain/4.Resources/plans` are authorized and exempt from the worktree rule and vault read-only default. This permits no other vault writes.
 
 ## User-facing plans

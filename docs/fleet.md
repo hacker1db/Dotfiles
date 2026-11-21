@@ -26,11 +26,11 @@ The binary comes from the Brewfile (`tap nicknisi/formulae`, `brew fleet`),
 along with `fswatch` for the sketchybar push watcher:
 
 ```zsh
-brew bundle --file=~/Developer/dotfiles/main/install/brewfile
+brew bundle --file=~/Developer/dotfiles/install/brewfile
 ```
 
 Then wire the agent hooks. `install/agent-profiles.zsh` (run via
-`~/Developer/dotfiles/main/install.sh link`, or as part of
+`~/Developer/dotfiles/install.sh link`, or as part of
 `install.sh all`) does this automatically for every harness:
 
 - **Claude Code** — runs `CLAUDE_CONFIG_DIR=<profile> fleet install` for each
