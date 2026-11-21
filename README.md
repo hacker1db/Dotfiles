@@ -181,6 +181,7 @@ Claude installation links instructions, output styles, and the statusline script
 - [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh link` generates and installs all three.
 - [Codex profiles](codex/PROFILES.md): `xp` (personal, `~/.codex`) and `xf` (Foundry, `~/.codex-foundry`) use separate `CODEX_HOME` directories, so the Foundry profile never sees the personal ChatGPT login. The same `./install.sh link` step generates and links the Foundry home.
 - Antigravity CLI: `ay` runs `agy --mode auto` (classifier-approved tool use, not `--dangerously-skip-permissions`); `ayc` continues the last conversation.
+- Antigravity settings: `./install.sh link` merges `gemini/antigravity-settings.json` (Auto mode, theme, permission rules) into `~/.gemini/antigravity-cli/settings.json` and into each T3 Antigravity provider's `antigravity-acp/settings.json`, because T3 runs Antigravity with its own `--gemini-dir`. The files stay machine-owned since `agy` rewrites them; tracked keys win, and tracked permission rules are added to local ones. T3 creates its provider directory at first Gemini sign-in, so rerun `link` after signing in on a new machine.
 - Workflow slash commands (reviews, GitHub/Azure DevOps, security, notes, reading, writing) come from the skills repository through skillctl, not from command files here. GitGuardian runs as a Git hook, not a Claude hook.
 
 ### Fleet agent orchestration
