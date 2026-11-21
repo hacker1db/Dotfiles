@@ -311,6 +311,22 @@ if [[ -d "$HOME/.t3" ]]; then
         2) warning "Some T3 provider profiles are disabled until provisioned; see the diagnostics above." ;;
         *) error "T3 provider configuration failed."; LINK_FAILURE=1 ;;
     esac
+    T3_UNIT="$HOME/.config/systemd/user/t3code.service"
+    if command -v systemctl >/dev/null 2>&1 && [[ -f "$T3_UNIT" ]]; then
+        T3_DROPIN="$T3_UNIT.d/claude-path.conf"
+        T3_DROPIN_CONTENT="[Service]
+Environment=\"PATH=$HOME/.local/bin:$DOTFILES/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin\""
+        if [[ ! -f "$T3_DROPIN" || "$(<"$T3_DROPIN")" != "$T3_DROPIN_CONTENT" ]]; then
+            mkdir -p "${T3_DROPIN:h}"
+            print -r -- "$T3_DROPIN_CONTENT" > "$T3_DROPIN"
+            if systemctl --user daemon-reload && { ! systemctl --user is-active --quiet t3code.service || systemctl --user restart t3code.service }; then
+                success "Updated T3 service PATH drop-in: $T3_DROPIN"
+            else
+                error "Reloading the T3 service failed after updating $T3_DROPIN."
+                LINK_FAILURE=1
+            fi
+        fi
+    fi
 else
     info "Skipping T3 Code; ~/.t3 not found."
 fi
