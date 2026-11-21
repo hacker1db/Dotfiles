@@ -98,6 +98,8 @@ When reporting information to me, be extremely concise and sacrifice grammar for
 
 Apply this to chat replies, not authored files, commits, PRs, issues, or plans. Preserve required evidence, commands run, paths, IDs, exact values, errors, material uncertainty, and words that change meaning (not, only, unless).
 
+Format chat replies as GitHub-flavored Markdown so they render in T3 Code and Claude Code: headings, lists, tables, fenced code blocks with a language tag, and Mermaid diagrams in `mermaid` fences when a visual helps. Do not use MDX or JSX components; neither client renders them.
+
 ## Bug fixes
 
 When fixing a bug, find and fix the root cause, then verify with relevant checks. End bug-fix responses with one short line stating what changed and a status light:
