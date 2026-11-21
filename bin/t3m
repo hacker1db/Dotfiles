@@ -61,6 +61,7 @@ fi
 T3_HOME="${T3CODE_HOME:-$HOME/.t3}"
 DB="$T3_HOME/userdata/statev2.sqlite"
 MANIFEST="$T3_HOME/userdata/model-manifest.json"
+SETTINGS="$T3_HOME/userdata/settings.json"
 if [ -n "${T3M_POPUP:-}" ]; then
   FZF_OPTS=(--height=100% --reverse --border=rounded --info=inline)
 else
@@ -114,15 +115,36 @@ data_threads() {
     jq -r '.[]? | [.threadId, "-", .title, (.status // "")] | @tsv' 2>/dev/null || true
 }
 
-# provider<TAB>model for current models.
+# instance<TAB>model<TAB>instance name for every enabled provider instance.
 data_models() {
-  [ -r "$MANIFEST" ] || return 0
-  python3 -I - "$MANIFEST" <<'PY'
+  [ -r "$MANIFEST" ] || [ -r "$SETTINGS" ] || return 0
+  python3 -I - "$MANIFEST" "$SETTINGS" <<'PY'
 import json, sys
-m = json.load(open(sys.argv[1])).get("manifest", {})
-for provider, models in m.get("currentModels", {}).items():
-    for slug in models:
-        print(f"{provider}\t{slug}")
+
+def load(path):
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+current = load(sys.argv[1]).get("manifest", {}).get("currentModels", {})
+instances = load(sys.argv[2]).get("providerInstances")
+if not isinstance(instances, dict) or not instances:
+    instances = {driver: {"driver": driver} for driver in current}
+for instance_id, instance in instances.items():
+    if not isinstance(instance, dict) or instance.get("enabled", True) is False:
+        continue
+    driver = instance.get("driver") or instance_id
+    slugs = list(current.get(driver, []))
+    for item in (instance.get("config") or {}).get("customModels") or []:
+        if isinstance(item, dict):
+            item = next((item[k] for k in ("slug", "id", "model", "name") if item.get(k)), None)
+        if isinstance(item, str) and item and item not in slugs:
+            slugs.append(item)
+    name = instance.get("displayName") or instance_id
+    for slug in slugs:
+        print(f"{instance_id}\t{slug}\t{name}")
 PY
 }
 
@@ -236,7 +258,7 @@ target_thread() {
 
 pick_model() {  # prints "provider<TAB>model"
   need fzf
-  data_models | fzf "${FZF_OPTS[@]}" --delimiter=$'\t' --prompt='model> ' \
+  data_models | fzf "${FZF_OPTS[@]}" --delimiter=$'\t' --with-nth=3,2 --prompt='model> ' \
     --header='enter: select · esc: project default' || true
 }
 
