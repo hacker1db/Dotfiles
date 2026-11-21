@@ -22,6 +22,12 @@ t3 theme set "$PWD/config/t3code/themes/eldritch-tmux-nvim.json" --base-dir "$HO
 
 Pull the dotfiles changes on each machine, then run the theme command or the normal link step. Commit the palette JSON, never the machine-local `settings.json` or secrets directory.
 
+## Service PATH drop-in (Linux)
+
+When the T3 server runs as the systemd user service `t3code.service`, it resolves provider binaries (`claude`, `claude-personal`, `grok`, ...) against the service's own `PATH`, not the interactive shell's. `install/link.zsh` maintains the drop-in `~/.config/systemd/user/t3code.service.d/claude-path.conf` so the service PATH contains `~/.local/bin` and this checkout's `bin/`. The drop-in is regenerated only when its content is wrong, and the service is reloaded and restarted only on a change. The step is skipped when `systemctl` or the unit file is absent (macOS, or T3 not installed as a service).
+
+After installing a new provider CLI, rerun `./install.sh link` or restart the service so a fresh process sees it.
+
 ## Provider profiles during installation
 
 `./install.sh link` (and `./install.sh all`) links the UI files above and runs `bin/t3-config providers`, which updates only `providerInstances` in `~/.t3/userdata/settings.json`. `link.zsh` skips this step when `~/.t3` does not exist. Quit T3 and stop any standalone server using that directory before running installation.
