@@ -1,5 +1,9 @@
 #!/usr/bin/env zsh
 export DOTFILES="${${(%):-%x}:A:h:h}"
+# Steps call helpers from bin/ (skillctl, claude-tmux-cleanup). A fresh
+# bootstrap shell, or one from before a checkout moved, lacks this bin on PATH.
+path=("$DOTFILES/bin" ${path:#$DOTFILES/bin})
+export PATH
 
 title() { print "\n\e[1;35m$1\e[0m\n\e[1;38;5;243m==============================\e[0m" }
 info() { print "\e[1;34mInfo:\e[0m $1" }
@@ -25,6 +29,9 @@ link_file() {
     elif [[ -L "$dest" || ! -e "$dest" ]]; then
         ln -sfn "$src" "$dest"
         print "Linked $dest -> $src"
+    elif [[ -d "$dest" && -z "$(print -l -- "$dest"/*(DN[1]))" ]]; then
+        rmdir "$dest" && ln -sfn "$src" "$dest"
+        print "Replaced empty $dest with link -> $src"
     else
         print "$dest exists and is not a symlink; skipping."
     fi
