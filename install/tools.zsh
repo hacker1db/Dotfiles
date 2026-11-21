@@ -115,7 +115,7 @@ if command -v gh >/dev/null 2>&1; then
     typeset ext
     typeset -A extensions=(dlvhdr/gh-dash v4.26.3 advanced-security/gh-sbom v0.1.1 github/gh-stack v0.3.0)
     for ext in ${(ok)extensions}; do
-        gh extension list 2>/dev/null | grep -q "[[:space:]]$ext[[:space:]]" && continue
+        gh extension list 2>/dev/null | grep -q "[[:space:]]${ext}[[:space:]]" && continue
         gh extension install --pin "${extensions[$ext]}" "$ext" || warning "gh extension install $ext failed"
     done
 fi
