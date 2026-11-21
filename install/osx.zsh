@@ -68,6 +68,32 @@ else
     warning "NvimTmux.app not found at $APP_SOURCE, skipping"
 fi
 
+title "Configuring Rex"
+REX_ID="com.superlogical.rex"
+if [[ -d /Applications/Rex.app || -d "$HOME/Applications/Rex.app" ]]; then
+    defaults write "$REX_ID" Workspace.terminalFontName -string "JetBrainsMono Nerd Font Mono"
+    defaults write "$REX_ID" Workspace.terminalFontStyle -string "SemiBold Italic"
+    defaults write "$REX_ID" Workspace.terminalFontPointSize -float 14
+    defaults write "$REX_ID" Workspace.terminalCopyOnSelect -bool true
+    defaults write "$REX_ID" Workspace.terminalUseThemePalette -bool true
+    defaults write "$REX_ID" Workspace.cursorShadersEnabled -bool true
+    defaults write "$REX_ID" Workspace.appearance -string "dark"
+    defaults write "$REX_ID" Workspace.interfaceStyle -string "blendTheme"
+    defaults write "$REX_ID" Workspace.inactivePaneFadeMode -string "both"
+    defaults write "$REX_ID" Workspace.paneDensity -string "comfortable"
+    defaults write "$REX_ID" Workspace.showsPaneHeaders -bool false
+    defaults write "$REX_ID" Workspace.paneHeaderVisibility -string "onHover"
+    defaults write "$REX_ID" Workspace.usesPaneGlass -bool true
+    defaults write "$REX_ID" Workspace.toolbarBehavior -string "onHover"
+    defaults write "$REX_ID" Workspace.sidebarPosition -string "left"
+    defaults write "$REX_ID" Workspace.tabBarEdge -string "top"
+    defaults write "$REX_ID" Workspace.tabStyle -string "horizontal"
+    defaults write "$REX_ID" Workspace.playsProgramActivitySounds -bool false
+    print "Rex preferences applied (restart Rex to load them)"
+else
+    warning "Rex.app not found, skipping Rex preferences"
+fi
+
 typeset app
 for app in Safari Finder Dock Mail SystemUIServer; do killall "$app" >/dev/null 2>&1 || true; done
 success "macOS setup complete"
