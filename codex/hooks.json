@@ -9,6 +9,16 @@
             "type": "command"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh -c 'rex __internal session-start --agent codex 2>/dev/null || true'",
+            "timeout": 5,
+            "statusMessage": "Loading Rex terminal context"
+          }
+        ]
       }
     ],
     "Stop": [
