@@ -21,7 +21,8 @@ docs/         Integration guides
 `~/Developer/dotfiles` is a plain clone with one checkout. Do not create Worktrunk worktrees for it.
 
 - `main` must always work. Never edit or commit while `main` is checked out.
-- Reuse the current feature branch unless the user explicitly requests a new branch. When starting from `main` or a detached HEAD, create a branch in place with `git switch -c <branch> origin/main`. New branches use `origin/main` unless the user explicitly requests another base.
+- If a feature branch is checked out, work on that feature branch; do not create another one unless the user explicitly requests a new branch.
+- Otherwise (on `main` or a detached HEAD), create a new feature branch before editing any file here: `git switch -c <branch> origin/main`. New branches use `origin/main` unless the user explicitly requests another base.
 - Installed links (`~/.zshrc`, `~/.config/*`, `~/.git-templates`, and others) point at this checkout, so the checked-out branch is the live configuration. Switching branches changes every terminal and application on the machine. Ask before switching away from a branch with uncommitted changes, and switch back to `main` when testing is done.
 - Anything that writes through the links, such as `Lazy sync` updating `lazy-lock.json` or `install.sh theme apply`, changes the checkout. Edit files in `~/Developer/dotfiles`, never through `~/.config`.
 - Run commands from the repository root with repo-relative paths.
