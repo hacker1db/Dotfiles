@@ -74,6 +74,21 @@ rex.bind("repeat/shift+k", "pane.resize", { amount = 10, direction = "up" })
 rex.bind("repeat/shift+l", "pane.resize", { amount = 10, direction = "right" })
 rex.bind("repeat/shift+m", "pane.zoom")
 
+-- Colors: Rex has no theme setting in init.lua, so this palette action imports
+-- the same Eldritch theme Ghostty uses and selects it. Run "Import Eldritch
+-- Theme" from the command palette once on a new machine.
+rex.action{
+  name  = "import_eldritch_theme",
+  title = "Import Eldritch Theme",
+  description = "Import ~/.config/ghostty/themes/Eldritch (from dotfiles) and select it.",
+  category = "Theme",
+  run   = function(ctx, args)
+    rex.client.queue("client.theme.import", {
+      path = os.getenv("HOME") .. "/.config/ghostty/themes/Eldritch",
+    })
+  end,
+}
+
 -- ctrl+h/j/k/l move between panes everywhere (vim-tmux-navigator style).
 -- In tmux, vim-tmux-navigator handles the key; in vim/nvim/fzf the program
 -- keeps it; otherwise Rex moves focus between its own panes.
