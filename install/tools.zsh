@@ -68,6 +68,8 @@ title "Installing standalone tools"
 
 [[ -x "$HOME/.local/bin/codex" ]] || run_installer https://chatgpt.com/codex/install.sh sh || warning "Codex installer failed"
 
+[[ -x "$HOME/.local/bin/agy" ]] || run_installer https://antigravity.google/cli/install.sh bash || warning "Antigravity CLI installer failed"
+
 [[ -d "$HOME/wordlists" ]] || git clone --depth 1 https://github.com/danielmiessler/SecLists.git "$HOME/wordlists" || warning "SecLists clone failed"
 
 title "Installing Homebrew packages"
