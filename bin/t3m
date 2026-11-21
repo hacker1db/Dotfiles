@@ -124,27 +124,43 @@ import json, sys
 def load(path):
     try:
         with open(path) as f:
-            return json.load(f)
+            data = json.load(f)
     except (OSError, ValueError):
         return {}
+    return data if isinstance(data, dict) else {}
 
-current = load(sys.argv[1]).get("manifest", {}).get("currentModels", {})
-instances = load(sys.argv[2]).get("providerInstances")
-if not isinstance(instances, dict) or not instances:
+def obj(value):
+    return value if isinstance(value, dict) else {}
+
+def text(value):
+    return " ".join(value.split()) if isinstance(value, str) else ""
+
+def slug_of(item):
+    if isinstance(item, dict):
+        return next((text(item[k]) for k in ("slug", "id", "model", "name") if text(item.get(k))), "")
+    return text(item)
+
+def entries(value):
+    return value if isinstance(value, list) else []
+
+current = obj(obj(load(sys.argv[1]).get("manifest")).get("currentModels"))
+instances = obj(load(sys.argv[2]).get("providerInstances"))
+if not instances:
     instances = {driver: {"driver": driver} for driver in current}
 for instance_id, instance in instances.items():
-    if not isinstance(instance, dict) or instance.get("enabled", True) is False:
+    instance = obj(instance)
+    config = obj(instance.get("config"))
+    if not instance or instance.get("enabled") is False or config.get("enabled") is False:
         continue
-    driver = instance.get("driver") or instance_id
-    slugs = list(current.get(driver, []))
-    for item in (instance.get("config") or {}).get("customModels") or []:
-        if isinstance(item, dict):
-            item = next((item[k] for k in ("slug", "id", "model", "name") if item.get(k)), None)
-        if isinstance(item, str) and item and item not in slugs:
-            slugs.append(item)
-    name = instance.get("displayName") or instance_id
+    driver = text(instance.get("driver")) or instance_id
+    slugs = []
+    for item in entries(current.get(driver)) + entries(config.get("customModels")):
+        slug = slug_of(item)
+        if slug and slug not in slugs:
+            slugs.append(slug)
+    name = text(instance.get("displayName")) or text(instance_id)
     for slug in slugs:
-        print(f"{instance_id}\t{slug}\t{name}")
+        print(f"{text(instance_id)}\t{slug}\t{name}")
 PY
 }
 
@@ -256,10 +272,10 @@ target_thread() {
   printf '%s\n' "$thread"
 }
 
-pick_model() {  # prints "provider<TAB>model"
+pick_model() {  # prints "instance<TAB>model"
   need fzf
   data_models | fzf "${FZF_OPTS[@]}" --delimiter=$'\t' --with-nth=3,2 --prompt='model> ' \
-    --header='enter: select · esc: project default' || true
+    --header='enter: select · esc: project default' | cut -f1,2 || true
 }
 
 menu() {  # $1 = prompt, rest = "key<TAB>label" lines; prints chosen key
