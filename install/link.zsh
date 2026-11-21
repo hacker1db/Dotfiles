@@ -24,7 +24,7 @@ done
 title "Linking agent instructions"
 typeset instructions="$DOTFILES/global/AGENTS.md"
 [[ -f "$instructions" ]] || { error "Missing instruction source: $instructions"; exit 1 }
-for destination in "$HOME/.codex/AGENTS.md" "$HOME/.copilot/copilot-instructions.md"; do
+for destination in "$HOME/.codex/AGENTS.md" "$HOME/.copilot/copilot-instructions.md" "$HOME/.gemini/GEMINI.md"; do
     if [[ -e "$destination" && "$instructions" -ef "$destination" ]]; then
         print "Instruction file already linked: $destination"
         continue
