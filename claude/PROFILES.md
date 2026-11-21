@@ -19,18 +19,18 @@ Use these absolute paths from GUI apps and other tools (such as T3 Code) that do
 | What | Path |
 | --- | --- |
 | Claude Code binary (native, auto-updating) | `~/.local/bin/claude` |
-| Personal launcher | `~/Developer/dotfiles/main/bin/claude-personal` |
-| Work subscription launcher | `~/Developer/dotfiles/main/bin/claude-subscription` |
-| Foundry launcher | `~/Developer/dotfiles/main/bin/claude-foundry` |
+| Personal launcher | `~/Developer/dotfiles/bin/claude-personal` |
+| Work subscription launcher | `~/Developer/dotfiles/bin/claude-subscription` |
+| Foundry launcher | `~/Developer/dotfiles/bin/claude-foundry` |
 | Profile config dirs | `~/.claude-personal`, `~/.claude-subscription`, `~/.claude-foundry` |
-| Generated settings (ignored by Git, mode 600) | `~/Developer/dotfiles/main/claude/.local/profiles/{personal,subscription,foundry}.json` |
-| Shared settings layer (committed) | `~/Developer/dotfiles/main/claude/settings.base.json` |
-| Profile settings and hooks (committed) | `~/Developer/dotfiles/main/claude/profiles/{personal,subscription,foundry}/{settings.json,hooks/}` |
+| Generated settings (ignored by Git, mode 600) | `~/Developer/dotfiles/claude/.local/profiles/{personal,subscription,foundry}.json` |
+| Shared settings layer (committed) | `~/Developer/dotfiles/claude/settings.base.json` |
+| Profile settings and hooks (committed) | `~/Developer/dotfiles/claude/profiles/{personal,subscription,foundry}/{settings.json,hooks/}` |
 | Foundry resource | `ANTHROPIC_FOUNDRY_RESOURCE` in `~/.localrc` → `~/OneDrive*/Personal/.localrc`; without it, the installer still creates `~/.claude-foundry` (so `cf` resolves) and prints a note; rerun after setting it |
 | Machine-local settings (work hooks, MCP, plugins, model) | `CLAUDE_SETTINGS_JSON` and `CLAUDE_SETTINGS_JSON_{PERSONAL,SUBSCRIPTION,FOUNDRY}` in `~/.localrc`; see [Machine-local settings](#machine-local-settings) |
 | Local autoMode input | `~/.config/claude-code/automode.json` (falls back to `foundry-automode.json`) |
-| MCP servers (all profiles) | `~/.mcp.json` → `~/Developer/dotfiles/main/claude/mcp.json` |
-| Installer | `~/Developer/dotfiles/main/install/agent-profiles.zsh` (also installs the Codex Foundry home) |
+| MCP servers (all profiles) | `~/.mcp.json` → `~/Developer/dotfiles/claude/mcp.json` |
+| Installer | `~/Developer/dotfiles/install/agent-profiles.zsh` (also installs the Codex Foundry home) |
 
 Each profile dir contains:
 

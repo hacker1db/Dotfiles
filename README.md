@@ -14,35 +14,23 @@ On a new machine, run:
 zsh -c "$(curl -fsSL https://raw.githubusercontent.com/hacker1db/Dotfiles/main/install.sh)"
 ```
 
-When `install.sh` runs outside a checkout, it clones the repository bare into `~/Developer/dotfiles` with a `main` worktree (the layout `bin/git-bare-clone` creates), then runs `~/Developer/dotfiles/main/install.sh all`. Pass a step to run it instead of `all`: `zsh -c "$(curl ...)" _ link`. On macOS it first checks for the Xcode Command Line Tools, which provide Git, and starts their installer if they are missing; run the command again once they finish. On Linux, `sh -c` or `bash -c` also work: a POSIX prologue installs zsh, Git, curl, and the Homebrew build prerequisites with apt, dnf, pacman, or zypper (through `sudo` unless run as root) when any are missing, then reruns the installer under zsh. Rerunning resumes an interrupted clone and skips steps already done, and it stops if `~/Developer/dotfiles/.bare` or `main` exists but is not this repository. If `~/Developer/dotfiles` is a plain clone of this repository, the bootstrap converts it to the bare layout: with no local changes or unpushed commits, it removes the old checkout (untracked files stay in place) and creates the `main` worktree; otherwise it stops and says what to move aside.
+When `install.sh` runs outside a checkout, it clones the repository into `~/Developer/dotfiles`, then runs `~/Developer/dotfiles/install.sh all`. Pass a step to run it instead of `all`: `zsh -c "$(curl ...)" _ link`. On macOS it first checks for the Xcode Command Line Tools, which provide Git, and starts their installer if they are missing; run the command again once they finish. On Linux, `sh -c` or `bash -c` also work: a POSIX prologue installs zsh, Git, curl, and the Homebrew build prerequisites with apt, dnf, pacman, or zypper (through `sudo` unless run as root) when any are missing, then reruns the installer under zsh. Rerunning reuses an existing clone and skips steps already done, and it stops if `~/Developer/dotfiles` exists but is not a clone of this repository. Machines still on the older bare layout (`~/Developer/dotfiles/.bare` with a `main/` worktree) keep working: the bootstrap runs `main/install.sh` there.
 
-The first clone uses HTTPS because no SSH agent is set up yet; the repository is public, so it needs no credentials. Once SSH works, switch its remote with `git -C ~/Developer/dotfiles remote set-url origin git@github.com:hacker1db/Dotfiles.git`. The installed links always point at `~/Developer/dotfiles/main`, and branch worktrees (`wt switch -c <branch>`) land beside it in `~/Developer/dotfiles/`.
+The first clone uses HTTPS because no SSH agent is set up yet; the repository is public, so it needs no credentials. Once SSH works, switch its remote with `git -C ~/Developer/dotfiles remote set-url origin git@github.com:hacker1db/Dotfiles.git`. The installed links point at `~/Developer/dotfiles`, so the checked-out branch is the live configuration.
 
 Each step under `install/` is one zsh script with the same name; `install.sh` runs them in order. The scripts change macOS preferences and configure applications, so review them before a full run. Every step resolves `DOTFILES` from the checkout that contains it, so a stale value from an older shell setup is ignored. `link` moves a regular-file `~/.zshrc` or `~/.zshenv` aside to a timestamped `.backup` before linking it (carry machine-specific settings over to `~/.localrc`). When run in a terminal, `all` and `link` finish by starting a fresh Zsh with `DOTFILES` cleared, so the current terminal picks up the new configuration.
 
-To try the configuration from a different worktree, select it explicitly:
+To try a change, switch branches in place; every terminal and application picks it up on its next reload:
 
 ```zsh
-wt switch -c my-change
-./install.sh use
+cd ~/Developer/dotfiles
+git switch -c my-change origin/main
+exec zsh
 ```
 
-`use` retargets existing configuration symlinks from the active checkout to the selected checkout, then opens a fresh Zsh automatically when run in a terminal. It preserves unmanaged files, checks replacement paths before changing links, and runs no package installs. Zsh derives `DOTFILES` from its selected configuration file. Other existing terminals need to reload; applications load the selected configuration when they next reload or restart. This selection applies across terminals. Keep the selected worktree until you switch away from it. Noninteractive invocations only update the links.
+Switch back with `git switch main && exec zsh`.
 
-From the selected feature shell, switch back with:
-
-```zsh
-cd ~/Developer/dotfiles/main
-dotfiles-use
-```
-
-`dotfiles-use [checkout]` accepts an explicit path or defaults to the current directory. `./install.sh use` defaults to the worktree containing that installer. Switching works even after the previously selected worktree was deleted: links into any worktree of the repository, live or removed, move to the selected checkout, and generated agent profiles under `claude/.local` and `codex/.local` are copied over when the selected checkout lacks them. Links with no counterpart in the selected checkout are left alone and listed, so `install.sh link` can repair them.
-
-`wt remove` and `wt merge` run the `pre-remove` hook in `.config/wt.toml`, which switches the machine back to `main` before deleting the selected worktree (approve it the first time wt asks). If a selected worktree disappears another way, for example after merging on another machine, restore the shell with:
-
-```zsh
-~/Developer/dotfiles/main/bin/dotfiles-use ~/Developer/dotfiles/main
-```
+`dotfiles-use [checkout]` (or `./install.sh use`) still retargets the installed links to another checkout, for example a separate clone. It preserves unmanaged files, checks replacement paths before changing links, runs no package installs, and copies generated agent profiles under `claude/.local` and `codex/.local` when the selected checkout lacks them. Links with no counterpart in the selected checkout are left alone and listed, so `install.sh link` can repair them.
 
 Homebrew 7 asks for confirmation before installing or upgrading packages. `HOMEBREW_NO_ASK=1` turns this off: `install/tools.zsh` sets it for the install, and `zsh/brew.zsh` exports it for interactive shells, so neither stops at `[y/n]` prompts. Bundle applies the trust declarations in `install/brewfile`. Remove the export from `zsh/brew.zsh` to get the prompts back.
 
@@ -109,11 +97,11 @@ wt pull-all
 
 `wt pull-all` fetches every remote with pruning, then runs `git pull --ff-only --no-autostash` in each worktree **of the current repository** using that branch's configured upstream. Worktrees without a resolvable upstream, including detached worktrees, are skipped. A failed initial fetch stops the operation; individual pull failures are reported while remaining worktrees continue. Diverged branches require manual resolution. Local edits are not stashed; Git refuses updates that would overwrite them. This does not discover unrelated repositories or change remote URLs.
 
-`wt-pull-all` in `zsh/functions.zsh` is the fuller sync. It fetches all remotes with pruning, runs `wt switch --no-cd --no-hooks` for every remote branch of `origin` that has no worktree yet and is not already merged into the default branch, fast-forwards every worktree the same way the alias does, and then confirms the local default branch matches its upstream. When the default branch is not checked out anywhere it is fast-forwarded as a plain ref, so the primary worktree can stay on a feature branch. A default branch that is behind or diverged is reported and makes the command exit non-zero. Finally `wt step prune --foreground` removes worktrees and branches already merged into the default branch, keeping Worktrunk's one-day age guard for fresh worktrees. `wt-pull-all --dry-run` prints the worktrees it would add and previews the prune without changing anything. Reload it with `source ~/Developer/dotfiles/main/zsh/functions.zsh`. `cob` wraps `wt switch --create`. `gcc` invokes `git-clean-merged`, which can delete merged local **and remote** branches.
+`wt-pull-all` in `zsh/functions.zsh` is the fuller sync. It fetches all remotes with pruning, runs `wt switch --no-cd --no-hooks` for every remote branch of `origin` that has no worktree yet and is not already merged into the default branch, fast-forwards every worktree the same way the alias does, and then confirms the local default branch matches its upstream. When the default branch is not checked out anywhere it is fast-forwarded as a plain ref, so the primary worktree can stay on a feature branch. A default branch that is behind or diverged is reported and makes the command exit non-zero. Finally `wt step prune --foreground` removes worktrees and branches already merged into the default branch, keeping Worktrunk's one-day age guard for fresh worktrees. `wt-pull-all --dry-run` prints the worktrees it would add and previews the prune without changing anything. Reload it with `source ~/Developer/dotfiles/zsh/functions.zsh`. `cob` wraps `wt switch --create`. `gcc` invokes `git-clean-merged`, which can delete merged local **and remote** branches.
 
 #### Bare clones
 
-`bin/git-bare-clone` sets up a repository for working only in worktrees, the same layout `install.sh` uses for `~/Developer/dotfiles`:
+`bin/git-bare-clone` sets up a repository for working only in worktrees, for other repositories (dotfiles itself is a plain clone):
 
 ```text
 <name>/
@@ -167,7 +155,7 @@ Each machine uses one GitHub user. `git/gitconfig.symlink` holds account-neutral
 
 ### Hooks
 
-New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, which `install.sh link` creates and `install.sh use` repoints at the selected checkout. The dispatcher resolves `git/hooks/` from the checkout `~/.gitconfig` links to, falling back to `~/Developer/dotfiles/main`. Git copies template hooks only at clone time, so `install.sh link` also replaces stale dispatcher copies in existing repositories under `~/Developer` (override with colon-separated `DOTFILES_HOOK_ROOTS`). It runs matching files there and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a GitGuardian (`ggshield`, installed by the Brewfile) secret scan of staged changes. The GitGuardian hook scans only repositories whose `origin` belongs to `github.user` or a `github.org` value from your Git config (override with `GITGUARDIAN_PERSONAL_REMOTES`), and skips every other repository. It uses ggshield's stored login, so run `ggshield auth login` once per machine (`--method oob` without a browser); without one, the commit is blocked with that instruction. On a machine where ggshield is logged in to a different account, set `GITGUARDIAN_PERSONAL_OP_REF` in `~/.localrc` to an `op://` reference for your personal key.
+New repositories can inherit `git/templates/hooks/` through `~/.git-templates`, which `install.sh link` creates and `install.sh use` repoints at the selected checkout. The dispatcher resolves `git/hooks/` from the checkout `~/.gitconfig` links to, falling back to `~/Developer/dotfiles`. Git copies template hooks only at clone time, so `install.sh link` also replaces stale dispatcher copies in existing repositories under `~/Developer` (override with colon-separated `DOTFILES_HOOK_ROOTS`). It runs matching files there and propagates failures: JSCS/JSHint pre-commit checks, recent-branch tracking after checkout/merge, and a GitGuardian (`ggshield`, installed by the Brewfile) secret scan of staged changes. The GitGuardian hook scans only repositories whose `origin` belongs to `github.user` or a `github.org` value from your Git config (override with `GITGUARDIAN_PERSONAL_REMOTES`), and skips every other repository. It uses ggshield's stored login, so run `ggshield auth login` once per machine (`--method oob` without a browser); without one, the commit is blocked with that instruction. On a machine where ggshield is logged in to a different account, set `GITGUARDIAN_PERSONAL_OP_REF` in `~/.localrc` to an `op://` reference for your personal key.
 
 ## CI and security scanning
 

@@ -8,7 +8,7 @@ return {
             lint.linters["markdownlint-cli2"].args = {
                 "-",
                 "--config",
-                (os.getenv("DOTFILES") or (os.getenv("HOME") .. "/Developer/dotfiles/main")) .. "/.markdownlint.yaml",
+                (os.getenv("DOTFILES") or (os.getenv("HOME") .. "/Developer/dotfiles")) .. "/.markdownlint.yaml",
             }
             lint.linters_by_ft = {
                 markdown = { "markdownlint-cli2" },

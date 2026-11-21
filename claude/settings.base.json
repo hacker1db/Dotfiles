@@ -207,8 +207,7 @@
       "Bash(curl *)",
       "Bash(wget *)",
       "Edit(~/notes/SecondBrain/**)",
-      "Edit(~/.git-templates/**)",
-      "Edit(~/Developer/dotfiles/main/**)"
+      "Edit(~/.git-templates/**)"
     ],
     "disableBypassPermissionsMode": "disable"
   }
