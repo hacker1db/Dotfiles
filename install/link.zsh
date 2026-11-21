@@ -43,6 +43,34 @@ for destination in "$HOME/.codex/AGENTS.md" "$HOME/.copilot/copilot-instructions
     print "Linked $destination -> $instructions"
 done
 
+title "Merging Antigravity settings"
+# agy rewrites settings.json (trusted workspaces, model, /config changes), so
+# merge the tracked keys into each machine-owned file instead of linking it.
+# T3 runs Antigravity with its own --gemini-dir, so its copies get the same keys.
+# Tracked permission rules are added to local ones, never replacing them.
+typeset agy_settings="$DOTFILES/gemini/antigravity-settings.json" agy_merged
+if ! command -v jq >/dev/null 2>&1; then
+    warning "jq not found; skipping Antigravity settings"
+else
+    for destination in "$HOME/.gemini/antigravity-cli" \
+        "$HOME"/.t3/userdata/providers/antigravity/*/antigravity-acp(N/); do
+        destination="$destination/settings.json"
+        mkdir -p "${destination:h}"
+        [[ -s "$destination" ]] || print '{}' > "$destination"
+        if agy_merged="$(jq -s '.[0] as $l | .[1] as $t | ($l * $t)
+            | reduce ("allow", "ask", "deny") as $k (.;
+                if $t.permissions[$k] then
+                    .permissions[$k] = (($l.permissions[$k] // []) + $t.permissions[$k] | unique)
+                else . end)' "$destination" "$agy_settings")"; then
+            print -r -- "$agy_merged" > "$destination"
+            print "Merged Antigravity settings into $destination"
+        else
+            warning "Could not merge Antigravity settings into $destination"
+            LINK_FAILURE=1
+        fi
+    done
+fi
+
 title "Linking agent hooks"
 typeset -A agent_hooks=(
     "$DOTFILES/codex/hooks.json" "$HOME/.codex/hooks.json"

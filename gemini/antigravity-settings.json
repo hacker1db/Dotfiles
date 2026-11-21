@@ -1,0 +1,9 @@
+{
+  "agentMode": "auto",
+  "colorScheme": "tokyo night",
+  "permissions": {
+    "allow": [
+      "mcp(t3-code/list_issues)"
+    ]
+  }
+}
