@@ -1,8 +1,5 @@
 #!/usr/bin/env zsh
 export DOTFILES="${${(%):-%x}:A:h:h}"
-# An exported REPORTTIME from an older shell makes zsh print timing reports in
-# every step, and a failed report aborts the step.
-unset REPORTTIME REPORTMEMORY
 
 title() { print "\n\e[1;35m$1\e[0m\n\e[1;38;5;243m==============================\e[0m" }
 info() { print "\e[1;34mInfo:\e[0m $1" }
@@ -28,9 +25,6 @@ link_file() {
     elif [[ -L "$dest" || ! -e "$dest" ]]; then
         ln -sfn "$src" "$dest"
         print "Linked $dest -> $src"
-    elif [[ -d "$dest" && -z "$(ls -A "$dest")" ]]; then
-        rmdir "$dest" && ln -sfn "$src" "$dest"
-        print "Replaced empty $dest with link -> $src"
     else
         print "$dest exists and is not a symlink; skipping."
     fi
