@@ -1,9 +1,12 @@
 -- Rex config migrated from tmux (~/.config/tmux/tmux.conf) and Ghostty.
 --
 -- tmux runs inside Rex, and both use ctrl+a as the prefix. So ctrl+a and
--- ctrl+h/j/k/l are Lua functions that check the focused terminal's foreground
--- program: when it is tmux they return false and the key goes to tmux;
--- otherwise Rex handles them with the same bindings tmux has.
+-- ctrl+h/j/k/l are bound to init.lua actions that check the focused terminal's
+-- foreground program: when it is tmux they send the key on to it; otherwise Rex
+-- handles them with the same bindings tmux has. They are actions, not key
+-- handler functions, because Rex only lets an action queue client actions such
+-- as client.mode.enter or pane.focus; a key handler that tries raises an error
+-- and Rex drops the key.
 
 local terminal = "com.superlogical.terminal"
 
@@ -29,11 +32,19 @@ end
 
 -- Prefix: ctrl+a enters the one-key "prefix" mode, unless tmux is in front.
 rex.mode("prefix", { exclusive = true })
-rex.bind("ctrl+a", function(ctx, ev)
-  if in_tmux() then return false end
-  rex.client.queue("client.mode.enter", { name = "prefix", once = true })
-  return true
-end)
+rex.action{
+  name  = "tmux_or_rex_prefix",
+  title = "Ctrl+A: tmux prefix or Rex prefix",
+  category = "Keys",
+  run   = function(ctx, args)
+    if in_tmux() then
+      rex.client.queue("pane.send_key", { key = "ctrl+a" })
+    else
+      rex.client.queue("client.mode.enter", { name = "prefix", once = true })
+    end
+  end,
+}
+rex.bind("ctrl+a", "tmux_or_rex_prefix")
 
 -- tmux.conf:23 bind-key a send-prefix
 rex.bind("prefix/a", "pane.send_key", { key = "ctrl+a" })
@@ -93,10 +104,19 @@ rex.action{
 -- In tmux, vim-tmux-navigator handles the key; in vim/nvim/fzf the program
 -- keeps it; otherwise Rex moves focus between its own panes.
 for key, direction in pairs({ h = "left", j = "down", k = "up", l = "right" }) do
-  rex.bind("ctrl+" .. key, function(ctx, ev)
-    local name = foreground()
-    if name == "tmux" or wants_nav_keys(name) then return false end
-    rex.client.queue("pane.focus", { direction = direction })
-    return true
-  end)
+  local name = "navigate_" .. direction
+  rex.action{
+    name  = name,
+    title = "Ctrl+" .. key:upper() .. ": navigate " .. direction,
+    category = "Keys",
+    run   = function(ctx, args)
+      local program = foreground()
+      if program == "tmux" or wants_nav_keys(program) then
+        rex.client.queue("pane.send_key", { key = "ctrl+" .. key })
+      else
+        rex.client.queue("pane.focus", { direction = direction })
+      end
+    end,
+  }
+  rex.bind("ctrl+" .. key, name)
 end
