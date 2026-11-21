@@ -184,13 +184,15 @@ Installation registers T3 providers for Claude personal, work subscription, and 
 | Claude Code | `claude/CLAUDE.md` | `~/.claude-{personal,subscription,foundry}/CLAUDE.md` |
 | Codex | `global/AGENTS.md` | `~/.codex/AGENTS.md` |
 | Copilot CLI | `global/AGENTS.md` | `~/.copilot/copilot-instructions.md` |
+| Antigravity CLI (`agy`) | `global/AGENTS.md` | `~/.gemini/GEMINI.md` |
 
-Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for the single shared policy. `claude/CLAUDE.md` contains only `@AGENTS.md`. Its sibling `claude/AGENTS.md` and the other tool instruction sources are symlinks to the shared policy. `./install.sh link` links the Codex and Copilot files and backs up anything already there, then links each Claude profile's `CLAUDE.md` and `AGENTS.md` and skips a path that is not already a link. Start a new tool session to reload them.
+Edit root `AGENTS.md` for repository guidance and `global/AGENTS.md` for the single shared policy. `claude/CLAUDE.md` contains only `@AGENTS.md`. Its sibling `claude/AGENTS.md` and the other tool instruction sources are symlinks to the shared policy. `./install.sh link` links the Codex, Copilot, and Antigravity files and backs up anything already there, then links each Claude profile's `CLAUDE.md` and `AGENTS.md` and skips a path that is not already a link. Start a new tool session to reload them.
 
 Claude installation links instructions, output styles, and the statusline script into each profile directory, and generates each profile's settings from layered fragments. MCP configuration is linked to `~/.mcp.json`.
 
 - [Claude profiles](claude/PROFILES.md): `cc` (personal, the default), `cw` (work subscription), and `cf` (Foundry) each use their own `CLAUDE_CONFIG_DIR` with separate login, settings, skills, and plugins. `./install.sh link` generates and installs all three.
 - [Codex profiles](codex/PROFILES.md): `xp` (personal, `~/.codex`) and `xf` (Foundry, `~/.codex-foundry`) use separate `CODEX_HOME` directories, so the Foundry profile never sees the personal ChatGPT login. The same `./install.sh link` step generates and links the Foundry home.
+- Antigravity CLI: `ay` runs `agy --mode auto` (classifier-approved tool use, not `--dangerously-skip-permissions`); `ayc` continues the last conversation.
 - Workflow slash commands (reviews, GitHub/Azure DevOps, security, notes, reading, writing) come from the skills repository through skillctl, not from command files here. GitGuardian runs as a Git hook, not a Claude hook.
 
 ### Fleet agent orchestration
