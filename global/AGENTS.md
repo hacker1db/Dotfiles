@@ -90,15 +90,6 @@ These rules cut wasted work. They never waive a step required elsewhere in this 
 - Change only what the request needs. Follow existing patterns. Report unrelated problems you notice instead of fixing them.
 - Verify with the narrowest check that proves the outcome, plus every check the repository requires. Then stop: add no scope once the outcome is verified and the required steps are done.
 
-## No code comments
-
-Comments drift from the code they describe, and agents trust them over the code.
-
-- Do not add comments to code: no doc comments, line comments, or block comments.
-- Make the code explain itself through names, small functions, and tests.
-- Keep only comments that change behavior, such as `//go:build`, `//go:embed`, `//nolint`, shebangs, and license headers a repository requires.
-- When you edit code that already has comments, do not trust them. Read the code instead.
-
 ## Opening files
 
 I use Neovim in tmux, not a GUI editor. When I ask to open, show, view, jump to, or edit a file or `path:line`, or to review files you changed, use the `nvim-tmux` skill. Never open files in VS Code, Cursor, or another GUI editor, and do not open files unless I ask.
