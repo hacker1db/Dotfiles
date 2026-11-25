@@ -1,0 +1,17 @@
+#!/bin/sh
+# Scans the lines a commit adds for secrets with betterleaks (MIT, local only; no account, and no
+# network unless --validate is passed, which this hook never does).
+# Allow a false positive with a `betterleaks:allow` comment on the line, or add its fingerprint to
+# the repository's .betterleaksignore. Skip once with `SKIP_BETTERLEAKS=1 git commit ...`.
+
+[ -z "${SKIP_BETTERLEAKS:-}" ] || {
+	echo "betterleaks: secret scan skipped (SKIP_BETTERLEAKS is set)" >&2
+	exit 0
+}
+
+command -v betterleaks >/dev/null 2>&1 || {
+	echo "betterleaks not found; install it with: brew install betterleaks" >&2
+	exit 1
+}
+
+exec betterleaks git --pre-commit --staged --redact --no-banner --verbose
