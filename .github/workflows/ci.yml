@@ -43,20 +43,21 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Require GitGuardian API key
+      - name: Scan new commits with betterleaks
         env:
-          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          # v1.10.1; same version as the Homebrew formula the pre-commit hook uses
+          IMAGE: ghcr.io/betterleaks/betterleaks:v1.10.1@sha256:f345c1ac502abc51ec334c3d815ad18a79fb1509555fc4496b2cb88e760681b3
         run: |
-          if [ -z "$GITGUARDIAN_API_KEY" ]; then
-            echo "::error::GITGUARDIAN_API_KEY is unavailable. Fork pull requests get no secrets, and Dependabot pull requests need it under Dependabot secrets. A maintainer must scan these changes."
-            exit 1
+          if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            range="$HEAD_SHA"
+          else
+            range="$BASE_SHA..$HEAD_SHA"
           fi
-      - uses: GitGuardian/ggshield-action@5cc1ed2be3e8bf625d354c7170731880670f74de # v1.56.1
-        env:
-          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
-          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
-          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+          docker run --rm --network none -v "$PWD:/repo:ro" -w /repo \
+            -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/repo \
+            "$IMAGE" git /repo --log-opts="$range" --redact --no-banner --verbose
 
   dependency-review:
     if: github.event_name == 'pull_request'
