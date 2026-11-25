@@ -50,6 +50,15 @@
             "type": "command"
           }
         ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${DOTFILES:-$HOME/Developer/dotfiles}/bin/agent-secret-scan\""
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -68,6 +77,26 @@
           {
             "type": "command",
             "command": "export PATH=\"/opt/homebrew/bin:/home/linuxbrew/.linuxbrew/bin:/usr/local/bin:$HOME/.local/bin:$PATH\"; out=$(rtk hook codex) || exit $?; [ -z \"$out\" ] || printf %s \"$out\" | jq -c 'if .hookSpecificOutput.permissionDecision? == \"allow\" then empty else . end'"
+          }
+        ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${DOTFILES:-$HOME/Developer/dotfiles}/bin/agent-secret-scan\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${DOTFILES:-$HOME/Developer/dotfiles}/bin/agent-secret-scan\""
           }
         ]
       }

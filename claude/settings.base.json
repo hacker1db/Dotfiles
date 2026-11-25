@@ -9,6 +9,15 @@
   "hooks": {
     "PreToolUse": [
       {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${DOTFILES:-$HOME/Developer/dotfiles}/bin/agent-secret-scan\""
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -48,6 +57,28 @@
             "type": "command",
             "command": "claude-tmux-cleanup",
             "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${DOTFILES:-$HOME/Developer/dotfiles}/bin/agent-secret-scan\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${DOTFILES:-$HOME/Developer/dotfiles}/bin/agent-secret-scan\""
           }
         ]
       }

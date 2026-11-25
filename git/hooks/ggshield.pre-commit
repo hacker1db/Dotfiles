@@ -1,0 +1,27 @@
+#!/bin/sh
+# Work-repo secret scan with GitGuardian ggshield. betterleaks.pre-commit
+# already scans every commit locally; this adds ggshield only for repos whose
+# origin is not owned by github.user or a github.org, and only on machines
+# where github.user is not hacker1db (work machines).
+
+[ "$(git config --includes --global --get github.user 2>/dev/null)" = hacker1db ] && exit 0
+
+owners=$(
+	{
+		git config --get github.user
+		git config --get-all github.org
+	} 2>/dev/null | grep -E '^[A-Za-z0-9-]+$' | paste -sd '|' -
+)
+personal=${GITGUARDIAN_PERSONAL_REMOTES:-${owners:+(github\.com[:/]|github-[A-Za-z0-9._-]+:)($owners)/}}
+origin=$(git remote get-url origin 2>/dev/null) || origin=""
+
+[ -n "$origin" ] || exit 0
+if [ -n "$personal" ] && printf '%s\n' "$origin" | grep -qiE "$personal"; then
+	exit 0
+fi
+
+command -v ggshield >/dev/null 2>&1 || {
+	echo "ggshield not found; install it with: brew install ggshield" >&2
+	exit 1
+}
+exec ggshield secret scan pre-commit "$@"

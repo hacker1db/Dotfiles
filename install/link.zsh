@@ -75,6 +75,7 @@ title "Linking agent hooks"
 typeset -A agent_hooks=(
     "$DOTFILES/codex/hooks.json" "$HOME/.codex/hooks.json"
     "$DOTFILES/copilot/hooks/rtk-rewrite.json" "$HOME/.copilot/hooks/rtk-rewrite.json"
+    "$DOTFILES/copilot/hooks/secret-scan.json" "$HOME/.copilot/hooks/secret-scan.json"
 )
 typeset hook_src
 for hook_src destination in "${(@kv)agent_hooks}"; do
@@ -352,6 +353,14 @@ if [[ "$profiles_rc" -eq 2 ]]; then
 elif [[ "$profiles_rc" -ne 0 ]]; then
     error "Agent profile setup failed."
     LINK_FAILURE=1
+fi
+
+if [[ "$(git config --includes --global --get github.user 2>/dev/null)" != hacker1db ]] && command -v ggshield >/dev/null 2>&1; then
+    title "Configuring GitGuardian machine protection"
+    if ! ggshield machine setup --no-honeytokens --no-git-hooks --agent claude-code; then
+        error "GitGuardian machine setup failed."
+        LINK_FAILURE=1
+    fi
 fi
 
 [[ "$LINK_FAILURE" -eq 0 ]] || { error "Dotfiles linking needs attention; see the diagnostics above."; exit 1 }
