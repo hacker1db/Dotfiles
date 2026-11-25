@@ -2,9 +2,9 @@
 # Work-repo secret scan with GitGuardian ggshield. betterleaks.pre-commit
 # already scans every commit locally; this adds ggshield only for repos whose
 # origin is not owned by github.user or a github.org, and only on machines
-# where github.user is not hacker1db (work machines).
+# whose dotfiles.secretScanner is ggshield (the default).
 
-[ "$(git config --includes --global --get github.user 2>/dev/null)" = hacker1db ] && exit 0
+[ "$(git config --includes --global --get dotfiles.secretScanner 2>/dev/null || echo ggshield)" = ggshield ] || exit 0
 
 owners=$(
 	{
