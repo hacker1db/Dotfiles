@@ -90,9 +90,9 @@ brew "fnm"
 brew "fswatch"
 # Command-line fuzzy finder written in Go
 brew "fzf"
-# Scanner for secrets and sensitive data in code (work machines only;
-# personal machines, github.user == hacker1db, use betterleaks)
-brew "ggshield" unless `git config --includes --global --get github.user 2>/dev/null`.strip == "hacker1db"
+# GitGuardian secret scanner; skipped when ~/.gitconfig-local sets
+# dotfiles.secretScanner to betterleaks or none
+brew "ggshield" unless %w[betterleaks none].include?(`git config --includes --global --get dotfiles.secretScanner 2>/dev/null`.strip)
 # GitHub command-line tool
 brew "gh"
 # Distributed revision control system
