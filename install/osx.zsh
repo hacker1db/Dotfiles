@@ -87,8 +87,19 @@ if [[ -d /Applications/Rex.app || -d "$HOME/Applications/Rex.app" ]]; then
     defaults write "$REX_ID" Workspace.toolbarBehavior -string "onHover"
     defaults write "$REX_ID" Workspace.sidebarPosition -string "left"
     defaults write "$REX_ID" Workspace.tabBarEdge -string "top"
-    defaults write "$REX_ID" Workspace.tabStyle -string "horizontal"
+    defaults write "$REX_ID" Workspace.tabStyle -string "vertical"
+    defaults write "$REX_ID" Workspace.tabIconTintMode -string "off"
+    defaults write "$REX_ID" Workspace.sidebarCollapsed -bool true
+    defaults write "$REX_ID" Workspace.sidebarShowsActivity -bool false
+    defaults write "$REX_ID" Workspace.activityGrouping -string "priority"
+    defaults write "$REX_ID" Workspace.usesStandardInactiveWindowPaneStyles -bool true
+    defaults write "$REX_ID" Workspace.terminalSmoothScrolling -bool true
+    defaults write "$REX_ID" Workspace.terminalCustomSchemeLinks -string "ask"
+    defaults write "$REX_ID" Workspace.lightThemeID -string "merino-light"
     defaults write "$REX_ID" Workspace.playsProgramActivitySounds -bool false
+    defaults write "$REX_ID" rex.agents.names-sessions -bool true
+    defaults write "$REX_ID" rex.client.remoteControl -bool true
+    defaults write "$REX_ID" rex.server.automatic-restart-enabled -bool true
     print "Rex preferences applied (restart Rex to load them)"
 else
     warning "Rex.app not found, skipping Rex preferences"
