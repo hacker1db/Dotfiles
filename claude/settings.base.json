@@ -177,7 +177,6 @@
       "Bash(wget *)",
       "Edit(~/notes/SecondBrain/**)",
       "Edit(~/.git-templates/**)"
-    ],
-    "disableBypassPermissionsMode": "disable"
+    ]
   }
 }
