@@ -44,6 +44,15 @@ change_shell() {
         login_shell="$(getent passwd "$user" | cut -d: -f7)"
     fi
     [[ "${login_shell:-$SHELL}" == "$zsh_path" ]] && { print "Login shell already $zsh_path"; return 0 }
+    if [[ "$OSTYPE" == linux* && "${DOTFILES_NONINTERACTIVE:-0}" == 1 ]]; then
+        sudo -n true || { error "Noninteractive shell setup requires passwordless sudo"; return 1 }
+        if ! grep -qFx "$zsh_path" /etc/shells; then
+            print -r -- "$zsh_path" | sudo -n tee -a /etc/shells >/dev/null || return 1
+        fi
+        sudo -n chsh -s "$zsh_path" "$user" || return 1
+        print "Default shell changed to $zsh_path"
+        return 0
+    fi
     if [[ ! -t 0 ]]; then
         print -u2 "Warning: no TTY; cannot change login shell to $zsh_path. Run: chsh -s $zsh_path"
         return 1
@@ -108,10 +117,19 @@ if command -v go >/dev/null 2>&1; then
     for pkg in github.com/air-verse/air@v1.67.4 charm.land/glow/v3@v3.0.0; do
         go install "$pkg" || warning "go install $pkg failed"
     done
+    if [[ "$OSTYPE" == linux* && ! -x "$(go env GOPATH)/bin/tflint" ]]; then
+        go install github.com/terraform-linters/tflint@latest || { error "TFLint installation failed"; exit 1 }
+    fi
 fi
 
 if command -v gh >/dev/null 2>&1; then
-    gh auth status >/dev/null 2>&1 || gh auth login || true
+    if ! gh auth status >/dev/null 2>&1; then
+        if [[ "${DOTFILES_NONINTERACTIVE:-0}" != 1 && -t 0 ]]; then
+            gh auth login || true
+        else
+            print "Skipping GitHub login: run gh auth login when ready"
+        fi
+    fi
     typeset ext
     typeset -A extensions=(dlvhdr/gh-dash v4.26.3 advanced-security/gh-sbom v0.1.1 github/gh-stack v0.3.0)
     for ext in ${(ok)extensions}; do
