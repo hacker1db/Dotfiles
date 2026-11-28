@@ -49,6 +49,7 @@ When the repository has a configured, reachable remote:
 
 1. Tier the pull request with the `pr-tier` skill and apply its icon-only title prefix (`[🌳]`, `[🌿]`, `[🍃]`). Do not create or apply `tier:*` labels. Keep squash and merge commit subjects conventional, without the prefix.
 2. Start the `babysit-pr` skill right after opening a pull request, without being asked.
+3. Open related pull requests as a stack. When one task produces more than one pull request, base the first on the default branch and each later one on the branch before it, so merge order and dependencies are explicit. Title each `[n/N <icon>]` and list the whole stack in every body. Fix review findings on that pull request's own branch, then rebase the branches above it. A single pull request, or an unrelated change requested separately, targets the default branch.
 
 ### User-facing plans
 
